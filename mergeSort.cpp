@@ -1,8 +1,8 @@
 /*
  * @Author: zhanghao 
  * @Date: 2018-11-20 15:29:07 
- * @Last Modified by:   zhanghao 
- * @Last Modified time: 2018-11-20 15:29:07 
+ * @Last Modified by: zhanghao
+ * @Last Modified time: 2018-11-27 02:15:51
  */
 
 #include <iostream>
@@ -32,26 +32,9 @@ int main() {
 void mergeSort(int array[], int left, int right) {
     if (left < right) {
         int center = (left+right)/2;
-
-        // todo:
-        // cout<<"准备递归：";
-        // for (int i = 0; i<=right-left;i++) {
-        //     std::cout<<array[i]<<" ";
-        // }
-        // cout<<"共"<<right-left+1<<"个"<<endl;
-
         mergeSort(array, left, center);
-
         mergeSort(array, center+1, right);
-
         merge(array, left, center, right);
-
-        // todo:
-        // cout<<"递归后：";
-        // for (int i = 0; i<=right-left;i++) {
-        //     std::cout<<array[i]<<" ";
-        // }
-        // cout<<"共"<<right-left+1<<"个"<<endl;
     }
 }
 
@@ -60,13 +43,6 @@ void merge(int array[], int left, int center, int right) {
     int p = left;
     int q = center+1;
     int i = 0;
-
-    // cout<<"某次merge：";
-    // for (int i = 0; i<=right-left;i++) {
-    //     std::cout<<array[i]<<" ";
-    // }
-    // cout<<endl;
-
     while(p <= center&&q <= right) {
         if (array[p] < array[q]) {
             tempArray[i] = array[p];
@@ -92,11 +68,4 @@ void merge(int array[], int left, int center, int right) {
     for (i = 0;i < sizeof(tempArray)/sizeof(int);i++) {
         array[left+i] = tempArray[i];
     }
-
-    // todo: 
-    // cout<<"某次merge结果：";
-    // for (int i = 0; i<=right-left;i++) {
-    //     std::cout<<array[i]<<" ";
-    // }
-    // cout<<endl;
 }
