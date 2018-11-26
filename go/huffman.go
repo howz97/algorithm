@@ -2,7 +2,7 @@
  * @Author: zhanghao
  * @Date: 2018-11-20 15:28:57
  * @Last Modified by: zhanghao
- * @Last Modified time: 2018-11-21 11:15:18
+ * @Last Modified time: 2018-11-27 02:09:05
  */
 
 package main
@@ -10,73 +10,104 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 )
 
 func main() {
-	// 打印huffmanTree的top节点
-	huffmanTree := createHTreeASICC("./testHuffman.txt")
-	fmt.Println("huffmanTree top:", huffmanTree)
-
-	// 打印该文件的huffman编码
-	m := make(map[uint32]string)
-	hTreeToMap(huffmanTree, "", m)
-	fmt.Println("huffmanTree:", m)
-
-	// 用01字符串表示该文件转码后的二进制值
-	hc := toHuffmanCode(huffmanTree, "/Users/zhanghao/Documents/algorithmNCEPU/shiyan/go/testHuffman.txt")
-	fmt.Println("huffman code:", hc)
+	huffman := NewHuffman("./huffman.txt")
+	huffman.printWeights()
+	fmt.Println()
+	huffman.printEncodeMap()
+	fmt.Println()
+	fmt.Println("用0-1字符串表示文件编码结果(用0-1表示bit位):")
+	fmt.Println(huffman.encodedBinStr())
+	fmt.Println()
+	fmt.Printf("压缩比例: %f", huffman.compressRate)
+	fmt.Println()
 }
 
-func createHTreeASICC(filename string) *binaryTree {
-	weights := countASICC(filename)
-	return createHTree(weights)
+type CHuffman struct {
+	filename     string
+	weights      map[byte]uint
+	tree         *binaryTree
+	encodeMap    map[byte]string
+	compressRate float64
 }
 
-func hTreeToMap(ht *binaryTree, code string, m map[uint32]string) {
+func NewHuffman(filename string) *CHuffman {
+	wghts := getASICCWeights(filename)
+	t := generateHuffmantree(wghts)
+	enmap := make(map[byte]string)
+	getEncodeMap(t, "", enmap)
+	return &CHuffman{
+		filename:  filename,
+		weights:   wghts,
+		tree:      t,
+		encodeMap: enmap,
+	}
+}
+
+func (hm *CHuffman) printWeights() {
+	fmt.Println("asicc码及出现次数: ")
+	for k, _ := range hm.weights {
+		fmt.Print("["+string(k)+":", hm.weights[k], "]")
+	}
+	fmt.Println()
+}
+
+func (hm *CHuffman) printEncodeMap() {
+	fmt.Println("Huffman编码对照表(用0-1表示bit位): ")
+	for k, _ := range hm.encodeMap {
+		fmt.Print("["+string(k)+":", hm.encodeMap[k], "]  ")
+	}
+	fmt.Println()
+}
+
+func (hm *CHuffman) encodedBinStr() string {
+	fileBytes, err := ioutil.ReadFile(hm.filename)
+	if err != nil {
+		panic(err)
+	}
+	var encodedBinStr string
+	for i, _ := range fileBytes {
+		encodedBinStr += hm.encodeMap[fileBytes[i]]
+	}
+	var finfo os.FileInfo
+	finfo, err = os.Stat(hm.filename)
+	hm.compressRate = float64(len(encodedBinStr)) / float64((finfo.Size() * 8))
+	return encodedBinStr
+}
+
+func getEncodeMap(ht *binaryTree, code string, m map[byte]string) {
 	if ht.left == nil {
 		m[ht.c] = code
 		return
 	}
-	hTreeToMap(ht.left, code+"0", m)
-	hTreeToMap(ht.right, code+"1", m)
+	getEncodeMap(ht.left, code+"0", m)
+	getEncodeMap(ht.right, code+"1", m)
 }
 
-func toHuffmanCode(ht *binaryTree, filename string) string {
-	fileBytes, err := ioutil.ReadFile(filename)
-	if err != nil {
-		panic(err)
-	}
-	huffmanTree := createHTreeASICC(filename)
-	m := make(map[uint32]string)
-	hTreeToMap(huffmanTree, "", m)
-	var huffmanCode string
-	for i, _ := range fileBytes {
-		huffmanCode = huffmanCode + m[uint32(fileBytes[i])]
-	}
-	return huffmanCode
-}
-
-func countASICC(filename string) (weights map[uint32]uint) {
-	weights = make(map[uint32]uint)
+func getASICCWeights(filename string) (weights map[byte]uint) {
+	weights = make(map[byte]uint)
 	fileBytes, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
 	for i, _ := range fileBytes {
-		weights[uint32(fileBytes[i])]++
+		weights[fileBytes[i]]++
 	}
 	return weights
 }
 
 type binaryTree struct {
-	c      uint32
+	c      byte
 	weight uint
 	left   *binaryTree
 	right  *binaryTree
 }
 
-// 创建huffman tree. index作为assic码(或者其他码)的值. weights[i]为权值(该码出现的次数)
-func createHTree(weights map[uint32]uint) *binaryTree {
+// 创建huffman tree.
+func generateHuffmantree(weights map[byte]uint) *binaryTree {
 	// 创建森林 []*binaryTree
 	forest := make([]*binaryTree, len(weights))
 	i := 0
@@ -88,7 +119,7 @@ func createHTree(weights map[uint32]uint) *binaryTree {
 		i++
 	}
 
-	minIndex := [2]uint{}
+	minIndex := [2]byte{}
 	minBT := [2]*binaryTree{}
 	finish := false
 	for !finish {
@@ -98,10 +129,10 @@ func createHTree(weights map[uint32]uint) *binaryTree {
 				if forest[i] != nil {
 					if minBT[j] == nil {
 						minBT[j] = forest[i]
-						minIndex[j] = uint(i)
+						minIndex[j] = byte(i)
 					} else if forest[i].weight < minBT[j].weight {
 						minBT[j] = forest[i]
-						minIndex[j] = uint(i)
+						minIndex[j] = byte(i)
 					}
 				}
 			}
