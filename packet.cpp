@@ -2,7 +2,7 @@
  * @Author: zhanghao 
  * @Date: 2018-11-25 22:43:27 
  * @Last Modified by: zhanghao
- * @Last Modified time: 2018-11-26 04:41:52
+ * @Last Modified time: 2018-11-26 15:38:27
  */
 
 #include<iostream>
@@ -126,6 +126,9 @@ vector<Ware> readWares(string filename) {
     getline(in2, temp);
     int weightWidth = temp.find("value");
     for (int i=0; getline(in2, temp);i++) {
+        if (temp.empty()) {
+            continue;
+        }
         Ware w;
         w.no = i;
         w.weight = str2float(temp.substr(0,weightWidth));
