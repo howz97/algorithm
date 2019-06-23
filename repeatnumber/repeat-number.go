@@ -1,5 +1,6 @@
 package repeatnumber
 
+// FindRepeatNo -
 func FindRepeatNo(numbers []int, length int) int {
 	for i := 0; i < length; i++ {
 		if numbers[i] == i {
