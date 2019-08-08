@@ -1,5 +1,11 @@
 package twodarraylookup
 
+/*
+给定一个二维数组，其每一行从左到右递增排序，从上到下也是递增排序。
+给定一个数，判断这个数是否在该二维数组中。
+https://github.com/CyC2018/CS-Notes/blob/master/notes/%E5%89%91%E6%8C%87%20Offer%20%E9%A2%98%E8%A7%A3%20-%203~9.md#4-%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84%E4%B8%AD%E7%9A%84%E6%9F%A5%E6%89%BE
+*/
+
 var twodarray = make([][]int, 5)
 
 func init() {
