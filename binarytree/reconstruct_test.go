@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func Test_BuildBinaryTree(t *testing.T) {
+func Test_ReconstructBinTree(t *testing.T) {
 	inorder := []Node{
 		Node{key: 9},
 		Node{key: 3},
@@ -21,7 +21,7 @@ func Test_BuildBinaryTree(t *testing.T) {
 		Node{key: 7},
 	}
 
-	binTree := BuildBinaryTree(inorder, preorder)
+	binTree := ReconstructBinTree(inorder, preorder)
 	fmt.Println(binTree)
 	fmt.Println(binTree.leftSon)
 	fmt.Println(binTree.rightSon)

@@ -15,8 +15,8 @@ var rootOffSet = -1
 https://github.com/CyC2018/CS-Notes/blob/master/notes/%E5%89%91%E6%8C%87%20Offer%20%E9%A2%98%E8%A7%A3%20-%203~9.md#7-%E9%87%8D%E5%BB%BA%E4%BA%8C%E5%8F%89%E6%A0%91
 */
 
-// BuildBinaryTree -
-func BuildBinaryTree(inorder, preorder []Node) *Node {
+// ReconstructBinTree -
+func ReconstructBinTree(inorder, preorder []Node) *Node {
 	if len(inorder) == 0 {
 		return nil
 	}
@@ -30,8 +30,8 @@ func BuildBinaryTree(inorder, preorder []Node) *Node {
 			break
 		}
 	}
-	root.leftSon = BuildBinaryTree(inorder[:i], preorder)
-	root.rightSon = BuildBinaryTree(inorder[i+1:], preorder)
+	root.leftSon = ReconstructBinTree(inorder[:i], preorder)
+	root.rightSon = ReconstructBinTree(inorder[i+1:], preorder)
 
 	return &root
 }
