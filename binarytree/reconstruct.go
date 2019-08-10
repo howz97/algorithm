@@ -1,13 +1,12 @@
 package binarytree
 
-// Node -
+var rootOffSet = -1
+
 type Node struct {
-	key      int
+	Key      int
 	leftSon  *Node
 	rightSon *Node
 }
-
-var rootOffSet = -1
 
 /*
 根据二叉树的前序遍历和中序遍历的结果，重建出该二叉树。
@@ -26,7 +25,7 @@ func ReconstructBinTree(inorder, preorder []Node) *Node {
 
 	i := 0
 	for i = range inorder {
-		if inorder[i].key == root.key { // 要求每个节点key唯一
+		if inorder[i].Key == root.Key { // 要求每个节点key唯一
 			break
 		}
 	}

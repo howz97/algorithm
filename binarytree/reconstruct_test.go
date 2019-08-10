@@ -7,18 +7,18 @@ import (
 
 func Test_ReconstructBinTree(t *testing.T) {
 	inorder := []Node{
-		Node{key: 9},
-		Node{key: 3},
-		Node{key: 15},
-		Node{key: 20},
-		Node{key: 7},
+		Node{Key: 9},
+		Node{Key: 3},
+		Node{Key: 15},
+		Node{Key: 20},
+		Node{Key: 7},
 	}
 	preorder := []Node{
-		Node{key: 3},
-		Node{key: 9},
-		Node{key: 20},
-		Node{key: 15},
-		Node{key: 7},
+		Node{Key: 3},
+		Node{Key: 9},
+		Node{Key: 20},
+		Node{Key: 15},
+		Node{Key: 7},
 	}
 
 	binTree := ReconstructBinTree(inorder, preorder)
