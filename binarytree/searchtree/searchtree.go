@@ -1,82 +1,138 @@
 package searchtree
 
-type element interface {
-	ID() int
+import "fmt"
+
+// SearchTree -
+type SearchTree struct {
+	root *node
 }
 
-// Node -
-type Node struct {
-	Elem     element
-	leftSon  *Node
-	rightSon *Node
+// New return an empty dictionary
+func New() *SearchTree {
+	return new(SearchTree)
 }
 
-// NewSearchTree new an empty search tree
-func NewSearchTree(e element) *Node {
-	return &Node{
-		Elem: e,
+// Insert insert a k-v pair into this dictionary
+// if value is nil, is is a vitual deletion operation
+func (st *SearchTree) Insert(key int, value interface{}) {
+	st.root = st.root.insert(key, value)
+}
+
+// Find -
+func (st *SearchTree) Find(key int) interface{} {
+	n := st.root.find(key)
+	if n == nil {
+		return nil
 	}
-}
-
-// Insert insert an element to search tree
-func Insert(st *Node, e element) *Node {
-	if st == nil {
-		st = new(Node)
-		st.Elem = e
-	} else if e.ID() == st.Elem.ID() {
-		st.Elem = e
-	} else if e.ID() < st.Elem.ID() {
-		st.leftSon = Insert(st.leftSon, e)
-	} else {
-		st.rightSon = Insert(st.rightSon, e)
+	if n.value == nil {
+		st.Delete(n.key)
+		return nil
 	}
-	return st
-}
-
-// Find find the element by id in search tree
-func Find(st *Node, id int) *Node {
-	var position *Node
-	if st == nil {
-		// do nothing and return nil
-	} else if id == st.Elem.ID() {
-		position = st
-	} else if id < st.Elem.ID() {
-		position = Find(st.leftSon, id)
-	} else {
-		position = Find(st.rightSon, id)
-	}
-	return position
+	return n.value
 }
 
 // FindMin -
-func FindMin(st *Node) *Node {
-	var min *Node
-	if st == nil {
-		// do nothing and return nil
-	} else {
-		min = st
-		for min.leftSon != nil {
-			min = min.leftSon
-		}
-	}
-	return min
+func (st *SearchTree) FindMin() interface{} {
+	return st.root.findMin().value
 }
 
 // FindMax -
-func FindMax(st *Node) *Node {
-	var max *Node
-	if st == nil {
-		// do nothing and return nil
-	} else {
-		max = st
-		for max.rightSon != nil {
-			max = max.rightSon
-		}
-	}
-	return max
+func (st *SearchTree) FindMax() interface{} {
+	return st.root.findMax().value
 }
 
-// DeleteMin -
+// Delete -
+func (st *SearchTree) Delete(key int) {
+	st.root = st.root.delete(key)
+}
+
+type node struct {
+	value    interface{}
+	key      int
+	leftSon  *node
+	rightSon *node
+}
+
+func (n *node) insert(k int, v interface{}) *node {
+	if n == nil {
+		n = new(node)
+		n.key = k
+		n.value = v
+		return n
+	}
+	if k < n.key {
+		n.leftSon = n.leftSon.insert(k, v)
+		return n
+	}
+	if k > n.key {
+		n.rightSon = n.rightSon.insert(k, v)
+		return n
+	}
+	n.value = v
+	return n
+}
+
+func (n *node) find(key int) *node {
+	if n == nil {
+		return nil
+	}
+	if key < n.key {
+		return n.leftSon.find(key)
+	}
+	if key > n.key {
+		return n.rightSon.find(key)
+	}
+	return n
+}
+
+func (n *node) findMin() *node {
+	if n == nil {
+		return nil
+	}
+	for n.leftSon != nil {
+		n = n.leftSon
+	}
+	return n
+}
+
+func (n *node) findMax() *node {
+	if n == nil {
+		return nil
+	}
+	for n.rightSon != nil {
+		n = n.rightSon
+	}
+	return n
+}
+
+func (n *node) delete(key int) *node {
+	if n == nil {
+		fmt.Printf("avltree: delete not existed key(%v)", key)
+		return nil
+	}
+	if key < n.key {
+		n.leftSon = n.leftSon.delete(key)
+		return n
+	}
+	if key > n.key {
+		n.rightSon = n.rightSon.delete(key)
+		return n
+	}
+
+	if n.leftSon == nil {
+		return n.rightSon
+	}
+	if n.rightSon == nil {
+		return n.leftSon
+	}
+	deleted := n
+	n = n.rightSon.findMin()
+	n.rightSon = deleted.rightSon.delete(n.key)
+	n.leftSon = deleted.leftSon
+	return n
+}
+
+/* 开始写成了这样... 做的太复杂了
 func DeleteMin(st *Node) *Node {
 	var min *Node
 	var pOfMin *Node
@@ -97,7 +153,6 @@ func DeleteMin(st *Node) *Node {
 	return min
 }
 
-// DeleteMax -
 func DeleteMax(st *Node) *Node {
 	var max *Node
 	var pOfMax *Node
@@ -118,7 +173,6 @@ func DeleteMax(st *Node) *Node {
 	return max
 }
 
-// Delete -
 func Delete(st *Node, id int) *Node {
 	return delete(st, id, nil, false)
 }
@@ -201,3 +255,4 @@ func delete(st *Node, id int, p *Node, leftOfP bool) *Node {
 	}
 	return deleted
 }
+*/

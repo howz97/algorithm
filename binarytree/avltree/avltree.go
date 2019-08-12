@@ -26,7 +26,15 @@ func (avl *AVL) Insert(key int, value interface{}) {
 
 // Find -
 func (avl *AVL) Find(key int) interface{} {
-	return avl.root.find(key)
+	n := avl.root.find(key)
+	if n == nil {
+		return nil
+	}
+	if n.value == nil {
+		avl.Delete(n.key)
+		return nil
+	}
+	return n.value
 }
 
 // FindMin -
@@ -142,7 +150,7 @@ func max(a, b int8) int8 {
 	return b
 }
 
-func (n *node) find(key int) interface{} {
+func (n *node) find(key int) *node {
 	if n == nil {
 		return nil
 	}
@@ -152,7 +160,7 @@ func (n *node) find(key int) interface{} {
 	if key < n.key {
 		return n.leftSon.find(key)
 	}
-	return n.value
+	return n
 }
 
 func (n *node) findMin() *node {

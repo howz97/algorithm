@@ -1,2 +1,2 @@
 # algorithm
-experiment of NCEPU algorithm lesson
+data structures and algorithm

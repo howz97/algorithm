@@ -1,7 +1,6 @@
 package searchtree
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -15,62 +14,29 @@ func (s *student) ID() int {
 }
 
 func Test_searchtree(t *testing.T) {
-	st := NewSearchTree(&student{id: 10, name: "s10"})
-	Insert(st, &student{id: 6, name: "s6"})
-	Insert(st, &student{id: 7, name: "s7"})
-	Insert(st, &student{id: 13, name: "s13"})
-	Insert(st, &student{id: 5, name: "s5"})
-	Insert(st, &student{id: 9, name: "s9"})
-	Insert(st, &student{id: 2, name: "s2"})
-	Insert(st, &student{id: 14, name: "s14"})
-	Insert(st, &student{id: 15, name: "s15"})
-	Insert(st, &student{id: 11, name: "s11"})
-	Insert(st, &student{id: 1, name: "s1"})
-
-	fmt.Println(st.Elem.ID())
-	fmt.Println(st.leftSon.Elem.ID())
-	fmt.Println(st.rightSon.Elem.ID())
-
-	s9node := Find(st, 9)
-	s9 := s9node.Elem.(*student)
-	if s9.name != "s9" {
-		t.Fatal("find s9")
+	searchT := New()
+	for i := 1; i <= 7; i++ {
+		searchT.Insert(i, i)
 	}
-
-	minnode := FindMin(st)
-	min := minnode.Elem.(*student)
-	if min.name != "s1" {
-		t.Fatal("find min")
+	for i := 16; i >= 10; i-- {
+		searchT.Insert(i, i)
 	}
+	searchT.Insert(8, 8)
+	searchT.Insert(9, 9)
 
-	maxnode := FindMax(st)
-	max := maxnode.Elem.(*student)
-	if max.name != "s15" {
-		t.Fatal("find max")
+	if searchT.FindMin().(int) != 1 {
+		t.Fatal("FindMin failed")
 	}
-
-	DeleteMin(st)
-	minnode = FindMin(st)
-	min = minnode.Elem.(*student)
-	if min.name != "s2" {
-		t.Fatal("find second small")
+	if searchT.FindMax().(int) != 16 {
+		t.Fatal("FindMax failed")
 	}
-
-	DeleteMax(st)
-	maxnode = FindMax(st)
-	max = maxnode.Elem.(*student)
-	if max.name != "s14" {
-		t.Fatal("find second big")
-	}
-
-	Delete(st, 9)
-	s9node = Find(st, 9)
-	if s9node != nil {
-		t.Fatal("delete s9")
-	}
-	Delete(st, 10)
-	s10node := Find(st, 10)
-	if s10node != nil {
-		t.Fatal("delete s10")
+	for i := 1; i <= 16; i++ {
+		if searchT.Find(i).(int) != i {
+			t.Fatal("Find failed")
+		}
+		searchT.Delete(i)
+		if searchT.Find(i) != nil {
+			t.Fatal("Delete failed")
+		}
 	}
 }
