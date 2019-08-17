@@ -36,6 +36,22 @@ func Test_InsertSort(t *testing.T) {
 	}
 }
 
+func Test_ShellSort(t *testing.T) {
+	ShellSort(disorderData)
+	fmt.Println(disorderData)
+	if !isInOrder(disorderData) {
+		t.Fatal("data not in order after sorted")
+	}
+}
+
+func Test_PopSort(t *testing.T) {
+	PopSort(disorderData)
+	fmt.Println(disorderData)
+	if !isInOrder(disorderData) {
+		t.Fatal("data not in order after sorted")
+	}
+}
+
 func isInOrder(data []int) bool {
 	for i := 0; i < len(data)-1; i++ {
 		if data[i] > data[i+1] {
