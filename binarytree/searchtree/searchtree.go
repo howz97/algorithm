@@ -1,6 +1,9 @@
 package searchtree
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 // SearchTree -
 type SearchTree struct {
@@ -25,7 +28,7 @@ func (st *SearchTree) Find(key int) interface{} {
 		return nil
 	}
 	if n.value == nil {
-		st.Delete(n.key)
+		st.Delete(n.key) // 删除value为nil的节点
 		return nil
 	}
 	return n.value
@@ -126,9 +129,16 @@ func (n *node) delete(key int) *node {
 		return n.leftSon
 	}
 	deleted := n
-	n = n.rightSon.findMin()
-	n.rightSon = deleted.rightSon.delete(n.key)
-	n.leftSon = deleted.leftSon
+	// to make it randomly
+	if time.Now().UnixNano()&1 == 1 {
+		n = n.leftSon.findMax()
+		n.leftSon = deleted.leftSon.delete(n.key)
+		n.rightSon = deleted.rightSon
+	} else {
+		n = n.rightSon.findMin()
+		n.rightSon = deleted.rightSon.delete(n.key)
+		n.leftSon = deleted.leftSon
+	}
 	return n
 }
 

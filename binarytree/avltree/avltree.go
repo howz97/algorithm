@@ -31,7 +31,7 @@ func (avl *AVL) Find(key int) interface{} {
 		return nil
 	}
 	if n.value == nil {
-		avl.Delete(n.key)
+		avl.Delete(n.key) // 删除value为nil的节点
 		return nil
 	}
 	return n.value
@@ -58,8 +58,8 @@ func (avl *AVL) Empty() bool {
 }
 
 type node struct {
-	value    interface{}
 	key      int
+	value    interface{}
 	height   int8
 	leftSon  *node
 	rightSon *node

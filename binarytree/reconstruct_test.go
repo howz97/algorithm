@@ -22,7 +22,12 @@ func Test_ReconstructBinTree(t *testing.T) {
 	}
 
 	binTree := ReconstructBinTree(inorder, preorder)
-	fmt.Println(binTree)
-	fmt.Println(binTree.leftSon)
-	fmt.Println(binTree.rightSon)
+	preOrder(binTree)
+	fmt.Println()
+	inOrder(binTree)
+	fmt.Println()
+	sufOrder(binTree)
+	fmt.Println()
+	levelOrder(binTree)
+	fmt.Println()
 }
