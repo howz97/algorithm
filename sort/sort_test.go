@@ -52,6 +52,14 @@ func Test_PopSort(t *testing.T) {
 	}
 }
 
+func Test_HeapSort(t *testing.T) {
+	HeapSort(disorderData)
+	fmt.Println(disorderData)
+	if !isInOrder(disorderData) {
+		t.Fatal("data not in order after sorted")
+	}
+}
+
 func isInOrder(data []int) bool {
 	for i := 0; i < len(data)-1; i++ {
 		if data[i] > data[i+1] {
