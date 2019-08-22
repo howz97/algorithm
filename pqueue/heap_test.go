@@ -1,9 +1,11 @@
-package binaryheap
+package pqueue
 
-import "testing"
+import (
+	"testing"
+)
 
 func Test_Heap(t *testing.T) {
-	h := New(10)
+	h := NewBinHeap(10)
 	if !h.Insert(1) ||
 		!h.Insert(1) ||
 		!h.Insert(2) ||
@@ -29,21 +31,49 @@ func Test_Heap(t *testing.T) {
 	}
 
 	arry := []int{4, 5, 6, 3, 2, 1, 7, 8, 9, 9, 8, 7, 6, 5, 4, 3, 2, 1}
-	h = NewWitArray(arry, 9)
+	h = NewBinHeapWitArray(arry, 9)
 	for i := 1; i <= 9; i++ {
 		if h.DelMin() != i {
 			t.Fatal("DelMin failed")
 		}
 	}
 
-	h = NewWitArray(arry, 20)
+	h = NewBinHeapWitArray(arry, 20)
 	if h.Cap() != 20 || h.Size() != 18 {
-		t.Fatal("NewWitArray failed")
+		t.Fatal("NewBinHeapWitArray failed")
 	}
 	for i := 1; h.Size() != 0; i++ {
 		h.DelMin()
 	}
 	if h.Size() != 0 {
 		t.Fatal("DelMin failed")
+	}
+}
+
+func Test_LeftistHeap(t *testing.T) {
+	lh1 := NewLeftistH()
+	for i := 0; i < 10; i++ {
+		lh1.Insert(i)
+	}
+
+	lh2 := NewLeftistH()
+	for i := 10; i < 20; i++ {
+		lh2.Insert(i)
+	}
+	lh1.Merge(lh2)
+	if lh1.Size() != 20 {
+		t.Fatal()
+	}
+
+	for i := 0; i < 20; i++ {
+		k, ok := lh1.Front()
+		if !ok {
+			t.Fatal()
+		}
+		if k != i {
+			println(i, k)
+			t.Fatal()
+		}
+		lh1.DelMin()
 	}
 }

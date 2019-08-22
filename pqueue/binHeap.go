@@ -1,23 +1,23 @@
-package binaryheap
+package pqueue
 
-// Heap -
-type Heap struct {
+// BinHeap -
+type BinHeap struct {
 	size int
 	arry []int
 }
 
-// New -
-func New(cap int) *Heap {
-	h := &Heap{
+// NewBinHeap -
+func NewBinHeap(cap int) *BinHeap {
+	h := &BinHeap{
 		arry: make([]int, cap+1),
 	}
 	h.arry[0] = -1 << 63
 	return h
 }
 
-// NewWitArray -
-func NewWitArray(arry []int, cap int) *Heap {
-	h := &Heap{
+// NewBinHeapWitArray -
+func NewBinHeapWitArray(arry []int, cap int) *BinHeap {
+	h := &BinHeap{
 		arry: make([]int, cap+1),
 	}
 	h.arry[0] = -1 << 63
@@ -35,17 +35,17 @@ func NewWitArray(arry []int, cap int) *Heap {
 }
 
 // Size return the total amount of element in heap
-func (h *Heap) Size() int {
+func (h *BinHeap) Size() int {
 	return h.size
 }
 
 // Cap return the upper limit of the number of element in heap
-func (h *Heap) Cap() int {
+func (h *BinHeap) Cap() int {
 	return len(h.arry) - 1
 }
 
 // Insert -
-func (h *Heap) Insert(k int) (ok bool) {
+func (h *BinHeap) Insert(k int) (ok bool) {
 	if h.size >= h.Cap() {
 		return false
 	}
@@ -56,7 +56,7 @@ func (h *Heap) Insert(k int) (ok bool) {
 }
 
 // DelMin -
-func (h *Heap) DelMin() int {
+func (h *BinHeap) DelMin() int {
 	del := h.arry[1]
 	h.arry[1] = h.arry[h.size]
 	h.size--
@@ -64,7 +64,7 @@ func (h *Heap) DelMin() int {
 	return del
 }
 
-func (h *Heap) percolateDown(i int) {
+func (h *BinHeap) percolateDown(i int) {
 	arry := h.arry
 	k := arry[i]
 	cavIdx := i
@@ -85,7 +85,7 @@ func (h *Heap) percolateDown(i int) {
 	arry[cavIdx] = k
 }
 
-func (h *Heap) percolateUp(i int) {
+func (h *BinHeap) percolateUp(i int) {
 	arry := h.arry
 	k := arry[i]
 	cavIdx := i

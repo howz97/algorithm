@@ -58,8 +58,9 @@ func (avl *AVL) Empty() bool {
 }
 
 type node struct {
-	key      int
-	value    interface{}
+	key   int
+	value interface{}
+
 	height   int8
 	leftSon  *node
 	rightSon *node
