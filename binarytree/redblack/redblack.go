@@ -1,7 +1,5 @@
 package redblack
 
-import "fmt"
-
 const (
 	red   = true
 	black = false
@@ -49,15 +47,62 @@ func (rb *RedBlack) FindMax() interface{} {
 	return rb.root.findMax().value
 }
 
+// DelMin -
+func (rb *RedBlack) DelMin() {
+	if rb.root == nil {
+		return
+	}
+	if !rb.root.leftSon.isRed() && !rb.root.rightSon.isRed() {
+		rb.root.color = red
+	}
+	rb.root = rb.root.delMin()
+	if rb.root != nil {
+		rb.root.color = black
+	}
+}
+
+// DelMax -
+func (rb *RedBlack) DelMax() {
+	if rb.root == nil {
+		return
+	}
+	if !rb.root.leftSon.isRed() && !rb.root.rightSon.isRed() {
+		rb.root.color = red
+	}
+	rb.root = rb.root.delMax()
+	if rb.root != nil {
+		rb.root.color = black
+	}
+}
+
 // Delete -
 func (rb *RedBlack) Delete(key int) {
+	if rb.root == nil {
+		return
+	}
+	if !rb.root.leftSon.isRed() && !rb.root.rightSon.isRed() {
+		rb.root.color = red
+	}
 	rb.root = rb.root.delete(key)
+	if rb.root != nil {
+		rb.root.color = black
+	}
 }
 
 // Empty return true if it is an emoty tree
 func (rb *RedBlack) Empty() bool {
 	return rb.root == nil
 }
+
+// Size -
+func (rb *RedBlack) Size() int {
+	if rb.root == nil {
+		return 0
+	}
+	return rb.root.size
+}
+
+/*=============================================================================*/
 
 type node struct {
 	key      int
@@ -93,7 +138,7 @@ func (n *node) insert(k int, v interface{}) *node {
 		n = rotateRight(n)
 	}
 	if n.leftSon.isRed() && n.rightSon.isRed() {
-		n = flipColors(n)
+		flipColors(n)
 	}
 	return n
 }
@@ -131,9 +176,97 @@ func (n *node) findMax() *node {
 	return n
 }
 
+func (n *node) delMin() *node {
+	if n.leftSon == nil {
+		return nil
+	}
+	if !n.leftSon.isRed() && !n.leftSon.leftSon.isRed() {
+		n = moveRedLeft(n)
+	}
+	n.leftSon = n.leftSon.delMin()
+	return balance(n)
+}
+
+func (n *node) delMax() *node {
+	if n.leftSon.isRed() {
+		n = rotateRight(n)
+	}
+	if n.rightSon == nil {
+		return nil
+	}
+	if !n.rightSon.isRed() && !n.rightSon.rightSon.isRed() {
+		n = moveRedRight(n)
+	}
+	n.rightSon = n.rightSon.delMax()
+	return balance(n)
+}
+
+func moveRedRight(r *node) *node {
+	flipColors2(r)
+	if !r.leftSon.leftSon.isRed() {
+		r = rotateRight(r)
+	}
+	return r
+}
+
+func moveRedLeft(r *node) *node {
+	flipColors2(r)
+	if r.rightSon.leftSon.isRed() {
+		r.rightSon = rotateRight(r.rightSon)
+		r = rotateLeft(r)
+	}
+	return r
+}
+
+func balance(r *node) *node {
+	if r.rightSon.isRed() {
+		r = rotateLeft(r)
+	}
+	r.size = size(r.leftSon) + size(r.rightSon) + 1
+	if !r.leftSon.isRed() && r.rightSon.isRed() {
+		r = rotateLeft(r)
+	}
+	if r.leftSon.isRed() && r.leftSon.leftSon.isRed() {
+		r = rotateRight(r)
+	}
+	if r.leftSon.isRed() && r.rightSon.isRed() {
+		flipColors(r) // ?
+	}
+	return r
+}
+
+func flipColors2(r *node) {
+	r.color = black
+	r.leftSon.color = red
+	r.rightSon.color = red
+}
+
 func (n *node) delete(k int) *node {
-	fmt.Println("delete not support")
-	return n
+	if k < n.key {
+		if !n.leftSon.isRed() && !n.leftSon.leftSon.isRed() {
+			n = moveRedLeft(n)
+		}
+		n.leftSon = n.leftSon.delete(k)
+	} else {
+		if n.leftSon.isRed() {
+			n = rotateRight(n)
+		}
+		if k == n.key && n.rightSon == nil {
+			return nil
+		}
+		if !n.rightSon.isRed() && !n.rightSon.leftSon.isRed() {
+			n = moveRedRight(n)
+		}
+		if k == n.key {
+			min := n.rightSon.findMin()
+			n.value = min.value
+			n.key = min.key
+			n.rightSon = n.rightSon.delMin()
+		} else {
+			n.rightSon = n.rightSon.delete(k)
+		}
+	}
+	return balance(n)
 }
 
 func (n *node) isRed() bool {
@@ -153,28 +286,38 @@ func size(n *node) int {
 func rotateLeft(root *node) *node {
 	newRoot := root.rightSon
 	root.rightSon = newRoot.leftSon
-	root.color = red
 	newRoot.leftSon = root
-	newRoot.color = black
 	root.size = size(root.leftSon) + size(root.rightSon) + 1
 	newRoot.size = size(newRoot.leftSon) + size(newRoot.rightSon) + 1
+	if root.color == black {
+		newRoot.color = black
+		root.color = red
+	}
 	return newRoot
 }
 
 func rotateRight(root *node) *node {
 	newRoot := root.leftSon
 	root.leftSon = newRoot.rightSon
-	root.color = red
 	newRoot.rightSon = root
-	newRoot.color = black
 	root.size = size(root.leftSon) + size(root.rightSon) + 1
 	newRoot.size = size(newRoot.leftSon) + size(newRoot.rightSon) + 1
+	if root.color == black {
+		newRoot.color = black
+		root.color = red
+	}
 	return newRoot
 }
 
-func flipColors(root *node) *node {
+func flipColors(root *node) {
 	root.leftSon.color = black
 	root.rightSon.color = black
 	root.color = red
-	return root
+}
+
+func key(n *node) int {
+	if n == nil {
+		return 0
+	}
+	return n.key
 }
