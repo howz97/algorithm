@@ -24,7 +24,7 @@ func NewAlphabet(s string) *Alphabet {
 	return a
 }
 
-// ToRune -
+// ToRune convert index to rune
 func (a *Alphabet) ToRune(i int) rune {
 	r, exst := a.itor[i]
 	if !exst {
@@ -33,7 +33,7 @@ func (a *Alphabet) ToRune(i int) rune {
 	return r
 }
 
-// ToIndex -
+// ToIndex convert rune to index
 func (a *Alphabet) ToIndex(r rune) int {
 	i, exst := a.rtoi[r]
 	if !exst {
@@ -48,7 +48,7 @@ func (a *Alphabet) Contains(r rune) bool {
 	return exst
 }
 
-// R -
+// R is the size of this Alphabet
 func (a *Alphabet) R() int {
 	return len(a.rtoi)
 }
