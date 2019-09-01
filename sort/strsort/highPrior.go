@@ -3,7 +3,7 @@ package strsort
 var aux [][]rune
 
 // HighPriorSort -
-func HighPriorSort(a alphbt,strs []string) {
+func HighPrior(a alphbt, strs []string) {
 	aux = make([][]rune, len(strs))
 
 	// convert string to []rune
@@ -21,14 +21,14 @@ func HighPriorSort(a alphbt,strs []string) {
 	}
 }
 
-func highPriorSort(a alphbt,strs [][]rune, lo, hi, d int) {
+func highPriorSort(a alphbt, strs [][]rune, lo, hi, d int) {
 	if lo >= hi {
 		return
 	}
 	count := make([]int, a.R()+2)
 	// start counting
 	for i := lo; i <= hi; i++ {
-		count[toIndex(a,strs[i], d)+2]++
+		count[toIndex(a, strs[i], d)+2]++
 	}
 
 	// convert count to inserting index
@@ -41,8 +41,8 @@ func highPriorSort(a alphbt,strs [][]rune, lo, hi, d int) {
 
 	// inserting accord to head rune
 	for i := lo; i <= hi; i++ {
-		aux[insrtingIdx[toIndex(a,strs[i], d)+1]] = strs[i]
-		insrtingIdx[toIndex(a,strs[i], d)+1]++
+		aux[insrtingIdx[toIndex(a, strs[i], d)+1]] = strs[i]
+		insrtingIdx[toIndex(a, strs[i], d)+1]++
 	}
 
 	// write back
@@ -52,7 +52,7 @@ func highPriorSort(a alphbt,strs [][]rune, lo, hi, d int) {
 
 	// recursion
 	for i := 0; i < a.R(); i++ {
-		highPriorSort(a,strs, insrtingIdx[i], insrtingIdx[i+1]-1, d+1)
+		highPriorSort(a, strs, insrtingIdx[i], insrtingIdx[i+1]-1, d+1)
 	}
 }
 

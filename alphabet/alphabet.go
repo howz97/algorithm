@@ -18,16 +18,16 @@ const (
 )
 
 var (
-	Binary = NewAlphabet(BINARY)
-	Dna = NewAlphabet(DNA)
-	Octal = NewAlphabet(OCTAL)
-	Decimal = NewAlphabet(DECIMAL)
+	Binary      = NewAlphabet(BINARY)
+	Dna         = NewAlphabet(DNA)
+	Octal       = NewAlphabet(OCTAL)
+	Decimal     = NewAlphabet(DECIMAL)
 	Hexadecimal = NewAlphabet(HEXADECIMAL)
-	LowerCase = NewAlphabet(LOWERCASE)
-	UpperCase = NewAlphabet(UPPERCASE)
-	Base64 = NewAlphabet(BASE64)
-	Ascii = NewAlphabet(ASCII)
-	Unicode = new(AlphabetUnicode)
+	LowerCase   = NewAlphabet(LOWERCASE)
+	UpperCase   = NewAlphabet(UPPERCASE)
+	Base64      = NewAlphabet(BASE64)
+	Ascii       = NewAlphabet(ASCII)
+	Unicode     = new(AlphabetUnicode)
 )
 
 // Alphabet represent an alphabet
@@ -105,7 +105,7 @@ func (a *Alphabet) ToRunes(indices []int) []rune {
 	return runes
 }
 
-type AlphabetUnicode struct {}
+type AlphabetUnicode struct{}
 
 func (u *AlphabetUnicode) ToRune(i int) rune {
 	return rune(i)
