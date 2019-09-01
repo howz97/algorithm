@@ -5,6 +5,18 @@ import (
 	"math"
 )
 
+const (
+	BINARY      = "01"
+	DNA         = "ACTG"
+	OCTAL       = "01234567"
+	DECIMAL     = "0123456789"
+	HEXADECIMAL = "0123456789ABCDEF"
+	LOWERCASE   = "abcdefghijklmnopqrstuvwxyz"
+	UPPERCASE   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	BASE64      = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+	ASCII       = " !\"#$%&'()*+,-./" + DECIMAL + ":;<=>?@" + UPPERCASE + "[\\]^_`" + LOWERCASE + "{|}~"
+)
+
 // Alphabet represent an alphabet
 type Alphabet struct {
 	rtoi map[rune]int
@@ -76,6 +88,38 @@ func (a *Alphabet) ToRunes(indices []int) []rune {
 	runes := make([]rune, 0)
 	for i := range indices {
 		runes = append(runes, a.ToRune(indices[i]))
+	}
+	return runes
+}
+
+type Unicode struct {}
+
+func (u *Unicode) ToRune(i int) rune {
+	return rune(i)
+}
+
+func (u *Unicode) ToIndex(r rune) int {
+	return int(r)
+}
+
+func (u *Unicode) R() int {
+	return 0xFFFF
+}
+
+// ToIndeices equal to call ToIndex for every rune in s
+func (u *Unicode) ToIndeices(s string) []int {
+	indices := make([]int, 0)
+	for _, r := range s {
+		indices = append(indices, u.ToIndex(r))
+	}
+	return indices
+}
+
+// ToRunes equal to call ToRune for every index in indices
+func (u *Unicode) ToRunes(indices []int) []rune {
+	runes := make([]rune, 0)
+	for i := range indices {
+		runes = append(runes, u.ToRune(indices[i]))
 	}
 	return runes
 }
