@@ -17,6 +17,19 @@ const (
 	ASCII       = " !\"#$%&'()*+,-./" + DECIMAL + ":;<=>?@" + UPPERCASE + "[\\]^_`" + LOWERCASE + "{|}~"
 )
 
+var (
+	Binary = NewAlphabet(BINARY)
+	Dna = NewAlphabet(DNA)
+	Octal = NewAlphabet(OCTAL)
+	Decimal = NewAlphabet(DECIMAL)
+	Hexadecimal = NewAlphabet(HEXADECIMAL)
+	LowerCase = NewAlphabet(LOWERCASE)
+	UpperCase = NewAlphabet(UPPERCASE)
+	Base64 = NewAlphabet(BASE64)
+	Ascii = NewAlphabet(ASCII)
+	Unicode = new(AlphabetUnicode)
+)
+
 // Alphabet represent an alphabet
 type Alphabet struct {
 	rtoi map[rune]int
@@ -92,22 +105,22 @@ func (a *Alphabet) ToRunes(indices []int) []rune {
 	return runes
 }
 
-type Unicode struct {}
+type AlphabetUnicode struct {}
 
-func (u *Unicode) ToRune(i int) rune {
+func (u *AlphabetUnicode) ToRune(i int) rune {
 	return rune(i)
 }
 
-func (u *Unicode) ToIndex(r rune) int {
+func (u *AlphabetUnicode) ToIndex(r rune) int {
 	return int(r)
 }
 
-func (u *Unicode) R() int {
+func (u *AlphabetUnicode) R() int {
 	return 0xFFFF
 }
 
 // ToIndeices equal to call ToIndex for every rune in s
-func (u *Unicode) ToIndeices(s string) []int {
+func (u *AlphabetUnicode) ToIndeices(s string) []int {
 	indices := make([]int, 0)
 	for _, r := range s {
 		indices = append(indices, u.ToIndex(r))
@@ -116,7 +129,7 @@ func (u *Unicode) ToIndeices(s string) []int {
 }
 
 // ToRunes equal to call ToRune for every index in indices
-func (u *Unicode) ToRunes(indices []int) []rune {
+func (u *AlphabetUnicode) ToRunes(indices []int) []rune {
 	runes := make([]rune, 0)
 	for i := range indices {
 		runes = append(runes, u.ToRune(indices[i]))

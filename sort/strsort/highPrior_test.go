@@ -21,10 +21,9 @@ func Test_HighPriorSort(t *testing.T) {
 		"are",
 		"surely",
 		"seashells",
-		"啊xyz",
+		"xyz",
 	}
-	u := alphabet.NewAlphabet(alphabet.LOWERCASE+"啊")
-	HighPriorSort(u, strs)
+	HighPriorSort(alphabet.LowerCase, strs)
 	fmt.Println(strs)
 
 	strs = append(strs,
@@ -36,6 +35,6 @@ func Test_HighPriorSort(t *testing.T) {
 		"CHINA",
 		"ℹChina",
 	)
-	HighPriorSort(new(alphabet.Unicode), strs)
+	HighPriorSort(alphabet.Unicode, strs)
 	fmt.Println(strs)
 }
