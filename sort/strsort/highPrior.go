@@ -57,7 +57,7 @@ func highPriorSort(a alphbt, strs [][]rune, lo, hi, d int) {
 }
 
 // toIndex convert rune to index.
-// when d is out of range the runes, -1 returned
+// when d is out of the range of the runes, -1 returned
 // otherwise, it is equal to ToIndex
 func toIndex(a alphbt, runes []rune, d int) int {
 	if d >= len(runes) {
