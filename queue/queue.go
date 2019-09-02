@@ -10,7 +10,7 @@ func NewStrQ() *StrQ {
 }
 
 type elem struct {
-	s string
+	s    string
 	next *elem
 }
 

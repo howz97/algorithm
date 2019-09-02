@@ -3,14 +3,14 @@ package trietree
 import "github.com/zh1014/algorithm/queue"
 
 type Trie struct {
-	a alphbt
+	a    alphbt
 	tree *trie
 	size int
 }
 
 func New(a alphbt) *Trie {
 	return &Trie{
-		a:    a,
+		a: a,
 	}
 }
 
@@ -28,7 +28,7 @@ func (t *Trie) Insert(k string, v interface{}) {
 }
 
 func (t *Trie) Delete(k string) {
-	t.tree=t.tree.delete(t.a, []rune(k))
+	t.tree = t.tree.delete(t.a, []rune(k))
 	t.size--
 }
 
@@ -56,7 +56,7 @@ func (t *Trie) KeysWithPrefix(p string) []string {
 	return keys
 }
 
-func (t *Trie)KeysMatch(p string) []string {
+func (t *Trie) KeysMatch(p string) []string {
 	keys := make([]string, 0)
 	keysQ := queue.NewStrQ()
 	t.tree.keysMatch(t.a, []rune(p), "", keysQ)
@@ -75,11 +75,11 @@ func (t *Trie) Size() int {
 }
 
 type trie struct {
-	val   interface{}
+	val  interface{}
 	next []*trie
 }
 
-func (t *trie)find(a alphbt, k []rune) *trie {
+func (t *trie) find(a alphbt, k []rune) *trie {
 	if t == nil {
 		return nil
 	}
@@ -89,7 +89,7 @@ func (t *trie)find(a alphbt, k []rune) *trie {
 	return t.next[a.ToIndex(k[0])].find(a, k[1:])
 }
 
-func (t *trie)insert(a alphbt, k []rune, v interface{}) *trie {
+func (t *trie) insert(a alphbt, k []rune, v interface{}) *trie {
 	if t == nil {
 		t = &trie{
 			next: make([]*trie, a.R()),
@@ -97,17 +97,17 @@ func (t *trie)insert(a alphbt, k []rune, v interface{}) *trie {
 	}
 	if len(k) == 0 {
 		t.val = v
-	}else {
+	} else {
 		t.next[a.ToIndex(k[0])] = t.next[a.ToIndex(k[0])].insert(a, k[1:], v)
 	}
 	return t
 }
 
-func (t *trie)delete(a alphbt, k []rune) *trie {
+func (t *trie) delete(a alphbt, k []rune) *trie {
 	if t != nil {
-		if len(k) == 0  {
+		if len(k) == 0 {
 			t.val = nil
-		}else {
+		} else {
 			t.next[a.ToIndex(k[0])] = t.next[a.ToIndex(k[0])].delete(a, k[1:])
 		}
 	}
@@ -117,7 +117,7 @@ func (t *trie)delete(a alphbt, k []rune) *trie {
 	return t
 }
 
-func (t *trie)isEmpty() bool {
+func (t *trie) isEmpty() bool {
 	if t == nil {
 		return true
 	}
@@ -132,20 +132,20 @@ func (t *trie)isEmpty() bool {
 	return true
 }
 
-func (t *trie)contains(a alphbt, k []rune) bool {
+func (t *trie) contains(a alphbt, k []rune) bool {
 	if t == nil {
 		return false
 	}
 	if len(k) == 0 {
 		return t.val != nil
-	}else {
+	} else {
 		return t.next[a.ToIndex(k[0])].contains(a, k[1:])
 	}
 }
 
 // longestPrefixOf 找出t的所有匹配s[d:]的前缀的key中最长的那一个
 // 返回值length代表s的前length个rune就是这个要找的key
-func (t *trie)longestPrefixOf(a alphbt,s []rune, d int, length int) int {
+func (t *trie) longestPrefixOf(a alphbt, s []rune, d int, length int) int {
 	if t == nil {
 		return length
 	}
@@ -158,7 +158,7 @@ func (t *trie)longestPrefixOf(a alphbt,s []rune, d int, length int) int {
 	return t.next[a.ToIndex(s[d])].longestPrefixOf(a, s, d+1, length)
 }
 
-func (t *trie)keysWithPrefix(a alphbt, p string) *queue.StrQ {
+func (t *trie) keysWithPrefix(a alphbt, p string) *queue.StrQ {
 	keysQ := queue.NewStrQ()
 	t.find(a, []rune(p)).collect(a, p, keysQ)
 	return keysQ
@@ -166,7 +166,7 @@ func (t *trie)keysWithPrefix(a alphbt, p string) *queue.StrQ {
 
 // collect collects all keys of t and put them into StrQ
 // p is the prefix record
-func (t *trie)collect(a alphbt, p string, keys *queue.StrQ){
+func (t *trie) collect(a alphbt, p string, keys *queue.StrQ) {
 	if t == nil {
 		return
 	}
@@ -178,7 +178,7 @@ func (t *trie)collect(a alphbt, p string, keys *queue.StrQ){
 	}
 }
 
-func (t *trie)keysMatch(a alphbt,pattern []rune, prefix string,keys *queue.StrQ) {
+func (t *trie) keysMatch(a alphbt, pattern []rune, prefix string, keys *queue.StrQ) {
 	if t == nil {
 		return
 	}
@@ -192,7 +192,7 @@ func (t *trie)keysMatch(a alphbt,pattern []rune, prefix string,keys *queue.StrQ)
 		for i := range t.next {
 			t.next[i].keysMatch(a, pattern[1:], prefix+string(a.ToRune(i)), keys)
 		}
-	}else {
+	} else {
 		t.next[a.ToIndex(pattern[0])].keysMatch(a, pattern[1:], prefix+string(pattern[0]), keys)
 	}
 	return

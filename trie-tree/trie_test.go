@@ -51,7 +51,7 @@ func TestTrie_Insert(t *testing.T) {
 	}
 
 	fmt.Println("she* :", trieT.KeysWithPrefix("she"))
-	fmt.Println("all keys: ",trieT.Keys())
+	fmt.Println("all keys: ", trieT.Keys())
 	trieT.Insert("hallo", "hallo")
 	trieT.Insert("hillo", "hillo")
 	fmt.Println("hello hallo hillo", trieT.KeysMatch("h.llo"))
