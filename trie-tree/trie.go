@@ -8,7 +8,7 @@ type Trie struct {
 	size int
 }
 
-func New(a alphbt) *Trie {
+func NewTrie(a alphbt) *Trie {
 	return &Trie{
 		a: a,
 	}
@@ -156,12 +156,6 @@ func (t *trie) longestPrefixOf(a alphbt, s []rune, d int, length int) int {
 		return length
 	}
 	return t.next[a.ToIndex(s[d])].longestPrefixOf(a, s, d+1, length)
-}
-
-func (t *trie) keysWithPrefix(a alphbt, p string) *queue.StrQ {
-	keysQ := queue.NewStrQ()
-	t.find(a, []rune(p)).collect(a, p, keysQ)
-	return keysQ
 }
 
 // collect collects all keys of t and put them into StrQ

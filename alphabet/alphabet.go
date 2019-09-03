@@ -62,7 +62,7 @@ func (a *Alphabet) ToRune(i int) rune {
 func (a *Alphabet) ToIndex(r rune) int {
 	i, exst := a.rtoi[r]
 	if !exst {
-		panic(fmt.Sprintf("rune %v do not belong to Alphabet", r))
+		panic(fmt.Sprintf("rune %v do not belong to Alphabet", string(r)))
 	}
 	return i
 }
