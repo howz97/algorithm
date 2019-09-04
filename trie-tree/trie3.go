@@ -131,14 +131,21 @@ func (t *trie3) delete(a alphbt, k []rune) *trie3 {
 			t.v = nil
 		}
 	}
-	if t.isEmpty() {
-		t = nil
+	if t == nil {
+		return nil
+	}
+	if t.isEmpty() { // 该节点没有存东西，也没有后继节点，属于二叉查找树的空节点，类似BST删除操作
+		if t.left == nil {
+			t = t.right
+		}else if t.right == nil {
+			t = t.left
+		}
 	}
 	return t
 }
 
 func (t *trie3) isEmpty() bool {
-	if t == nil || (t.v == nil && t.left == nil && t.mid == nil && t.right == nil) {
+	if t.v == nil && t.mid == nil {
 		return true
 	}
 	return false
