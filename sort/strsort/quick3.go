@@ -1,8 +1,3 @@
-/*
- * Revision History:
- *     Initial: 2019/09/01        Zhang Hao
- */
-
 package strsort
 
 func Quick3(a alphbt, strs []string) {
