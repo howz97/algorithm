@@ -1,4 +1,4 @@
-package trietree
+package tst_optimized
 
 import (
 	"fmt"
@@ -8,25 +8,25 @@ import (
 )
 
 func TestTrie3C_Delete(t *testing.T) {
-	trie := NewTrie3C(alphabet.Unicode)
-	items := []string{"你好", "你好看","你好好看","你是？", "你是谁", "你是谁啊","你是胖虎",
-		"你还问？", "你还看","你还不说","你还不睡",
-		"你真蠢","你真是个弟弟","你真好看","你真的是胖虎？","你真是个弟弟啊2333",
-		"我是你爸","我是纯甄小蛮腰","我😍你",
-		"abc","123","abb","ab13","w2f","2d2wd","s2qd","2s2","$%^&","....","1w2r3tyd","3f","s2qd",
+	trie := NewTst2(alphabet.Unicode)
+	items := []string{"你好", "你好看", "你好好看", "你是？", "你是谁", "你是谁啊", "你是胖虎",
+		"你还问？", "你还看", "你还不说", "你还不睡",
+		"你真蠢", "你真是个弟弟", "你真好看", "你真的是胖虎？", "你真是个弟弟啊2333",
+		"我是你爸", "我是纯甄小蛮腰", "我😍你",
+		"abc", "123", "abb", "ab13", "w2f", "2d2wd", "s2qd", "2s2", "$%^&", "....", "1w2r3tyd", "3f", "s2qd",
 	}
 	for i := range items {
 		trie.Insert(items[i], i)
 	}
 	midPoint := 10
-	for i := midPoint; i>=0; i-- {
+	for i := midPoint; i >= 0; i-- {
 		trie.Delete(items[i])
 		if trie.Contains(items[i]) {
 			t.Fatal()
 		}
 		trie.Delete(items[i])
 	}
-	for i := midPoint+1; i<len(items); i++ {
+	for i := midPoint + 1; i < len(items); i++ {
 		trie.Delete(items[i])
 		if trie.Contains(items[i]) {
 			t.Fatal()
@@ -36,14 +36,14 @@ func TestTrie3C_Delete(t *testing.T) {
 	trie.IsEmpty()
 
 	trie.Compress()
-	for i := midPoint; i>=0; i-- {
+	for i := midPoint; i >= 0; i-- {
 		trie.Delete(items[i])
 		if trie.Contains(items[i]) {
 			t.Fatal()
 		}
 		trie.Delete(items[i])
 	}
-	for i := midPoint+1; i<len(items); i++ {
+	for i := midPoint + 1; i < len(items); i++ {
 		trie.Delete(items[i])
 		if trie.Contains(items[i]) {
 			t.Fatal()
@@ -54,12 +54,12 @@ func TestTrie3C_Delete(t *testing.T) {
 }
 
 func TestTrie3C_Contains(t *testing.T) {
-	trie := NewTrie3C(alphabet.Unicode)
-	items := []string{"你好", "你好看","你好好看","你是？", "你是谁", "你是谁啊","你是胖虎",
-		"你还问？", "你还看","你还不说","你还不睡",
-		"你真蠢","你真是个弟弟","你真好看","你真的是胖虎？","你真是个弟弟啊2333",
-		"我是你爸","我是纯甄小蛮腰","我😍你",
-		"abc","123","abb","ab13","w2f","2d2wd","s2qd","2s2","$%^&","....","1w2r3tyd","3f","s2qd",
+	trie := NewTst2(alphabet.Unicode)
+	items := []string{"你好", "你好看", "你好好看", "你是？", "你是谁", "你是谁啊", "你是胖虎",
+		"你还问？", "你还看", "你还不说", "你还不睡",
+		"你真蠢", "你真是个弟弟", "你真好看", "你真的是胖虎？", "你真是个弟弟啊2333",
+		"我是你爸", "我是纯甄小蛮腰", "我😍你",
+		"abc", "123", "abb", "ab13", "w2f", "2d2wd", "s2qd", "2s2", "$%^&", "....", "1w2r3tyd", "3f", "s2qd",
 	}
 	for i := range items {
 		trie.Insert(items[i], i)
@@ -69,13 +69,13 @@ func TestTrie3C_Contains(t *testing.T) {
 			t.Fatal()
 		}
 	}
-	for i:=len(items)-1; i>=0;i-- {
+	for i := len(items) - 1; i >= 0; i-- {
 		if !trie.Contains(items[i]) {
 			t.Fatal()
 		}
 	}
 	for i := 0; i < 100; i++ {
-		r := rand.Int()%len(items)
+		r := rand.Int() % len(items)
 		if !trie.Contains(items[r]) {
 			t.Fatal()
 		}
@@ -87,13 +87,13 @@ func TestTrie3C_Contains(t *testing.T) {
 			t.Fatal()
 		}
 	}
-	for i:=len(items)-1; i>=0;i-- {
+	for i := len(items) - 1; i >= 0; i-- {
 		if !trie.Contains(items[i]) {
 			t.Fatal()
 		}
 	}
 	for i := 0; i < 100; i++ {
-		r := rand.Int()%len(items)
+		r := rand.Int() % len(items)
 		if !trie.Contains(items[r]) {
 			t.Fatal()
 		}
@@ -101,11 +101,11 @@ func TestTrie3C_Contains(t *testing.T) {
 }
 
 func TestTrie3C_KeysWithPrefix(t *testing.T) {
-	trie := NewTrie3C(alphabet.Unicode)
-	items := []string{"你好", "你好看","你好好看","你是？", "你是谁", "你是谁啊","你是胖虎",
-		"你还问？", "你还看","你还不说","你还不睡",
-		"你真蠢","你真是个弟弟","你真好看","你真的是胖虎？","你真是个弟弟啊2333",
-		"我是你爸","我是纯甄小蛮腰","我😍你",
+	trie := NewTst2(alphabet.Unicode)
+	items := []string{"你好", "你好看", "你好好看", "你是？", "你是谁", "你是谁啊", "你是胖虎",
+		"你还问？", "你还看", "你还不说", "你还不睡",
+		"你真蠢", "你真是个弟弟", "你真好看", "你真的是胖虎？", "你真是个弟弟啊2333",
+		"我是你爸", "我是纯甄小蛮腰", "我😍你",
 	}
 	for i := range items {
 		trie.Insert(items[i], i)
@@ -133,11 +133,11 @@ func TestTrie3C_KeysWithPrefix(t *testing.T) {
 }
 
 func TestTrie3C_KeysMatch(t *testing.T) {
-	trie := NewTrie3C(alphabet.Unicode)
-	items := []string{"你好", "你好看","你好好看","你是？", "你是谁", "你是谁啊","你是胖虎",
-		"你还问？", "你还看","你还不说","你还不睡",
-		"你真蠢","你真是个弟弟","你真好看","你真的是胖虎？","你真是个弟弟啊2333",
-		"我是你爸","我是纯甄小蛮腰","我😍你",
+	trie := NewTst2(alphabet.Unicode)
+	items := []string{"你好", "你好看", "你好好看", "你是？", "你是谁", "你是谁啊", "你是胖虎",
+		"你还问？", "你还看", "你还不说", "你还不睡",
+		"你真蠢", "你真是个弟弟", "你真好看", "你真的是胖虎？", "你真是个弟弟啊2333",
+		"我是你爸", "我是纯甄小蛮腰", "我😍你",
 	}
 	for i := range items {
 		trie.Insert(items[i], i)
@@ -171,7 +171,7 @@ func TestTrie3C_KeysMatch(t *testing.T) {
 }
 
 func TestTrie3C_LongestPrefixOf(t *testing.T) {
-	trie := NewTrie3C(alphabet.Unicode)
+	trie := NewTst2(alphabet.Unicode)
 	items := []string{"你好", "你好看", "你好好看", "你是？", "你是谁", "你是谁啊", "你是胖虎",
 		"你还问？", "你还看", "你还不说", "你还不睡",
 		"你真蠢", "你真是个弟弟", "你真好看", "你真的是胖虎？", "你真是个弟弟啊2333",

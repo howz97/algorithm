@@ -1,23 +1,23 @@
-package trietree
+package tst_optimized
 
 import (
 	"errors"
 	"github.com/zh1014/algorithm/queue"
 )
 
-type Trie3C struct {
+type Tst2 struct {
 	a          alphbt
-	tree       *trie3C
+	tree       *tst2
 	compressed bool
 }
 
-func NewTrie3C(a alphbt) *Trie3C {
-	return &Trie3C{
+func NewTst2(a alphbt) *Tst2 {
+	return &Tst2{
 		a: a,
 	}
 }
 
-func (t *Trie3C) Insert(k string, v interface{}) error {
+func (t *Tst2) Insert(k string, v interface{}) error {
 	if t.Compressed() {
 		return errors.New(" Can not insert k-v into compressed trie tree ")
 	}
@@ -25,7 +25,7 @@ func (t *Trie3C) Insert(k string, v interface{}) error {
 	return nil
 }
 
-func (t *Trie3C) Compress() error {
+func (t *Tst2) Compress() error {
 	if t.Compressed() {
 		return errors.New(" Duplicate compress ")
 	}
@@ -33,11 +33,11 @@ func (t *Trie3C) Compress() error {
 	return nil
 }
 
-func (t *Trie3C) Compressed() bool {
+func (t *Tst2) Compressed() bool {
 	return t.compressed
 }
 
-func (t *Trie3C) Find(k string) interface{} {
+func (t *Tst2) Find(k string) interface{} {
 	f := t.tree.find(t.a, []rune(k))
 	if f == nil {
 		// this trie-tree node not exist
@@ -46,24 +46,24 @@ func (t *Trie3C) Find(k string) interface{} {
 	return f.v
 }
 
-func (t *Trie3C) Delete(k string) {
+func (t *Tst2) Delete(k string) {
 	t.tree = t.tree.delete(t.a, []rune(k))
 }
 
-func (t *Trie3C) Contains(k string) bool {
+func (t *Tst2) Contains(k string) bool {
 	return t.tree.contains(t.a, []rune(k))
 }
 
-func (t *Trie3C) IsEmpty() bool {
+func (t *Tst2) IsEmpty() bool {
 	return t.tree == nil
 }
 
-func (t *Trie3C) LongestPrefixOf(s string) string {
+func (t *Tst2) LongestPrefixOf(s string) string {
 	runes := []rune(s)
 	return string(runes[:t.tree.longestPrefixOf(t.a, runes, 0, 0)])
 }
 
-func (t *Trie3C) KeysWithPrefix(p string) []string {
+func (t *Tst2) KeysWithPrefix(p string) []string {
 	keys := make([]string, 0)
 	keysQ := queue.NewStrQ()
 	if p == "" {
@@ -78,7 +78,7 @@ func (t *Trie3C) KeysWithPrefix(p string) []string {
 				keysQ.PushBack(p)
 			}
 			f.mid.collect(t.a, p, keysQ)
-		}else {
+		} else {
 			runes := []rune(p)
 			f.collect(t.a, string(runes[:len(runes)-i-1]), keysQ)
 		}
@@ -89,7 +89,7 @@ func (t *Trie3C) KeysWithPrefix(p string) []string {
 	return keys
 }
 
-func (t *Trie3C) KeysMatch(p string) []string {
+func (t *Tst2) KeysMatch(p string) []string {
 	keys := make([]string, 0)
 	keysQ := queue.NewStrQ()
 	t.tree.keysMatch(t.a, []rune(p), []rune(""), keysQ)
@@ -99,24 +99,22 @@ func (t *Trie3C) KeysMatch(p string) []string {
 	return keys
 }
 
-func (t *Trie3C) Keys() []string {
+func (t *Tst2) Keys() []string {
 	return t.KeysWithPrefix("")
 }
 
-type trie3C struct {
-	rs    []rune
-	left  *trie3C
-	mid   *trie3C
-	right *trie3C
-	v     interface{}
+type tst2 struct {
+	rs               []rune
+	v                interface{}
+	left, mid, right *tst2
 }
 
-func (t *trie3C) insert(a alphbt, k []rune, v interface{}) *trie3C {
+func (t *tst2) insert(a alphbt, k []rune, v interface{}) *tst2 {
 	if len(k) == 0 {
 		panic("empty key")
 	}
 	if t == nil {
-		t = &trie3C{
+		t = &tst2{
 			rs: k[:1],
 		}
 	}
@@ -135,7 +133,7 @@ func (t *trie3C) insert(a alphbt, k []rune, v interface{}) *trie3C {
 	return t
 }
 
-func (t *trie3C) compress() {
+func (t *tst2) compress() {
 	if t == nil {
 		return
 	}
@@ -154,15 +152,15 @@ func (t *trie3C) compress() {
 	return
 }
 
-func (t *trie3C) canShrink() bool {
+func (t *tst2) canShrink() bool {
 	return t.v == nil && t.left == nil && t.right == nil
 }
 
-func (t *trie3C) delete(a alphbt, k []rune) *trie3C {
+func (t *tst2) delete(a alphbt, k []rune) *tst2 {
 	if len(k) == 0 {
 		panic("empty key")
 	}
-	if t == nil || !equal(t.rs[:len(t.rs) - 1], k[:len(t.rs) - 1]) {
+	if t == nil || !equal(t.rs[:len(t.rs)-1], k[:len(t.rs)-1]) {
 		return t
 	}
 	lastRune := len(t.rs) - 1
@@ -184,21 +182,21 @@ func (t *trie3C) delete(a alphbt, k []rune) *trie3C {
 	return t
 }
 
-func (t *trie3C) isEmpty() bool {
+func (t *tst2) isEmpty() bool {
 	if t.v == nil && t.mid == nil && t.left == nil && t.right == nil {
 		return true
 	}
 	return false
 }
 
-func (t *trie3C) contains(a alphbt, k []rune) bool {
+func (t *tst2) contains(a alphbt, k []rune) bool {
 	f := t.find(a, k)
 	return f != nil && f.v != nil
 }
 
 // find 找到k对应的节点(n)，有这个节点不代表k存在，是否存在需要看n.v是否为nil
-func (t *trie3C) find(a alphbt, k []rune) *trie3C {
-	if t == nil || len(k) < len(t.rs)||!equal(t.rs[:len(t.rs) - 1], k[:len(t.rs) - 1]) {
+func (t *tst2) find(a alphbt, k []rune) *tst2 {
+	if t == nil || len(k) < len(t.rs) || !equal(t.rs[:len(t.rs)-1], k[:len(t.rs)-1]) {
 		return nil
 	}
 	lastRune := len(t.rs) - 1
@@ -216,17 +214,17 @@ func (t *trie3C) find(a alphbt, k []rune) *trie3C {
 	}
 }
 
-func (t *trie3C) locate(a alphbt, k []rune) (l *trie3C, i int) {
+func (t *tst2) locate(a alphbt, k []rune) (l *tst2, i int) {
 	if t == nil {
 		return nil, 0
 	}
 	if len(k) < len(t.rs) {
 		if equal(k, t.rs[:len(k)]) {
-			return t, len(k) -1
+			return t, len(k) - 1
 		}
 		return nil, 0
 	}
-	if !equal(t.rs[:len(t.rs) - 1], k[:len(t.rs) - 1]) {
+	if !equal(t.rs[:len(t.rs)-1], k[:len(t.rs)-1]) {
 		return nil, 0
 	}
 	lastRune := len(t.rs) - 1
@@ -244,11 +242,11 @@ func (t *trie3C) locate(a alphbt, k []rune) (l *trie3C, i int) {
 	}
 }
 
-func (t *trie3C) longestPrefixOf(a alphbt, s []rune, d, length int) int {
+func (t *tst2) longestPrefixOf(a alphbt, s []rune, d, length int) int {
 	if len(s) == 0 {
 		panic("empty s")
 	}
-	if t == nil || !equal(s[d:d+len(t.rs) - 1], t.rs[:len(t.rs) - 1]) {
+	if t == nil || !equal(s[d:d+len(t.rs)-1], t.rs[:len(t.rs)-1]) {
 		return length
 	}
 	lastRune := len(t.rs) - 1
@@ -269,7 +267,7 @@ func (t *trie3C) longestPrefixOf(a alphbt, s []rune, d, length int) int {
 	}
 }
 
-func (t *trie3C) collect(a alphbt, p string, keys *queue.StrQ) {
+func (t *tst2) collect(a alphbt, p string, keys *queue.StrQ) {
 	if t == nil {
 		return
 	}
@@ -281,29 +279,24 @@ func (t *trie3C) collect(a alphbt, p string, keys *queue.StrQ) {
 	t.right.collect(a, p+string(dropLastR(t.rs)), keys)
 }
 
-func dropLast(s string) string {
-	rs := []rune(s)
-	return string(rs[:len(rs)-1])
-}
-
 func dropLastR(rs []rune) []rune {
 	return rs[:len(rs)-1]
 }
 
-func (t *trie3C) keysMatch(a alphbt, pattern []rune, prefix []rune, keys *queue.StrQ) {
-	if t == nil || len(pattern) == 0 ||len(pattern) < len(t.rs)||!match(pattern[:len(t.rs) - 1], t.rs[:len(t.rs) - 1]){
+func (t *tst2) keysMatch(a alphbt, pattern []rune, prefix []rune, keys *queue.StrQ) {
+	if t == nil || len(pattern) == 0 || len(pattern) < len(t.rs) || !match(pattern[:len(t.rs)-1], t.rs[:len(t.rs)-1]) {
 		return
 	}
 	lastRune := len(t.rs) - 1
 	if pattern[lastRune] == '.' || a.ToIndex(pattern[lastRune]) < a.ToIndex(t.rs[lastRune]) {
-		t.left.keysMatch(a, dropFirstN(pattern, len(t.rs) - 1), append(prefix, t.rs[:len(t.rs) - 1]...), keys)
+		t.left.keysMatch(a, dropFirstN(pattern, len(t.rs)-1), append(prefix, t.rs[:len(t.rs)-1]...), keys)
 	}
 	if pattern[lastRune] == '.' || a.ToIndex(pattern[lastRune]) > a.ToIndex(t.rs[lastRune]) {
-		t.right.keysMatch(a, dropFirstN(pattern, len(t.rs) - 1), append(prefix, t.rs[:len(t.rs) - 1]...), keys)
+		t.right.keysMatch(a, dropFirstN(pattern, len(t.rs)-1), append(prefix, t.rs[:len(t.rs)-1]...), keys)
 	}
 	if pattern[lastRune] == '.' || a.ToIndex(pattern[lastRune]) == a.ToIndex(t.rs[lastRune]) {
 		if len(pattern) > len(t.rs) {
-			t.mid.keysMatch(a, dropFirstN(pattern,len(t.rs)), append(prefix, t.rs...), keys)
+			t.mid.keysMatch(a, dropFirstN(pattern, len(t.rs)), append(prefix, t.rs...), keys)
 		} else if t.v != nil {
 			keys.PushBack(string(append(prefix, t.rs...)))
 		}

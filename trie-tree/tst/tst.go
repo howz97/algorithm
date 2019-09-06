@@ -1,27 +1,27 @@
-package trietree
+package tst
 
 import (
 	"github.com/zh1014/algorithm/queue"
 )
 
-type Trie3 struct {
+type Tst struct {
 	a    alphbt
-	tree *trie3
+	tree *tst
 	size int
 }
 
-func NewTrie3(a alphbt) *Trie3 {
-	return &Trie3{
+func NewTst(a alphbt) *Tst {
+	return &Tst{
 		a: a,
 	}
 }
 
-func (t *Trie3) Insert(k string, v interface{}) {
+func (t *Tst) Insert(k string, v interface{}) {
 	t.tree = t.tree.insert(t.a, []rune(k), v)
 	t.size++
 }
 
-func (t *Trie3) Find(k string) interface{} {
+func (t *Tst) Find(k string) interface{} {
 	f := t.tree.find(t.a, []rune(k))
 	if f == nil {
 		// this trie-tree node not exist
@@ -30,29 +30,29 @@ func (t *Trie3) Find(k string) interface{} {
 	return f.v
 }
 
-func (t *Trie3) Delete(k string) {
+func (t *Tst) Delete(k string) {
 	t.tree = t.tree.delete(t.a, []rune(k))
 	t.size--
 }
 
-func (t *Trie3) Contains(k string) bool {
+func (t *Tst) Contains(k string) bool {
 	return t.tree.contains(t.a, []rune(k))
 }
 
-func (t *Trie3) IsEmpty() bool {
+func (t *Tst) IsEmpty() bool {
 	return t.size == 0
 }
 
-func (t *Trie3) Size() int {
+func (t *Tst) Size() int {
 	return t.size
 }
 
-func (t *Trie3) LongestPrefixOf(s string) string {
+func (t *Tst) LongestPrefixOf(s string) string {
 	runes := []rune(s)
 	return string(runes[:t.tree.longestPrefixOf(t.a, runes, 0, 0)])
 }
 
-func (t *Trie3) KeysWithPrefix(p string) []string {
+func (t *Tst) KeysWithPrefix(p string) []string {
 	keys := make([]string, 0)
 	keysQ := queue.NewStrQ()
 	if p == "" {
@@ -73,7 +73,7 @@ func (t *Trie3) KeysWithPrefix(p string) []string {
 	return keys
 }
 
-func (t *Trie3) KeysMatch(p string) []string {
+func (t *Tst) KeysMatch(p string) []string {
 	keys := make([]string, 0)
 	keysQ := queue.NewStrQ()
 	t.tree.keysMatch(t.a, []rune(p), "", keysQ)
@@ -83,24 +83,22 @@ func (t *Trie3) KeysMatch(p string) []string {
 	return keys
 }
 
-func (t *Trie3) Keys() []string {
+func (t *Tst) Keys() []string {
 	return t.KeysWithPrefix("")
 }
 
-type trie3 struct {
-	r     rune
-	left  *trie3
-	mid   *trie3
-	right *trie3
-	v     interface{}
+type tst struct {
+	r                rune
+	v                interface{}
+	left, mid, right *tst
 }
 
-func (t *trie3) insert(a alphbt, k []rune, v interface{}) *trie3 {
+func (t *tst) insert(a alphbt, k []rune, v interface{}) *tst {
 	if len(k) == 0 {
 		panic("empty key")
 	}
 	if t == nil {
-		t = &trie3{
+		t = &tst{
 			r: k[0],
 		}
 	}
@@ -119,7 +117,7 @@ func (t *trie3) insert(a alphbt, k []rune, v interface{}) *trie3 {
 	return t
 }
 
-func (t *trie3) delete(a alphbt, k []rune) *trie3 {
+func (t *tst) delete(a alphbt, k []rune) *tst {
 	if len(k) == 0 {
 		panic("empty key")
 	}
@@ -148,20 +146,20 @@ func (t *trie3) delete(a alphbt, k []rune) *trie3 {
 	return t
 }
 
-func (t *trie3) isEmpty() bool {
+func (t *tst) isEmpty() bool {
 	if t.v == nil && t.mid == nil {
 		return true
 	}
 	return false
 }
 
-func (t *trie3) contains(a alphbt, k []rune) bool {
+func (t *tst) contains(a alphbt, k []rune) bool {
 	f := t.find(a, k)
 	return f != nil && f.v != nil
 }
 
 // find 找到k对应的节点(n)，有这个节点不代表k存在，是否存在需要看n.v是否为nil
-func (t *trie3) find(a alphbt, k []rune) *trie3 {
+func (t *tst) find(a alphbt, k []rune) *tst {
 	if len(k) == 0 {
 		panic("empty key")
 	}
@@ -182,7 +180,7 @@ func (t *trie3) find(a alphbt, k []rune) *trie3 {
 	}
 }
 
-func (t *trie3) longestPrefixOf(a alphbt, s []rune, d, length int) int {
+func (t *tst) longestPrefixOf(a alphbt, s []rune, d, length int) int {
 	if len(s) == 0 {
 		panic("empty s")
 	}
@@ -206,7 +204,7 @@ func (t *trie3) longestPrefixOf(a alphbt, s []rune, d, length int) int {
 	}
 }
 
-func (t *trie3) collect(a alphbt, p string, keys *queue.StrQ) {
+func (t *tst) collect(a alphbt, p string, keys *queue.StrQ) {
 	if t == nil {
 		return
 	}
@@ -218,7 +216,7 @@ func (t *trie3) collect(a alphbt, p string, keys *queue.StrQ) {
 	t.right.collect(a, p, keys)
 }
 
-func (t *trie3) keysMatch(a alphbt, pattern []rune, prefix string, keys *queue.StrQ) {
+func (t *tst) keysMatch(a alphbt, pattern []rune, prefix string, keys *queue.StrQ) {
 	if len(pattern) == 0 {
 		panic("empty pattern")
 	}
