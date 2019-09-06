@@ -49,7 +49,7 @@ func (t *Trie3) Size() int {
 
 func (t *Trie3) LongestPrefixOf(s string) string {
 	runes := []rune(s)
-	return string(runes[:t.tree.longestPrefixOf(t.a, runes, 0,0)])
+	return string(runes[:t.tree.longestPrefixOf(t.a, runes, 0, 0)])
 }
 
 func (t *Trie3) KeysWithPrefix(p string) []string {
@@ -57,8 +57,15 @@ func (t *Trie3) KeysWithPrefix(p string) []string {
 	keysQ := queue.NewStrQ()
 	if p == "" {
 		t.tree.collect(t.a, p, keysQ)
-	}else {
-		t.tree.find(t.a, []rune(p)).collect(t.a, p, keysQ)
+	} else {
+		f := t.tree.find(t.a, []rune(p))
+		if f == nil {
+			return nil
+		}
+		if f.v != nil {
+			keysQ.PushBack(p)
+		}
+		f.mid.collect(t.a, p, keysQ)
 	}
 	for !keysQ.IsEmpty() {
 		keys = append(keys, keysQ.Front())
@@ -131,13 +138,10 @@ func (t *trie3) delete(a alphbt, k []rune) *trie3 {
 			t.v = nil
 		}
 	}
-	if t == nil {
-		return nil
-	}
-	if t.isEmpty() { // 该节点没有存东西，也没有后继节点，属于二叉查找树的空节点，类似BST删除操作
+	if t.isEmpty() { // 该节点没有存东西，也没有后继节点，类似BST删除操作
 		if t.left == nil {
 			t = t.right
-		}else if t.right == nil {
+		} else if t.right == nil {
 			t = t.left
 		}
 	}
@@ -178,7 +182,7 @@ func (t *trie3) find(a alphbt, k []rune) *trie3 {
 	}
 }
 
-func (t *trie3) longestPrefixOf(a alphbt, s []rune, d,length int) int {
+func (t *trie3) longestPrefixOf(a alphbt, s []rune, d, length int) int {
 	if len(s) == 0 {
 		panic("empty s")
 	}
@@ -187,15 +191,15 @@ func (t *trie3) longestPrefixOf(a alphbt, s []rune, d,length int) int {
 	}
 	switch true {
 	case a.ToIndex(s[d]) < a.ToIndex(t.r):
-		return t.left.longestPrefixOf(a, s, d,length)
+		return t.left.longestPrefixOf(a, s, d, length)
 	case a.ToIndex(s[d]) > a.ToIndex(t.r):
-		return t.right.longestPrefixOf(a, s, d,length)
+		return t.right.longestPrefixOf(a, s, d, length)
 	default:
 		if t.v != nil {
-			length = d+1
+			length = d + 1
 		}
 		if d < len(s)-1 {
-			return t.mid.longestPrefixOf(a, s, d+1,length)
+			return t.mid.longestPrefixOf(a, s, d+1, length)
 		} else { // len(k) == 1
 			return length
 		}
@@ -221,16 +225,16 @@ func (t *trie3) keysMatch(a alphbt, pattern []rune, prefix string, keys *queue.S
 	if t == nil {
 		return
 	}
-	if pattern[0] == rune('.')||a.ToIndex(pattern[0]) < a.ToIndex(t.r) {
+	if pattern[0] == rune('.') || a.ToIndex(pattern[0]) < a.ToIndex(t.r) {
 		t.left.keysMatch(a, pattern, prefix, keys)
 	}
-	if pattern[0] == rune('.')||a.ToIndex(pattern[0]) > a.ToIndex(t.r) {
+	if pattern[0] == rune('.') || a.ToIndex(pattern[0]) > a.ToIndex(t.r) {
 		t.right.keysMatch(a, pattern, prefix, keys)
 	}
-	if pattern[0] == rune('.')||a.ToIndex(pattern[0]) == a.ToIndex(t.r) {
+	if pattern[0] == rune('.') || a.ToIndex(pattern[0]) == a.ToIndex(t.r) {
 		if len(pattern) > 1 {
 			t.mid.keysMatch(a, pattern[1:], prefix+string(t.r), keys)
-		} else { // len(pattern) == 1
+		} else if t.v != nil { // len(pattern) == 1
 			keys.PushBack(prefix + string(t.r))
 		}
 	}
