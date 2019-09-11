@@ -20,21 +20,19 @@ func NewBM(pattern string) *BoyerMoore {
 
 func (bm *BoyerMoore) Index(s string) int {
 	lenS := len(s)
-	i := bm.lenPttrn - 1
-	for i < lenS {
+	i := 0
+	for i < lenS-bm.lenPttrn {
 		j := bm.lenPttrn - 1
-		k := 0
-		for k = 0; k < bm.lenPttrn && s[i-k] == bm.pttrn[j]; k++ {
-			j--
+		for ; j>=0 && s[i+j] == bm.pttrn[j]; j-- {
 		}
 		if j < 0 {
-			return i - bm.lenPttrn + 1
+			return i
 		}
-		iadd := j - bm.right[s[i-k]]
-		if iadd < 1 {
-			iadd = 1
+		skip := j - bm.right[s[i+j]]
+		if skip < 1 {
+			skip = 1
 		}
-		i += iadd
+		i += skip
 	}
 	return -1
 }

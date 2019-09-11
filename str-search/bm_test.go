@@ -2,7 +2,9 @@ package str_search
 
 import (
 	"fmt"
+	"os"
 	"testing"
+	"time"
 )
 
 func TestBoyerMoore_IndexAll(t *testing.T) {
@@ -43,4 +45,30 @@ func TestBoyerMoore_IndexAll2(t *testing.T) {
 			t.Fatal()
 		}
 	}
+}
+
+func TestBoyerMoore_Index(t *testing.T) {
+	pattern := "It is a far, far better thing that I do, than I have ever done"
+	file, err := os.Open("/Users/zhanghao/go/src/github.com/zh1014/algorithm/str-search/tale.txt")
+	if err != nil {
+		panic(err)
+	}
+	fileStat, err := file.Stat()
+	if err != nil {
+		panic(err)
+	}
+	txt := make([]byte, fileStat.Size())
+	n, err := file.Read(txt)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Read %v byte data from %v\n", n, fileStat.Name())
+	bm := NewBM(pattern)
+	start := time.Now()
+	i := bm.Index(string(txt))
+	elapsed := time.Since(start)
+	if i < 0 {
+		t.Fatal()
+	}
+	fmt.Printf("[%v]Found at %v: %v\n",elapsed.String(),i,string(txt[i:i+bm.lenPttrn]))
 }
