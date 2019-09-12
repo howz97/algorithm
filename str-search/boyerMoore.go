@@ -23,7 +23,7 @@ func (bm *BoyerMoore) Index(s string) int {
 	i := 0
 	for i < lenS-bm.lenPttrn {
 		j := bm.lenPttrn - 1
-		for ; j>=0 && s[i+j] == bm.pttrn[j]; j-- {
+		for ; j >= 0 && s[i+j] == bm.pttrn[j]; j-- {
 		}
 		if j < 0 {
 			return i

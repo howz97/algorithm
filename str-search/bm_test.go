@@ -70,5 +70,5 @@ func TestBoyerMoore_Index(t *testing.T) {
 	if i < 0 {
 		t.Fatal()
 	}
-	fmt.Printf("[%v]Found at %v: %v\n",elapsed.String(),i,string(txt[i:i+bm.lenPttrn]))
+	fmt.Printf("[%v]Found at %v: %v\n", elapsed.String(), i, string(txt[i:i+bm.lenPttrn]))
 }

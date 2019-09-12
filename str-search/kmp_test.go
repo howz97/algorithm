@@ -61,7 +61,7 @@ func TestKMP_Index(t *testing.T) {
 	if i < 0 {
 		t.Fatal()
 	}
-	fmt.Printf("[%v]Found at %v: %v\n",elapsed.String(),i,string(txt[i:i+kmp.lenPttrn]))
+	fmt.Printf("[%v]Found at %v: %v\n", elapsed.String(), i, string(txt[i:i+kmp.lenPttrn]))
 }
 
 func TestContrast(t *testing.T) {
@@ -81,14 +81,14 @@ func TestContrast(t *testing.T) {
 	}
 	txtStr := string(txt)
 
-	const testCount  = 10
+	const testCount = 10
 	kmp := NewKMP(pattern)
 	fmt.Println("KMP:")
 	for i := 0; i < testCount; i++ {
 		start := time.Now()
 		idx := kmp.Index(txtStr)
 		elapsed := time.Since(start)
-		fmt.Printf("%v Found at %v\n",elapsed.String(),idx)
+		fmt.Printf("%v Found at %v\n", elapsed.String(), idx)
 	}
 
 	bm := NewBM(pattern)
@@ -97,7 +97,7 @@ func TestContrast(t *testing.T) {
 		start := time.Now()
 		idx := bm.Index(txtStr)
 		elapsed := time.Since(start)
-		fmt.Printf("%v Found at %v\n",elapsed.String(),idx)
+		fmt.Printf("%v Found at %v\n", elapsed.String(), idx)
 	}
 
 	fmt.Println("\nRabinKarp:")
@@ -105,7 +105,7 @@ func TestContrast(t *testing.T) {
 		start := time.Now()
 		idx := IndexRabinKarp(txtStr, pattern)
 		elapsed := time.Since(start)
-		fmt.Printf("%v Found at %v\n",elapsed.String(),idx)
+		fmt.Printf("%v Found at %v\n", elapsed.String(), idx)
 	}
 
 	fmt.Println("\nbytes.Index(Rabin-Karp):")
@@ -113,6 +113,6 @@ func TestContrast(t *testing.T) {
 		start := time.Now()
 		idx := strings.Index(txtStr, pattern)
 		elapsed := time.Since(start)
-		fmt.Printf("%v Found at %v\n",elapsed.String(),idx)
+		fmt.Printf("%v Found at %v\n", elapsed.String(), idx)
 	}
 }

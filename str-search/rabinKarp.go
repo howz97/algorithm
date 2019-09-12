@@ -1,5 +1,5 @@
 /*
-	Go library: bytes.Index
+	Go library: strings.Index
 */
 package str_search
 
