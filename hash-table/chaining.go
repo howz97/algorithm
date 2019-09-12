@@ -1,39 +1,106 @@
 package hashtable
 
 const (
-	maxBucketAvrgSize = 4
+	maxLoadFactor = 8
+	minLoadFactor = 1
 )
 
 type ChainHT struct {
 	kvNum   int
-	tblSize int
-	tbl     []bucket
+	tbl     table
 }
 
-func New() *ChainHT {
+func New(size int) *ChainHT {
+	if size < 1 {
+		panic("hash table size less than 1")
+	}
 	return &ChainHT{
-		tblSize: 1,
-		tbl:     make([]bucket, 1),
+		tbl:     makeTable(size),
 	}
 }
 
-func (t *ChainHT) Put(k Key, v interface{}) {
-	t.tbl[k.HashCode()%t.tblSize].put(k, v)
-	t.kvNum++
-	//if t.BucketAvrgSize() >= maxBucketAvrgSize {
-	//	for i :=0; i< t.tblSize;i++ {
-	//		t.tbl = append(t.tbl, bucket{})
-	//	}
-	//	t.tblSize *= 2
-	//}
+func (ht *ChainHT) Put(k Key, v interface{}) {
+	if v == nil {
+		ht.delete(k)
+		return
+	}
+	if ht.LoadFactor() >= maxLoadFactor {
+		ht.expand()
+	}
+	ht.tbl.put(k, v)
+	ht.kvNum++
 }
 
-func (t *ChainHT) Get(k Key) interface{} {
-
+func (ht *ChainHT) Get(k Key) interface{} {
+	return ht.tbl.get(k)
 }
 
-func (t *ChainHT) BucketAvrgSize() int {
-	return t.kvNum/t.tblSize
+func (ht *ChainHT) delete(k Key) {
+	if ht.tbl.delete(k) {
+		ht.kvNum--
+		if ht.LoadFactor() < minLoadFactor {
+			ht.shrink()
+		}
+	}
+}
+
+func (ht *ChainHT) TblSize() int {
+	return ht.tbl.size()
+}
+
+func (ht *ChainHT) Size() int {
+	return ht.kvNum
+}
+
+func (ht *ChainHT) LoadFactor() int {
+	return ht.Size()/ ht.TblSize()
+}
+
+func (ht *ChainHT) expand() {
+	newTbl := make([]bucket, ht.TblSize()*2)
+	tblMove(ht.tbl, newTbl)
+	ht.tbl = newTbl
+}
+
+func (ht *ChainHT) shrink() {
+	if ht.TblSize() == 1 {
+		return
+	}
+	newTbl := make([]bucket, ht.TblSize()/2)
+	tblMove(ht.tbl, newTbl)
+	ht.tbl = newTbl
+}
+
+func tblMove(src table, dst table) {
+	for _, b := range src {
+		n := b.head
+		for n != nil {
+			dst.put(n.k, n.v)
+			n = n.next
+		}
+	}
+}
+
+type table []bucket
+
+func makeTable(size int) table {
+	return make(table, size)
+}
+
+func (t table) put(k Key, v interface{}) {
+	t[k.HashCode()%t.size()].put(k, v)
+}
+
+func (t table) get(k Key) interface{} {
+	return t[k.HashCode()%t.size()].get(k)
+}
+
+func (t table) delete(k Key) bool {
+	return t[k.HashCode()%t.size()].delete(k)
+}
+
+func (t table) size() int {
+	return len(t)
 }
 
 type bucket struct {
@@ -46,6 +113,12 @@ func (b *bucket) put(k Key, v interface{}) {
 
 func (b *bucket) get(k Key) interface{} {
 	return b.head.get(k)
+}
+
+func (b *bucket) delete(k Key) bool {
+	var deleted bool
+	b.head, deleted = b.head.delete(k)
+	return deleted
 }
 
 type node struct {
@@ -77,4 +150,16 @@ func (n *node) get(k Key) interface{} {
 		return n.v
 	}
 	return n.next.get(k)
+}
+
+func (n *node)delete(k Key) (*node, bool) {
+	if n == nil {
+		return nil, false
+	}
+	if k.Equal(n.k) {
+		return n.next, true
+	}
+	var deleted bool
+	n.next, deleted = n.next.delete(k)
+	return n, deleted
 }
