@@ -16,20 +16,20 @@ var (
 	ErrEmptyBQ = errors.New("delete but BQ has been empty")
 )
 
-// BQ is a binomail queue
+// BQ is a binomial queue
 type BQ struct {
 	currentSize int
 	trees       []*node
 }
 
-// New return a binomail queue with default capacity
+// New return a binomial queue with default capacity
 func New() *BQ {
 	return &BQ{
 		trees: make([]*node, defaultMaxTrees),
 	}
 }
 
-// NewWithMaxTrees return a binomail queue that capacity equal to 2^(maxTrees+1)-1
+// NewWithMaxTrees return a binomial queue that capacity equal to 2^(maxTrees+1)-1
 func NewWithMaxTrees(maxTrees int) *BQ {
 	return &BQ{
 		trees: make([]*node, maxTrees),
@@ -45,8 +45,6 @@ func (bq *BQ) Merge(bq1 *BQ) error {
 	var carry *node
 	for i := 0; i <= max(bq.MaxTrees(), bq1.MaxTrees()); i++ {
 		switch bq.hasTree(i) + bq1.hasTree(i)*2 + notNil(carry)*4 {
-		case 0:
-		case 1:
 		case 2:
 			bq.trees[i] = bq1.trees[i]
 		case 3:
@@ -62,14 +60,13 @@ func (bq *BQ) Merge(bq1 *BQ) error {
 			fallthrough
 		case 7:
 			carry = merge(carry, bq1.trees[i])
-		default:
-			panic("exst return neither 0 nor 1")
+		default: // case 0, case 1
 		}
 	}
 	return nil
 }
 
-// Insert k into binomail queue. ErrExceedCap returned when BQ has been full
+// Insert k into binomial queue. ErrExceedCap returned when BQ has been full
 func (bq *BQ) Insert(k int) error {
 	bq1 := NewWithMaxTrees(1)
 	bq1.trees[0] = &node{
@@ -112,7 +109,7 @@ func (bq *BQ) IsEmpty() bool {
 	return bq.currentSize == 0
 }
 
-// Size return the current size of the binomail queue
+// Size return the current size of the binomial queue
 func (bq *BQ) Size() int {
 	return bq.currentSize
 }

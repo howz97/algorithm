@@ -33,29 +33,28 @@ var (
 // Alphabet represent an alphabet
 type Alphabet struct {
 	rtoi map[rune]int
-	itor map[int]rune
+	itor []rune
 }
 
 // NewAlphabet assume every rune in s is unique
 func NewAlphabet(s string) *Alphabet {
 	a := &Alphabet{
 		rtoi: make(map[rune]int),
-		itor: make(map[int]rune),
+		itor: make([]rune, 0),
 	}
 	for i, r := range s {
 		a.rtoi[r] = i
-		a.itor[i] = r
+		a.itor = append(a.itor, r)
 	}
 	return a
 }
 
 // ToRune convert index to rune
 func (a *Alphabet) ToRune(i int) rune {
-	r, exst := a.itor[i]
-	if !exst {
+	if i >= len(a.itor) {
 		panic(fmt.Sprintf("index %v exceed range of Alphabet", i))
 	}
-	return r
+	return a.itor[i]
 }
 
 // ToIndex convert rune to index
