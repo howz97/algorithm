@@ -1,17 +1,17 @@
 package queue
 
 type StrQ struct {
-	head *elem
-	tail *elem
+	head *elemStr
+	tail *elemStr
 }
 
 func NewStrQ() *StrQ {
 	return new(StrQ)
 }
 
-type elem struct {
+type elemStr struct {
 	s    string
-	next *elem
+	next *elemStr
 }
 
 func (q *StrQ) Front() string {
@@ -30,12 +30,12 @@ func (q *StrQ) Front() string {
 
 func (q *StrQ) PushBack(s string) {
 	if q.tail == nil {
-		q.head = &elem{
+		q.head = &elemStr{
 			s: s,
 		}
 		q.tail = q.head
 	} else {
-		q.tail.next = &elem{
+		q.tail.next = &elemStr{
 			s: s,
 		}
 		q.tail = q.tail.next

@@ -6,8 +6,8 @@ const (
 )
 
 type ChainHT struct {
-	kvNum   int
-	tbl     table
+	kvNum int
+	tbl   table
 }
 
 func New(size int) *ChainHT {
@@ -15,7 +15,7 @@ func New(size int) *ChainHT {
 		panic("hash table size less than 1")
 	}
 	return &ChainHT{
-		tbl:     makeTable(size),
+		tbl: makeTable(size),
 	}
 }
 
@@ -53,7 +53,7 @@ func (ht *ChainHT) Size() int {
 }
 
 func (ht *ChainHT) LoadFactor() int {
-	return ht.Size()/ ht.TblSize()
+	return ht.Size() / ht.TblSize()
 }
 
 func (ht *ChainHT) expand() {
@@ -130,13 +130,13 @@ type node struct {
 func (n *node) put(k Key, v interface{}) *node {
 	if n == nil {
 		return &node{
-			k:    k,
-			v:    v,
+			k: k,
+			v: v,
 		}
 	}
 	if k.Equal(n.k) {
 		n.v = v
-	}else {
+	} else {
 		n.next = n.next.put(k, v)
 	}
 	return n
@@ -152,7 +152,7 @@ func (n *node) get(k Key) interface{} {
 	return n.next.get(k)
 }
 
-func (n *node)delete(k Key) (*node, bool) {
+func (n *node) delete(k Key) (*node, bool) {
 	if n == nil {
 		return nil, false
 	}
