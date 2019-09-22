@@ -23,6 +23,7 @@ func NewConnectivity(g Graph) *ConnvtyDetector {
 
 func (cd *ConnvtyDetector) dfs(g Graph, src int) {
 	cd.id[src] = cd.count
+	cd.marked[src] = true
 	adjs, _ := g.Adjacent(src)
 	for _, adj := range adjs {
 		if !cd.marked[adj] {

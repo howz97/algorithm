@@ -34,6 +34,9 @@ func NewSymbolGraph(filename string) (*SymbolGraph, error) {
 	}
 	for i := range dataSpltd {
 		dataSpltd[i] = strings.Trim(dataSpltd[i], " ")
+		if dataSpltd[i] == "" {
+			continue
+		}
 		s := dataSpltd[i]
 		if s[len(s)-1] == ':' {
 			s = s[:len(s)-1]
@@ -46,10 +49,16 @@ func NewSymbolGraph(filename string) (*SymbolGraph, error) {
 	sg.g = NewGraph(len(sg.st))
 	v := 0
 	for _, s := range dataSpltd {
+		if s == "" {
+			continue
+		}
 		if s[len(s)-1] == ':' {
 			v = sg.st[s[:len(s)-1]]
 		} else {
-			sg.g.AddEdge(v, sg.st[s])
+			err := sg.g.AddEdge(v, sg.st[s])
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	return sg, nil

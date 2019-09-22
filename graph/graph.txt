@@ -1,0 +1,103 @@
+A:
+    B
+    C
+    D
+E:
+    F
+    G
+    H
+I:
+    J
+    K
+    A
+    B
+    C
+D:
+    E
+    F
+    G
+    H
+I:
+    J
+    K
+    A
+    B
+    C
+    D
+E:
+    F
+    G
+    H
+    I
+    J
+K:
+    A
+    B
+    C
+    D
+    E
+F:
+    G
+    H
+    I
+K:
+    B
+    C
+    D
+    E
+F:
+    G
+    H
+    I
+J:
+    K
+    A
+    B
+C:
+    D
+    E
+    F
+    G
+H:
+    I
+    J
+    B
+    C
+D:
+    E
+    F
+    G
+H:
+    I
+    J
+K:
+    A
+    B
+    C
+    D
+    E
+    F
+    G
+H:
+    I
+    J
+    G
+    I
+    J
+    K
+    A
+    B
+    C
+    D
+    E
+    F
+G:
+    H
+    I
+    K
+    A
+B:
+    C
+    D
+    E
+    F

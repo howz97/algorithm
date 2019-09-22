@@ -9,6 +9,7 @@ import (
 
 var (
 	errVerticalNotExist = errors.New("vertical not exist")
+	errNotSupportSelfLoop = errors.New("not support self loop")
 )
 
 type Graph []set.Set
@@ -42,13 +43,16 @@ func (g Graph) NumEdge() int {
 	for i := range g {
 		nume += g[i].Len()
 	}
-	return nume
+	return nume/2
 }
 
 // AddEdge add edge v1-v2
 func (g Graph) AddEdge(v1, v2 int) error {
 	if !g.HasV(v1) || !g.HasV(v2) {
 		return errVerticalNotExist
+	}
+	if v1 == v2 {
+		return errNotSupportSelfLoop
 	}
 	g[v1].Add(v2)
 	g[v2].Add(v1)
