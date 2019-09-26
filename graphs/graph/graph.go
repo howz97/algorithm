@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	errVerticalNotExist = errors.New("vertical not exist")
+	errVerticalNotExist   = errors.New("vertical not exist")
 	errNotSupportSelfLoop = errors.New("not support self loop")
 )
 
@@ -43,7 +43,7 @@ func (g Graph) NumEdge() int {
 	for i := range g {
 		nume += g[i].Len()
 	}
-	return nume/2
+	return nume / 2
 }
 
 // AddEdge add edge v1-v2
@@ -94,14 +94,14 @@ func HasCycle(g Graph) bool {
 		if b {
 			continue
 		}
-		if hasCycleDFS(g, i,i, marked) {
+		if hasCycleDFS(g, i, i, marked) {
 			return true
 		}
 	}
 	return false
 }
 
-func hasCycleDFS(g Graph, last,cur int,marked []bool) bool {
+func hasCycleDFS(g Graph, last, cur int, marked []bool) bool {
 	if marked[cur] {
 		return true
 	}
@@ -111,7 +111,7 @@ func hasCycleDFS(g Graph, last,cur int,marked []bool) bool {
 		if adj == last {
 			continue
 		}
-		if hasCycleDFS(g, cur,adj, marked) {
+		if hasCycleDFS(g, cur, adj, marked) {
 			return true
 		}
 	}
@@ -125,7 +125,7 @@ func IsBipartiteGraph(g Graph) bool {
 		if b {
 			continue
 		}
-		if !isBipartiteDFS(g, i,true, colors,marked) {
+		if !isBipartiteDFS(g, i, true, colors, marked) {
 			return false
 		}
 	}
@@ -143,8 +143,7 @@ func isBipartiteDFS(g Graph, cur int, color bool, colors []bool, marked []bool) 
 			}
 		}
 		return true
-	}else {
+	} else {
 		return colors[cur] == color
 	}
 }
-

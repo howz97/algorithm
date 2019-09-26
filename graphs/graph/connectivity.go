@@ -50,6 +50,6 @@ func (cd *ConnvtyDetector) SubGraphIDOf(v int) (int, error) {
 	return cd.id[v], nil
 }
 
-func (cd *ConnvtyDetector)hasV(v int) bool {
-	return v >=0 && v < len(cd.marked)
+func (cd *ConnvtyDetector) hasV(v int) bool {
+	return v >= 0 && v < len(cd.marked)
 }

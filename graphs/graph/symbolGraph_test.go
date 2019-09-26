@@ -14,7 +14,7 @@ func TestNewSymbolGraph(t *testing.T) {
 	if b, _ := sg.HasEdge("A", "E"); b {
 		t.Fatal()
 	}
-	if err := sg.AddEdge("A", "E");err != nil {
+	if err := sg.AddEdge("A", "E"); err != nil {
 		t.Fatal(err)
 	}
 	t.Log(sg.NumEdge())
@@ -22,35 +22,35 @@ func TestNewSymbolGraph(t *testing.T) {
 		t.Fatal()
 	}
 	adj, _ := sg.Adjacent("A")
-	t.Log("A -> ",adj)
+	t.Log("A -> ", adj)
 }
 
 func TestNewGraph(t *testing.T) {
 	g := NewGraph(7)
-	g.AddEdge(0,1)
-	g.AddEdge(0,2)
-	g.AddEdge(0,5)
-	g.AddEdge(2,1)
-	g.AddEdge(2,3)
-	g.AddEdge(2,4)
-	g.AddEdge(3,4)
-	g.AddEdge(3,5)
+	g.AddEdge(0, 1)
+	g.AddEdge(0, 2)
+	g.AddEdge(0, 5)
+	g.AddEdge(2, 1)
+	g.AddEdge(2, 3)
+	g.AddEdge(2, 4)
+	g.AddEdge(3, 4)
+	g.AddEdge(3, 5)
 	bfs, err := NewBFS(g, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !bfs.IsConnectedTo(3) {
+	if !bfs.IsMarked(3) {
 		t.Fatal()
 	}
-	if bfs.IsConnectedTo(6) {
+	if bfs.IsMarked(6) {
 		t.Fatal()
 	}
-	t.Log("shortest path of 0->3: ",bfs.ShortestPathTo(3))
+	t.Log("shortest path of 0->3: ", bfs.ShortestPathTo(3))
 	cd := NewConnectivity(g)
-	if b, _ := cd.IsConnected(3,6); b {
+	if b, _ := cd.IsConnected(3, 6); b {
 		t.Fatal()
 	}
-	if b, _ := cd.IsConnected(3,1); !b {
+	if b, _ := cd.IsConnected(3, 1); !b {
 		t.Fatal()
 	}
 	t.Log("number of subGraph:", cd.NumSubGraph())

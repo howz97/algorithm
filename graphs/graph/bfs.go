@@ -40,7 +40,7 @@ func NewBFS(g Graph, src int) (*BFS, error) {
 	return bfs, nil
 }
 
-func (bfs *BFS) IsConnectedTo(v int) bool {
+func (bfs *BFS) IsMarked(v int) bool {
 	if v < 0 || v >= len(bfs.marked) {
 		return false
 	}
