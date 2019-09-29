@@ -66,7 +66,6 @@ func (a *Alphabet) ToIndex(r rune) int {
 	return i
 }
 
-// Contains -
 func (a *Alphabet) Contains(r rune) bool {
 	_, exst := a.rtoi[r]
 	return exst

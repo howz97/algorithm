@@ -14,7 +14,8 @@ func Test_StrQueue(t *testing.T) {
 		q.PushBack(strconv.Itoa(i))
 	}
 	for i := 0; i <= 10; i++ {
-		n, _ := strconv.Atoi(q.Front())
+		s, _ := q.Front()
+		n, _ := strconv.Atoi(s)
 		if n != i {
 			t.Fatal()
 		}

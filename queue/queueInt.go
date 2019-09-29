@@ -14,22 +14,20 @@ type elemInt struct {
 	next *elemInt
 }
 
-func (q *IntQ) Front() int {
+func (q *IntQ) Front() (int, error) {
+	if q.IsEmpty() {
+		return 0, ErrEmptyQ
+	}
+	e := q.head.i
+	q.head = q.head.next
 	if q.head == nil {
-		return 0
-	}
-	i := q.head.i
-	if q.head.next == nil {
-		q.head = nil
 		q.tail = nil
-	} else {
-		q.head = q.head.next
 	}
-	return i
+	return e, nil
 }
 
 func (q *IntQ) PushBack(i int) {
-	if q.tail == nil {
+	if q.IsEmpty() {
 		q.head = &elemInt{
 			i: i,
 		}

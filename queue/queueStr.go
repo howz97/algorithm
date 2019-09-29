@@ -14,22 +14,20 @@ type elemStr struct {
 	next *elemStr
 }
 
-func (q *StrQ) Front() string {
+func (q *StrQ) Front() (string, error) {
+	if q.IsEmpty() {
+		return "", ErrEmptyQ
+	}
+	e := q.head.s
+	q.head = q.head.next
 	if q.head == nil {
-		return ""
-	}
-	s := q.head.s
-	if q.head.next == nil {
-		q.head = nil
 		q.tail = nil
-	} else {
-		q.head = q.head.next
 	}
-	return s
+	return e, nil
 }
 
 func (q *StrQ) PushBack(s string) {
-	if q.tail == nil {
+	if q.IsEmpty() {
 		q.head = &elemStr{
 			s: s,
 		}
