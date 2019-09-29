@@ -64,7 +64,7 @@ func TestKMP_Index(t *testing.T) {
 	fmt.Printf("[%v]Found at %v: %v\n", elapsed.String(), i, string(txt[i:i+kmp.lenPttrn]))
 }
 
-func TestContrast(t *testing.T) {
+func TestPerformance(t *testing.T) {
 	pattern := "It is a far, far better thing that I do, than I have ever done"
 	file, err := os.Open("/Users/zhanghao/go/src/github.com/zh1014/algorithm/str-search/tale.txt")
 	if err != nil {
