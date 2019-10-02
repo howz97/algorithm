@@ -190,7 +190,7 @@ func primVisit(g EdgeWeightedGraph, v int, marked []bool, pq *pqueue.BinHeap, ed
 	}
 }
 
-// Kruskal 仅支持连通图
+// Kruskal 该实现仅支持连通图
 func (g EdgeWeightedGraph) Kruskal() *queue.Queen {
 	mst := queue.NewQueen(g.NumV()- 1)
 	uf := unionfind.NewUF(g.NumV())
