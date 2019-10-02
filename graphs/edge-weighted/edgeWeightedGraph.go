@@ -184,8 +184,7 @@ func primVisit(g EdgeWeightedGraph, v int, marked []bool, pq *pqueue.BinHeap, ed
 			edgeTo[w] = e
 			pq.Insert(e.weight, w)
 		}else if e.weight < edgeTo[w].weight {
-			pq.Delete(edgeTo[w].weight, w)
-			pq.Insert(e.weight, w)
+			pq.Update(e.weight, w)
 			edgeTo[w] = e
 		}
 	}
