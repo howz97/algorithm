@@ -1,21 +1,21 @@
-package edge_weighted
+package ewg
 
-type edgeSet map[*edge]struct{}
+type edgeSet map[*Edge]struct{}
 
-func New() edgeSet {
-	return make(map[*edge]struct{})
+func NewEdgeSet() edgeSet {
+	return make(map[*Edge]struct{})
 }
 
-func (s edgeSet) add(e *edge) {
+func (s edgeSet) add(e *Edge) {
 	s[e] = struct{}{}
 }
 
-func (s edgeSet) contains(e *edge) bool {
+func (s edgeSet) contains(e *Edge) bool {
 	_, contain := s[e]
 	return contain
 }
 
-func (s edgeSet) remove(e *edge) {
+func (s edgeSet) remove(e *Edge) {
 	delete(s, e)
 }
 
@@ -29,8 +29,8 @@ func (s edgeSet) len() int {
 	return len(s)
 }
 
-func (s edgeSet) traverse() []*edge {
-	result := make([]*edge, 0)
+func (s edgeSet) traverse() []*Edge {
+	result := make([]*Edge, 0)
 	for e := range s {
 		result = append(result, e)
 	}

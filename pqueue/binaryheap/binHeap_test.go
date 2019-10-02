@@ -25,7 +25,7 @@ func Test_Heap(t *testing.T) {
 		t.Fatal("DelMin failed")
 	}
 	for i := 1; i <= 9; i++ {
-		if _, m := h.DelMin();m != i {
+		if _, m := h.DelMin(); m != i {
 			t.Fatal("DelMin failed")
 		}
 	}

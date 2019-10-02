@@ -60,12 +60,12 @@ func (h *BinHeap) Insert(p int, v interface{}) (ok bool) {
 		return false
 	}
 	h.size++
-	h.arry[h.size] = Elem{p:p, v:v}
+	h.arry[h.size] = Elem{p: p, v: v}
 	h.percolateUp(h.size)
 	return true
 }
 
-func (h *BinHeap) DelMin() (p int, v interface{}) {
+func (h *BinHeap) DelMin() interface{} {
 	if h.IsEmpty() {
 		panic("delete from empty heap")
 	}
@@ -73,7 +73,7 @@ func (h *BinHeap) DelMin() (p int, v interface{}) {
 	h.arry[1] = h.arry[h.size]
 	h.size--
 	h.percolateDown(1)
-	return del.p, del.v
+	return del.v
 }
 
 func (h *BinHeap) IsEmpty() bool {

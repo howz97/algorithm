@@ -1,12 +1,12 @@
 package queue
 
-type InterfaceQ struct {
+type LinkedQueue struct {
 	head *elemInterface
 	tail *elemInterface
 }
 
-func NewInterfaceQ() *InterfaceQ {
-	return new(InterfaceQ)
+func NewLinkedQueue() *LinkedQueue {
+	return new(LinkedQueue)
 }
 
 type elemInterface struct {
@@ -15,7 +15,7 @@ type elemInterface struct {
 }
 
 // Front return a nil when queue has been empty
-func (q *InterfaceQ) Front() interface{} {
+func (q *LinkedQueue) Front() interface{} {
 	if q.IsEmpty() {
 		return nil
 	}
@@ -28,7 +28,7 @@ func (q *InterfaceQ) Front() interface{} {
 }
 
 // PushBack can not insert a nil element
-func (q *InterfaceQ) PushBack(e interface{}) error {
+func (q *LinkedQueue) PushBack(e interface{}) error {
 	if e == nil {
 		return ErrPushBackNilElem
 	}
@@ -46,6 +46,6 @@ func (q *InterfaceQ) PushBack(e interface{}) error {
 	return nil
 }
 
-func (q *InterfaceQ) IsEmpty() bool {
+func (q *LinkedQueue) IsEmpty() bool {
 	return q.head == nil
 }
