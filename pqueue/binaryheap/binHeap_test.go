@@ -21,11 +21,11 @@ func Test_Heap(t *testing.T) {
 	if h.Insert(9, 9) {
 		t.Fatal("Insert failed")
 	}
-	if _, m := h.DelMin(); m != 1 {
+	if m := h.DelMin(); m != 1 {
 		t.Fatal("DelMin failed")
 	}
 	for i := 1; i <= 9; i++ {
-		if _, m := h.DelMin(); m != i {
+		if m := h.DelMin(); m != i {
 			t.Fatal("DelMin failed")
 		}
 	}
