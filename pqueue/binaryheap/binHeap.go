@@ -1,26 +1,37 @@
 package pqueue
 
+type Elem struct {
+	p int
+	v interface{}
+}
+
 // BinHeap -
 type BinHeap struct {
 	size int
-	arry []int
+	arry []Elem
 }
 
 // NewBinHeap -
 func NewBinHeap(cap int) *BinHeap {
-	h := &BinHeap{
-		arry: make([]int, cap+1),
+	if cap < 1 {
+		panic("capacity less than 1")
 	}
-	h.arry[0] = -1 << 63
+	h := &BinHeap{
+		arry: make([]Elem, cap+1),
+	}
+	h.arry[0].p = -1 << 63
 	return h
 }
 
 // NewBinHeapWitArray -
-func NewBinHeapWitArray(arry []int, cap int) *BinHeap {
-	h := &BinHeap{
-		arry: make([]int, cap+1),
+func NewBinHeapWitArray(arry []Elem, cap int) *BinHeap {
+	if cap < 1 {
+		panic("capacity less than 1")
 	}
-	h.arry[0] = -1 << 63
+	h := &BinHeap{
+		arry: make([]Elem, cap+1),
+	}
+	h.arry[0].p = -1 << 63
 	if len(arry) >= cap {
 		copy(h.arry[1:], arry[:cap])
 		h.size = cap
@@ -44,53 +55,62 @@ func (h *BinHeap) Cap() int {
 	return len(h.arry) - 1
 }
 
-// Insert -
-func (h *BinHeap) Insert(k int) (ok bool) {
+func (h *BinHeap) Insert(p int, v interface{}) (ok bool) {
 	if h.size >= h.Cap() {
 		return false
 	}
 	h.size++
-	h.arry[h.size] = k
+	h.arry[h.size] = Elem{p:p, v:v}
 	h.percolateUp(h.size)
 	return true
 }
 
-// DelMin -
-func (h *BinHeap) DelMin() int {
+func (h *BinHeap) DelMin() (p int, v interface{}) {
+	if h.IsEmpty() {
+		panic("delete from empty heap")
+	}
 	del := h.arry[1]
 	h.arry[1] = h.arry[h.size]
 	h.size--
 	h.percolateDown(1)
-	return del
+	return del.p, del.v
+}
+
+func (h *BinHeap) IsEmpty() bool {
+	return h.size == 0
+}
+
+func (h *BinHeap) IsFull() bool {
+	return h.size == h.Cap()
 }
 
 func (h *BinHeap) percolateDown(i int) {
 	arry := h.arry
-	k := arry[i]
-	cavIdx := i
+	downingElem := arry[i]
+	cavPointer := i
 	for {
-		if cavIdx*2 > h.size {
+		if cavPointer*2 > h.size {
 			break
 		}
-		smallC := cavIdx * 2
-		if smallC != h.size && arry[smallC+1] < arry[smallC] {
+		smallC := cavPointer * 2
+		if smallC != h.size && arry[smallC+1].p < arry[smallC].p {
 			smallC++
 		}
-		if arry[smallC] > k {
+		if arry[smallC].p > downingElem.p {
 			break
 		}
-		arry[cavIdx] = arry[smallC]
-		cavIdx = smallC
+		arry[cavPointer] = arry[smallC]
+		cavPointer = smallC
 	}
-	arry[cavIdx] = k
+	arry[cavPointer] = downingElem
 }
 
 func (h *BinHeap) percolateUp(i int) {
 	arry := h.arry
-	k := arry[i]
-	cavIdx := i
-	for ; arry[cavIdx/2] > k; cavIdx /= 2 {
-		h.arry[cavIdx] = h.arry[cavIdx/2]
+	uppingElem := arry[i]
+	cavPointer := i
+	for ; arry[cavPointer/2].p > uppingElem.p; cavPointer /= 2 {
+		h.arry[cavPointer] = h.arry[cavPointer/2]
 	}
-	arry[cavIdx] = k
+	arry[cavPointer] = uppingElem
 }
