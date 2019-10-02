@@ -6,7 +6,6 @@ import (
 	pqueue "github.com/zh1014/algorithm/pqueue/binaryheap"
 	"github.com/zh1014/algorithm/queue"
 	unionfind "github.com/zh1014/algorithm/union-find"
-	"math"
 )
 
 var (
@@ -24,68 +23,53 @@ func NewEWG(numV int) EdgeWeightedGraph {
 	return g
 }
 
-func (ewg EdgeWeightedGraph) NumV() int {
-	return len(ewg)
+func (g EdgeWeightedGraph) NumV() int {
+	return len(g)
 }
 
-func (ewg EdgeWeightedGraph) NumE() int {
+func (g EdgeWeightedGraph) NumE() int {
 	nume := 0
-	for i := range ewg {
-		nume += ewg[i].len()
+	for i := range g {
+		nume += g[i].len()
 	}
 	return nume / 2
 }
 
-func (ewg EdgeWeightedGraph) AddEdge(e *Edge) {
+func (g EdgeWeightedGraph) AddEdge(e *Edge) {
 	v1 := e.EitherV()
 	v2 := e.Another(v1)
-	if !ewg.HasV(v1) || !ewg.HasV(v2) {
+	if !g.HasV(v1) || !g.HasV(v2) {
 		panic(ErrVerticalNotExist)
 	}
 	if v1 == v2 {
 		panic(ErrNotSupportSelfLoop)
 	}
-	ewg[v1].add(e)
-	ewg[v2].add(e)
+	g[v1].add(e)
+	g[v2].add(e)
 }
 
-func (ewg EdgeWeightedGraph) Adjacent(v int) []*Edge {
-	if !ewg.HasV(v) {
+func (g EdgeWeightedGraph) Adjacent(v int) []*Edge {
+	if !g.HasV(v) {
 		panic(ErrVerticalNotExist)
 	}
-	return ewg[v].traverse()
+	return g[v].traverse()
 }
 
-func (ewg EdgeWeightedGraph) AllEdges() []*Edge {
-	marked := make([]bool, ewg.NumV())
-	edgesQ := queue.NewQueen(ewg.NumV())
-	for i, b := range marked {
-		if !b {
-			ewg.dfsAllEdges(i, marked, edgesQ)
+func (g EdgeWeightedGraph) AllEdges() *queue.Queen {
+	edges := queue.NewQueen(g.NumE())
+	for i := range g {
+		adj := g.Adjacent(i)
+		for _, e := range adj {
+			if e.Another(i) > i { // self-loop not supported
+				edges.PushBack(e)
+			}
 		}
-	}
-	edges := make([]*Edge, ewg.NumV())
-	for i := 0; !edgesQ.IsEmpty(); i++ {
-		f, _ := edgesQ.Front()
-		edges[i] = f.(*Edge)
 	}
 	return edges
 }
 
-func (ewg EdgeWeightedGraph) dfsAllEdges(v int, marked []bool, edges *queue.Queen) {
-	adj := ewg.Adjacent(v)
-	for _, e := range adj {
-		v2 := e.Another(v)
-		if !marked[v2] {
-			edges.PushBack(e)
-			marked[v2] = true
-			ewg.dfsAllEdges(v2, marked, edges)
-		}
-	}
-}
-
-func (ewg EdgeWeightedGraph) HasV(v int) bool {
-	return v >= 0 && v < ewg.NumV()
+func (g EdgeWeightedGraph) HasV(v int) bool {
+	return v >= 0 && v < g.NumV()
 }
 
 type Edge struct {
@@ -111,19 +95,19 @@ func (e *Edge) GetWeight() int {
 	return e.weight
 }
 
-func (ewg EdgeWeightedGraph) LazyPrim() *MSTForest {
-	marked := make([]bool, ewg.NumV())
+func (g EdgeWeightedGraph) LazyPrim() *MSTForest {
+	marked := make([]bool, g.NumV())
 	f := newMSTForest()
 	for i, b := range marked {
 		if !b {
-			f.addMST(lazyPrim(ewg, i, marked))
+			f.addMST(lazyPrim(g, i, marked))
 		}
 	}
 	return f
 }
 
 func lazyPrim(g EdgeWeightedGraph, v int, marked []bool) *queue.LinkedQueue {
-	pq := pqueue.NewBinHeap(g.NumV() - 1)
+	pq := pqueue.NewBinHeap(g.NumE())
 	marked[v] = true
 	vadj := g.Adjacent(v)
 	mst := queue.NewLinkedQueue()
@@ -157,64 +141,67 @@ func lazyPrimVisit(g EdgeWeightedGraph, v int, marked []bool, pq *pqueue.BinHeap
 	}
 }
 
-func (ewg EdgeWeightedGraph) Prim() *MSTForest {
-	marked := make([]bool, ewg.NumV())
-	distTo := make([]int, ewg.NumV())
-	for i := range distTo {
-		distTo[i] = math.MaxInt64
-	}
+func (g EdgeWeightedGraph) Prim() *MSTForest {
+	marked := make([]bool, g.NumV())
+	edgeTo := make([]*Edge, g.NumV())
 	f := newMSTForest()
 	for i, b := range marked {
 		if !b {
-			f.addMST(prim(ewg, i, marked, distTo))
+			f.addMST(prim(g, i, marked, edgeTo))
 		}
 	}
 	return f
 }
 
-func prim(g EdgeWeightedGraph, v int, marked []bool, distTo []int) *queue.LinkedQueue {
+func prim(g EdgeWeightedGraph, v int, marked []bool, edgeTo []*Edge) *queue.LinkedQueue {
 	pq := pqueue.NewBinHeap(g.NumV() - 1)
 	marked[v] = true
-	vadj := g.Adjacent(v)
-	mst := queue.NewLinkedQueue()
-	for i := range vadj {
-		pq.Insert(vadj[i].weight, vadj[i])
+	adj := g.Adjacent(v)
+	for _, e := range adj {
+		w := e.Another(v)
+		pq.Insert(e.weight, w)
+		edgeTo[w] = e
 	}
+	mst := queue.NewLinkedQueue()
 	for !pq.IsEmpty() {
 		m := pq.DelMin()
-		e := m.(*Edge)
-		mst.PushBack(e)
-		if !marked[e.v] {
-			primVisit(g, e.v, marked, pq, distTo)
-		}
-		if !marked[e.w] {
-			primVisit(g, e.w, marked, pq, distTo)
-		}
+		w := m.(int)
+		mst.PushBack(edgeTo[w])
+		primVisit(g, w, marked, pq, edgeTo)
 	}
 	return mst
 }
 
-func primVisit(g EdgeWeightedGraph, v int, marked []bool, pq *pqueue.BinHeap, distTo []int) {
+func primVisit(g EdgeWeightedGraph, v int, marked []bool, pq *pqueue.BinHeap, edgeTo []*Edge) {
 	marked[v] = true
-	vadj := g.Adjacent(v)
-	for _, e := range vadj {
+	adj := g.Adjacent(v)
+	for _, e := range adj {
 		w := e.Another(v)
-		if !marked[w] && e.weight < distTo[w] {
-			distTo[w] = e.weight
-			pq.Insert(e.weight, e)
+		if marked[w] {
+			continue
+		}
+		if edgeTo[w] == nil {
+			edgeTo[w] = e
+			pq.Insert(e.weight, w)
+		}else if e.weight < edgeTo[w].weight {
+			pq.Delete(edgeTo[w].weight, w)
+			pq.Insert(e.weight, w)
+			edgeTo[w] = e
 		}
 	}
 }
 
-func (ewg EdgeWeightedGraph) Kruskal() *queue.Queen {
-	mst := queue.NewQueen(ewg.NumV())
-	uf := unionfind.NewUF(ewg.NumV())
-	pq := pqueue.NewBinHeap(ewg.NumE())
-	allEdge := ewg.AllEdges()
-	for _, e := range allEdge {
+// Kruskal 仅支持连通图
+func (g EdgeWeightedGraph) Kruskal() *queue.Queen {
+	mst := queue.NewQueen(g.NumV()- 1)
+	uf := unionfind.NewUF(g.NumV())
+	pq := pqueue.NewBinHeap(g.NumE())
+	allEdge := g.AllEdges()
+	for !allEdge.IsEmpty() {
+		e := allEdge.Front().(*Edge)
 		pq.Insert(e.weight, e)
 	}
-	for !pq.IsEmpty() {
+	for !mst.IsFull() {
 		min := pq.DelMin()
 		minE := min.(*Edge)
 		if uf.IsConnected(minE.v, minE.w) {

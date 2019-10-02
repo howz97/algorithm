@@ -1,7 +1,9 @@
 package pqueue
 
 import (
+	"fmt"
 	"testing"
+	"time"
 )
 
 func Test_Heap(t *testing.T) {
@@ -21,6 +23,7 @@ func Test_Heap(t *testing.T) {
 	if h.Insert(9, 9) {
 		t.Fatal("Insert failed")
 	}
+	fmt.Println(h.find(5,5))
 	if m := h.DelMin(); m != 1 {
 		t.Fatal("DelMin failed")
 	}
@@ -29,4 +32,17 @@ func Test_Heap(t *testing.T) {
 			t.Fatal("DelMin failed")
 		}
 	}
+}
+
+func TestBinHeap_Delete(t *testing.T) {
+	h := NewBinHeap(9)
+	t1 := time.Now()
+	t2 := time.Now()
+	t3 := time.Now()
+	t4 := time.Now()
+	h.Insert(1, &t1)
+	h.Insert(2, &t2)
+	h.Insert(3, &t3)
+	h.Insert(4, &t4)
+	fmt.Println(h.find(3, &t3))
 }

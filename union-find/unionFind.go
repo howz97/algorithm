@@ -45,9 +45,10 @@ func (uf *UnionFind) Union(v1, v2 int) {
 	if uf.IsConnected(v1, v2) {
 		return
 	}
+	v2id := uf.id[v2]
 	for i := range uf.id {
-		if uf.id[i] == v2 {
-			uf.id[i] = v1
+		if uf.id[i] == v2id {
+			uf.id[i] = uf.id[v1]
 		}
 	}
 	uf.numcc--

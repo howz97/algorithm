@@ -76,6 +76,25 @@ func (h *BinHeap) DelMin() interface{} {
 	return del.v
 }
 
+func (h *BinHeap) Delete(p int, v interface{}) {
+	i := h.find(p, v)
+	if i == -1 {
+		return
+	}
+	h.arry[i] = h.arry[h.size]
+	h.size--
+	h.percolateDown(i)
+}
+
+func (h *BinHeap) find(p int, v interface{}) int {
+	for i, e := range h.arry {
+		if e.p == p && e.v == v {
+			return i
+		}
+	}
+	return -1
+}
+
 func (h *BinHeap) IsEmpty() bool {
 	return h.size == 0
 }

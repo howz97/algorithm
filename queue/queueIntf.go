@@ -15,8 +15,9 @@ var (
 
 // Queue can not dynamically expand. Implemented by slice
 type Queen struct {
-	elems           []interface{}
-	head, back, cap int
+	elems      []interface{}
+	head, back int
+	size, cap  int
 }
 
 func NewQueen(cap int) *Queen {
@@ -29,9 +30,9 @@ func NewQueen(cap int) *Queen {
 	}
 }
 
-func (q *Queen) Front() (interface{}, error) {
+func (q *Queen) Front() interface{} {
 	if q.IsEmpty() {
-		return nil, ErrEmptyQ
+		return nil
 	}
 	e := q.elems[q.head]
 	q.elems[q.head] = nil
@@ -39,7 +40,8 @@ func (q *Queen) Front() (interface{}, error) {
 	if q.head >= q.cap {
 		q.head -= q.cap
 	}
-	return e, nil
+	q.size--
+	return e
 }
 
 // PushBack can not insert a nil element
@@ -55,13 +57,22 @@ func (q *Queen) PushBack(e interface{}) error {
 	if q.back >= q.cap {
 		q.back -= q.cap
 	}
+	q.size++
 	return nil
 }
 
 func (q *Queen) IsEmpty() bool {
-	return q.elems[q.head] == nil
+	return q.size == 0
 }
 
 func (q *Queen) IsFull() bool {
-	return q.elems[q.back] != nil
+	return q.size == q.cap
+}
+
+func (q *Queen) Size() int {
+	return q.size
+}
+
+func (q *Queen) Cap() int {
+	return q.cap
 }
