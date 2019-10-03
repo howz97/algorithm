@@ -14,16 +14,16 @@ type elemInt struct {
 	next *elemInt
 }
 
-func (q *IntQ) Front() (int, error) {
+func (q *IntQ) Front() (int, bool) {
 	if q.IsEmpty() {
-		return 0, ErrEmptyQ
+		return 0, false
 	}
 	e := q.head.i
 	q.head = q.head.next
 	if q.head == nil {
 		q.tail = nil
 	}
-	return e, nil
+	return e, true
 }
 
 func (q *IntQ) PushBack(i int) {
