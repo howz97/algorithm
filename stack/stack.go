@@ -33,12 +33,12 @@ func (s *Stack) IsEmpty() bool {
 	return s.top == 0
 }
 
-func (s *Stack) Pop() (int, error) {
+func (s *Stack) Pop() int {
 	if s.IsEmpty() {
-		return 0, ErrEmptyStack
+		panic("pop from empty stack")
 	}
 	s.top--
-	return s.elems[s.top], nil
+	return s.elems[s.top]
 }
 
 func (s *Stack) Push(elem int) {
