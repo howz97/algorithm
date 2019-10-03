@@ -75,9 +75,9 @@ func (g Digraph) String() string {
 	return out
 }
 
-func (g Digraph)Reverse() Digraph {
+func (g Digraph) Reverse() Digraph {
 	rg := NewDigraph(g.NumV())
-	for v :=0; v < g.NumV(); v++ {
+	for v := 0; v < g.NumV(); v++ {
 		adj := g.Adjacent(v)
 		for _, w := range adj {
 			rg.AddEdge(w, v)

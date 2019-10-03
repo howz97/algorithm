@@ -31,8 +31,8 @@ func TestSCC_IsStronglyConnected(t *testing.T) {
 	fmt.Println("number of edge: ", g.NumEdge())
 	scc := NewSCC(g)
 	fmt.Println("number of SCC:", scc.NumSCC())
-	for i := 0; i < g.NumV(); i ++ {
-		fmt.Printf("SCC ID of vertical(%v): %v\n", i,scc.GetID(i))
+	for i := 0; i < g.NumV(); i++ {
+		fmt.Printf("SCC ID of vertical(%v): %v\n", i, scc.GetID(i))
 	}
 	if !scc.IsStronglyConnected(1, 1) {
 		t.Fatal()
