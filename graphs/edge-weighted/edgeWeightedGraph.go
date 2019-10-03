@@ -183,7 +183,7 @@ func primVisit(g EdgeWeightedGraph, v int, marked []bool, pq *pqueue.BinHeap, ed
 		if edgeTo[w] == nil {
 			pq.Insert(e.weight, w)
 			edgeTo[w] = e
-		}else if e.weight < edgeTo[w].weight {
+		} else if e.weight < edgeTo[w].weight {
 			pq.Update(e.weight, w)
 			edgeTo[w] = e
 		}
@@ -192,7 +192,7 @@ func primVisit(g EdgeWeightedGraph, v int, marked []bool, pq *pqueue.BinHeap, ed
 
 // Kruskal 该实现仅支持连通图
 func (g EdgeWeightedGraph) Kruskal() *queue.Queen {
-	mst := queue.NewQueen(g.NumV()- 1)
+	mst := queue.NewQueen(g.NumV() - 1)
 	uf := unionfind.NewUF(g.NumV())
 	pq := pqueue.NewBinHeap(g.NumE())
 	allEdge := g.AllEdges()

@@ -2,27 +2,29 @@ package digraph
 
 type SCC struct {
 	marked []bool
-	id []int
-	g Digraph
+	id     []int
+	g      Digraph
+	count  int
 }
 
 func NewSCC(g Digraph) *SCC {
 	scc := &SCC{
 		marked: make([]bool, g.NumV()),
 		id:     make([]int, g.NumV()),
-		g:g,
+		g:      g,
 	}
-	topOrderStack := TopologicalOrder(g)
-	for sccid := 0;!topOrderStack.IsEmpty();sccid++ {
+	topOrderStack := ReversePostOrder(g.Reverse())
+	for !topOrderStack.IsEmpty() {
 		v := topOrderStack.Pop()
 		if !scc.marked[v] {
-			scc.markID(v, sccid)
+			scc.markID(v, scc.count)
+			scc.count++
 		}
 	}
 	return scc
 }
 
-func (scc *SCC)markID(v, sccid int) {
+func (scc *SCC) markID(v, sccid int) {
 	scc.marked[v] = true
 	scc.id[v] = sccid
 	adj := scc.g.Adjacent(v)
@@ -47,6 +49,10 @@ func (scc *SCC) GetID(v int) int {
 	return scc.id[v]
 }
 
+func (scc *SCC) NumSCC() int {
+	return scc.count
+}
+
 func (scc *SCC) has(v int) bool {
-	return v >=0 && v <len(scc.marked)
+	return v >= 0 && v < len(scc.marked)
 }

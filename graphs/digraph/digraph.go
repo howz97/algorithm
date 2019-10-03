@@ -74,3 +74,14 @@ func (g Digraph) String() string {
 	out += "\n"
 	return out
 }
+
+func (g Digraph)Reverse() Digraph {
+	rg := NewDigraph(g.NumV())
+	for v :=0; v < g.NumV(); v++ {
+		adj := g.Adjacent(v)
+		for _, w := range adj {
+			rg.AddEdge(w, v)
+		}
+	}
+	return rg
+}

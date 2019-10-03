@@ -23,7 +23,7 @@ func Test_Heap(t *testing.T) {
 	if h.Insert(9, 9) {
 		t.Fatal("Insert failed")
 	}
-	fmt.Println(h.find(5,5))
+	fmt.Println(h.find(5, 5))
 	if m := h.DelMin(); m != 1 {
 		t.Fatal("DelMin failed")
 	}

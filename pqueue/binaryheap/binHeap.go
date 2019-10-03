@@ -103,7 +103,7 @@ func (h *BinHeap) Update(p int, v interface{}) {
 	if p > h.arry[i].p {
 		h.arry[i].p = p
 		h.percolateDown(i)
-	}else {
+	} else {
 		h.arry[i].p = p
 		h.percolateUp(i)
 	}
