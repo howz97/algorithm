@@ -26,7 +26,7 @@ func NewBFS(g Digraph, src int) *BFS {
 	bfs.marked[src] = true
 	q.PushBack(src)
 	for !q.IsEmpty() {
-		edge := q.Front()
+		edge, _ := q.Front()
 		adjs := g.Adjacent(edge)
 		for _, adj := range adjs {
 			if bfs.marked[adj] {
