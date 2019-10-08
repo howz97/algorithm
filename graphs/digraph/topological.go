@@ -2,7 +2,7 @@ package digraph
 
 import "github.com/zh1014/algorithm/stack"
 
-func ReversePostOrder(g Digraph) *stack.Stack {
+func ReversePostOrder(g Digraph) *stack.StackInt {
 	marked := make([]bool, g.NumV())
 	result := stack.New(g.NumV())
 	for i, b := range marked {
@@ -13,7 +13,7 @@ func ReversePostOrder(g Digraph) *stack.Stack {
 	return result
 }
 
-func reversePostDFS(g Digraph, v int, marked []bool, result *stack.Stack) {
+func reversePostDFS(g Digraph, v int, marked []bool, result *stack.StackInt) {
 	marked[v] = true
 	adj := g.Adjacent(v)
 	for _, w := range adj {
@@ -24,7 +24,7 @@ func reversePostDFS(g Digraph, v int, marked []bool, result *stack.Stack) {
 	result.Push(v)
 }
 
-func TopologicalSort(g Digraph) *stack.Stack {
+func TopologicalSort(g Digraph) *stack.StackInt {
 	if !DetectDirCycle(g) {
 		return ReversePostOrder(g)
 	}

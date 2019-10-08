@@ -1,26 +1,16 @@
 package stack
 
-import "errors"
-
-const (
-	defaultInitCap = 50
-)
-
-var (
-	ErrEmptyStack = errors.New("empty stack")
-)
-
 type Stack struct {
-	elems []int
+	elems []interface{}
 	top   int
 }
 
-func New(initCap int) *Stack {
+func NewStack(initCap int) *Stack {
 	if initCap < 2 {
 		initCap = defaultInitCap
 	}
 	return &Stack{
-		elems: make([]int, initCap),
+		elems: make([]interface{}, initCap),
 		top:   0,
 	}
 }
@@ -30,10 +20,10 @@ func (s *Stack) Size() int {
 }
 
 func (s *Stack) IsEmpty() bool {
-	return s.top == 0
+	return s == nil || s.top == 0
 }
 
-func (s *Stack) Pop() int {
+func (s *Stack) Pop() interface{} {
 	if s.IsEmpty() {
 		panic("pop from empty stack")
 	}
@@ -41,7 +31,7 @@ func (s *Stack) Pop() int {
 	return s.elems[s.top]
 }
 
-func (s *Stack) Push(elem int) {
+func (s *Stack) Push(elem interface{}) {
 	if s.isFull() {
 		s.elems = append(s.elems, elem)
 	} else {
