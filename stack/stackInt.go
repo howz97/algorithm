@@ -30,7 +30,7 @@ func (s *StackInt) Size() int {
 }
 
 func (s *StackInt) IsEmpty() bool {
-	return s.top == 0
+	return s == nil || s.top == 0
 }
 
 func (s *StackInt) Pop() int {

@@ -19,15 +19,16 @@ type ShortestPathSearcher struct {
 	spt []*ShortestPathTree
 }
 
-func NewSPS(g EdgeWeightedDigraph, alg int) *ShortestPathSearcher {
+func NewSPS(g EdgeWeightedDigraph, alg int) (*ShortestPathSearcher, error) {
 	sps := &ShortestPathSearcher{
 		g:   g,
 		spt: make([]*ShortestPathTree, g.NumV()),
 	}
+	// TODO 检查负权重边，环，负权重环
 	for src := range sps.spt {
 		sps.spt[src] = NewSPT(g, src, alg)
 	}
-	return sps
+	return sps, nil
 }
 
 func (s *ShortestPathSearcher) Distance(src, dst int) float64 {
@@ -72,7 +73,7 @@ func NewSPT(g EdgeWeightedDigraph, src int, alg int) *ShortestPathTree {
 	case Dijkstra:
 		spt.dijkstra()
 	case Topological:
-		spt.topological()
+		spt.topological(src)
 	case BellmanFord:
 		spt.bellmanFord()
 	}
@@ -133,8 +134,23 @@ func dijkstraRelax(g EdgeWeightedDigraph, v int, edgeTo []*Edge, distTo []float6
 	}
 }
 
-func (spt *ShortestPathTree) topological() {
+func (spt *ShortestPathTree) topological(src int) {
+	marked := make([]bool, spt.g.NumV())
+	topoSortStack := stack.NewStackInt(spt.g.NumV())
+	reversePostDFS(spt.g, spt.src, marked, topoSortStack)
+	for !topoSortStack.IsEmpty() {
+		topologicalRelax(spt.g, topoSortStack.Pop(), spt.edgeTo, spt.distTo)
+	}
+}
 
+func topologicalRelax(g EdgeWeightedDigraph, v int, edgeTo []*Edge, distTo []float64) {
+	adj := g.Adjacent(v)
+	for _, e := range adj {
+		if distTo[v]+e.weight < distTo[e.to] {
+			edgeTo[e.to] = e
+			distTo[e.to] = distTo[v] + e.weight
+		}
+	}
 }
 
 func (spt *ShortestPathTree) bellmanFord() {

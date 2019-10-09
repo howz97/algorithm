@@ -1,8 +1,8 @@
-package digraph
+package ewd
 
 import "github.com/zh1014/algorithm/stack"
 
-func ReversePostOrder(g Digraph) *stack.StackInt {
+func ReversePostOrder(g EdgeWeightedDigraph) *stack.StackInt {
 	marked := make([]bool, g.NumV())
 	result := stack.NewStackInt(g.NumV())
 	for i, b := range marked {
@@ -13,18 +13,18 @@ func ReversePostOrder(g Digraph) *stack.StackInt {
 	return result
 }
 
-func reversePostDFS(g Digraph, v int, marked []bool, result *stack.StackInt) {
+func reversePostDFS(g EdgeWeightedDigraph, v int, marked []bool, result *stack.StackInt) {
 	marked[v] = true
 	adj := g.Adjacent(v)
-	for _, w := range adj {
-		if !marked[w] {
-			reversePostDFS(g, w, marked, result)
+	for _, e := range adj {
+		if !marked[e.to] {
+			reversePostDFS(g, e.to, marked, result)
 		}
 	}
 	result.Push(v)
 }
 
-func TopologicalSort(g Digraph) *stack.StackInt {
+func TopologicalSort(g EdgeWeightedDigraph) *stack.StackInt {
 	if !DetectDirCycle(g) {
 		return ReversePostOrder(g)
 	}

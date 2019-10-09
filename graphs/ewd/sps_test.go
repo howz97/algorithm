@@ -5,20 +5,31 @@ import (
 	"testing"
 )
 
-func TestNewSPS(t *testing.T) {
+func TestNewSPS_Dijkstra(t *testing.T) {
 	g, err := ImportEWD("./tinyEWD.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
-	sps := NewSPS(g, Dijkstra)
+	sps, _ := NewSPS(g, Dijkstra)
 	for i := range g {
 		printPath(sps, 0, i)
 	}
 }
 
+func TestNewSPS_Topological(t *testing.T) {
+	g, err := ImportEWD("./tinyEWDAG.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	sps, _ := NewSPS(g, Topological)
+	for i := range g {
+		printPath(sps, 1, i)
+	}
+}
+
 func printPath(sps *ShortestPathSearcher, src, dst int) {
 	p := sps.Path(src, dst)
-	fmt.Print("PATH: ")
+	fmt.Print("PATH: ", src)
 	for !p.IsEmpty() {
 		e := p.Pop().(*Edge)
 		fmt.Print("->", e.to)
