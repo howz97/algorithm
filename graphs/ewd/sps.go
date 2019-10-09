@@ -3,6 +3,7 @@ package ewd
 import (
 	"fmt"
 	pqueue "github.com/zh1014/algorithm/pqueue/binaryheap"
+	"github.com/zh1014/algorithm/queue"
 	"github.com/zh1014/algorithm/stack"
 	"math"
 )
@@ -73,7 +74,7 @@ func NewSPT(g EdgeWeightedDigraph, src int, alg int) *ShortestPathTree {
 	case Dijkstra:
 		spt.dijkstra()
 	case Topological:
-		spt.topological(src)
+		spt.topological()
 	case BellmanFord:
 		spt.bellmanFord()
 	}
@@ -134,7 +135,7 @@ func dijkstraRelax(g EdgeWeightedDigraph, v int, edgeTo []*Edge, distTo []float6
 	}
 }
 
-func (spt *ShortestPathTree) topological(src int) {
+func (spt *ShortestPathTree) topological() {
 	marked := make([]bool, spt.g.NumV())
 	topoSortStack := stack.NewStackInt(spt.g.NumV())
 	reversePostDFS(spt.g, spt.src, marked, topoSortStack)
@@ -154,5 +155,27 @@ func topologicalRelax(g EdgeWeightedDigraph, v int, edgeTo []*Edge, distTo []flo
 }
 
 func (spt *ShortestPathTree) bellmanFord() {
+	needRelax := queue.NewIntQ()
+	onQ := make([]bool, spt.g.NumV())
+	needRelax.PushBack(spt.src)
+	onQ[spt.src] = true
+	for !needRelax.IsEmpty() {
+		v, _ := needRelax.Front()
+		onQ[spt.src] = false
+		bellmanFordRelax(spt.g, v, spt.edgeTo, spt.distTo, needRelax, onQ)
+	}
+}
 
+func bellmanFordRelax(g EdgeWeightedDigraph, v int, edgeTo []*Edge, distTo []float64, needRelax *queue.IntQ, onQ []bool) {
+	adj := g.Adjacent(v)
+	for _, e := range adj {
+		if distTo[v]+e.weight < distTo[e.to] {
+			edgeTo[e.to] = e
+			distTo[e.to] = distTo[v] + e.weight
+			if !onQ[e.to] {
+				needRelax.PushBack(e.to)
+				onQ[e.to] = true
+			}
+		}
+	}
 }

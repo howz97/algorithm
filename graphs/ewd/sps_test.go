@@ -27,6 +27,19 @@ func TestNewSPS_Topological(t *testing.T) {
 	}
 }
 
+func TestNewSPS_BellmanFord(t *testing.T) {
+	g, err := ImportEWD("./tinyEWD.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	sps, _ := NewSPS(g, BellmanFord)
+	for src := range g {
+		for dst := range g {
+			printPath(sps, src, dst)
+		}
+	}
+}
+
 func printPath(sps *ShortestPathSearcher, src, dst int) {
 	p := sps.Path(src, dst)
 	fmt.Print("PATH: ", src)
