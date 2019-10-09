@@ -11,8 +11,10 @@ func TestNewSPS_Dijkstra(t *testing.T) {
 		t.Fatal(err)
 	}
 	sps, _ := NewSPS(g, Dijkstra)
-	for i := range g {
-		printPath(sps, 0, i)
+	for src := range g {
+		for dst := range g {
+			printPath(sps, src, dst)
+		}
 	}
 }
 
@@ -22,17 +24,23 @@ func TestNewSPS_Topological(t *testing.T) {
 		t.Fatal(err)
 	}
 	sps, _ := NewSPS(g, Topological)
-	for i := range g {
-		printPath(sps, 1, i)
+	for src := range g {
+		for dst := range g {
+			printPath(sps, src, dst)
+		}
 	}
 }
 
 func TestNewSPS_BellmanFord(t *testing.T) {
-	g, err := ImportEWD("./tinyEWD.txt")
+	g, err := ImportEWD("./tinyEWDnc.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
-	sps, _ := NewSPS(g, BellmanFord)
+	sps, err := NewSPS(g, BellmanFord)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	for src := range g {
 		for dst := range g {
 			printPath(sps, src, dst)

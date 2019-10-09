@@ -1,11 +1,13 @@
 package ewd
 
 import (
+	"errors"
 	"fmt"
 	pqueue "github.com/zh1014/algorithm/pqueue/binaryheap"
 	"github.com/zh1014/algorithm/queue"
 	"github.com/zh1014/algorithm/stack"
 	"math"
+	"strconv"
 )
 
 const (
@@ -25,9 +27,12 @@ func NewSPS(g EdgeWeightedDigraph, alg int) (*ShortestPathSearcher, error) {
 		g:   g,
 		spt: make([]*ShortestPathTree, g.NumV()),
 	}
-	// TODO 检查负权重边，环，负权重环
+	var err error
 	for src := range sps.spt {
-		sps.spt[src] = NewSPT(g, src, alg)
+		sps.spt[src], err = NewSPT(g, src, alg)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return sps, nil
 }
@@ -53,7 +58,7 @@ type ShortestPathTree struct {
 	edgeTo []*Edge
 }
 
-func NewSPT(g EdgeWeightedDigraph, src int, alg int) *ShortestPathTree {
+func NewSPT(g EdgeWeightedDigraph, src int, alg int) (*ShortestPathTree, error) {
 	if !g.HasV(src) {
 		panic(ErrVerticalNotExist)
 	}
@@ -72,13 +77,27 @@ func NewSPT(g EdgeWeightedDigraph, src int, alg int) *ShortestPathTree {
 	spt.distTo[src] = 0
 	switch alg {
 	case Dijkstra:
+		if g.HasNegativeEdge() {
+			return nil, errors.New("this digraph contains negative edge")
+		}
 		spt.dijkstra()
 	case Topological:
+		if DetectDirCycle(spt.g) {
+			return nil, errors.New("this digraph contains directed cycle")
+		}
 		spt.topological()
 	case BellmanFord:
-		spt.bellmanFord()
+		negativeCycle := spt.bellmanFord()
+		if negativeCycle != nil {
+			s := ""
+			for !negativeCycle.IsEmpty() {
+				e := negativeCycle.Pop().(*Edge)
+				s += strconv.Itoa(e.from) + "->" + strconv.Itoa(e.to) + "  "
+			}
+			return nil, errors.New("weight negative cycle: " + s)
+		}
 	}
-	return spt
+	return spt, nil
 }
 
 func (spt *ShortestPathTree) CanReach(dst int) bool {
@@ -154,16 +173,79 @@ func topologicalRelax(g EdgeWeightedDigraph, v int, edgeTo []*Edge, distTo []flo
 	}
 }
 
-func (spt *ShortestPathTree) bellmanFord() {
+func (spt *ShortestPathTree) bellmanFord() *stack.Stack {
 	needRelax := queue.NewIntQ()
 	onQ := make([]bool, spt.g.NumV())
 	needRelax.PushBack(spt.src)
 	onQ[spt.src] = true
+	relaxTimes := 0
 	for !needRelax.IsEmpty() {
 		v, _ := needRelax.Front()
 		onQ[spt.src] = false
 		bellmanFordRelax(spt.g, v, spt.edgeTo, spt.distTo, needRelax, onQ)
+		relaxTimes++
+		if relaxTimes%spt.g.NumV() == 0 {
+			if c := spt.findNegativeCycle(); c != nil {
+				return c
+			}
+		}
 	}
+	return nil
+}
+
+func (spt *ShortestPathTree) findNegativeCycle() *stack.Stack {
+	g := NewEWD(spt.g.NumV())
+	for _, e := range spt.edgeTo {
+		if e != nil {
+			g.AddEdge(e)
+		}
+	}
+	marked := make([]bool, spt.g.NumV())
+	s := stack.NewStack(spt.g.NumV())
+	onS := make([]bool, spt.g.NumV())
+	for i := 0; i < spt.g.NumV(); i++ {
+		if !marked[i] {
+			if c := findNC(g, i, marked, s, onS, spt.edgeTo); c != nil {
+				return c
+			}
+		}
+	}
+	return nil
+}
+
+func findNC(g EdgeWeightedDigraph, v int, marked []bool, s *stack.Stack, onS []bool, edgeTo []*Edge) *stack.Stack {
+	if onS[v] {
+		c := stack.NewStack(g.NumV())
+		var weight float64
+		for !s.IsEmpty() {
+			e := s.Pop().(*Edge)
+			weight += e.weight
+			c.Push(e)
+		}
+		if weight < 0 {
+			return c
+		}
+		for !c.IsEmpty() {
+			s.Push(c.Pop().(*Edge))
+		}
+		return nil
+	}
+	if marked[v] {
+		return nil
+	}
+	marked[v] = true
+	onS[v] = true
+	s.Push(edgeTo[v])
+	adj := g.Adjacent(v)
+	for _, e := range adj {
+		c := findNC(g, e.to, marked, s, onS, edgeTo)
+		if c != nil {
+			return c
+		}
+	}
+	onS[v] = false
+	s.Pop()
+	return nil
 }
 
 func bellmanFordRelax(g EdgeWeightedDigraph, v int, edgeTo []*Edge, distTo []float64, needRelax *queue.IntQ, onQ []bool) {

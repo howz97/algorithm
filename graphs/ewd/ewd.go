@@ -145,6 +145,18 @@ func (g EdgeWeightedDigraph) HasV(v int) bool {
 	return v >= 0 && v < g.NumV()
 }
 
+func (g EdgeWeightedDigraph) HasNegativeEdge() bool {
+	for i := range g {
+		adj := g.Adjacent(i)
+		for _, e := range adj {
+			if e.weight < 0 {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 type Edge struct {
 	from, to int
 	weight   float64
