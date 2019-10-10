@@ -28,6 +28,16 @@ func NewSPS(g EdgeWeightedDigraph, alg int) (*ShortestPathSearcher, error) {
 		spt: make([]*ShortestPathTree, g.NumV()),
 	}
 	var err error
+	switch alg {
+	case Dijkstra:
+		if g.HasNegativeEdge() {
+			return nil, errors.New("this digraph contains negative edge")
+		}
+	case Topological:
+		if DetectDirCycle(g) {
+			return nil, errors.New("this digraph contains directed cycle")
+		}
+	}
 	for src := range sps.spt {
 		sps.spt[src], err = NewSPT(g, src, alg)
 		if err != nil {
@@ -77,14 +87,8 @@ func NewSPT(g EdgeWeightedDigraph, src int, alg int) (*ShortestPathTree, error) 
 	spt.distTo[src] = 0
 	switch alg {
 	case Dijkstra:
-		if g.HasNegativeEdge() {
-			return nil, errors.New("this digraph contains negative edge")
-		}
 		spt.dijkstra()
 	case Topological:
-		if DetectDirCycle(spt.g) {
-			return nil, errors.New("this digraph contains directed cycle")
-		}
 		spt.topological()
 	case BellmanFord:
 		negativeCycle := spt.bellmanFord()
