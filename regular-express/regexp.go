@@ -3,6 +3,7 @@ package regexp
 import (
 	"fmt"
 	"github.com/zh1014/algorithm/graphs/digraph"
+	"github.com/zh1014/algorithm/queue"
 	"github.com/zh1014/algorithm/set"
 	"github.com/zh1014/algorithm/stack"
 )
@@ -16,7 +17,7 @@ func IsMatch(pattern, txt string) bool {
 		for !reachableStatus.IsEmpty() {
 			status := reachableStatus.RemoveOne()
 			if status < len(symbolTbl) && match(symbolTbl[status], r) {
-				statusAfterMatch.Add(status+1)
+				statusAfterMatch.Add(status + 1)
 			}
 		}
 		if statusAfterMatch.IsEmpty() {
@@ -66,38 +67,25 @@ func isPrimeRune(r rune) bool {
 }
 
 func getReachableStatus(g digraph.Digraph, src, reachable set.Set) {
-	marked := make([]bool, g.NumV())
+	tc := digraph.NewTransitiveClosure(g)
+	srcQ := queue.NewIntQ()
 	for !src.IsEmpty() {
-		aSourceStatus := src.RemoveOne()
-		dfs(g, aSourceStatus, marked)
+		srcQ.PushBack(src.RemoveOne())
 	}
-	for i, b := range marked {
-		if b {
-			reachable.Add(i)
-		}
+	reachableQ := tc.ReachableVertices(srcQ)
+	for !reachableQ.IsEmpty() {
+		reachable.Add(reachableQ.Front())
 	}
 }
 
 func getStartStatus(g digraph.Digraph) set.Set {
-	marked := make([]bool, g.NumV())
-	dfs(g, 0, marked)
-	reachable := set.New()
-	for i, b := range marked {
-		if b {
-			reachable.Add(i)
-		}
+	startStatus := set.New()
+	dfs := digraph.NewDFS(g, 0)
+	rvQ := dfs.ReachableVertices()
+	for !rvQ.IsEmpty() {
+		startStatus.Add(rvQ.Front())
 	}
-	return reachable
-}
-
-func dfs(g digraph.Digraph, v int, marked []bool) {
-	marked[v] = true
-	adj := g.Adjacent(v)
-	for _, w := range adj {
-		if !marked[w] {
-			dfs(g, w, marked)
-		}
-	}
+	return startStatus
 }
 
 func createNFA(symbolTable []symbol) digraph.Digraph {

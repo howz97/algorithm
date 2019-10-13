@@ -15,7 +15,7 @@ type BFS struct {
 
 func NewBFS(g Digraph, src int) *BFS {
 	if !g.HasV(src) {
-		panic(ErrVerticalNotExist)
+		panic(ErrVertexNotExist)
 	}
 	bfs := &BFS{
 		src:    src,
@@ -26,7 +26,7 @@ func NewBFS(g Digraph, src int) *BFS {
 	bfs.marked[src] = true
 	q.PushBack(src)
 	for !q.IsEmpty() {
-		edge, _ := q.Front()
+		edge := q.Front()
 		adjs := g.Adjacent(edge)
 		for _, adj := range adjs {
 			if bfs.marked[adj] {
@@ -42,14 +42,14 @@ func NewBFS(g Digraph, src int) *BFS {
 
 func (bfs *BFS) IsMarked(v int) bool {
 	if !bfs.Contains(v) {
-		panic(ErrVerticalNotExist)
+		panic(ErrVertexNotExist)
 	}
 	return bfs.marked[v]
 }
 
 func (bfs *BFS) ShortestPathTo(dst int) []int {
 	if !bfs.Contains(dst) {
-		panic(ErrVerticalNotExist)
+		panic(ErrVertexNotExist)
 	}
 	if !bfs.marked[dst] {
 		return nil

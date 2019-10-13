@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrVerticalNotExist   = errors.New("vertical not exist")
+	ErrVertexNotExist     = errors.New("vertex not exist")
 	ErrNotSupportSelfLoop = errors.New("not support self loop")
 )
 
@@ -39,7 +39,7 @@ func (g Digraph) NumEdge() int {
 
 func (g Digraph) AddEdge(v1, v2 int) {
 	if !g.HasV(v1) || !g.HasV(v2) {
-		panic(ErrVerticalNotExist)
+		panic(ErrVertexNotExist)
 	}
 	if v1 == v2 {
 		panic(ErrNotSupportSelfLoop)
@@ -49,14 +49,14 @@ func (g Digraph) AddEdge(v1, v2 int) {
 
 func (g Digraph) HasEdge(v1, v2 int) bool {
 	if !g.HasV(v1) || !g.HasV(v2) {
-		panic(ErrVerticalNotExist)
+		panic(ErrVertexNotExist)
 	}
 	return g[v1].Contains(v2)
 }
 
 func (g Digraph) Adjacent(v int) []int {
 	if !g.HasV(v) {
-		panic(ErrVerticalNotExist)
+		panic(ErrVertexNotExist)
 	}
 	return g[v].Traverse()
 }
