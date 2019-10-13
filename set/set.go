@@ -23,6 +23,19 @@ func (s Set) Remove(i int) {
 	delete(s, i)
 }
 
+// RemoveOne is not allowed to be called when it is empty
+func (s Set) RemoveOne() int {
+	i := 0
+	if s.IsEmpty() {
+		panic("removing from an empty set is not allowed")
+	}
+	for i = range s {
+		s.Remove(i)
+		break
+	}
+	return i
+}
+
 func (s Set) Clear() {
 	for k := range s {
 		delete(s, k)
@@ -31,6 +44,10 @@ func (s Set) Clear() {
 
 func (s Set) Len() int {
 	return len(s)
+}
+
+func (s Set) IsEmpty() bool {
+	return s.Len() == 0
 }
 
 func (s Set) Traverse() []int {
