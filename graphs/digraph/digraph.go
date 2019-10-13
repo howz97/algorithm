@@ -65,8 +65,8 @@ func (g Digraph) String() string {
 	out := ""
 	for i := range g {
 		out += strconv.Itoa(i) + " :"
-		adj := g[i].Traverse()
-		for j := range adj {
+		adj := g.Adjacent(i)
+		for _, j := range adj {
 			out += " " + strconv.Itoa(j)
 		}
 		out += "\n"
