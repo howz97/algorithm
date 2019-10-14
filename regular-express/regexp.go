@@ -29,7 +29,7 @@ func IsMatch(pattern, txt string) bool {
 }
 
 func match(s symbol, r rune) bool {
-	return isPrimeDot(s) || (!s.isPrime && s.r == r)
+	return isWildCard(s) || (!s.isPrime && s.r == r)
 }
 
 type symbol struct {
@@ -38,14 +38,14 @@ type symbol struct {
 }
 
 func parsePattern(pattern string) []symbol {
-	// this can only transfer \( \) \| \* \.
+	// this can only transfer \( \) \| \* \. \\
 	pttrnRunes := []rune(pattern)
 	numRunes := len(pttrnRunes)
 	symbolTable := make([]symbol, 0, numRunes)
 	for i := 0; i < numRunes; i++ {
 		if pttrnRunes[i] == '\\' {
 			i++
-			if !isPrimeRune(pttrnRunes[i]) {
+			if !canBeTransferred(pttrnRunes[i]) {
 				panic(fmt.Sprintf("invalid transfer: \\%v", string(pttrnRunes[i])))
 			}
 			symbolTable = append(symbolTable, symbol{
@@ -64,6 +64,10 @@ func parsePattern(pattern string) []symbol {
 
 func isPrimeRune(r rune) bool {
 	return r == '(' || r == ')' || r == '|' || r == '*' || r == '.'
+}
+
+func canBeTransferred(r rune) bool {
+	return r == '(' || r == ')' || r == '|' || r == '*' || r == '.' || r == '\\'
 }
 
 func getReachableStatus(g digraph.Digraph, src, reachable set.Set) {
@@ -101,16 +105,23 @@ func createNFA(symbolTable []symbol) digraph.Digraph {
 			stck.Push(i)
 		}
 		if symbl.isPrime && symbl.r == ')' {
-			or := stck.Pop()
-			if symbolTable[or].r == '(' {
-				leftBracket = or
-			} else { // symbolTable[or].r == '|'
-				leftBracket = stck.Pop()
+			allOr := queue.NewIntQ()
+			for !stck.IsEmpty() {
+				out := stck.Pop()
+				if symbolTable[out].r == '|' {
+					allOr.PushBack(out)
+				}else { // got '('
+					leftBracket = out
+					break
+				}
+			}
+			for !allOr.IsEmpty() {
+				or := allOr.Front()
 				g.AddEdge(leftBracket, or+1)
 				g.AddEdge(or, i)
 			}
 		}
-		if i+1 < tblSize && isPrimeWildCard(symbolTable[i+1]) {
+		if i+1 < tblSize && isClosure(symbolTable[i+1]) {
 			g.AddEdge(leftBracket, i+1)
 			g.AddEdge(i+1, leftBracket)
 		}
@@ -118,10 +129,10 @@ func createNFA(symbolTable []symbol) digraph.Digraph {
 	return g
 }
 
-func isPrimeDot(s symbol) bool {
+func isWildCard(s symbol) bool {
 	return s.isPrime && s.r == '.'
 }
 
-func isPrimeWildCard(s symbol) bool {
+func isClosure(s symbol) bool {
 	return s.isPrime && s.r == '*'
 }
