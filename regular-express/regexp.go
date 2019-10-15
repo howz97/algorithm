@@ -6,6 +6,9 @@ import (
 	"github.com/zh1014/algorithm/queue"
 	"github.com/zh1014/algorithm/set"
 	"github.com/zh1014/algorithm/stack"
+	"strconv"
+	"strings"
+	"unicode/utf8"
 )
 
 func IsMatch(pattern, txt string) bool {
@@ -39,7 +42,7 @@ type symbol struct {
 
 func parsePattern(pattern string) []symbol {
 	// this can only transfer \( \) \| \* \. \\
-	pttrnRunes := []rune(pattern)
+	pttrnRunes := preHandle([]rune(pattern))
 	numRunes := len(pttrnRunes)
 	symbolTable := make([]symbol, 0, numRunes)
 	for i := 0; i < numRunes; i++ {
@@ -60,6 +63,113 @@ func parsePattern(pattern string) []symbol {
 		})
 	}
 	return symbolTable
+}
+
+func preHandle(pattern []rune) []rune {
+	handled := make([]rune, 0, len(pattern)*2)
+	lp := 0
+	lpStack := stack.NewStackInt(10) // 随意设定
+	for i:=0; i<len(pattern); i++ {
+		switch pattern[i] {
+		case '\\': // must put \ on top case
+			lp = i
+			i++
+			handled = append(handled, '\\', pattern[i])
+		case '(':
+			lpStack.Push(len(handled))
+			handled = append(handled, '(')
+		case ')':
+			lp = lpStack.Pop()
+			handled = append(handled, ')')
+		case '+':
+			handled = append(handled, handled[lp:]...)
+			handled = append(handled, '*')
+		case '?':
+			lastRegExp := make([]rune, len(handled[lp:]))
+			copy(lastRegExp, handled[lp:])
+			handled = handled[:lp+1]
+			handled = append(handled, lastRegExp...)
+			handled = append(handled, '|',')')
+		case '{':
+			rb := indexRune(pattern[i:], '}')
+			if rb < 0 {
+				panic(fmt.Sprintf("[surround %v] no corresponding right bracket", i))
+			}
+			inBrackets := pattern[i+1:rb+i]
+			i += rb
+			if len(inBrackets) == 0 {
+				panic(fmt.Sprintf("[surround %v] nothing in bracket", i))
+			}
+			hyphen := indexRune(inBrackets, '-')
+			lastRegExp := make([]rune, len(handled[lp:]))
+			copy(lastRegExp, handled[lp:])
+			if hyphen < 0 { // a number in brackets: {n}
+				n, err := strconv.Atoi(string(inBrackets))
+				if err != nil {
+					panic(fmt.Sprintf("[surround %v] not a number in bracket: %v", i, err.Error()))
+				}
+				if n < 1 {
+					panic(fmt.Sprintf("[surround %v] number in bracket less than 1", i))
+				}
+				handled = append(handled, repeatRunes(lastRegExp, n-1)...)
+			}else { // a range in brackets: {n-m}
+				lowerLimit, err := strconv.Atoi(string(inBrackets[:hyphen]))
+				if err != nil {
+					panic(fmt.Sprintf("[surround %v] invalid range in bracket: %v", i, err.Error()))
+				}
+				if lowerLimit < 0 {
+					panic(fmt.Sprintf("[surround %v] invalid range in bracket", i))
+				}
+				upperLimit, err := strconv.Atoi(string(inBrackets[hyphen+1:]))
+				if err != nil {
+					panic(fmt.Sprintf("[surround %v] invalid range in bracket: %v", i, err.Error()))
+				}
+				if upperLimit <= lowerLimit {
+					panic(fmt.Sprintf("[surround %v] invalid range in bracket", i))
+				}
+				handled = handled[:lp+1]
+				for j := lowerLimit; j <= upperLimit; j++ {
+					handled = append(handled, repeatRunes(lastRegExp, j)...)
+					if j != upperLimit {
+						handled = append(handled, '|')
+					}
+				}
+				handled = append(handled, ')')
+			}
+		default:
+			handled = append(handled, pattern[i])
+			lp = i
+		}
+	}
+	return handled
+}
+
+func indexLastRune(runes []rune, r rune) int {
+	if !utf8.ValidRune(r) {
+		panic(fmt.Sprintf("invalid rune: %v", r))
+	}
+	for i:=len(runes)-1; i>=0;i-- {
+		if runes[i] == r {
+			return i
+		}
+	}
+	return -1
+}
+
+func repeatRunes(runes []rune, count int) []rune {
+	return []rune(strings.Repeat(string(runes), count))
+}
+
+func indexRune(runes []rune, r rune) int {
+	if !utf8.ValidRune(r) {
+		panic(fmt.Sprintf("invalid rune: %v", r))
+	}
+	for i:=range runes{
+		if runes[i] == r {
+			return i
+		}
+	}
+	return -1
 }
 
 func isPrimeRune(r rune) bool {

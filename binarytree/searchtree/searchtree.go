@@ -16,7 +16,7 @@ func New() *SearchTree {
 }
 
 // Insert insert a k-v pair into this dictionary
-// if value is nil, is is a vitual deletion operation
+// if value is nil, is is a virtual deletion operation
 func (st *SearchTree) Insert(key int, value interface{}) {
 	st.root = st.root.insert(key, value)
 }
