@@ -144,18 +144,6 @@ func preHandle(pattern []rune) []rune {
 	return handled
 }
 
-func indexLastRune(runes []rune, r rune) int {
-	if !utf8.ValidRune(r) {
-		panic(fmt.Sprintf("invalid rune: %v", r))
-	}
-	for i:=len(runes)-1; i>=0;i-- {
-		if runes[i] == r {
-			return i
-		}
-	}
-	return -1
-}
-
 func repeatRunes(runes []rune, count int) []rune {
 	return []rune(strings.Repeat(string(runes), count))
 }
