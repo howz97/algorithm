@@ -87,7 +87,7 @@ func preHandle(pattern []rune) []rune {
 		case '?':
 			lastRegExp := make([]rune, len(handled[lp:]))
 			copy(lastRegExp, handled[lp:])
-			handled = handled[:lp+1]
+			handled = append(handled[:lp], '(')
 			handled = append(handled, lastRegExp...)
 			handled = append(handled, '|',')')
 		case '{':
@@ -127,7 +127,7 @@ func preHandle(pattern []rune) []rune {
 				if upperLimit <= lowerLimit {
 					panic(fmt.Sprintf("[surround %v] invalid range in bracket", i))
 				}
-				handled = handled[:lp+1]
+				handled = append(handled[:lp], '(')
 				for j := lowerLimit; j <= upperLimit; j++ {
 					handled = append(handled, repeatRunes(lastRegExp, j)...)
 					if j != upperLimit {
