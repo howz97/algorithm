@@ -11,6 +11,7 @@ import (
 	"unicode/utf8"
 )
 
+// IsMatch return whether the txt is match with the pattern
 func IsMatch(pattern, txt string) bool {
 	symbolTbl := parsePattern(pattern)
 	g := createNFA(symbolTbl)
@@ -42,7 +43,7 @@ type symbol struct {
 
 func parsePattern(pattern string) []symbol {
 	// this can only transfer \( \) \| \* \. \\
-	pttrnRunes := preHandle([]rune(pattern))
+	pttrnRunes := compile([]rune(pattern))
 	numRunes := len(pttrnRunes)
 	symbolTable := make([]symbol, 0, numRunes)
 	for i := 0; i < numRunes; i++ {
@@ -65,7 +66,7 @@ func parsePattern(pattern string) []symbol {
 	return symbolTable
 }
 
-func preHandle(pattern []rune) []rune {
+func compile(pattern []rune) []rune {
 	handled := make([]rune, 0, len(pattern)*2)
 	lp := 0
 	lpStack := stack.NewStackInt(10) // 随意设定
@@ -142,6 +143,14 @@ func preHandle(pattern []rune) []rune {
 		}
 	}
 	return handled
+}
+
+// characterSetConv convert character set to multiple OR.
+// [abc] => (a|b|c)
+// [0-9] => (0|1|2|3|4|5|6|7|8|9)
+// [^abc] => complement of (a|b|c)
+func characterSetConv(cs []rune) []rune {
+	return nil
 }
 
 func repeatRunes(runes []rune, count int) []rune {

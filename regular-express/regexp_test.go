@@ -45,9 +45,9 @@ func TestIsMatch(t *testing.T) {
 	}
 
 	// {n-m}
-	if !IsMatch(`(1(a|b|c|d){0-3}2)`, `12`) ||
-		!IsMatch(`(1(a|b|c|d){0-3}2)`, `1abc2`) ||
-		IsMatch(`(1(a|b|c|d){0-3}2)`, `1abcd2`) {
+	if !IsMatch(`(1(a|b|c|豪){0-3}2)`, `12`) ||
+		!IsMatch(`(1(a|b|c|豪){0-3}2)`, `1ab豪2`) ||
+		IsMatch(`(1(a|b|c|豪){0-3}2)`, `1abc豪2`) {
 		t.Fail()
 	}
 	if !IsMatch(`(1a{0-3}2)`, `12`) ||
@@ -56,5 +56,5 @@ func TestIsMatch(t *testing.T) {
 		t.Fail()
 	}
 
-	//fmt.Println("==>> ", string(preHandle([]rune(`(1a{0-3}2)`))))
+	//fmt.Println("==>> ", string(compile([]rune(`(1a{0-3}2)`))))
 }
