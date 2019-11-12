@@ -1,8 +1,8 @@
 package power
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func TestPower(t *testing.T) {

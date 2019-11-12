@@ -70,7 +70,7 @@ func compile(pattern []rune) []rune {
 	handled := make([]rune, 0, len(pattern)*2)
 	lp := 0
 	lpStack := stack.NewStackInt(10) // 随意设定
-	for i:=0; i<len(pattern); i++ {
+	for i := 0; i < len(pattern); i++ {
 		switch pattern[i] {
 		case '\\': // must put \ on top case
 			lp = i
@@ -90,13 +90,13 @@ func compile(pattern []rune) []rune {
 			copy(lastRegExp, handled[lp:])
 			handled = append(handled[:lp], '(')
 			handled = append(handled, lastRegExp...)
-			handled = append(handled, '|',')')
+			handled = append(handled, '|', ')')
 		case '{':
 			rb := indexRune(pattern[i:], '}')
 			if rb < 0 {
 				panic(fmt.Sprintf("[surround %v] no corresponding right bracket", i))
 			}
-			inBrackets := pattern[i+1:rb+i]
+			inBrackets := pattern[i+1 : rb+i]
 			i += rb
 			if len(inBrackets) == 0 {
 				panic(fmt.Sprintf("[surround %v] nothing in bracket", i))
@@ -113,7 +113,7 @@ func compile(pattern []rune) []rune {
 					panic(fmt.Sprintf("[surround %v] number in bracket less than 1", i))
 				}
 				handled = append(handled, repeatRunes(lastRegExp, n-1)...)
-			}else { // a range in brackets: {n-m}
+			} else { // a range in brackets: {n-m}
 				lowerLimit, err := strconv.Atoi(string(inBrackets[:hyphen]))
 				if err != nil {
 					panic(fmt.Sprintf("[surround %v] invalid range in bracket: %v", i, err.Error()))
@@ -161,7 +161,7 @@ func indexRune(runes []rune, r rune) int {
 	if !utf8.ValidRune(r) {
 		panic(fmt.Sprintf("invalid rune: %v", r))
 	}
-	for i:=range runes{
+	for i := range runes {
 		if runes[i] == r {
 			return i
 		}
@@ -217,7 +217,7 @@ func createNFA(symbolTable []symbol) digraph.Digraph {
 				out := stck.Pop()
 				if symbolTable[out].r == '|' {
 					allOr.PushBack(out)
-				}else { // got '('
+				} else { // got '('
 					leftBracket = out
 					break
 				}

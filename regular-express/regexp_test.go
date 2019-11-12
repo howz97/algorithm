@@ -11,7 +11,7 @@ func TestIsMatch(t *testing.T) {
 	// +
 	if IsMatch(`(1(a|b|c|d)+2)`, `12`) ||
 		!IsMatch(`(1(a|b|c|d)+2)`, `1a2`) ||
-			!IsMatch(`(1(a|b|c|d)+2)`, `1aabbdcdc2`) {
+		!IsMatch(`(1(a|b|c|d)+2)`, `1aabbdcdc2`) {
 		t.Fail()
 	}
 	if IsMatch(`(1a+2)`, `12`) ||

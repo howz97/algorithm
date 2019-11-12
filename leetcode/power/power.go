@@ -11,17 +11,17 @@ func Power(base float64, exponent int) (float64, error) {
 	var absExponent uint
 	if exponent < 0 {
 		absExponent = uint(-exponent)
-	}else {
+	} else {
 		absExponent = uint(exponent)
 	}
-	result := PowerUnsignExponent(base, absExponent)
+	result := UnsignExponent(base, absExponent)
 	if exponent < 0 {
-		result = 1.0/result
+		result = 1.0 / result
 	}
 	return result, nil
 }
 
-func PowerUnsignExponent(base float64, exponent uint) float64 {
+func UnsignExponent(base float64, exponent uint) float64 {
 	if exponent == 0 {
 		return 1
 	}
@@ -31,9 +31,9 @@ func PowerUnsignExponent(base float64, exponent uint) float64 {
 	if exponent == 1 {
 		return base
 	}
-	if (exponent &1) == 0 {
-		return PowerUnsignExponent(base*base, exponent >> 1)
-	}else {
-		return PowerUnsignExponent(base*base, exponent>>1) * base
+	if (exponent & 1) == 0 {
+		return UnsignExponent(base*base, exponent>>1)
+	} else {
+		return UnsignExponent(base*base, exponent>>1) * base
 	}
 }
