@@ -4,13 +4,13 @@ import "testing"
 
 func TestPathOfSum(t *testing.T) {
 	leaf1 := &node{
-		v:     1,
+		v: 1,
 	}
 	leaf2 := &node{
-		v:     2,
+		v: 2,
 	}
 	leaf3 := &node{
-		v:     3,
+		v: 3,
 	}
 	h1node1 := &node{
 		v:     3,

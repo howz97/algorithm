@@ -3,7 +3,7 @@ package pathofsum
 import "fmt"
 
 type node struct {
-	v      int
+	v     int
 	left  *node
 	right *node
 }
