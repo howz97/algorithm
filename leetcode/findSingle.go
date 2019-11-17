@@ -4,11 +4,9 @@ package leetcode
 func findSingle(numbers []int) int {
 	count := make([]int, 64)
 	for _, n := range numbers {
-		index := 0
-		for n != 0 {
-			count[index] += n & 1
+		for i:=0;i<64;i++ {
+			count[i] += n & 1
 			n = n >> 1
-			index++
 		}
 	}
 	result := 0
