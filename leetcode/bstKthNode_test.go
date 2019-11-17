@@ -32,7 +32,7 @@ func TestBSTKthNode(t *testing.T) {
 		v:    8,
 		left: h2node1,
 	}
-	for i := 1; i<=7; i++ {
+	for i := 1; i <= 7; i++ {
 		println(bstKthNode(tree, i).v)
 	}
 }
