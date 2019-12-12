@@ -12,12 +12,12 @@ func TestContrast(t *testing.T) {
 	//testPerformance(PopSort, "PopSort")
 	//testPerformance(SelectSort, "SelectSort")
 	//testPerformance(InsertSort, "InsertSort")
-	//testPerformance(ShellSort, "ShellSort")
-	testPerformance(MergeSort, "MergeSort")
-	testPerformance(HeapSort, "HeapSort")
-	testPerformance(QuickSort, "QuickSort")
+	testPerformance(ShellSort, "ShellSort")
+	//testPerformance(MergeSort, "MergeSort")
+	//testPerformance(HeapSort, "HeapSort")
+	//testPerformance(QuickSort, "QuickSort")
 
-	testPerformance(sort.Ints, "Go library sort.Ints")
+	//testPerformance(sort.Ints, "Go library sort.Ints")
 }
 
 const (
@@ -47,7 +47,7 @@ func performanceRandomInput(sortAlg func([]int), algName string) {
 		sortAlg(inputData)
 		elapsed := time.Since(start)
 		if !sort.IntsAreSorted(inputData) {
-			panic("failed to sort")
+			panic("failed to sort: "+ algName)
 		}
 		fmt.Print(elapsed.String(), "  ")
 	}
@@ -100,7 +100,7 @@ func performanceReverseSortedInput(sortAlg func([]int), algName string) {
 }
 
 func genRandomData(data []int, uplimit int) {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(14)
 	for i := range data {
 		data[i] = rand.Intn(uplimit)
 	}
