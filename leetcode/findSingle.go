@@ -4,7 +4,7 @@ package leetcode
 func findSingle(numbers []int) int {
 	count := make([]int, 64)
 	for _, n := range numbers {
-		for i:=0;i<64;i++ {
+		for i := 0; i < 64; i++ {
 			count[i] += n & 1
 			n = n >> 1
 		}

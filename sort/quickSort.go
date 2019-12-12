@@ -5,14 +5,8 @@ func QuickSort(data []int) {
 	if len(data) <= 1 {
 		return
 	}
-	if len(data) == 2 {
-		if data[0] > data[1] {
-			data[0], data[1] = data[1], data[0]
-		}
-		return
-	}
 	median2end(data)
-	medianIdx := cutoff(data)
+	medianIdx := cutOff(data)
 	QuickSort(data[:medianIdx])
 	QuickSort(data[medianIdx+1:])
 }
@@ -32,22 +26,66 @@ func median2end(data []int) {
 }
 
 // 此时枢纽元在 data[len(data)-1] , 开始分割data[:len(data)-1], 并将枢纽元交换到i最终位置
-func cutoff(data []int) int {
+func cutOff(data []int) int {
+	if len(data) == 0 {
+		panic("cutting off empty slice")
+	}
+	if len(data) == 1 {
+		return 0
+	}
 	i, j := 0, len(data)-2
-	median := data[len(data)-1]
-	for i < j {
-		for data[i] < median {
+	median := len(data) - 1
+	for i <= j {
+		for i < len(data) && data[i] < data[median] {
 			i++
 		}
-		for data[j] > median && j > 0 {
+		for j >= 0 && data[j] > data[median] {
 			j--
 		}
-		if i < j {
+		if i == median {
+			return len(data) - 1
+		}
+		if j < 0 {
+			data[0], data[median] = data[median], data[0]
+			return 0
+		}
+		if i <= j {
 			data[i], data[j] = data[j], data[i]
 			i++
 			j--
 		}
 	}
-	data[i], data[len(data)-1] = data[len(data)-1], data[i]
+	data[i], data[median] = data[median], data[i]
 	return i
 }
+
+// obsoleted: 这种cutOff在随机输入下没有优势。且在输入中大量重复时复杂度达到O(n平方)
+//func cutOff(data []int) int {
+//	if len(data) == 0 {
+//		panic("cutting off empty slice")
+//	}
+//	i, j := 0, len(data)-1
+//	median := len(data)-1
+//	for i <= j {
+//		for i < len(data) && data[i] <= data[median] {
+//			i++
+//		}
+//		for j >=0 && data[j] >= data[median] {
+//			j--
+//		}
+//		if i == len(data) {
+//			return len(data) -1
+//		}
+//		if j < 0 {
+//			data[0], data[median] = data[median], data[0]
+//			return 0
+//		}
+//		if i < j {
+//			data[i], data[j] = data[j], data[i]
+//			i++
+//			j--
+//		}
+//	}
+//	data[i], data[median] = data[median], data[i]
+//	return i
+//}

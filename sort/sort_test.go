@@ -2,69 +2,118 @@ package sort
 
 import (
 	"fmt"
+	"math/rand"
+	"sort"
 	"testing"
+	"time"
 )
 
-var disorderData = []int{3, 4, 6, 3, 2, 0, 1, 5, 678, 3, 56, 78, 2, 45, 34, 6, 6, 6, 6, 87, 34, 23, 12, 23, 33, 66, 77, 9}
+func TestContrast(t *testing.T) {
+	//testPerformance(PopSort, "PopSort")
+	//testPerformance(SelectSort, "SelectSort")
+	//testPerformance(InsertSort, "InsertSort")
+	//testPerformance(ShellSort, "ShellSort")
+	//testPerformance(HeapSort, "HeapSort")
+	testPerformance(QuickSort, "QuickSort")
 
-func Test_QuickSort(t *testing.T) {
-	QuickSort(disorderData)
-	fmt.Println(disorderData)
-	if !isInOrder(disorderData) {
-		t.Fatal("data not in order after sorted")
-	}
+	testPerformance(sort.Ints, "Go library sort.Ints")
 }
 
-func Test_cutoff(t *testing.T) {
-	cutoff(disorderData)
-	fmt.Println(disorderData)
+const (
+	testFreq         = 1
+	inputSize        = 100
+	randInputUpLimit = 100000000
+	dupInputUpLimit  = 10
+)
+
+var (
+	inputData = make([]int, inputSize)
+)
+
+func testPerformance(sortAlg func([]int), algName string) {
+	performanceRandomInput(sortAlg, algName)
+	performanceDupInput(sortAlg, algName)
+	performanceSortedInput(sortAlg, algName)
+	performanceReverseSortedInput(sortAlg, algName)
 }
 
-func Test_SelectSort(t *testing.T) {
-	SelectSort(disorderData)
-	fmt.Println(disorderData)
-	if !isInOrder(disorderData) {
-		t.Fatal("data not in order after sorted")
-	}
-}
-
-func Test_InsertSort(t *testing.T) {
-	InsertSort(disorderData)
-	fmt.Println(disorderData)
-	if !isInOrder(disorderData) {
-		t.Fatal("data not in order after sorted")
-	}
-}
-
-func Test_ShellSort(t *testing.T) {
-	ShellSort(disorderData)
-	fmt.Println(disorderData)
-	if !isInOrder(disorderData) {
-		t.Fatal("data not in order after sorted")
-	}
-}
-
-func Test_PopSort(t *testing.T) {
-	PopSort(disorderData)
-	fmt.Println(disorderData)
-	if !isInOrder(disorderData) {
-		t.Fatal("data not in order after sorted")
-	}
-}
-
-func Test_HeapSort(t *testing.T) {
-	HeapSort(disorderData)
-	fmt.Println(disorderData)
-	if !isInOrder(disorderData) {
-		t.Fatal("data not in order after sorted")
-	}
-}
-
-func isInOrder(data []int) bool {
-	for i := 0; i < len(data)-1; i++ {
-		if data[i] > data[i+1] {
-			return false
+func performanceRandomInput(sortAlg func([]int), algName string) {
+	fmt.Printf("%v : random(%v):\n", algName, inputSize)
+	for pass := 0; pass < testFreq; pass++ {
+		genRandomData(inputData, randInputUpLimit)
+		start := time.Now()
+		sortAlg(inputData)
+		elapsed := time.Since(start)
+		if !sort.IntsAreSorted(inputData) {
+			panic("failed to sort")
 		}
+		fmt.Print(elapsed.String(), "  ")
 	}
-	return true
+	fmt.Println()
+}
+
+func performanceDupInput(sortAlg func([]int), algName string) {
+	fmt.Printf("%v : dup(%v):\n", algName, inputSize)
+	for pass := 0; pass < testFreq; pass++ {
+		genRandomData(inputData, dupInputUpLimit)
+		start := time.Now()
+		sortAlg(inputData)
+		elapsed := time.Since(start)
+		if !sort.IntsAreSorted(inputData) {
+			panic("failed to sort")
+		}
+		fmt.Print(elapsed.String(), "  ")
+	}
+	fmt.Println()
+}
+
+func performanceSortedInput(sortAlg func([]int), algName string) {
+	fmt.Printf("%v : sorted(%v):\n", algName, inputSize)
+	genSortedData(inputData)
+	for pass := 0; pass < testFreq; pass++ {
+		start := time.Now()
+		sortAlg(inputData)
+		elapsed := time.Since(start)
+		if !sort.IntsAreSorted(inputData) {
+			panic("failed to sort")
+		}
+		fmt.Print(elapsed.String(), "  ")
+	}
+	fmt.Println()
+}
+
+func performanceReverseSortedInput(sortAlg func([]int), algName string) {
+	fmt.Printf("%v : reverse(%v):\n", algName, inputSize)
+	for pass := 0; pass < testFreq; pass++ {
+		genReverseSortedData(inputData)
+		start := time.Now()
+		sortAlg(inputData)
+		elapsed := time.Since(start)
+		if !sort.IntsAreSorted(inputData) {
+			panic("failed to sort")
+		}
+		fmt.Print(elapsed.String(), "  ")
+	}
+	fmt.Println()
+}
+
+func genRandomData(data []int, uplimit int) {
+	rand.Seed(time.Now().UnixNano())
+	for i := range data {
+		data[i] = rand.Intn(uplimit)
+	}
+}
+
+func genSortedData(data []int) {
+	for i := range data {
+		data[i] = i
+	}
+}
+
+func genReverseSortedData(data []int) {
+	n := len(data)
+	for i := range data {
+		n--
+		data[i] = n
+	}
 }
