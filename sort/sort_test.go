@@ -13,7 +13,8 @@ func TestContrast(t *testing.T) {
 	//testPerformance(SelectSort, "SelectSort")
 	//testPerformance(InsertSort, "InsertSort")
 	//testPerformance(ShellSort, "ShellSort")
-	//testPerformance(HeapSort, "HeapSort")
+	testPerformance(MergeSort, "MergeSort")
+	testPerformance(HeapSort, "HeapSort")
 	testPerformance(QuickSort, "QuickSort")
 
 	testPerformance(sort.Ints, "Go library sort.Ints")
@@ -21,7 +22,7 @@ func TestContrast(t *testing.T) {
 
 const (
 	testFreq         = 1
-	inputSize        = 100
+	inputSize        = 10000000
 	randInputUpLimit = 100000000
 	dupInputUpLimit  = 10
 )
@@ -35,6 +36,7 @@ func testPerformance(sortAlg func([]int), algName string) {
 	performanceDupInput(sortAlg, algName)
 	performanceSortedInput(sortAlg, algName)
 	performanceReverseSortedInput(sortAlg, algName)
+	fmt.Println("-------------------------------------")
 }
 
 func performanceRandomInput(sortAlg func([]int), algName string) {
