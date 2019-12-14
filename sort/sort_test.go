@@ -47,7 +47,7 @@ func performanceRandomInput(sortAlg func([]int), algName string) {
 		sortAlg(inputData)
 		elapsed := time.Since(start)
 		if !sort.IntsAreSorted(inputData) {
-			panic("failed to sort: "+ algName)
+			panic("failed to sort: " + algName)
 		}
 		fmt.Print(elapsed.String(), "  ")
 	}
