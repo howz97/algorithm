@@ -19,7 +19,7 @@ func NewTst2(a alphbt) *Tst2 {
 
 func (t *Tst2) Insert(k string, v interface{}) error {
 	if t.Compressed() {
-		return errors.New(" Can not insert k-v into compressed trie tree ")
+		panic("can not insert into compressed trie-tree")
 	}
 	t.tree = t.tree.insert(t.a, []rune(k), v)
 	return nil
@@ -30,6 +30,7 @@ func (t *Tst2) Compress() error {
 		return errors.New(" Duplicate compress ")
 	}
 	t.tree.compress()
+	t.compressed = true
 	return nil
 }
 
