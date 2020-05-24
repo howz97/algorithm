@@ -14,16 +14,16 @@ type elemStr struct {
 	next *elemStr
 }
 
-func (q *StrQ) Front() (string, error) {
+func (q *StrQ) Front() string {
 	if q.IsEmpty() {
-		return "", ErrEmptyQ
+		panic("empty queue")
 	}
 	e := q.head.s
 	q.head = q.head.next
 	if q.head == nil {
 		q.tail = nil
 	}
-	return e, nil
+	return e
 }
 
 func (q *StrQ) PushBack(s string) {
