@@ -2,18 +2,19 @@ package tst_optimized
 
 import (
 	"errors"
+	"github.com/zh1014/algorithm/alphabet"
 	"github.com/zh1014/algorithm/queue"
 )
 
 type Tst2 struct {
-	a          alphbt
+	Alpb       alphabet.IAlphabet
 	tree       *tst2
 	compressed bool
 }
 
-func NewTst2(a alphbt) *Tst2 {
+func NewTst2(a alphabet.IAlphabet) *Tst2 {
 	return &Tst2{
-		a: a,
+		Alpb: a,
 	}
 }
 
@@ -21,7 +22,7 @@ func (t *Tst2) Insert(k string, v interface{}) error {
 	if t.Compressed() {
 		panic("can not insert into compressed trie-tree")
 	}
-	t.tree = t.tree.insert(t.a, []rune(k), v)
+	t.tree = t.tree.insert(t.Alpb, []rune(k), v)
 	return nil
 }
 
@@ -39,7 +40,7 @@ func (t *Tst2) Compressed() bool {
 }
 
 func (t *Tst2) Find(k string) interface{} {
-	f := t.tree.find(t.a, []rune(k))
+	f := t.tree.find(t.Alpb, []rune(k))
 	if f == nil {
 		// this trie-tree node not exist
 		return nil
@@ -48,11 +49,11 @@ func (t *Tst2) Find(k string) interface{} {
 }
 
 func (t *Tst2) Delete(k string) {
-	t.tree = t.tree.delete(t.a, []rune(k))
+	t.tree = t.tree.delete(t.Alpb, []rune(k))
 }
 
 func (t *Tst2) Contains(k string) bool {
-	return t.tree.contains(t.a, []rune(k))
+	return t.tree.contains(t.Alpb, []rune(k))
 }
 
 func (t *Tst2) IsEmpty() bool {
@@ -61,16 +62,16 @@ func (t *Tst2) IsEmpty() bool {
 
 func (t *Tst2) LongestPrefixOf(s string) string {
 	runes := []rune(s)
-	return string(runes[:t.tree.longestPrefixOf(t.a, runes, 0, 0)])
+	return string(runes[:t.tree.longestPrefixOf(t.Alpb, runes, 0, 0)])
 }
 
 func (t *Tst2) KeysWithPrefix(p string) []string {
 	keys := make([]string, 0)
 	keysQ := queue.NewStrQ()
 	if p == "" {
-		t.tree.collect(t.a, p, keysQ)
+		t.tree.collect(t.Alpb, p, keysQ)
 	} else {
-		f, i := t.tree.locate(t.a, []rune(p))
+		f, i := t.tree.locate(t.Alpb, []rune(p))
 		if f == nil {
 			return nil
 		}
@@ -78,10 +79,10 @@ func (t *Tst2) KeysWithPrefix(p string) []string {
 			if f.v != nil {
 				keysQ.PushBack(p)
 			}
-			f.mid.collect(t.a, p, keysQ)
+			f.mid.collect(t.Alpb, p, keysQ)
 		} else {
 			runes := []rune(p)
-			f.collect(t.a, string(runes[:len(runes)-i-1]), keysQ)
+			f.collect(t.Alpb, string(runes[:len(runes)-i-1]), keysQ)
 		}
 	}
 	for !keysQ.IsEmpty() {
@@ -93,7 +94,7 @@ func (t *Tst2) KeysWithPrefix(p string) []string {
 func (t *Tst2) KeysMatch(p string) []string {
 	keys := make([]string, 0)
 	keysQ := queue.NewStrQ()
-	t.tree.keysMatch(t.a, []rune(p), []rune(""), keysQ)
+	t.tree.keysMatch(t.Alpb, []rune(p), []rune(""), keysQ)
 	for !keysQ.IsEmpty() {
 		keys = append(keys, keysQ.Front())
 	}
@@ -110,7 +111,7 @@ type tst2 struct {
 	left, mid, right *tst2
 }
 
-func (t *tst2) insert(a alphbt, k []rune, v interface{}) *tst2 {
+func (t *tst2) insert(a alphabet.IAlphabet, k []rune, v interface{}) *tst2 {
 	if len(k) == 0 {
 		panic("empty key")
 	}
@@ -157,7 +158,7 @@ func (t *tst2) canShrink() bool {
 	return t.v == nil && t.left == nil && t.right == nil
 }
 
-func (t *tst2) delete(a alphbt, k []rune) *tst2 {
+func (t *tst2) delete(a alphabet.IAlphabet, k []rune) *tst2 {
 	if len(k) == 0 {
 		panic("empty key")
 	}
@@ -190,13 +191,13 @@ func (t *tst2) isEmpty() bool {
 	return false
 }
 
-func (t *tst2) contains(a alphbt, k []rune) bool {
+func (t *tst2) contains(a alphabet.IAlphabet, k []rune) bool {
 	f := t.find(a, k)
 	return f != nil && f.v != nil
 }
 
 // find 找到k对应的节点(n)，有这个节点不代表k存在，是否存在需要看n.v是否为nil
-func (t *tst2) find(a alphbt, k []rune) *tst2 {
+func (t *tst2) find(a alphabet.IAlphabet, k []rune) *tst2 {
 	if t == nil || len(k) < len(t.rs) || !equal(t.rs[:len(t.rs)-1], k[:len(t.rs)-1]) {
 		return nil
 	}
@@ -215,7 +216,7 @@ func (t *tst2) find(a alphbt, k []rune) *tst2 {
 	}
 }
 
-func (t *tst2) locate(a alphbt, k []rune) (l *tst2, i int) {
+func (t *tst2) locate(a alphabet.IAlphabet, k []rune) (l *tst2, i int) {
 	if t == nil {
 		return nil, 0
 	}
@@ -243,7 +244,7 @@ func (t *tst2) locate(a alphbt, k []rune) (l *tst2, i int) {
 	}
 }
 
-func (t *tst2) longestPrefixOf(a alphbt, s []rune, d, length int) int {
+func (t *tst2) longestPrefixOf(a alphabet.IAlphabet, s []rune, d, length int) int {
 	if len(s) == 0 {
 		panic("empty s")
 	}
@@ -268,7 +269,7 @@ func (t *tst2) longestPrefixOf(a alphbt, s []rune, d, length int) int {
 	}
 }
 
-func (t *tst2) collect(a alphbt, p string, keys *queue.StrQ) {
+func (t *tst2) collect(a alphabet.IAlphabet, p string, keys *queue.StrQ) {
 	if t == nil {
 		return
 	}
@@ -284,7 +285,7 @@ func dropLastR(rs []rune) []rune {
 	return rs[:len(rs)-1]
 }
 
-func (t *tst2) keysMatch(a alphbt, pattern []rune, prefix []rune, keys *queue.StrQ) {
+func (t *tst2) keysMatch(a alphabet.IAlphabet, pattern []rune, prefix []rune, keys *queue.StrQ) {
 	if t == nil || len(pattern) == 0 || len(pattern) < len(t.rs) || !match(pattern[:len(t.rs)-1], t.rs[:len(t.rs)-1]) {
 		return
 	}
