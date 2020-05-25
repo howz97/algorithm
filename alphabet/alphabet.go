@@ -113,6 +113,10 @@ func (u *AlphabetUnicode) ToIndex(r rune) int {
 	return int(r)
 }
 
+func (u *AlphabetUnicode) Contains(r rune) bool {
+	return true
+}
+
 func (u *AlphabetUnicode) R() int {
 	return 0xFFFF
 }
