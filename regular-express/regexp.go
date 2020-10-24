@@ -17,7 +17,7 @@ func IsMatch(pattern, txt string) bool {
 	g := createNFA(symbolTbl)
 	reachableStatus := getStartStatus(g)
 	for _, r := range txt {
-		statusAfterMatch := set.New()
+		statusAfterMatch := set.NewIntSet()
 		for !reachableStatus.IsEmpty() {
 			status := reachableStatus.RemoveOne()
 			if status < len(symbolTbl) && match(symbolTbl[status], r) {
@@ -177,7 +177,7 @@ func canBeTransferred(r rune) bool {
 	return r == '(' || r == ')' || r == '|' || r == '*' || r == '.' || r == '\\'
 }
 
-func getReachableStatus(g digraph.Digraph, src, reachable set.Set) {
+func getReachableStatus(g digraph.Digraph, src, reachable set.IntSet) {
 	tc := digraph.NewTransitiveClosure(g)
 	srcQ := queue.NewIntQ()
 	for !src.IsEmpty() {
@@ -189,8 +189,8 @@ func getReachableStatus(g digraph.Digraph, src, reachable set.Set) {
 	}
 }
 
-func getStartStatus(g digraph.Digraph) set.Set {
-	startStatus := set.New()
+func getStartStatus(g digraph.Digraph) set.IntSet {
+	startStatus := set.NewIntSet()
 	dfs := digraph.NewDFS(g, 0)
 	rvQ := dfs.ReachableVertices()
 	for !rvQ.IsEmpty() {

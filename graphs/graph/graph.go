@@ -12,12 +12,12 @@ var (
 	errNotSupportSelfLoop = errors.New("not support self loop")
 )
 
-type Graph []set.Set
+type Graph []set.IntSet
 
 func NewGraph(numV int) Graph {
 	g := make(Graph, numV)
 	for i := range g {
-		g[i] = make(set.Set)
+		g[i] = make(set.IntSet)
 	}
 	return g
 }

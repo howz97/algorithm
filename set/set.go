@@ -1,44 +1,36 @@
 package set
 
-import (
-	"sort"
-)
+type Set map[interface{}]struct{}
 
-type Set map[int]struct{}
-
-func New() Set {
-	return make(map[int]struct{})
+func NewSet() Set {
+	return make(map[interface{}]struct{})
 }
 
-func (s Set) Add(i int) {
-	s[i] = struct{}{}
+func (s Set) Add(e interface{}) {
+	s[e] = struct{}{}
 }
 
-func (s Set) Contains(i int) bool {
-	_, contain := s[i]
-	return contain
+func (s Set) Contains(e interface{}) bool {
+	_, ok := s[e]
+	return ok
 }
 
-func (s Set) Remove(i int) {
-	delete(s, i)
+func (s Set) Remove(e interface{}) {
+	delete(s, e)
 }
 
-// RemoveOne is not allowed to be called when it is empty
-func (s Set) RemoveOne() int {
-	i := 0
-	if s.IsEmpty() {
-		panic("removing from an empty set is not allowed")
+// TakeOne take out an element
+func (s Set) TakeOne() interface{} {
+	for e := range s {
+		delete(s, e)
+		return e
 	}
-	for i = range s {
-		s.Remove(i)
-		break
-	}
-	return i
+	return nil
 }
 
 func (s Set) Clear() {
-	for k := range s {
-		delete(s, k)
+	for e := range s {
+		delete(s, e)
 	}
 }
 
@@ -47,19 +39,13 @@ func (s Set) Len() int {
 }
 
 func (s Set) IsEmpty() bool {
-	return s.Len() == 0
+	return len(s) == 0
 }
 
-func (s Set) Traverse() []int {
-	result := make([]int, 0)
-	for k := range s {
-		result = append(result, k)
+func (s Set) Traverse() []interface{} {
+	ret := make([]interface{}, 0, len(s))
+	for e := range s {
+		ret = append(ret, e)
 	}
-	return result
-}
-
-func (s Set) SortTraverse() []int {
-	result := s.Traverse()
-	sort.Ints(result)
-	return result
+	return ret
 }

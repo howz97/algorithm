@@ -4,7 +4,7 @@ import "github.com/zh1014/algorithm/set"
 
 func DetectDirCycle(g Digraph) bool {
 	marked := make([]bool, g.NumV())
-	s := set.New()
+	s := set.NewIntSet()
 	for i, b := range marked {
 		if !b {
 			if detectDirCycle(g, i, marked, s) {
@@ -15,7 +15,7 @@ func DetectDirCycle(g Digraph) bool {
 	return false
 }
 
-func detectDirCycle(g Digraph, v int, marked []bool, s set.Set) bool {
+func detectDirCycle(g Digraph, v int, marked []bool, s set.IntSet) bool {
 	if s.Contains(v) {
 		return true
 	}

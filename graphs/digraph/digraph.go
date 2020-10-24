@@ -11,12 +11,12 @@ var (
 	ErrNotSupportSelfLoop = errors.New("not support self loop")
 )
 
-type Digraph []set.Set
+type Digraph []set.IntSet
 
 func NewDigraph(numV int) Digraph {
 	g := make(Digraph, numV)
 	for i := range g {
-		g[i] = make(set.Set)
+		g[i] = make(set.IntSet)
 	}
 	return g
 }
