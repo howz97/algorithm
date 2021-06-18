@@ -23,7 +23,7 @@ func Test_Heap(t *testing.T) {
 	if h.Insert(9, 9) {
 		t.Fatal("Insert failed")
 	}
-	fmt.Println(h.find(5, 5))
+	fmt.Println(h.find(5))
 	if m := h.DelMin(); m != 1 {
 		t.Fatal("DelMin failed")
 	}
@@ -44,5 +44,5 @@ func TestBinHeap_Delete(t *testing.T) {
 	h.Insert(2, &t2)
 	h.Insert(3, &t3)
 	h.Insert(4, &t4)
-	fmt.Println(h.find(3, &t3))
+	fmt.Println(h.find(&t3))
 }

@@ -1,7 +1,7 @@
 package pqueue
 
 type Elem struct {
-	p float64
+	p int
 	v interface{}
 }
 
@@ -55,7 +55,7 @@ func (h *BinHeap) Cap() int {
 	return len(h.arry) - 1
 }
 
-func (h *BinHeap) Insert(p float64, v interface{}) (ok bool) {
+func (h *BinHeap) Insert(p int, v interface{}) (ok bool) {
 	if h.size >= h.Cap() {
 		return false
 	}
@@ -95,7 +95,7 @@ func (h *BinHeap) find(v interface{}) int {
 	return -1
 }
 
-func (h *BinHeap) Update(p float64, v interface{}) {
+func (h *BinHeap) Update(p int, v interface{}) {
 	i := h.find(v)
 	if i == -1 {
 		return

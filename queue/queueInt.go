@@ -16,7 +16,7 @@ type elemInt struct {
 
 func (q *IntQ) Front() int {
 	if q.IsEmpty() {
-		panic(ErrEmptyQ)
+		return 0
 	}
 	e := q.head.i
 	q.head = q.head.next

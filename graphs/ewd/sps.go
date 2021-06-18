@@ -3,11 +3,12 @@ package ewd
 import (
 	"errors"
 	"fmt"
+	"math"
+	"strconv"
+
 	pqueue "github.com/zh1014/algorithm/pqueue/binaryheap"
 	"github.com/zh1014/algorithm/queue"
 	"github.com/zh1014/algorithm/stack"
-	"math"
-	"strconv"
 )
 
 const (
@@ -150,9 +151,9 @@ func dijkstraRelax(g EdgeWeightedDigraph, v int, edgeTo []*Edge, distTo []float6
 			edgeTo[e.to] = e
 			distTo[e.to] = distTo[v] + e.weight
 			if inPQ {
-				pq.Update(distTo[e.to], e.to)
+				pq.Update(int(distTo[e.to]), e.to)
 			} else {
-				pq.Insert(distTo[e.to], e.to)
+				pq.Insert(int(distTo[e.to]), e.to)
 			}
 		}
 	}
@@ -184,7 +185,7 @@ func (spt *ShortestPathTree) bellmanFord() *stack.Stack {
 	onQ[spt.src] = true
 	relaxTimes := 0
 	for !needRelax.IsEmpty() {
-		v, _ := needRelax.Front()
+		v := needRelax.Front()
 		onQ[spt.src] = false
 		bellmanFordRelax(spt.g, v, spt.edgeTo, spt.distTo, needRelax, onQ)
 		relaxTimes++
