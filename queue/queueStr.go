@@ -16,7 +16,7 @@ type elemStr struct {
 
 func (q *StrQ) Front() string {
 	if q.IsEmpty() {
-		panic("empty queue")
+		return ""
 	}
 	e := q.head.s
 	q.head = q.head.next
