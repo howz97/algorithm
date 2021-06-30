@@ -1,5 +1,5 @@
 [package]
-name = "rust"
+name = "alg_rust"
 version = "0.1.0"
 authors = ["howz <964701944@qq.com>"]
 edition = "2018"

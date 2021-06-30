@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 pub fn length_of_longest_substring(s: String) -> i32 {
     let mut longest = 0;
     let mut start = 0;

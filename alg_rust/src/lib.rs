@@ -1,3 +1,8 @@
+pub mod median;
+pub mod fibonacci;
+pub mod pig_latin;
+pub mod substring;
+
 use std::collections::HashMap;
 
 pub fn calc_mean(numbers: &Vec<i32>) -> Option<i32> {
@@ -9,16 +14,6 @@ pub fn calc_mean(numbers: &Vec<i32>) -> Option<i32> {
         sum += number
     }
     Some(sum/(numbers.len() as i32))
-}
-
-pub fn calc_median(numbers: &mut Vec<i32>) -> Option<&i32> {
-    let length = numbers.len();
-    if length % 2 == 0 {
-        return None
-    }
-    numbers.sort();
-    let median_idx = length / 2;
-    numbers.get(median_idx)
 }
 
 pub fn calc_mode(numbers: &Vec<i32>) -> Option<i32> {
@@ -40,6 +35,3 @@ pub fn calc_mode(numbers: &Vec<i32>) -> Option<i32> {
     }
     Some(mode)
 }
-
-
-

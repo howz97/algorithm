@@ -1,4 +1,4 @@
 .vscode
 .idea
 test/
-rust/target
+alg_rust/target

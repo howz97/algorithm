@@ -101,14 +101,27 @@ pub fn find_median_sorted_array(nums: &Vec<i32>) -> f64 {
     return (m + m0) / 2.0
 }
 
+pub fn calc_median(numbers: &mut Vec<i32>) -> i32 {
+    let length = numbers.len();
+    if length == 0 {
+        panic!("empty vector")
+    }
+    numbers.sort();
+    let mut m = numbers[length / 2];
+    if length % 2 == 0 {
+        m = (m + numbers[length/2-1])/2
+    }
+    m
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     #[test]
     fn test_find_median_sorted_arrays() {
-        let nums1 = vec![1,2]
-        let nums2 = vec![3,4]
-        let median = find_median_sorted_arrays(nums1, num2);
+        let nums1 = vec![1,2];
+        let nums2 = vec![3,4];
+        let median = find_median_sorted_arrays(nums1, nums2);
         assert_eq!(median, 2.5);
     }
 }
