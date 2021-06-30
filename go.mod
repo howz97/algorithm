@@ -1,3 +1,3 @@
-module github.com/zh1014/algorithm
+module github.com/howz97/algorithm
 
 go 1.12
