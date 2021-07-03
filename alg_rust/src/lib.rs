@@ -2,6 +2,7 @@ pub mod median;
 pub mod fibonacci;
 pub mod pig_latin;
 pub mod substring;
+pub mod palindrome;
 
 use std::collections::HashMap;
 
