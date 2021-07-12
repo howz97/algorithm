@@ -3,6 +3,7 @@ pub mod fibonacci;
 pub mod pig_latin;
 pub mod substring;
 pub mod palindrome;
+pub mod reverse_k_group;
 
 use std::collections::HashMap;
 
