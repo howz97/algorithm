@@ -4,6 +4,7 @@ pub mod pig_latin;
 pub mod substring;
 pub mod palindrome;
 pub mod reverse_k_group;
+pub mod atoi;
 
 use std::collections::HashMap;
 
