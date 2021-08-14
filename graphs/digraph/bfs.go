@@ -1,8 +1,8 @@
 package digraph
 
 import (
-	"github.com/zh1014/algorithm/queue"
-	"github.com/zh1014/algorithm/sort"
+	"howz97/algorithm/queue"
+	"howz97/algorithm/sort"
 )
 
 type BFS struct {

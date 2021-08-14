@@ -1,6 +1,6 @@
 package digraph
 
-import "github.com/zh1014/algorithm/queue"
+import "howz97/algorithm/queue"
 
 type TransitiveClosure struct {
 	g   Digraph

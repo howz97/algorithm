@@ -1,11 +1,11 @@
-package ewg
+package weighted_graph
 
 import (
 	"errors"
 	"fmt"
-	pqueue "github.com/zh1014/algorithm/pqueue/binaryheap"
-	"github.com/zh1014/algorithm/queue"
-	unionfind "github.com/zh1014/algorithm/union-find"
+	pqueue "howz97/algorithm/pqueue/binaryheap"
+	"howz97/algorithm/queue"
+	unionfind "howz97/algorithm/union-find"
 )
 
 var (

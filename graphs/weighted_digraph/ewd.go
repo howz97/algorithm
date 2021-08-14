@@ -1,10 +1,10 @@
-package ewd
+package weighted_digraph
 
 import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/zh1014/algorithm/queue"
+	"howz97/algorithm/queue"
 	"os"
 	"strconv"
 	"strings"

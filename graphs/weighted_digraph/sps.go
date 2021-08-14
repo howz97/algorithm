@@ -1,4 +1,4 @@
-package ewd
+package weighted_digraph
 
 import (
 	"errors"
@@ -6,9 +6,9 @@ import (
 	"math"
 	"strconv"
 
-	pqueue "github.com/zh1014/algorithm/pqueue/binaryheap"
-	"github.com/zh1014/algorithm/queue"
-	"github.com/zh1014/algorithm/stack"
+	pqueue "howz97/algorithm/pqueue/binaryheap"
+	"howz97/algorithm/queue"
+	"howz97/algorithm/stack"
 )
 
 const (

@@ -1,6 +1,6 @@
 package digraph
 
-import "github.com/zh1014/algorithm/set"
+import "howz97/algorithm/set"
 
 func DetectDirCycle(g Digraph) bool {
 	marked := make([]bool, g.NumV())

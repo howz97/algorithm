@@ -1,7 +1,7 @@
 package tst
 
 import (
-	"github.com/zh1014/algorithm/queue"
+	"howz97/algorithm/queue"
 )
 
 type Tst struct {

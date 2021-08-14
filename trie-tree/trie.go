@@ -1,6 +1,6 @@
 package trietree
 
-import "github.com/zh1014/algorithm/queue"
+import "howz97/algorithm/queue"
 
 type Trie struct {
 	a    alphbt

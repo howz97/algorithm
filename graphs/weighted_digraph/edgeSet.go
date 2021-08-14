@@ -1,4 +1,4 @@
-package ewd
+package weighted_digraph
 
 type edgeSet map[*Edge]struct{}
 

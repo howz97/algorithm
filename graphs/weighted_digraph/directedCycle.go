@@ -1,6 +1,6 @@
-package ewd
+package weighted_digraph
 
-import "github.com/zh1014/algorithm/set"
+import "howz97/algorithm/set"
 
 func DetectDirCycle(g EdgeWeightedDigraph) bool {
 	marked := make([]bool, g.NumV())

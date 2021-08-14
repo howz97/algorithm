@@ -1,4 +1,4 @@
-package ewg
+package weighted_graph
 
 import (
 	"fmt"
