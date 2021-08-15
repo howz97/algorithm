@@ -10,7 +10,7 @@ func TestTopologicalSort(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	s := TopologicalSort(g)
+	s := g.TopologicalSort()
 	for !s.IsEmpty() {
 		fmt.Print(s.Pop(), " ")
 	}

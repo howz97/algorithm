@@ -2,12 +2,12 @@ package weighted_digraph
 
 import "howz97/algorithm/set"
 
-func DetectDirCycle(g EdgeWeightedDigraph) bool {
+func (g EdgeWeightedDigraph) DetectDirCycle() bool {
 	marked := make([]bool, g.NumV())
 	s := set.NewIntSet()
 	for i, b := range marked {
 		if !b {
-			if detectDirCycle(g, i, marked, s) {
+			if g.detectDirCycle(i, marked, s) {
 				return true
 			}
 		}
@@ -15,7 +15,7 @@ func DetectDirCycle(g EdgeWeightedDigraph) bool {
 	return false
 }
 
-func detectDirCycle(g EdgeWeightedDigraph, v int, marked []bool, s set.IntSet) bool {
+func (g EdgeWeightedDigraph) detectDirCycle(v int, marked []bool, s set.IntSet) bool {
 	if s.Contains(v) {
 		return true
 	}
@@ -24,7 +24,7 @@ func detectDirCycle(g EdgeWeightedDigraph, v int, marked []bool, s set.IntSet) b
 	adj := g.Adjacent(v)
 	for _, e := range adj {
 		w := e.to
-		if !marked[w] && detectDirCycle(g, w, marked, s) {
+		if !marked[w] && g.detectDirCycle(w, marked, s) {
 			return true
 		}
 	}

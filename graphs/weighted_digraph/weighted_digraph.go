@@ -166,7 +166,7 @@ func (e *Edge) From() int {
 	return e.from
 }
 
-func (e *Edge) To(v int) int {
+func (e *Edge) To() int {
 	return e.to
 }
 
