@@ -13,8 +13,8 @@ func TestEWD_Integer(t *testing.T) {
 	}
 	var (
 		spsDijkstra *ShortestPathSearcher
-		spsTop *ShortestPathSearcher
-		spsBF *ShortestPathSearcher
+		spsTop      *ShortestPathSearcher
+		spsBF       *ShortestPathSearcher
 	)
 	spsDijkstra, err = g.GenSearcherDijkstra()
 	if err != nil {
