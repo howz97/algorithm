@@ -34,21 +34,21 @@ func (g EdgeWeightedDigraph) NewShortestPathTree(src int) *ShortestPathTree {
 
 func (spt *ShortestPathTree) CanReach(dst int) bool {
 	if !spt.g.HasV(dst) {
-		panic(ErrVerticalNotExist)
+		return false
 	}
 	return spt.distTo[dst] != math.Inf(1)
 }
 
 func (spt *ShortestPathTree) DistanceTo(dst int) float64 {
 	if !spt.g.HasV(dst) {
-		panic(ErrVerticalNotExist)
+		return math.Inf(1)
 	}
 	return spt.distTo[dst]
 }
 
 func (spt *ShortestPathTree) PathTo(dst int) *stack.Stack {
 	if !spt.g.HasV(dst) {
-		panic(ErrVerticalNotExist)
+		return nil
 	}
 	s := stack.NewStack(spt.g.NumV() - 1)
 	for spt.edgeTo[dst] != nil {
