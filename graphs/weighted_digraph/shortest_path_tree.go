@@ -73,10 +73,7 @@ func dijkstraRelax(g EdgeWeightedDigraph, v int, edgeTo []*Edge, distTo []float6
 	adj := g.Adjacent(v)
 	for _, e := range adj {
 		if distTo[v]+e.weight < distTo[e.to] {
-			inPQ := true
-			if distTo[e.to] == math.Inf(1) {
-				inPQ = false
-			}
+			inPQ := distTo[e.to] != math.Inf(1)
 			edgeTo[e.to] = e
 			distTo[e.to] = distTo[v] + e.weight
 			if inPQ {
