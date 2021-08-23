@@ -3,7 +3,7 @@ package graph
 import (
 	"errors"
 	"fmt"
-	"howz97/algorithm/set"
+	"github.com/howz97/algorithm/set"
 	"strconv"
 )
 

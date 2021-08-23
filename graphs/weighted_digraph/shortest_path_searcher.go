@@ -2,7 +2,7 @@ package weighted_digraph
 
 import (
 	"errors"
-	"howz97/algorithm/stack"
+	"github.com/howz97/algorithm/stack"
 )
 
 type ShortestPathSearcher struct {

@@ -2,7 +2,7 @@ package hashtable
 
 import (
 	"fmt"
-	"howz97/algorithm/sort"
+	"github.com/howz97/algorithm/sort"
 	"os"
 	"strings"
 	"testing"

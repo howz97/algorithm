@@ -1,6 +1,6 @@
 package weighted_digraph
 
-import "howz97/algorithm/stack"
+import "github.com/howz97/algorithm/stack"
 
 func (g EdgeWeightedDigraph) ReversePostOrder() *stack.StackInt {
 	marked := make([]bool, g.NumV())

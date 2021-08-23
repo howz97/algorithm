@@ -2,7 +2,7 @@ package digraph
 
 import (
 	"errors"
-	"howz97/algorithm/set"
+	"github.com/howz97/algorithm/set"
 	"strconv"
 )
 

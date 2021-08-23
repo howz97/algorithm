@@ -1,9 +1,9 @@
 package weighted_digraph
 
 import (
-	pqueue "howz97/algorithm/pqueue/binaryheap"
-	"howz97/algorithm/queue"
-	"howz97/algorithm/stack"
+	pqueue "github.com/howz97/algorithm/pqueue/binaryheap"
+	"github.com/howz97/algorithm/queue"
+	"github.com/howz97/algorithm/stack"
 	"math"
 	"strconv"
 )

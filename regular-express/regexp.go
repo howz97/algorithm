@@ -2,10 +2,10 @@ package regexp
 
 import (
 	"fmt"
-	"howz97/algorithm/graphs/digraph"
-	"howz97/algorithm/queue"
-	"howz97/algorithm/set"
-	"howz97/algorithm/stack"
+	"github.com/howz97/algorithm/graphs/digraph"
+	"github.com/howz97/algorithm/queue"
+	"github.com/howz97/algorithm/set"
+	"github.com/howz97/algorithm/stack"
 	"strconv"
 	"strings"
 	"unicode/utf8"

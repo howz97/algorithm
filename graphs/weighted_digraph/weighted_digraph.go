@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"howz97/algorithm/queue"
+	"github.com/howz97/algorithm/queue"
 	"os"
 	"strconv"
 	"strings"

@@ -2,7 +2,7 @@ package tst_optimized
 
 import (
 	"fmt"
-	"howz97/algorithm/alphabet"
+	"github.com/howz97/algorithm/alphabet"
 	"math/rand"
 	"testing"
 )

@@ -1,6 +1,6 @@
 package digraph
 
-import "howz97/algorithm/queue"
+import "github.com/howz97/algorithm/queue"
 
 // Digraph does not support self-loop, but assume the source vertex can reach itself
 type DFS struct {

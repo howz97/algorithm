@@ -2,7 +2,7 @@ package strsort
 
 import (
 	"fmt"
-	"howz97/algorithm/alphabet"
+	"github.com/howz97/algorithm/alphabet"
 	"testing"
 )
 

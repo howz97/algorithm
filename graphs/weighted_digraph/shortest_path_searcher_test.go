@@ -2,7 +2,7 @@ package weighted_digraph
 
 import (
 	"fmt"
-	"howz97/algorithm/stack"
+	"github.com/howz97/algorithm/stack"
 	"testing"
 )
 

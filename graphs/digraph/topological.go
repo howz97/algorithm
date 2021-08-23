@@ -1,6 +1,6 @@
 package digraph
 
-import "howz97/algorithm/stack"
+import "github.com/howz97/algorithm/stack"
 
 func ReversePostOrder(g Digraph) *stack.StackInt {
 	marked := make([]bool, g.NumV())

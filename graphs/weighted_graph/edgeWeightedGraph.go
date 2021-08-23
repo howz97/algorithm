@@ -3,9 +3,9 @@ package weighted_graph
 import (
 	"errors"
 	"fmt"
-	pqueue "howz97/algorithm/pqueue/binaryheap"
-	"howz97/algorithm/queue"
-	unionfind "howz97/algorithm/union-find"
+	pqueue "github.com/howz97/algorithm/pqueue/binaryheap"
+	"github.com/howz97/algorithm/queue"
+	unionfind "github.com/howz97/algorithm/union-find"
 )
 
 var (

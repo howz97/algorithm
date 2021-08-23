@@ -1,8 +1,8 @@
 package graph
 
 import (
-	"howz97/algorithm/queue"
-	"howz97/algorithm/sort"
+	"github.com/howz97/algorithm/queue"
+	"github.com/howz97/algorithm/sort"
 )
 
 type BFS struct {

@@ -2,8 +2,8 @@ package tst_optimized
 
 import (
 	"errors"
-	"howz97/algorithm/alphabet"
-	"howz97/algorithm/queue"
+	"github.com/howz97/algorithm/alphabet"
+	"github.com/howz97/algorithm/queue"
 )
 
 type Tst2 struct {
