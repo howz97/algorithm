@@ -5,22 +5,6 @@ import (
 	"github.com/howz97/algorithm/hash_table"
 )
 
-//func main() {
-//	g, err := wDigraph.ImportEWD("/Users/zhanghao1/code/algorithm/integer_test/tinyEWD.txt")
-//	if err != nil {
-//		panic(err)
-//	}
-//	pathSearcher, err := g.GenSearcherDijkstra()
-//	/*
-//		pathSearcher, err := g.GenSearcherTopological()
-//		pathSearcher, err := g.GenSearcherBellmanFord()
-//	*/
-//	if err != nil {
-//		panic(err)
-//	}
-//	pathSearcher.PrintPath(0,7)
-//}
-
 func main() {
 	ht := hash_table.New(1)
 	ht.Put(hash_table.Str("a"), "A")
