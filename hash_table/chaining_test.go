@@ -1,4 +1,4 @@
-package hashtable
+package hash_table
 
 import (
 	"fmt"

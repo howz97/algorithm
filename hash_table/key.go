@@ -1,4 +1,4 @@
-package hashtable
+package hash_table
 
 import "unsafe"
 
@@ -54,3 +54,5 @@ func (s Str) Equal(k Key) bool {
 	}
 	return s == s2
 }
+
+type T interface{}

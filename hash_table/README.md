@@ -1,25 +1,11 @@
+链式哈希表
+```go
 package main
 
 import (
 	"fmt"
 	"github.com/howz97/algorithm/hash_table"
 )
-
-//func main() {
-//	g, err := wDigraph.ImportEWD("/Users/zhanghao1/code/algorithm/integer_test/tinyEWD.txt")
-//	if err != nil {
-//		panic(err)
-//	}
-//	pathSearcher, err := g.GenSearcherDijkstra()
-//	/*
-//		pathSearcher, err := g.GenSearcherTopological()
-//		pathSearcher, err := g.GenSearcherBellmanFord()
-//	*/
-//	if err != nil {
-//		panic(err)
-//	}
-//	pathSearcher.PrintPath(0,7)
-//}
 
 func main() {
 	ht := hash_table.New(1)
@@ -53,3 +39,19 @@ func main() {
 		return true
 	})
 }
+
+/*
+a -> A
+b -> B
+c -> C
+d -> D
+e -> E
+f -> F
+after delete (d/f/x) ...
+a -> A
+b -> B
+c -> C
+e -> E
+after delete all ... 0 1
+*/
+```
