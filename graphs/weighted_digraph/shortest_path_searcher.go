@@ -2,6 +2,7 @@ package weighted_digraph
 
 import (
 	"errors"
+	"fmt"
 	"github.com/howz97/algorithm/stack"
 )
 
@@ -71,4 +72,14 @@ func (s *ShortestPathSearcher) Path(src, dst int) *stack.Stack {
 		panic(ErrVerticalNotExist)
 	}
 	return s.spt[src].PathTo(dst)
+}
+
+func (s *ShortestPathSearcher) PrintPath(src, dst int) {
+	p := s.Path(src, dst)
+	fmt.Print("PATH: ", src)
+	for !p.IsEmpty() {
+		e := p.Pop().(*Edge)
+		fmt.Print("->", e.to)
+	}
+	fmt.Printf(" (distance %v)\n", s.Distance(src, dst))
 }

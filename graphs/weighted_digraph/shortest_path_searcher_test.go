@@ -64,7 +64,7 @@ func TestNewSPS_Dijkstra(t *testing.T) {
 	sps, _ := g.GenSearcherDijkstra()
 	for src := range g {
 		for dst := range g {
-			printPath(sps, src, dst)
+			sps.PrintPath(src, dst)
 		}
 	}
 }
@@ -77,7 +77,7 @@ func TestNewSPS_Topological(t *testing.T) {
 	sps, _ := g.GenSearcherTopological()
 	for src := range g {
 		for dst := range g {
-			printPath(sps, src, dst)
+			sps.PrintPath(src, dst)
 		}
 	}
 }
@@ -94,17 +94,7 @@ func TestNewSPS_BellmanFord(t *testing.T) {
 	}
 	for src := range g {
 		for dst := range g {
-			printPath(sps, src, dst)
+			sps.PrintPath(src, dst)
 		}
 	}
-}
-
-func printPath(sps *ShortestPathSearcher, src, dst int) {
-	p := sps.Path(src, dst)
-	fmt.Print("PATH: ", src)
-	for !p.IsEmpty() {
-		e := p.Pop().(*Edge)
-		fmt.Print("->", e.to)
-	}
-	fmt.Printf(" (distance %v)\n", sps.Distance(src, dst))
 }
