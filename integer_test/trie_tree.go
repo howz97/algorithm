@@ -36,6 +36,6 @@ func main() {
 	prefix := "bi"
 	fmt.Printf("keys with prefix '%s': %v\n", prefix, tst1.KeysWithPrefix(prefix))
 
-	str := "bytes"
+	str := "bitcoins"
 	fmt.Printf("longest key with prefix '%s': %s\n", str, tst1.LongestPrefixOf(str))
 }
