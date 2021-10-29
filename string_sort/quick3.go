@@ -1,4 +1,4 @@
-package strsort
+package string_sort
 
 func Quick3(a alphbt, strs []string) {
 	aux = make([][]rune, len(strs))

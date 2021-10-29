@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/str_search"
+	"github.com/howz97/algorithm/string_search"
 	"os"
 )
 
@@ -23,7 +23,7 @@ func main() {
 	}
 
 	pattern := "It is a far, far better thing that I do, than I have ever done"
-	searcher := str_search.NewKMP(pattern)
+	searcher := string_search.NewKMP(pattern)
 	//searcher := str_search.NewBM(pattern)
 	i := searcher.Index(string(txt))
 	//i := str_search.IndexRabinKarp(string(txt), pattern)

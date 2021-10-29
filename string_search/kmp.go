@@ -1,4 +1,4 @@
-package str_search
+package string_search
 
 const (
 	byteNum = 256

@@ -1,4 +1,4 @@
-package strsort
+package string_sort
 
 var aux [][]rune
 

@@ -1,7 +1,7 @@
 /*
 	Go library: strings.Index
 */
-package str_search
+package string_search
 
 // primeRK is the prime base used in Rabin-Karp algorithm.
 const primeRK = 16777619

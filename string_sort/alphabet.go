@@ -3,7 +3,7 @@
  *     Initial: 2019/09/01        Zhang Hao
  */
 
-package strsort
+package string_sort
 
 type alphbt interface {
 	// ToRune convert index to rune
