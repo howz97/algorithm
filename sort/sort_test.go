@@ -3,7 +3,7 @@ package sort
 import (
 	"fmt"
 	"math/rand"
-	"sort"
+	stdsort "sort"
 	"testing"
 	"time"
 )
@@ -12,12 +12,12 @@ func TestContrast(t *testing.T) {
 	//testPerformance(PopSort, "PopSort")
 	//testPerformance(SelectSort, "SelectSort")
 	//testPerformance(InsertSort, "InsertSort")
-	testPerformance(ShellSort, "ShellSort")
+	//testPerformance(ShellSort, "ShellSort")
 	//testPerformance(MergeSort, "MergeSort")
 	//testPerformance(HeapSort, "HeapSort")
-	//testPerformance(QuickSort, "QuickSort")
+	testPerformance(QuickSort, "QuickSort")
 
-	//testPerformance(sort.Ints, "Go library sort.Ints")
+	testPerformance(stdsort.Sort, "Go library sort.Ints")
 }
 
 const (
@@ -28,10 +28,10 @@ const (
 )
 
 var (
-	inputData = make([]int, inputSize)
+	inputData = make(stdsort.IntSlice, inputSize)
 )
 
-func testPerformance(sortAlg func([]int), algName string) {
+func testPerformance(sortAlg func(p stdsort.Interface), algName string) {
 	performanceRandomInput(sortAlg, algName)
 	performanceDupInput(sortAlg, algName)
 	performanceSortedInput(sortAlg, algName)
@@ -39,14 +39,14 @@ func testPerformance(sortAlg func([]int), algName string) {
 	fmt.Println("-------------------------------------")
 }
 
-func performanceRandomInput(sortAlg func([]int), algName string) {
+func performanceRandomInput(sortAlg func(p stdsort.Interface), algName string) {
 	fmt.Printf("%v : random(%v):\n", algName, inputSize)
 	for pass := 0; pass < testFreq; pass++ {
 		genRandomData(inputData, randInputUpLimit)
 		start := time.Now()
 		sortAlg(inputData)
 		elapsed := time.Since(start)
-		if !sort.IntsAreSorted(inputData) {
+		if !stdsort.IntsAreSorted(inputData) {
 			panic("failed to sort: " + algName)
 		}
 		fmt.Print(elapsed.String(), "  ")
@@ -54,14 +54,14 @@ func performanceRandomInput(sortAlg func([]int), algName string) {
 	fmt.Println()
 }
 
-func performanceDupInput(sortAlg func([]int), algName string) {
+func performanceDupInput(sortAlg func(p stdsort.Interface), algName string) {
 	fmt.Printf("%v : dup(%v):\n", algName, inputSize)
 	for pass := 0; pass < testFreq; pass++ {
 		genRandomData(inputData, dupInputUpLimit)
 		start := time.Now()
 		sortAlg(inputData)
 		elapsed := time.Since(start)
-		if !sort.IntsAreSorted(inputData) {
+		if !stdsort.IntsAreSorted(inputData) {
 			panic("failed to sort")
 		}
 		fmt.Print(elapsed.String(), "  ")
@@ -69,14 +69,14 @@ func performanceDupInput(sortAlg func([]int), algName string) {
 	fmt.Println()
 }
 
-func performanceSortedInput(sortAlg func([]int), algName string) {
+func performanceSortedInput(sortAlg func(p stdsort.Interface), algName string) {
 	fmt.Printf("%v : sorted(%v):\n", algName, inputSize)
 	genSortedData(inputData)
 	for pass := 0; pass < testFreq; pass++ {
 		start := time.Now()
 		sortAlg(inputData)
 		elapsed := time.Since(start)
-		if !sort.IntsAreSorted(inputData) {
+		if !stdsort.IntsAreSorted(inputData) {
 			panic("failed to sort")
 		}
 		fmt.Print(elapsed.String(), "  ")
@@ -84,14 +84,14 @@ func performanceSortedInput(sortAlg func([]int), algName string) {
 	fmt.Println()
 }
 
-func performanceReverseSortedInput(sortAlg func([]int), algName string) {
+func performanceReverseSortedInput(sortAlg func(p stdsort.Interface), algName string) {
 	fmt.Printf("%v : reverse(%v):\n", algName, inputSize)
 	for pass := 0; pass < testFreq; pass++ {
 		genReverseSortedData(inputData)
 		start := time.Now()
 		sortAlg(inputData)
 		elapsed := time.Since(start)
-		if !sort.IntsAreSorted(inputData) {
+		if !stdsort.IntsAreSorted(inputData) {
 			panic("failed to sort")
 		}
 		fmt.Print(elapsed.String(), "  ")
@@ -118,4 +118,11 @@ func genReverseSortedData(data []int) {
 		n--
 		data[i] = n
 	}
+}
+
+func Test_cutOff(t *testing.T) {
+	//sli := stdsort.IntSlice{9,1,1,4,4,5,6,7,3,2}
+	sli := stdsort.IntSlice{9, 8, 7, 4, 4, 5, 6, 7, 3, 2}
+	m := cutOff(sli, 0, 9)
+	t.Log(m, sli)
 }
