@@ -1,18 +1,23 @@
 package sort
 
-// QuickSort -
-func QuickSort(data []int) {
-	if len(data) <= 1 {
+import stdsort "sort"
+
+func QuickSort(data stdsort.Interface) {
+	quickSort(data, 0, data.Len()-1)
+}
+
+func quickSort(data stdsort.Interface, l, h int) {
+	if h -l <= 1 {
 		return
 	}
 	median2end(data)
 	medianIdx := cutOff(data)
-	QuickSort(data[:medianIdx])
-	QuickSort(data[medianIdx+1:])
+	quickSort(data, l, medianIdx)
+	quickSort(data, medianIdx+1, h)
 }
 
 // 把 data[0] data[len(data)/2] data[len(data)-1] 中的中位数（枢纽元）交换到data[len(data)-1]
-func median2end(data []int) {
+func median2end(data stdsort.Interface) {
 	if data[0] > data[len(data)/2] {
 		data[0], data[len(data)/2] = data[len(data)/2], data[0]
 	}
@@ -26,7 +31,7 @@ func median2end(data []int) {
 }
 
 // 此时枢纽元在 data[len(data)-1] , 开始分割data[:len(data)-1], 并将枢纽元交换到i最终位置
-func cutOff(data []int) int {
+func cutOff(data stdsort.Interface) int {
 	if len(data) == 0 {
 		panic("cutting off empty slice")
 	}
