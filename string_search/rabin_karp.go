@@ -1,6 +1,3 @@
-/*
-	Go library: strings.Index
-*/
 package string_search
 
 // primeRK is the prime base used in Rabin-Karp algorithm.

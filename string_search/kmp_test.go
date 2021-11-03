@@ -40,7 +40,7 @@ func TestKMP_IndexAll2(t *testing.T) {
 
 func TestKMP_Index(t *testing.T) {
 	pattern := "It is a far, far better thing that I do, than I have ever done"
-	file, err := os.Open("/Users/zhanghao/go/src/github.com/zh1014/algorithm/str-search/tale.txt")
+	file, err := os.Open("./tale.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -61,12 +61,66 @@ func TestKMP_Index(t *testing.T) {
 	if i < 0 {
 		t.Fatal()
 	}
-	fmt.Printf("[%v]Found at %v: %v\n", elapsed.String(), i, string(txt[i:i+kmp.lenPttrn]))
+	fmt.Printf("[%v]Found at %v: %v\n", elapsed.String(), i, string(txt[i:i+kmp.stateCnt]))
 }
 
+const (
+	testCount     = 20
+	KMPAlg        = "KMP       "
+	BoyerMooreAlg = "BoyerMoore"
+	RabinKarpAlg  = "RabinKarp "
+	Stdlib        = "Stdlib    "
+)
+
 func TestPerformance(t *testing.T) {
+	txtStr := string(readFileContent("./tale.txt"))
 	pattern := "It is a far, far better thing that I do, than I have ever done"
-	file, err := os.Open("/Users/zhanghao/go/src/github.com/zh1014/algorithm/str-search/tale.txt")
+	idx := strings.Index(txtStr, pattern)
+	result := make(map[string][]time.Duration)
+	kmp := NewKMP(pattern)
+	bm := NewBM(pattern)
+	for i := 0; i < testCount; i++ {
+		start := time.Now()
+		if kmp.Index(txtStr) != idx {
+			t.Fatal("wrong result")
+		}
+		elapsed := time.Since(start)
+		result[KMPAlg] = append(result[KMPAlg], elapsed)
+
+		start = time.Now()
+		if bm.Index(txtStr) != idx {
+			t.Fatal("wrong result")
+		}
+		elapsed = time.Since(start)
+		result[BoyerMooreAlg] = append(result[BoyerMooreAlg], elapsed)
+
+		start = time.Now()
+		if IndexRabinKarp(txtStr, pattern) != idx {
+			t.Fatal("wrong result")
+		}
+		elapsed = time.Since(start)
+		result[RabinKarpAlg] = append(result[RabinKarpAlg], elapsed)
+
+		start = time.Now()
+		if strings.Index(txtStr, pattern) != idx {
+			t.Fatal("wrong result")
+		}
+		elapsed = time.Since(start)
+		result[Stdlib] = append(result[Stdlib], elapsed)
+	}
+
+	for alg, sli := range result {
+		var avg time.Duration
+		for _, dur := range sli {
+			avg += dur
+		}
+		avg /= time.Duration(len(sli))
+		t.Logf("%s: avg=%s %v", alg, avg, sli)
+	}
+}
+
+func readFileContent(filename string) []byte {
+	file, err := os.Open(filename)
 	if err != nil {
 		panic(err)
 	}
@@ -79,40 +133,5 @@ func TestPerformance(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	txtStr := string(txt)
-
-	const testCount = 10
-	kmp := NewKMP(pattern)
-	fmt.Println("KMP:")
-	for i := 0; i < testCount; i++ {
-		start := time.Now()
-		idx := kmp.Index(txtStr)
-		elapsed := time.Since(start)
-		fmt.Printf("%v Found at %v\n", elapsed.String(), idx)
-	}
-
-	bm := NewBM(pattern)
-	fmt.Println("\nBoyerMoore:")
-	for i := 0; i < testCount; i++ {
-		start := time.Now()
-		idx := bm.Index(txtStr)
-		elapsed := time.Since(start)
-		fmt.Printf("%v Found at %v\n", elapsed.String(), idx)
-	}
-
-	fmt.Println("\nRabinKarp:")
-	for i := 0; i < testCount; i++ {
-		start := time.Now()
-		idx := IndexRabinKarp(txtStr, pattern)
-		elapsed := time.Since(start)
-		fmt.Printf("%v Found at %v\n", elapsed.String(), idx)
-	}
-
-	fmt.Println("\nbytes.Index(Rabin-Karp):")
-	for i := 0; i < testCount; i++ {
-		start := time.Now()
-		idx := strings.Index(txtStr, pattern)
-		elapsed := time.Since(start)
-		fmt.Printf("%v Found at %v\n", elapsed.String(), idx)
-	}
+	return txt
 }

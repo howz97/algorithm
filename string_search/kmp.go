@@ -5,49 +5,60 @@ const (
 )
 
 type KMP struct {
-	lenPttrn int
-	dfa      [][]int
+	stateCnt int
+	dfa      [][]int // deterministic finite automaton
 }
 
 func NewKMP(pattern string) *KMP {
 	kmp := &KMP{
 		dfa: make([][]int, byteNum),
 	}
-	kmp.lenPttrn = len(pattern)
+	kmp.stateCnt = len(pattern)
 	for i := range kmp.dfa {
-		kmp.dfa[i] = make([]int, kmp.lenPttrn)
+		kmp.dfa[i] = make([]int, kmp.stateCnt)
 	}
+
+	// init dfa
 	dfa := kmp.dfa
-	dfa[pattern[0]][0] = 1
-	x := 0
-	for i := 1; i < kmp.lenPttrn; i++ {
-		for j := 0; j < byteNum; j++ {
-			dfa[j][i] = dfa[j][x]
+	dfa[pattern[0]][0] = 1 // dfa[][0] is special
+
+	state := 1
+	rs := 0 // restart state
+	for state < kmp.stateCnt {
+		for i := 0; i < byteNum; i++ {
+			dfa[i][state] = dfa[i][rs]
 		}
-		dfa[pattern[i]][i] = i + 1
-		x = dfa[pattern[i]][x]
+		dfa[pattern[state]][state] = state + 1
+
+		rs = dfa[pattern[state]][rs]
+		state++
 	}
 	return kmp
 }
 
 func (kmp *KMP) Index(s string) int {
-	lS := len(s)
-	i, j := 0, 0
-	for ; i < lS && j < kmp.lenPttrn; i++ {
-		j = kmp.dfa[s[i]][j]
+	if len(s) < kmp.stateCnt {
+		return -1
 	}
-	if j == kmp.lenPttrn {
-		return i - j
+	i, state := 0, 0
+	for ; i < len(s) && state < kmp.stateCnt; i++ {
+		state = kmp.dfa[s[i]][state]
+	}
+	if state == kmp.stateCnt {
+		return i - state
 	}
 	return -1
 }
 
-func (kmp *KMP) IndexAll(s string) []int {
-	indices := make([]int, 0)
+func (kmp *KMP) IndexAll(s string) (indices []int) {
 	j := 0
-	for i := kmp.Index(s); i >= 0; i = kmp.Index(s[j:]) {
+	for {
+		i := kmp.Index(s)
+		if i < 0 {
+			return
+		}
 		indices = append(indices, j+i)
-		j = j + i + kmp.lenPttrn
+		j = j + i + kmp.stateCnt
+		s = s[i+kmp.stateCnt:]
 	}
-	return indices
 }
