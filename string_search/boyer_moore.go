@@ -17,9 +17,7 @@ func NewBM(pattern string) *BoyerMoore {
 }
 
 func (bm *BoyerMoore) Index(s string) int {
-	lenS := len(s)
-	i := 0
-	for i < lenS-bm.LenP() {
+	for i := 0; i < len(s)-bm.LenP(); {
 		j := bm.LenP() - 1
 		for ; j >= 0 && s[i+j] == bm.pattern[j]; j-- {
 		}
