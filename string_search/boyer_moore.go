@@ -1,16 +1,14 @@
 package string_search
 
 type BoyerMoore struct {
-	pttrn    string
-	lenPttrn int
-	right    []int
+	pattern string
+	right   []int
 }
 
 func NewBM(pattern string) *BoyerMoore {
 	bm := &BoyerMoore{
-		pttrn:    pattern,
-		lenPttrn: len(pattern),
-		right:    make([]int, byteNum),
+		pattern: pattern,
+		right:   make([]int, byteNum),
 	}
 	for i := 0; i < len(pattern); i++ {
 		bm.right[pattern[i]] = i
@@ -21,9 +19,9 @@ func NewBM(pattern string) *BoyerMoore {
 func (bm *BoyerMoore) Index(s string) int {
 	lenS := len(s)
 	i := 0
-	for i < lenS-bm.lenPttrn {
-		j := bm.lenPttrn - 1
-		for ; j >= 0 && s[i+j] == bm.pttrn[j]; j-- {
+	for i < lenS-bm.LenP() {
+		j := bm.LenP() - 1
+		for ; j >= 0 && s[i+j] == bm.pattern[j]; j-- {
 		}
 		if j < 0 {
 			return i
@@ -42,7 +40,11 @@ func (bm *BoyerMoore) IndexAll(s string) []int {
 	j := 0
 	for i := bm.Index(s); i >= 0; i = bm.Index(s[j:]) {
 		indices = append(indices, j+i)
-		j = j + i + bm.lenPttrn
+		j = j + i + bm.LenP()
 	}
 	return indices
+}
+
+func (bm *BoyerMoore) LenP() int {
+	return len(bm.pattern)
 }
