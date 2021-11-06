@@ -33,14 +33,17 @@ func (bm *BoyerMoore) Index(s string) int {
 	return -1
 }
 
-func (bm *BoyerMoore) IndexAll(s string) []int {
-	indices := make([]int, 0)
+func (bm *BoyerMoore) IndexAll(s string) (indices []int) {
 	j := 0
-	for i := bm.Index(s); i >= 0; i = bm.Index(s[j:]) {
+	for {
+		i := bm.Index(s)
+		if i < 0 {
+			return
+		}
 		indices = append(indices, j+i)
 		j = j + i + bm.LenP()
+		s = s[i+bm.LenP():]
 	}
-	return indices
 }
 
 func (bm *BoyerMoore) LenP() int {

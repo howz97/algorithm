@@ -49,7 +49,7 @@ func TestBoyerMoore_IndexAll2(t *testing.T) {
 
 func TestBoyerMoore_Index(t *testing.T) {
 	pattern := "It is a far, far better thing that I do, than I have ever done"
-	file, err := os.Open("/Users/zhanghao/go/src/github.com/zh1014/algorithm/str-search/tale.txt")
+	file, err := os.Open("./tale.txt")
 	if err != nil {
 		panic(err)
 	}
