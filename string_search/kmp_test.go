@@ -95,8 +95,8 @@ func TestPerformance(t *testing.T) {
 		result[BoyerMooreAlg] = append(result[BoyerMooreAlg], elapsed)
 
 		start = time.Now()
-		if IndexRabinKarp(txtStr, pattern) != idx {
-			t.Fatal("wrong result")
+		if i := IndexRabinKarp(txtStr, pattern); i != idx {
+			t.Fatalf("wrong result %d, should be %d", i, idx)
 		}
 		elapsed = time.Since(start)
 		result[RabinKarpAlg] = append(result[RabinKarpAlg], elapsed)
