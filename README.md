@@ -4,6 +4,8 @@
 https://github.com/howz97/algorithm/tree/master/sort
 * 字符串排序
 https://github.com/howz97/algorithm/tree/master/string_sort
+* Trie树
+https://github.com/howz97/algorithm/tree/master/trie_tree/tst
 * 子字符串查找 (KMP/BoyerMoore/RabinKarp)
 https://github.com/howz97/algorithm/tree/master/string_search
 * AVL树
@@ -14,7 +16,5 @@ https://github.com/howz97/algorithm/blob/master/hash_table
 https://github.com/howz97/algorithm/tree/master/graphs/weighted_digraph
 * 正则表达式
 https://github.com/howz97/algorithm/tree/master/regexp
-* Trie树
-https://github.com/howz97/algorithm/tree/master/trie_tree/tst
 * 优先队列 (二叉堆/左式堆/二项队列)
 https://github.com/howz97/algorithm/tree/master/pqueue
