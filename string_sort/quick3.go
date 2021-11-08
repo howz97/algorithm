@@ -2,7 +2,11 @@ package string_sort
 
 import "github.com/howz97/algorithm/alphabet"
 
-func Quick3(a alphabet.Interface, data []string) {
+func Quick3(data []string) {
+	Quick3WithAlphabet(alphabet.Unicode, data)
+}
+
+func Quick3WithAlphabet(a alphabet.Interface, data []string) {
 	runes := make([][]rune, len(data))
 	for i := range runes {
 		runes[i] = []rune(data[i])

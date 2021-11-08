@@ -2,6 +2,7 @@ package string_search
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
@@ -73,7 +74,11 @@ const (
 )
 
 func TestPerformance(t *testing.T) {
-	txtStr := string(readFileContent("./tale.txt"))
+	content, err := ioutil.ReadFile("./tale.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	txtStr := string(content)
 	pattern := "It is a far, far better thing that I do, than I have ever done"
 	idx := strings.Index(txtStr, pattern)
 	result := make(map[string][]time.Duration)
@@ -117,21 +122,4 @@ func TestPerformance(t *testing.T) {
 		avg /= time.Duration(len(sli))
 		t.Logf("%s: avg=%s %v", alg, avg, sli)
 	}
-}
-
-func readFileContent(filename string) []byte {
-	file, err := os.Open(filename)
-	if err != nil {
-		panic(err)
-	}
-	fileStat, err := file.Stat()
-	if err != nil {
-		panic(err)
-	}
-	txt := make([]byte, fileStat.Size())
-	_, err = file.Read(txt)
-	if err != nil {
-		panic(err)
-	}
-	return txt
 }
