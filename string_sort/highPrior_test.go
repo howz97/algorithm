@@ -23,7 +23,7 @@ func Test_HighPrior(t *testing.T) {
 		"seashells",
 		"xyz",
 	}
-	HighPrior(alphabet.LowerCase, strs)
+	HighPriorWithAlphabet(alphabet.LowerCase, strs)
 	fmt.Println(strs)
 
 	strs = append(strs,
@@ -35,7 +35,7 @@ func Test_HighPrior(t *testing.T) {
 		"CHINA",
 		"ℹChina",
 	)
-	HighPrior(alphabet.Unicode, strs)
+	HighPriorWithAlphabet(alphabet.Unicode, strs)
 	fmt.Println(strs)
 }
 

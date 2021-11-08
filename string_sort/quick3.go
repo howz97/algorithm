@@ -1,8 +1,8 @@
 package string_sort
 
-func Quick3(a alphbt, strs []string) {
-	aux = make([][]rune, len(strs))
+import "github.com/howz97/algorithm/alphabet"
 
+func Quick3(a alphabet.Interface, strs []string) {
 	// convert string to []rune
 	strsRune := make([][]rune, len(strs))
 	for i := range strsRune {
@@ -18,7 +18,7 @@ func Quick3(a alphbt, strs []string) {
 	}
 }
 
-func quick3(a alphbt, strs [][]rune, lo, hi, d int) {
+func quick3(a alphabet.Interface, strs [][]rune, lo, hi, d int) {
 	if lo >= hi {
 		return
 	}

@@ -6,78 +6,88 @@ import (
 )
 
 const (
-	BINARY      = "01"
-	DNA         = "ACTG"
-	OCTAL       = "01234567"
-	DECIMAL     = "0123456789"
-	HEXADECIMAL = "0123456789ABCDEF"
-	LOWERCASE   = "abcdefghijklmnopqrstuvwxyz"
-	UPPERCASE   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	BASE64      = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-	ASCII       = " !\"#$%&'()*+,-./" + DECIMAL + ":;<=>?@" + UPPERCASE + "[\\]^_`" + LOWERCASE + "{|}~"
+	BINARY      = `01`
+	DNA         = `ACTG`
+	OCTAL       = `01234567`
+	DECIMAL     = `0123456789`
+	HEXADECIMAL = `0123456789ABCDEF`
+	LOWERCASE   = `abcdefghijklmnopqrstuvwxyz`
+	UPPERCASE   = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`
+	BASE64      = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/`
+	ASCII       = ` !"#$%&'()*+,-./` + DECIMAL + `:;<=>?@` + UPPERCASE + `[\]^_` + "`" + LOWERCASE + `{|}~`
 )
 
 var (
-	Binary      = NewAlphabet(BINARY)
-	Dna         = NewAlphabet(DNA)
-	Octal       = NewAlphabet(OCTAL)
-	Decimal     = NewAlphabet(DECIMAL)
-	Hexadecimal = NewAlphabet(HEXADECIMAL)
-	LowerCase   = NewAlphabet(LOWERCASE)
-	UpperCase   = NewAlphabet(UPPERCASE)
-	Base64      = NewAlphabet(BASE64)
-	Ascii       = NewAlphabet(ASCII)
-	Unicode     = new(AlphabetUnicode)
+	Binary      = NewAlphabetImpl(BINARY)
+	Dna         = NewAlphabetImpl(DNA)
+	Octal       = NewAlphabetImpl(OCTAL)
+	Decimal     = NewAlphabetImpl(DECIMAL)
+	Hexadecimal = NewAlphabetImpl(HEXADECIMAL)
+	LowerCase   = NewAlphabetImpl(LOWERCASE)
+	UpperCase   = NewAlphabetImpl(UPPERCASE)
+	Base64      = NewAlphabetImpl(BASE64)
+	Ascii       = NewAlphabetImpl(ASCII)
+	Unicode     = new(unicodeImpl)
 )
 
-// Alphabet represent an alphabet
-type Alphabet struct {
-	rtoi map[rune]int
-	itor []rune
+type Interface interface {
+	ToRune(int) rune
+	ToIndex(rune) int
+	Contains(rune) bool
+	R() int
 }
 
-// NewAlphabet assume every rune in s is unique
-func NewAlphabet(s string) *Alphabet {
-	a := &Alphabet{
-		rtoi: make(map[rune]int),
-		itor: make([]rune, 0),
+type alphabetImpl struct {
+	r2i map[rune]int
+	i2r []rune
+}
+
+func NewAlphabetImpl(s string) *alphabetImpl {
+	a := &alphabetImpl{
+		r2i: make(map[rune]int),
+		i2r: make([]rune, 0),
 	}
-	for i, r := range s {
-		a.rtoi[r] = i
-		a.itor = append(a.itor, r)
+	i := 0
+	for _, r := range s {
+		if _, exist := a.r2i[r]; exist {
+			continue
+		}
+		a.r2i[r] = i
+		a.i2r = append(a.i2r, r)
+		i++
 	}
 	return a
 }
 
 // ToRune convert index to rune
-func (a *Alphabet) ToRune(i int) rune {
-	if i >= len(a.itor) {
-		panic(fmt.Sprintf("index %v exceed range of Alphabet", i))
+func (a *alphabetImpl) ToRune(i int) rune {
+	if i >= len(a.i2r) {
+		panic(fmt.Sprintf("index %v exceed range of alphabetImpl", i))
 	}
-	return a.itor[i]
+	return a.i2r[i]
 }
 
 // ToIndex convert rune to index
-func (a *Alphabet) ToIndex(r rune) int {
-	i, exst := a.rtoi[r]
+func (a *alphabetImpl) ToIndex(r rune) int {
+	i, exst := a.r2i[r]
 	if !exst {
-		panic(fmt.Sprintf("rune %v do not belong to Alphabet", string(r)))
+		panic(fmt.Sprintf("rune %v do not belong to alphabetImpl", string(r)))
 	}
 	return i
 }
 
-func (a *Alphabet) Contains(r rune) bool {
-	_, exst := a.rtoi[r]
+func (a *alphabetImpl) Contains(r rune) bool {
+	_, exst := a.r2i[r]
 	return exst
 }
 
 // R is the size of this Alphabet
-func (a *Alphabet) R() int {
-	return len(a.rtoi)
+func (a *alphabetImpl) R() int {
+	return len(a.r2i)
 }
 
 // lgR means the number of bits needed to represent R
-func (a *Alphabet) lgR() int {
+func (a *alphabetImpl) lgR() int {
 	logarithm := math.Log2(float64(a.R()))
 	if logarithm > math.Logb(float64(a.R())) {
 		return int(logarithm + 1)
@@ -86,7 +96,7 @@ func (a *Alphabet) lgR() int {
 }
 
 // ToIndeices equal to call ToIndex for every rune in s
-func (a *Alphabet) ToIndeices(s string) []int {
+func (a *alphabetImpl) ToIndeices(s string) []int {
 	indices := make([]int, 0)
 	for _, r := range s {
 		indices = append(indices, a.ToIndex(r))
@@ -95,7 +105,7 @@ func (a *Alphabet) ToIndeices(s string) []int {
 }
 
 // ToRunes equal to call ToRune for every index in indices
-func (a *Alphabet) ToRunes(indices []int) []rune {
+func (a *alphabetImpl) ToRunes(indices []int) []rune {
 	runes := make([]rune, 0)
 	for i := range indices {
 		runes = append(runes, a.ToRune(indices[i]))
@@ -103,26 +113,26 @@ func (a *Alphabet) ToRunes(indices []int) []rune {
 	return runes
 }
 
-type AlphabetUnicode struct{}
+type unicodeImpl struct{}
 
-func (u *AlphabetUnicode) ToRune(i int) rune {
+func (u *unicodeImpl) ToRune(i int) rune {
 	return rune(i)
 }
 
-func (u *AlphabetUnicode) ToIndex(r rune) int {
+func (u *unicodeImpl) ToIndex(r rune) int {
 	return int(r)
 }
 
-func (u *AlphabetUnicode) Contains(r rune) bool {
+func (u *unicodeImpl) Contains(_ rune) bool {
 	return true
 }
 
-func (u *AlphabetUnicode) R() int {
+func (u *unicodeImpl) R() int {
 	return 0xFFFF
 }
 
 // ToIndeices equal to call ToIndex for every rune in s
-func (u *AlphabetUnicode) ToIndeices(s string) []int {
+func (u *unicodeImpl) ToIndeices(s string) []int {
 	indices := make([]int, 0)
 	for _, r := range s {
 		indices = append(indices, u.ToIndex(r))
@@ -131,7 +141,7 @@ func (u *AlphabetUnicode) ToIndeices(s string) []int {
 }
 
 // ToRunes equal to call ToRune for every index in indices
-func (u *AlphabetUnicode) ToRunes(indices []int) []rune {
+func (u *unicodeImpl) ToRunes(indices []int) []rune {
 	runes := make([]rune, 0)
 	for i := range indices {
 		runes = append(runes, u.ToRune(indices[i]))

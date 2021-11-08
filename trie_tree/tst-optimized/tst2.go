@@ -7,12 +7,12 @@ import (
 )
 
 type Tst2 struct {
-	Alpb       alphabet.IAlphabet
+	Alpb       alphabet.Interface
 	tree       *tst2
 	compressed bool
 }
 
-func NewTst2(a alphabet.IAlphabet) *Tst2 {
+func NewTst2(a alphabet.Interface) *Tst2 {
 	return &Tst2{
 		Alpb: a,
 	}
@@ -111,7 +111,7 @@ type tst2 struct {
 	left, mid, right *tst2
 }
 
-func (t *tst2) insert(a alphabet.IAlphabet, k []rune, v interface{}) *tst2 {
+func (t *tst2) insert(a alphabet.Interface, k []rune, v interface{}) *tst2 {
 	if len(k) == 0 {
 		panic("empty key")
 	}
@@ -158,7 +158,7 @@ func (t *tst2) canShrink() bool {
 	return t.v == nil && t.left == nil && t.right == nil
 }
 
-func (t *tst2) delete(a alphabet.IAlphabet, k []rune) *tst2 {
+func (t *tst2) delete(a alphabet.Interface, k []rune) *tst2 {
 	if len(k) == 0 {
 		panic("empty key")
 	}
@@ -191,13 +191,13 @@ func (t *tst2) isEmpty() bool {
 	return false
 }
 
-func (t *tst2) contains(a alphabet.IAlphabet, k []rune) bool {
+func (t *tst2) contains(a alphabet.Interface, k []rune) bool {
 	f := t.find(a, k)
 	return f != nil && f.v != nil
 }
 
 // find 找到k对应的节点(n)，有这个节点不代表k存在，是否存在需要看n.v是否为nil
-func (t *tst2) find(a alphabet.IAlphabet, k []rune) *tst2 {
+func (t *tst2) find(a alphabet.Interface, k []rune) *tst2 {
 	if t == nil || len(k) < len(t.rs) || !equal(t.rs[:len(t.rs)-1], k[:len(t.rs)-1]) {
 		return nil
 	}
@@ -216,7 +216,7 @@ func (t *tst2) find(a alphabet.IAlphabet, k []rune) *tst2 {
 	}
 }
 
-func (t *tst2) locate(a alphabet.IAlphabet, k []rune) (l *tst2, i int) {
+func (t *tst2) locate(a alphabet.Interface, k []rune) (l *tst2, i int) {
 	if t == nil {
 		return nil, 0
 	}
@@ -244,7 +244,7 @@ func (t *tst2) locate(a alphabet.IAlphabet, k []rune) (l *tst2, i int) {
 	}
 }
 
-func (t *tst2) longestPrefixOf(a alphabet.IAlphabet, s []rune, d, length int) int {
+func (t *tst2) longestPrefixOf(a alphabet.Interface, s []rune, d, length int) int {
 	if len(s) == 0 {
 		panic("empty s")
 	}
@@ -269,7 +269,7 @@ func (t *tst2) longestPrefixOf(a alphabet.IAlphabet, s []rune, d, length int) in
 	}
 }
 
-func (t *tst2) collect(a alphabet.IAlphabet, p string, keys *queue.StrQ) {
+func (t *tst2) collect(a alphabet.Interface, p string, keys *queue.StrQ) {
 	if t == nil {
 		return
 	}
@@ -285,7 +285,7 @@ func dropLastR(rs []rune) []rune {
 	return rs[:len(rs)-1]
 }
 
-func (t *tst2) keysMatch(a alphabet.IAlphabet, pattern []rune, prefix []rune, keys *queue.StrQ) {
+func (t *tst2) keysMatch(a alphabet.Interface, pattern []rune, prefix []rune, keys *queue.StrQ) {
 	if t == nil || len(pattern) == 0 || len(pattern) < len(t.rs) || !match(pattern[:len(t.rs)-1], t.rs[:len(t.rs)-1]) {
 		return
 	}
