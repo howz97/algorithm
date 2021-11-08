@@ -2,47 +2,45 @@ package string_sort
 
 import "github.com/howz97/algorithm/alphabet"
 
-func Quick3(a alphabet.Interface, strs []string) {
-	// convert string to []rune
-	strsRune := make([][]rune, len(strs))
-	for i := range strsRune {
-		strsRune[i] = []rune(strs[i])
+func Quick3(a alphabet.Interface, data []string) {
+	runes := make([][]rune, len(data))
+	for i := range runes {
+		runes[i] = []rune(data[i])
 	}
-
-	// sort [][]rune which equal to strs
-	quick3(a, strsRune, 0, len(strs)-1, 0)
-
-	// convert []rune to string
-	for i := range strs {
-		strs[i] = string(strsRune[i])
+	quick3(a, runes, 0, len(data)-1, 0)
+	for i := range data {
+		data[i] = string(runes[i])
 	}
 }
 
-func quick3(a alphabet.Interface, strs [][]rune, lo, hi, d int) {
+func quick3(a alphabet.Interface, runes [][]rune, lo, hi, depth int) {
 	if lo >= hi {
 		return
 	}
-	v := toIndex(a, strs[lo], d)
-	tailV, i := lo, lo+1
-	end := hi
-
-	for i <= end {
+	middleV := toIndex(a, runes[lo], depth)
+	tail, i := lo, lo+1
+	head := hi
+	for i <= head {
+		v := toIndex(a, runes[i], depth)
 		switch true {
-		case toIndex(a, strs[i], d) == v:
+		case v < middleV:
+			runes[tail], runes[i] = runes[i], runes[tail]
+			tail++
 			i++
-		case toIndex(a, strs[i], d) < v:
-			strs[tailV], strs[i] = strs[i], strs[tailV]
-			tailV++
-			i++
+		case v > middleV:
+			runes[i], runes[head] = runes[head], runes[i]
+			head--
 		default:
-			strs[i], strs[end] = strs[end], strs[i]
-			end--
+			i++
 		}
 	}
+	// runes[0...tail] < middleV
+	// runes[tail...head] = middleV
+	// runes[head...] > middleV
 
-	quick3(a, strs, lo, tailV-1, d)
-	if v >= 0 {
-		quick3(a, strs, tailV, end, d+1)
+	quick3(a, runes, lo, tail-1, depth)
+	if middleV >= 0 {
+		quick3(a, runes, tail, head, depth+1)
 	}
-	quick3(a, strs, end+1, hi, d)
+	quick3(a, runes, head+1, hi, depth)
 }
