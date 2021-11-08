@@ -2,14 +2,15 @@ package string_sort
 
 import (
 	"github.com/howz97/algorithm/alphabet"
+	mysort "github.com/howz97/algorithm/sort"
 	"github.com/howz97/algorithm/util"
 	"sort"
 	"testing"
 	"time"
 )
 
-const filename = "./input.txt"
-//const filename = "../string_search/tale.txt"
+//const filename = "./input.txt"
+const filename = "../string_search/tale.txt"
 const testTimes = 10
 
 func Test_HighPrior(t *testing.T) {
@@ -34,6 +35,12 @@ func Test_Quick3WithAlphabet(t *testing.T) {
 
 func TestStdSort(t *testing.T) {
 	LoopTest(t, sort.Strings, "StdSort")
+}
+
+func TestQuickSort(t *testing.T) {
+	LoopTest(t, func(data []string) {
+		mysort.QuickSort(sort.StringSlice(data))
+	}, "StdSort")
 }
 
 func LoopTest(t *testing.T, fn func([]string), desc string) {
