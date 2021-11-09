@@ -1,3 +1,4 @@
 .vscode
 .idea
 alg_rust/target
+string_sort/*.txt

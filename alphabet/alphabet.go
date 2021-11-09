@@ -19,9 +19,9 @@ const (
 )
 
 var (
-	LowerCase   = NewAlphabetImpl(LOWERCASE)
-	Ascii       = NewAlphabetImpl(ASCII)
-	Unicode     = new(unicodeImpl)
+	LowerCase = NewAlphabetImpl(LOWERCASE)
+	Ascii     = NewAlphabetImpl(ASCII)
+	Unicode   = new(unicodeImpl)
 )
 
 type Interface interface {
