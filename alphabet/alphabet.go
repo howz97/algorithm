@@ -19,14 +19,7 @@ const (
 )
 
 var (
-	Binary      = NewAlphabetImpl(BINARY)
-	Dna         = NewAlphabetImpl(DNA)
-	Octal       = NewAlphabetImpl(OCTAL)
-	Decimal     = NewAlphabetImpl(DECIMAL)
-	Hexadecimal = NewAlphabetImpl(HEXADECIMAL)
 	LowerCase   = NewAlphabetImpl(LOWERCASE)
-	UpperCase   = NewAlphabetImpl(UPPERCASE)
-	Base64      = NewAlphabetImpl(BASE64)
 	Ascii       = NewAlphabetImpl(ASCII)
 	Unicode     = new(unicodeImpl)
 )
