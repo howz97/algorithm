@@ -3,6 +3,7 @@ package alphabet
 import (
 	"fmt"
 	"math"
+	"math/rand"
 )
 
 const (
@@ -111,6 +112,10 @@ func (a *alphabetImpl) ToRunes(indices []int) []rune {
 		runes = append(runes, a.ToRune(indices[i]))
 	}
 	return runes
+}
+
+func (a *alphabetImpl) Rand() rune {
+	return a.i2r[rand.Intn(len(a.i2r))]
 }
 
 type unicodeImpl struct{}
