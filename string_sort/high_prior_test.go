@@ -12,21 +12,23 @@ import (
 	"time"
 )
 
-const filename = "./length_rand.txt"
+const filename = "./length300.txt"
 const testTimes = 10
-const inputSize = 100000
+const inputSize = 10000
+
+var alpha = alphabet.NewAlphabetImpl(alphabet.UPPERCASE)
 
 func TestCreateInput(t *testing.T) {
 	CreateInputStrings(t, "./ip.txt", func() string {
 		return fmt.Sprintf("%d.%d.%d.%d", rand.Intn(256), rand.Intn(256), rand.Intn(256), rand.Intn(256))
 	})
 
-	CreateInputStrings(t, "./length5.txt", func() string {
+	CreateInputStrings(t, "./short.txt", func() string {
 		return RandString(5)
 	})
 
-	CreateInputStrings(t, "./length50.txt", func() string {
-		return RandString(50)
+	CreateInputStrings(t, "./long.txt", func() string {
+		return RandString(500)
 	})
 
 	CreateInputStrings(t, "./length_rand.txt", func() string {
@@ -37,7 +39,7 @@ func TestCreateInput(t *testing.T) {
 func RandString(length int) string {
 	str := ""
 	for i := 0; i < length; i++ {
-		str += string(alphabet.Ascii.Rand())
+		str += string(alpha.Rand())
 	}
 	return str
 }
@@ -62,7 +64,7 @@ func Test_HighPrior(t *testing.T) {
 
 func Test_HighPriorWithAlphabet(t *testing.T) {
 	LoopTest(t, func(data []string) {
-		HighPriorWithAlphabet(alphabet.Ascii, data)
+		HighPriorWithAlphabet(alpha, data)
 	}, "HighPriorWithAlphabet")
 }
 
@@ -72,7 +74,7 @@ func Test_Quick3(t *testing.T) {
 
 func Test_Quick3WithAlphabet(t *testing.T) {
 	LoopTest(t, func(data []string) {
-		Quick3WithAlphabet(alphabet.Ascii, data)
+		Quick3WithAlphabet(alpha, data)
 	}, "Quick3WithAlphabet")
 }
 
@@ -89,8 +91,8 @@ func TestQuickSort(t *testing.T) {
 func TestCompare(t *testing.T) {
 	//Test_HighPrior(t)
 	Test_HighPriorWithAlphabet(t)
-	Test_Quick3(t)
 	Test_Quick3WithAlphabet(t)
+	Test_Quick3(t)
 	TestQuickSort(t)
 	TestStdSort(t)
 }
