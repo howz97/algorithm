@@ -14,7 +14,7 @@ func main() {
 		"HUAWEI",
 		"AA",
 	}
-	string_sort.Quick3ASCII(data)
+	string_sort.Quick3Bytes(data)
 	fmt.Println(data)
 
 	uniData := []string{

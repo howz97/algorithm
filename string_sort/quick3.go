@@ -76,7 +76,7 @@ func medianOfTree(a alphabet.Interface, runes [][]rune, lo, hi, depth int) {
 	runes[hi], runes[m] = runes[m], runes[hi]
 }
 
-func Quick3ASCII(data []string) {
+func Quick3Bytes(data []string) {
 	bytes := make([][]byte, len(data))
 	for i := range bytes {
 		bytes[i] = []byte(data[i])

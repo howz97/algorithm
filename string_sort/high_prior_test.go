@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const filename = "./long.txt"
+const filename = "./tmp.txt"
 const testTimes = 1
 const inputSize = 100000
 
@@ -73,7 +73,7 @@ func Test_Quick3(t *testing.T) {
 }
 
 func Test_Quick3ASCII(t *testing.T) {
-	LoopTest(t, Quick3ASCII, "Quick3ASCII")
+	LoopTest(t, Quick3Bytes, "Quick3Bytes")
 }
 
 func Test_Quick3WithAlphabet(t *testing.T) {
