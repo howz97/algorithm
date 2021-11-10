@@ -12,8 +12,8 @@ import (
 	"time"
 )
 
-const filename = "./length_rand.txt"
-const testTimes = 10
+const filename = "./long.txt"
+const testTimes = 1
 const inputSize = 100000
 
 var alpha = alphabet.NewAlphabetImpl(alphabet.UPPERCASE)
@@ -72,6 +72,10 @@ func Test_Quick3(t *testing.T) {
 	LoopTest(t, Quick3, "Quick3")
 }
 
+func Test_Quick3ASCII(t *testing.T) {
+	LoopTest(t, Quick3ASCII, "Quick3ASCII")
+}
+
 func Test_Quick3WithAlphabet(t *testing.T) {
 	LoopTest(t, func(data []string) {
 		Quick3WithAlphabet(alpha, data)
@@ -93,6 +97,7 @@ func TestCompare(t *testing.T) {
 	Test_HighPriorWithAlphabet(t)
 	Test_Quick3WithAlphabet(t)
 	Test_Quick3(t)
+	Test_Quick3ASCII(t)
 	TestQuickSort(t)
 	TestStdSort(t)
 }
@@ -113,4 +118,36 @@ func LoopTest(t *testing.T, fn func([]string), desc string) {
 		}
 	}
 	t.Logf("%s results: avg=%v, %v", desc, util.AverageDuration(results), results)
+}
+
+func TestStringCompare(t *testing.T) {
+	str1 := RandString(200000)
+	str2 := str1
+	b := true
+
+	t0 := time.Now()
+	runes1 := []rune(str1)
+	runes2 := []rune(str2)
+	for i := range runes1 {
+		if runes1[i] < runes2[i] {
+			b = false
+			break
+		}
+	}
+	t.Logf("compare runes %v %v", time.Since(t0), b)
+
+	t0 = time.Now()
+	bytes1 := []byte(str1)
+	bytes2 := []byte(str2)
+	for i := range bytes1 {
+		if bytes1[i] < bytes2[i] {
+			b = false
+			break
+		}
+	}
+	t.Logf("range bytes %v %v", time.Since(t0), b)
+
+	t0 = time.Now()
+	b = str1 > str2
+	t.Logf("builtin %v %v", time.Since(t0), b)
 }
