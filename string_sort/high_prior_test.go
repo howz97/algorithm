@@ -12,9 +12,9 @@ import (
 	"time"
 )
 
-const filename = "./long.txt"
+const filename = "./length_rand.txt"
 const testTimes = 10
-const inputSize = 10000
+const inputSize = 100000
 
 var alpha = alphabet.NewAlphabetImpl(alphabet.UPPERCASE)
 
@@ -105,8 +105,11 @@ func LoopTest(t *testing.T, fn func([]string), desc string) {
 		fn(data)
 		dur := time.Since(start)
 		results = append(results, dur)
-		if !sort.StringsAreSorted(data) {
-			t.Fatalf("%s sort failed", desc)
+
+		for i := 1; i < len(data); i++ {
+			if data[i] < data[i-1] {
+				t.Fatalf("%s sort failed: %s, %s", desc, data[i-1], data[i])
+			}
 		}
 	}
 	t.Logf("%s results: avg=%v, %v", desc, util.AverageDuration(results), results)
