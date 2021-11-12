@@ -1,39 +1,41 @@
 package string_sort
 
 import (
-	"fmt"
 	"github.com/howz97/algorithm/alphabet"
 	mysort "github.com/howz97/algorithm/sort"
 	"github.com/howz97/algorithm/util"
-	"math/rand"
 	"os"
 	"sort"
 	"testing"
 	"time"
 )
 
-const filename = "./tmp.txt"
+const filename = "./long.txt"
 const testTimes = 1
-const inputSize = 100000
+const inputSize = 1000
 
 var alpha = alphabet.NewAlphabetImpl(alphabet.UPPERCASE)
 
 func TestCreateInput(t *testing.T) {
-	CreateInputStrings(t, "./ip.txt", func() string {
-		return fmt.Sprintf("%d.%d.%d.%d", rand.Intn(256), rand.Intn(256), rand.Intn(256), rand.Intn(256))
-	})
+	//CreateInputStrings(t, "./ip.txt", func() string {
+	//	return fmt.Sprintf("%d.%d.%d.%d", rand.Intn(256), rand.Intn(256), rand.Intn(256), rand.Intn(256))
+	//})
+	//
+	//CreateInputStrings(t, "./short.txt", func() string {
+	//	return RandString(5)
+	//})
 
-	CreateInputStrings(t, "./short.txt", func() string {
-		return RandString(5)
-	})
-
+	prefix := ""
+	for i := 0; i < 300000; i++ {
+		prefix += "A"
+	}
 	CreateInputStrings(t, "./long.txt", func() string {
-		return RandString(500)
+		return prefix + RandString(10)
 	})
 
-	CreateInputStrings(t, "./length_rand.txt", func() string {
-		return RandString(rand.Intn(100))
-	})
+	//CreateInputStrings(t, "./length_rand.txt", func() string {
+	//	return RandString(rand.Intn(100))
+	//})
 }
 
 func RandString(length int) string {
@@ -72,10 +74,6 @@ func Test_Quick3(t *testing.T) {
 	LoopTest(t, Quick3, "Quick3")
 }
 
-func Test_Quick3ASCII(t *testing.T) {
-	LoopTest(t, Quick3Bytes, "Quick3Bytes")
-}
-
 func Test_Quick3WithAlphabet(t *testing.T) {
 	LoopTest(t, func(data []string) {
 		Quick3WithAlphabet(alpha, data)
@@ -97,7 +95,6 @@ func TestCompare(t *testing.T) {
 	Test_HighPriorWithAlphabet(t)
 	Test_Quick3WithAlphabet(t)
 	Test_Quick3(t)
-	Test_Quick3ASCII(t)
 	TestQuickSort(t)
 	TestStdSort(t)
 }

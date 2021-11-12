@@ -13,17 +13,12 @@ func main() {
 		"CA",
 		"HUAWEI",
 		"AA",
-	}
-	string_sort.Quick3Bytes(data)
-	fmt.Println(data)
-
-	uniData := []string{
 		"张豪",
 		"张三",
 		"李四",
 		"王麻子",
 		"李二狗",
 	}
-	string_sort.Quick3(uniData)
-	fmt.Println(uniData)
+	string_sort.Quick3(data)
+	fmt.Println(data)
 }

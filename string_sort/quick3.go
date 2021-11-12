@@ -4,10 +4,6 @@ import (
 	"github.com/howz97/algorithm/alphabet"
 )
 
-func Quick3(data []string) {
-	Quick3WithAlphabet(alphabet.Unicode, data)
-}
-
 func Quick3WithAlphabet(a alphabet.Interface, data []string) {
 	runes := make([][]rune, len(data))
 	for i := range runes {
@@ -76,7 +72,8 @@ func medianOfTree(a alphabet.Interface, runes [][]rune, lo, hi, depth int) {
 	runes[hi], runes[m] = runes[m], runes[hi]
 }
 
-func Quick3Bytes(data []string) {
+// faster implementation for UTF-8 encoded string
+func Quick3(data []string) {
 	bytes := make([][]byte, len(data))
 	for i := range bytes {
 		bytes[i] = []byte(data[i])
@@ -87,7 +84,6 @@ func Quick3Bytes(data []string) {
 	}
 }
 
-// optimize for ascii string
 func quick3bytes(bytes [][]byte, lo, hi, depth int) {
 	if lo+1 >= hi {
 		if lo >= hi {
@@ -102,6 +98,7 @@ func quick3bytes(bytes [][]byte, lo, hi, depth int) {
 		}
 		return
 	}
+	medianOfTreeByte(bytes, lo, hi, depth)
 	middleV := byteAt(bytes[lo], depth)
 	tail, i := lo, lo+1
 	head := hi
@@ -135,4 +132,18 @@ func byteAt(bytes []byte, depth int) int16 {
 		return -1
 	}
 	return int16(bytes[depth])
+}
+
+func medianOfTreeByte(bytes [][]byte, lo, hi, depth int) {
+	m := int(uint(lo+hi) >> 1)
+	if byteAt(bytes[m], depth) < byteAt(bytes[lo], depth) {
+		bytes[m], bytes[lo] = bytes[lo], bytes[m]
+	}
+	if byteAt(bytes[hi], depth) < byteAt(bytes[m], depth) {
+		bytes[hi], bytes[m] = bytes[m], bytes[hi]
+		if byteAt(bytes[m], depth) < byteAt(bytes[lo], depth) {
+			bytes[lo], bytes[m] = bytes[m], bytes[lo]
+		}
+	}
+	bytes[hi], bytes[m] = bytes[m], bytes[hi]
 }
