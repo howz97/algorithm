@@ -51,7 +51,7 @@ func highPriorSort(a alphabet.Interface, runes, aux [][]rune, lo, hi, depth int)
 	}
 }
 
-func toIndex(a alphabet.Interface, runes []rune, depth int) int {
+func toIndex(a alphabet.Interface, runes []rune, depth int) rune {
 	if depth >= len(runes) {
 		return -1
 	}

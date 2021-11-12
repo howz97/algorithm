@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const filename = "./long.txt"
+const filename = "./short.txt"
 const testTimes = 1
 const inputSize = 1000
 

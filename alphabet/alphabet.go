@@ -24,24 +24,25 @@ var (
 	Unicode   = new(unicodeImpl)
 )
 
+// map unicode to other alphabet
 type Interface interface {
-	ToRune(int) rune
-	ToIndex(rune) int
+	ToRune(rune) rune
+	ToIndex(rune) rune
 	Contains(rune) bool
 	R() int
 }
 
 type alphabetImpl struct {
-	r2i map[rune]int
+	r2i map[rune]rune
 	i2r []rune
 }
 
 func NewAlphabetImpl(s string) *alphabetImpl {
 	a := &alphabetImpl{
-		r2i: make(map[rune]int),
+		r2i: make(map[rune]rune),
 		i2r: make([]rune, 0),
 	}
-	i := 0
+	i := rune(0)
 	for _, r := range s {
 		if _, exist := a.r2i[r]; exist {
 			continue
@@ -54,15 +55,15 @@ func NewAlphabetImpl(s string) *alphabetImpl {
 }
 
 // ToRune convert index to rune
-func (a *alphabetImpl) ToRune(i int) rune {
-	if i >= len(a.i2r) {
+func (a *alphabetImpl) ToRune(i rune) rune {
+	if int(i) >= len(a.i2r) {
 		panic(fmt.Sprintf("index %v exceed range of alphabetImpl", i))
 	}
 	return a.i2r[i]
 }
 
 // ToIndex convert rune to index
-func (a *alphabetImpl) ToIndex(r rune) int {
+func (a *alphabetImpl) ToIndex(r rune) rune {
 	i, exst := a.r2i[r]
 	if !exst {
 		panic(fmt.Sprintf("rune %v do not belong to alphabetImpl", string(r)))
@@ -89,9 +90,9 @@ func (a *alphabetImpl) lgR() int {
 	return int(logarithm)
 }
 
-// ToIndeices equal to call ToIndex for every rune in s
-func (a *alphabetImpl) ToIndeices(s string) []int {
-	indices := make([]int, 0)
+// ToIndices equal to call ToIndex for every rune in s
+func (a *alphabetImpl) ToIndices(s string) []rune {
+	indices := make([]rune, 0)
 	for _, r := range s {
 		indices = append(indices, a.ToIndex(r))
 	}
@@ -99,7 +100,7 @@ func (a *alphabetImpl) ToIndeices(s string) []int {
 }
 
 // ToRunes equal to call ToRune for every index in indices
-func (a *alphabetImpl) ToRunes(indices []int) []rune {
+func (a *alphabetImpl) ToRunes(indices []rune) []rune {
 	runes := make([]rune, 0)
 	for i := range indices {
 		runes = append(runes, a.ToRune(indices[i]))
@@ -113,12 +114,12 @@ func (a *alphabetImpl) Rand() rune {
 
 type unicodeImpl struct{}
 
-func (u *unicodeImpl) ToRune(i int) rune {
-	return rune(i)
+func (u *unicodeImpl) ToRune(i rune) rune {
+	return i
 }
 
-func (u *unicodeImpl) ToIndex(r rune) int {
-	return int(r)
+func (u *unicodeImpl) ToIndex(r rune) rune {
+	return r
 }
 
 func (u *unicodeImpl) Contains(_ rune) bool {
@@ -129,17 +130,16 @@ func (u *unicodeImpl) R() int {
 	return 0xFFFF
 }
 
-// ToIndeices equal to call ToIndex for every rune in s
-func (u *unicodeImpl) ToIndeices(s string) []int {
-	indices := make([]int, 0)
+// ToIndices equal to call ToIndex for every rune in s
+func (u *unicodeImpl) ToIndices(s string) []rune {
+	indices := make([]rune, 0)
 	for _, r := range s {
 		indices = append(indices, u.ToIndex(r))
 	}
 	return indices
 }
 
-// ToRunes equal to call ToRune for every index in indices
-func (u *unicodeImpl) ToRunes(indices []int) []rune {
+func (u *unicodeImpl) ToRunes(indices []rune) []rune {
 	runes := make([]rune, 0)
 	for i := range indices {
 		runes = append(runes, u.ToRune(indices[i]))
