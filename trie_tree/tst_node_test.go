@@ -1,4 +1,4 @@
-package tst
+package trietree
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 )
 
 func TestTst_Insert(t *testing.T) {
-	trieT := NewTst(alphabet.LowerCase)
+	trieT := NewTrie(alphabet.LowerCase, NewTSTNode(alphabet.LowerCase.Rand()))
 	if !trieT.IsEmpty() {
 		t.Fatal()
 	}
@@ -23,9 +23,6 @@ func TestTst_Insert(t *testing.T) {
 	trieT.Insert("alloc", "alloc")
 	trieT.Insert("milk", "milk")
 	trieT.Insert("memory", "memory")
-	if trieT.tree.isEmpty() {
-		t.Fatal()
-	}
 	if trieT.Size() != 11 {
 		t.Fatal()
 	}
@@ -59,7 +56,7 @@ func TestTst_Insert(t *testing.T) {
 }
 
 func TestTst_Delete(t *testing.T) {
-	trie := NewTst(alphabet.Unicode)
+	trie := NewTrie(alphabet.Unicode, NewTSTNode('a'))
 	items := []string{"你好", "你好看", "你好好看", "你是？", "你是谁", "你是谁啊", "你是胖虎",
 		"你还问？", "你还看", "你还不说", "你还不睡",
 		"你真蠢", "你真是个弟弟", "你真好看", "你真的是胖虎？", "你真是个弟弟啊2333",
@@ -88,7 +85,7 @@ func TestTst_Delete(t *testing.T) {
 }
 
 func TestTst_Contains(t *testing.T) {
-	trie := NewTst(alphabet.Unicode)
+	trie := NewTrie(alphabet.Unicode, NewTSTNode('a'))
 	items := []string{"你好", "你好看", "你好好看", "你是？", "你是谁", "你是谁啊", "你是胖虎",
 		"你还问？", "你还看", "你还不说", "你还不睡",
 		"你真蠢", "你真是个弟弟", "你真好看", "你真的是胖虎？", "你真是个弟弟啊2333",
@@ -117,7 +114,7 @@ func TestTst_Contains(t *testing.T) {
 }
 
 func TestTst_KeysWithPrefix(t *testing.T) {
-	trie := NewTst(alphabet.Unicode)
+	trie := NewTrie(alphabet.Unicode, NewTSTNode('a'))
 	items := []string{"你好", "你好看", "你好好看", "你是？", "你是谁", "你是谁啊", "你是胖虎",
 		"你还问？", "你还看", "你还不说", "你还不睡",
 		"你真蠢", "你真是个弟弟", "你真好看", "你真的是胖虎？", "你真是个弟弟啊2333",
@@ -138,7 +135,7 @@ func TestTst_KeysWithPrefix(t *testing.T) {
 }
 
 func TestTst_KeysMatch(t *testing.T) {
-	trie := NewTst(alphabet.Unicode)
+	trie := NewTrie(alphabet.Unicode, NewTSTNode('a'))
 	items := []string{"你好", "你好看", "你好好看", "你是？", "你是谁", "你是谁啊", "你是胖虎",
 		"你还问？", "你还看", "你还不说", "你还不睡",
 		"你真蠢", "你真是个弟弟", "你真好看", "你真的是胖虎？", "你真是个弟弟啊2333",
@@ -162,7 +159,7 @@ func TestTst_KeysMatch(t *testing.T) {
 }
 
 func TestTst_LongestPrefixOf(t *testing.T) {
-	trie := NewTst(alphabet.Unicode)
+	trie := NewTrie(alphabet.Unicode, NewTSTNode('a'))
 	items := []string{"你好", "你好看", "你好好看", "你是？", "你是谁", "你是谁啊", "你是胖虎",
 		"你还问？", "你还看", "你还不说", "你还不睡",
 		"你真蠢", "你真是个弟弟", "你真好看", "你真的是胖虎？", "你真是个弟弟啊2333",
