@@ -5,20 +5,20 @@ import (
 	"github.com/howz97/algorithm/queue"
 )
 
-type NodeSlice struct {
+type SliceNode struct {
 	val  T
-	next []*NodeSlice
+	next []*SliceNode
 }
 
-func NewNodeSlice(size int) *NodeSlice {
-	return &NodeSlice{next: make([]*NodeSlice, size)}
+func NewNodeSlice(size int) *SliceNode {
+	return &SliceNode{next: make([]*SliceNode, size)}
 }
 
-func (t *NodeSlice) Value() T {
+func (t *SliceNode) Value() T {
 	return t.val
 }
 
-func (t *NodeSlice) Find(a alphabet.Interface, k []rune) TrieNode {
+func (t *SliceNode) Find(a alphabet.Interface, k []rune) TrieNode {
 	if len(k) == 0 {
 		return t
 	}
@@ -29,7 +29,7 @@ func (t *NodeSlice) Find(a alphabet.Interface, k []rune) TrieNode {
 	return next.Find(a, k[1:])
 }
 
-func (t *NodeSlice) Insert(a alphabet.Interface, k []rune, v T) {
+func (t *SliceNode) Insert(a alphabet.Interface, k []rune, v T) {
 	if len(k) == 0 {
 		t.val = v
 		return
@@ -44,7 +44,7 @@ func (t *NodeSlice) Insert(a alphabet.Interface, k []rune, v T) {
 	next.Insert(a, k[1:], v)
 }
 
-func (t *NodeSlice) Delete(a alphabet.Interface, k []rune) {
+func (t *SliceNode) Delete(a alphabet.Interface, k []rune) {
 	if len(k) == 0 {
 		t.val = nil
 		return
@@ -58,7 +58,7 @@ func (t *NodeSlice) Delete(a alphabet.Interface, k []rune) {
 
 // LongestPrefixOf 找出t的所有匹配s[d:]的前缀的key中最长的那一个
 // 返回值length代表s的前l个rune就是这个要找的key
-func (t *NodeSlice) LongestPrefixOf(a alphabet.Interface, s []rune, d int, l int) int {
+func (t *SliceNode) LongestPrefixOf(a alphabet.Interface, s []rune, d int, l int) int {
 	if t.val != nil {
 		l = d
 	}
@@ -75,7 +75,7 @@ func (t *NodeSlice) LongestPrefixOf(a alphabet.Interface, s []rune, d int, l int
 
 // Collect collects all keys of t and put them into StrQ
 // p is the prefix record
-func (t *NodeSlice) Collect(a alphabet.Interface, prefix string, keys *queue.StrQ) {
+func (t *SliceNode) Collect(a alphabet.Interface, prefix string, keys *queue.StrQ) {
 	if t.val != nil {
 		keys.PushBack(prefix)
 	}
@@ -87,7 +87,7 @@ func (t *NodeSlice) Collect(a alphabet.Interface, prefix string, keys *queue.Str
 	}
 }
 
-func (t *NodeSlice) KeysMatch(a alphabet.Interface, pattern []rune, prefix string, keys *queue.StrQ) {
+func (t *SliceNode) KeysMatch(a alphabet.Interface, pattern []rune, prefix string, keys *queue.StrQ) {
 	if len(pattern) == 0 {
 		if t.val != nil {
 			keys.PushBack(prefix)
