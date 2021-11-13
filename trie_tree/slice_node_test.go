@@ -7,7 +7,7 @@ import (
 )
 
 func TestTrie_Insert(t *testing.T) {
-	trieT := NewTrie(alphabet.LowerCase)
+	trieT := NewTrie(alphabet.LowerCase, NewNodeSlice(alphabet.LowerCase.R()))
 	if !trieT.IsEmpty() {
 		t.Fatal()
 	}
@@ -22,9 +22,6 @@ func TestTrie_Insert(t *testing.T) {
 	trieT.Insert("alloc", "alloc")
 	trieT.Insert("milk", "milk")
 	trieT.Insert("memory", "memory")
-	if trieT.tree.isEmpty() {
-		t.Fatal()
-	}
 	if trieT.Size() != 11 {
 		t.Fatal()
 	}

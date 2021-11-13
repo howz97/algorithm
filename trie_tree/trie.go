@@ -1,42 +1,55 @@
 package trietree
 
-import "github.com/howz97/algorithm/queue"
+import (
+	"github.com/howz97/algorithm/alphabet"
+	"github.com/howz97/algorithm/queue"
+)
 
-type Interface interface {
+type T interface{}
+
+type TrieNode interface {
+	Value() T
+	Find(a alphabet.Interface, k []rune) TrieNode
+	Insert(a alphabet.Interface, k []rune, v T)
+	Delete(a alphabet.Interface, k []rune)
+	LongestPrefixOf(a alphabet.Interface, s []rune, d, l int) int
+	Collect(a alphabet.Interface, prefix string, keys *queue.StrQ)
+	KeysMatch(a alphabet.Interface, pattern []rune, prefix string, keys *queue.StrQ)
 }
 
 type Trie struct {
-	a    alphbt
-	tree *trie
+	a    alphabet.Interface
+	tree TrieNode
 	size int
 }
 
-func NewTrie(a alphbt) *Trie {
+func NewTrie(a alphabet.Interface, node TrieNode) *Trie {
 	return &Trie{
-		a: a,
+		a:    a,
+		tree: node,
 	}
 }
 
 func (t *Trie) Find(k string) interface{} {
-	n := t.tree.find(t.a, []rune(k))
+	n := t.tree.Find(t.a, []rune(k))
 	if n == nil {
 		return nil
 	}
-	return n.val
+	return n.Value()
 }
 
 func (t *Trie) Insert(k string, v interface{}) {
-	t.tree = t.tree.insert(t.a, []rune(k), v)
+	t.tree.Insert(t.a, []rune(k), v)
 	t.size++
 }
 
 func (t *Trie) Delete(k string) {
-	t.tree = t.tree.delete(t.a, []rune(k))
+	t.tree.Delete(t.a, []rune(k))
 	t.size--
 }
 
 func (t *Trie) Contains(k string) bool {
-	return t.tree.contains(t.a, []rune(k))
+	return t.Find(k) != nil
 }
 
 func (t *Trie) IsEmpty() bool {
@@ -45,32 +58,34 @@ func (t *Trie) IsEmpty() bool {
 
 func (t *Trie) LongestPrefixOf(s string) string {
 	runes := []rune(s)
-	l := t.tree.longestPrefixOf(t.a, runes, 0, 0)
+	l := t.tree.LongestPrefixOf(t.a, runes, 0, 0)
 	return string(runes[:l])
 }
 
-func (t *Trie) KeysWithPrefix(p string) []string {
-	keys := make([]string, 0)
-	keysQ := queue.NewStrQ()
-	t.tree.find(t.a, []rune(p)).collect(t.a, p, keysQ)
-	for !keysQ.IsEmpty() {
-		keys = append(keys, keysQ.Front())
+func (t *Trie) KeysWithPrefix(prefix string) (keys []string) {
+	node := t.tree.Find(t.a, []rune(prefix))
+	if node == nil {
+		return
 	}
-	return keys
-}
-
-func (t *Trie) KeysMatch(p string) []string {
-	keys := make([]string, 0)
-	keysQ := queue.NewStrQ()
-	t.tree.keysMatch(t.a, []rune(p), "", keysQ)
-	for !keysQ.IsEmpty() {
-		keys = append(keys, keysQ.Front())
+	q := queue.NewStrQ()
+	node.Collect(t.a, prefix, q)
+	for !q.IsEmpty() {
+		keys = append(keys, q.Front())
 	}
-	return keys
+	return
 }
 
 func (t *Trie) Keys() []string {
 	return t.KeysWithPrefix("")
+}
+
+func (t *Trie) KeysMatch(p string) (keys []string) {
+	q := queue.NewStrQ()
+	t.tree.KeysMatch(t.a, []rune(p), "", q)
+	for !q.IsEmpty() {
+		keys = append(keys, q.Front())
+	}
+	return
 }
 
 func (t *Trie) Size() int {
