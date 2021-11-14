@@ -10,7 +10,7 @@ type SliceNode struct {
 	next []*SliceNode
 }
 
-func NewNodeSlice(size int) *SliceNode {
+func newSliceNode(size int) *SliceNode {
 	return &SliceNode{next: make([]*SliceNode, size)}
 }
 
@@ -29,7 +29,7 @@ func (t *SliceNode) Find(a alphabet.Interface, k []rune) TrieNode {
 	return next.Find(a, k[1:])
 }
 
-func (t *SliceNode) Insert(a alphabet.Interface, k []rune, v T) {
+func (t *SliceNode) Upsert(a alphabet.Interface, k []rune, v T) {
 	if len(k) == 0 {
 		t.val = v
 		return
@@ -38,10 +38,10 @@ func (t *SliceNode) Insert(a alphabet.Interface, k []rune, v T) {
 	i := a.ToIndex(k[0])
 	next := t.next[i]
 	if next == nil {
-		next = NewNodeSlice(a.R())
+		next = newSliceNode(a.R())
 		t.next[i] = next
 	}
-	next.Insert(a, k[1:], v)
+	next.Upsert(a, k[1:], v)
 }
 
 func (t *SliceNode) Delete(a alphabet.Interface, k []rune) {
@@ -108,4 +108,8 @@ func (t *SliceNode) KeysMatch(a alphabet.Interface, pattern []rune, prefix strin
 			next.KeysMatch(a, pattern[1:], prefix, keys)
 		}
 	}
+}
+
+func (t *SliceNode) Keys(a alphabet.Interface, keys *queue.StrQ) {
+	t.Collect(a, "", keys)
 }

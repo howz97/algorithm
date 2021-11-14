@@ -10,11 +10,12 @@ type T interface{}
 type TrieNode interface {
 	Value() T
 	Find(a alphabet.Interface, k []rune) TrieNode
-	Insert(a alphabet.Interface, k []rune, v T)
+	Upsert(a alphabet.Interface, k []rune, v T)
 	Delete(a alphabet.Interface, k []rune)
 	LongestPrefixOf(a alphabet.Interface, s []rune, d, l int) int
 	Collect(a alphabet.Interface, prefix string, keys *queue.StrQ)
 	KeysMatch(a alphabet.Interface, pattern []rune, prefix string, keys *queue.StrQ)
+	Keys(a alphabet.Interface, keys *queue.StrQ)
 }
 
 type Trie struct {
@@ -23,10 +24,17 @@ type Trie struct {
 	size int
 }
 
-func NewTrie(a alphabet.Interface, node TrieNode) *Trie {
+func NewTrie(a alphabet.Interface) *Trie {
 	return &Trie{
 		a:    a,
-		tree: node,
+		tree: newSliceNode(a.R()),
+	}
+}
+
+func NewTST() *Trie {
+	return &Trie{
+		a:    alphabet.Unicode,
+		tree: newTSTNode('z'),
 	}
 }
 
@@ -38,8 +46,8 @@ func (t *Trie) Find(k string) interface{} {
 	return n.Value()
 }
 
-func (t *Trie) Insert(k string, v interface{}) {
-	t.tree.Insert(t.a, []rune(k), v)
+func (t *Trie) Upsert(k string, v interface{}) {
+	t.tree.Upsert(t.a, []rune(k), v)
 	t.size++
 }
 
@@ -62,21 +70,23 @@ func (t *Trie) LongestPrefixOf(s string) string {
 	return string(runes[:l])
 }
 
-func (t *Trie) KeysWithPrefix(prefix string) (keys []string) {
+func (t *Trie) KeysWithPrefix(prefix string) []string {
+	if prefix == "" {
+		return t.Keys()
+	}
 	node := t.tree.Find(t.a, []rune(prefix))
 	if node == nil {
-		return
+		return nil
 	}
 	q := queue.NewStrQ()
 	node.Collect(t.a, prefix, q)
-	for !q.IsEmpty() {
-		keys = append(keys, q.Front())
-	}
-	return
+	return q.PopAll()
 }
 
 func (t *Trie) Keys() []string {
-	return t.KeysWithPrefix("")
+	q := queue.NewStrQ()
+	t.tree.Keys(t.a, q)
+	return q.PopAll()
 }
 
 func (t *Trie) KeysMatch(p string) (keys []string) {

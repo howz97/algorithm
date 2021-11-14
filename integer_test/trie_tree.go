@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/howz97/algorithm/alphabet"
-	"github.com/howz97/algorithm/trie_tree/tst"
+	"github.com/howz97/algorithm/trie_tree"
 )
 
 var dict = map[string]string{
@@ -24,18 +24,19 @@ var dict = map[string]string{
 }
 
 func main() {
-	tst1 := tst.NewTst(alphabet.Ascii)
+	trie := trietree.NewTrie(alphabet.Ascii)
+	//trie := trietree.NewTST()
 	for k, v := range dict {
-		tst1.Insert(k, v)
+		trie.Upsert(k, v)
 	}
-	fmt.Println("all keys:", tst1.Keys())
+	fmt.Println("all keys:", trie.Keys())
 
 	pattern := "a......"
-	fmt.Printf("keys match '%s': %v\n", pattern, tst1.KeysMatch(pattern))
+	fmt.Printf("keys match '%s': %v\n", pattern, trie.KeysMatch(pattern))
 
 	prefix := "bi"
-	fmt.Printf("keys with prefix '%s': %v\n", prefix, tst1.KeysWithPrefix(prefix))
+	fmt.Printf("keys with prefix '%s': %v\n", prefix, trie.KeysWithPrefix(prefix))
 
 	str := "bitcoins"
-	fmt.Printf("longest key with prefix '%s': %s\n", str, tst1.LongestPrefixOf(str))
+	fmt.Printf("longest key with prefix '%s': %s\n", str, trie.LongestPrefixOf(str))
 }

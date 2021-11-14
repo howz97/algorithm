@@ -43,3 +43,11 @@ func (q *StrQ) PushBack(s string) {
 func (q *StrQ) IsEmpty() bool {
 	return q.head == nil
 }
+
+func (q *StrQ) PopAll() []string {
+	var strings []string
+	for !q.IsEmpty() {
+		strings = append(strings, q.Front())
+	}
+	return strings
+}
