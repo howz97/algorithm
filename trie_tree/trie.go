@@ -46,7 +46,7 @@ func (t *Trie) Find(k string) interface{} {
 	return n.Value()
 }
 
-func (t *Trie) Upsert(k string, v interface{}) {
+func (t *Trie) Upsert(k string, v T) {
 	t.tree.Upsert(t.a, []rune(k), v)
 	t.size++
 }
@@ -89,13 +89,10 @@ func (t *Trie) Keys() []string {
 	return q.PopAll()
 }
 
-func (t *Trie) KeysMatch(p string) (keys []string) {
+func (t *Trie) KeysMatch(p string) []string {
 	q := queue.NewStrQ()
 	t.tree.KeysMatch(t.a, []rune(p), "", q)
-	for !q.IsEmpty() {
-		keys = append(keys, q.Front())
-	}
-	return
+	return q.PopAll()
 }
 
 func (t *Trie) Size() int {
