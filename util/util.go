@@ -31,17 +31,18 @@ func IndexStringSlice(strings []string, str string) int {
 	return -1
 }
 
-func SimplePatternMatch(pattern, str []rune) bool {
-	if len(pattern) != len(str) {
+func IsRunesMatch(pattern, runes []rune) bool {
+	if len(pattern) != len(runes) {
 		return false
 	}
-	for i, r := range pattern {
-		if r == '.' {
-			continue
-		}
-		if r != str[i] {
+	for i, p := range pattern {
+		if !IsRuneMatch(p, runes[i]) {
 			return false
 		}
 	}
 	return true
+}
+
+func IsRuneMatch(p, r rune) bool {
+	return p == '.' || p == r
 }

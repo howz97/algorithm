@@ -8,14 +8,16 @@ import (
 type T interface{}
 
 type TrieNode interface {
-	Value() T
-	Find(a alphabet.Interface, k []rune) TrieNode
+	Find(a alphabet.Interface, k []rune) T
 	Upsert(a alphabet.Interface, k []rune, v T)
 	Delete(a alphabet.Interface, k []rune)
+	Locate(a alphabet.Interface, k []rune) (TrieNode, []rune)
 	LongestPrefixOf(a alphabet.Interface, s []rune, d, l int) int
 	Collect(a alphabet.Interface, prefix string, keys *queue.StrQ)
 	KeysMatch(a alphabet.Interface, pattern []rune, prefix string, keys *queue.StrQ)
 	Keys(a alphabet.Interface, keys *queue.StrQ)
+	Compress() error
+	IsCompressed() bool
 }
 
 type Trie struct {
@@ -38,12 +40,15 @@ func NewTST() *Trie {
 	}
 }
 
-func (t *Trie) Find(k string) interface{} {
-	n := t.tree.Find(t.a, []rune(k))
-	if n == nil {
-		return nil
+func NewTSTC() *Trie {
+	return &Trie{
+		a:    alphabet.Unicode,
+		tree: &TSTC{TSTCNode: *newTSTCNode('z')},
 	}
-	return n.Value()
+}
+
+func (t *Trie) Find(k string) T {
+	return t.tree.Find(t.a, []rune(k))
 }
 
 func (t *Trie) Upsert(k string, v T) {
@@ -74,10 +79,11 @@ func (t *Trie) KeysWithPrefix(prefix string) []string {
 	if prefix == "" {
 		return t.Keys()
 	}
-	node := t.tree.Find(t.a, []rune(prefix))
+	node, runes := t.tree.Locate(t.a, []rune(prefix))
 	if node == nil {
 		return nil
 	}
+	prefix += string(runes)
 	q := queue.NewStrQ()
 	node.Collect(t.a, prefix, q)
 	return q.PopAll()

@@ -20,6 +20,13 @@ func TestTSTNode(t *testing.T) {
 	UnicodeKeys(t, trie)
 }
 
+func TestTSTCNode(t *testing.T) {
+	trie := NewTSTC()
+	ASCIIKeys(t, trie)
+	trie = NewTSTC()
+	UnicodeKeys(t, trie)
+}
+
 func ASCIIKeys(t *testing.T, trie *Trie) {
 	var dict = map[string]string{
 		"a":         "一个",
@@ -139,13 +146,13 @@ func LongestPrefixOf(t *testing.T, trie *Trie, str string) {
 func KeysMatch(t *testing.T, trie *Trie, pattern string) {
 	var correct []string
 	for _, k := range trie.Keys() {
-		if util.SimplePatternMatch([]rune(pattern), []rune(k)) {
+		if util.IsRunesMatch([]rune(pattern), []rune(k)) {
 			correct = append(correct, k)
 		}
 	}
 	got := trie.KeysMatch(pattern)
 	if !StringSliceEqual(correct, got) {
-		t.Fatalf("two set not equal: %v, %v", correct, got)
+		t.Fatalf("KeysMatch(%s) two set not equal: %v, %v", pattern, correct, got)
 	}
 }
 

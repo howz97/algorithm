@@ -1,22 +1,19 @@
 package trietree
 
 import (
+	"errors"
 	"github.com/howz97/algorithm/alphabet"
 	"github.com/howz97/algorithm/queue"
 )
 
 type TSTNode struct {
 	r                rune
-	v                interface{}
+	v                T
 	left, mid, right *TSTNode
 }
 
 func newTSTNode(r rune) *TSTNode {
 	return &TSTNode{r: r}
-}
-
-func (t *TSTNode) Value() T {
-	return t.v
 }
 
 func (t *TSTNode) Upsert(_ alphabet.Interface, k []rune, v T) {
@@ -68,28 +65,36 @@ func (t *TSTNode) Delete(_ alphabet.Interface, k []rune) {
 	}
 }
 
-// find 找到k对应的节点(n)，有这个节点不代表k存在，是否存在需要看n.v是否为nil
-func (t *TSTNode) Find(_ alphabet.Interface, k []rune) TrieNode {
-	if len(k) == 0 {
+func (t *TSTNode) Find(a alphabet.Interface, k []rune) T {
+	node, _ := t.Locate(a, k)
+	if node == nil {
 		return nil
+	}
+	return node.(*TSTNode).v
+}
+
+// find 找到k对应的节点(n)，有这个节点不代表k存在，是否存在需要看n.v是否为nil
+func (t *TSTNode) Locate(_ alphabet.Interface, k []rune) (TrieNode, []rune) {
+	if len(k) == 0 {
+		return nil, nil
 	}
 	switch true {
 	case k[0] < t.r:
 		if t.left != nil {
-			return t.left.Find(nil, k)
+			return t.left.Locate(nil, k)
 		}
 	case k[0] > t.r:
 		if t.right != nil {
-			return t.right.Find(nil, k)
+			return t.right.Locate(nil, k)
 		}
 	default:
 		if len(k) == 1 {
-			return t
+			return t, nil
 		} else if t.mid != nil {
-			return t.mid.Find(nil, k[1:])
+			return t.mid.Locate(nil, k[1:])
 		}
 	}
-	return nil
+	return nil, nil
 }
 
 func (t *TSTNode) LongestPrefixOf(_ alphabet.Interface, s []rune, d, l int) int {
@@ -165,4 +170,12 @@ func (t *TSTNode) KeysMatch(_ alphabet.Interface, pattern []rune, prefix string,
 
 func (t *TSTNode) Keys(_ alphabet.Interface, keys *queue.StrQ) {
 	t.collect(nil, "", keys)
+}
+
+func (t *TSTNode) Compress() error {
+	return errors.New("compress not support")
+}
+
+func (t *TSTNode) IsCompressed() bool {
+	return false
 }

@@ -1,6 +1,7 @@
 package trietree
 
 import (
+	"errors"
 	"github.com/howz97/algorithm/alphabet"
 	"github.com/howz97/algorithm/queue"
 )
@@ -14,19 +15,23 @@ func newSliceNode(size int) *SliceNode {
 	return &SliceNode{next: make([]*SliceNode, size)}
 }
 
-func (t *SliceNode) Value() T {
-	return t.val
+func (t *SliceNode) Find(a alphabet.Interface, k []rune) T {
+	node, _ := t.Locate(a, k)
+	if node == nil {
+		return nil
+	}
+	return node.(*SliceNode).val
 }
 
-func (t *SliceNode) Find(a alphabet.Interface, k []rune) TrieNode {
+func (t *SliceNode) Locate(a alphabet.Interface, k []rune) (TrieNode, []rune) {
 	if len(k) == 0 {
-		return t
+		return t, nil
 	}
 	next := t.next[a.ToIndex(k[0])]
 	if next == nil {
-		return nil
+		return nil, nil
 	}
-	return next.Find(a, k[1:])
+	return next.Locate(a, k[1:])
 }
 
 func (t *SliceNode) Upsert(a alphabet.Interface, k []rune, v T) {
@@ -112,4 +117,12 @@ func (t *SliceNode) KeysMatch(a alphabet.Interface, pattern []rune, prefix strin
 
 func (t *SliceNode) Keys(a alphabet.Interface, keys *queue.StrQ) {
 	t.Collect(a, "", keys)
+}
+
+func (t *SliceNode) Compress() error {
+	return errors.New("compress not support")
+}
+
+func (t *SliceNode) IsCompressed() bool {
+	return false
 }
