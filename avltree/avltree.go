@@ -20,12 +20,12 @@ func New() *AVL {
 
 // Insert insert a k-v pair into this dictionary
 // if value is nil, is is a vitual deletion operation
-func (avl *AVL) Insert(key int, value interface{}) {
+func (avl *AVL) Insert(key int, value T) {
 	avl.root = avl.root.insert(key, value)
 }
 
 // Find -
-func (avl *AVL) Find(key int) interface{} {
+func (avl *AVL) Find(key int) T {
 	n := avl.root.find(key)
 	if n == nil {
 		return nil
@@ -38,12 +38,12 @@ func (avl *AVL) Find(key int) interface{} {
 }
 
 // FindMin -
-func (avl *AVL) FindMin() interface{} {
+func (avl *AVL) FindMin() T {
 	return avl.root.findMin().value
 }
 
 // FindMax -
-func (avl *AVL) FindMax() interface{} {
+func (avl *AVL) FindMax() T {
 	return avl.root.findMax().value
 }
 
@@ -57,16 +57,17 @@ func (avl *AVL) Empty() bool {
 	return avl.root == nil
 }
 
-type node struct {
-	key   int
-	value interface{}
+type T interface{}
 
-	height   int8
-	leftSon  *node
-	rightSon *node
+type node struct {
+	key    int
+	value  T
+	height int8
+	left   *node
+	right  *node
 }
 
-func (n *node) insert(k int, v interface{}) *node {
+func (n *node) insert(k int, v T) *node {
 	if n == nil {
 		n = new(node)
 		n.key = k
@@ -74,66 +75,66 @@ func (n *node) insert(k int, v interface{}) *node {
 	} else if k == n.key {
 		n.value = v
 	} else if k < n.key {
-		n.leftSon = n.leftSon.insert(k, v)
-		if height(n.leftSon)-height(n.rightSon) > 1 {
+		n.left = n.left.insert(k, v)
+		if height(n.left)-height(n.right) > 1 {
 			n = rotation(n)
 		}
-		n.height = max(height(n.leftSon), height(n.rightSon)) + 1
+		n.height = max(height(n.left), height(n.right)) + 1
 	} else {
-		n.rightSon = n.rightSon.insert(k, v)
-		if height(n.rightSon)-height(n.leftSon) > 1 {
+		n.right = n.right.insert(k, v)
+		if height(n.right)-height(n.left) > 1 {
 			n = rotation(n)
 		}
-		n.height = max(height(n.leftSon), height(n.rightSon)) + 1
+		n.height = max(height(n.left), height(n.right)) + 1
 	}
 	return n
 }
 
 func rotation(r *node) *node {
 	switch true {
-	case height(r.leftSon)-height(r.rightSon) == 2:
-		if height(r.leftSon.leftSon) > height(r.leftSon.rightSon) {
+	case height(r.left)-height(r.right) == 2:
+		if height(r.left.left) > height(r.left.right) {
 			r = leftSingelRotation(r)
 		} else {
 			r = leftDoubleRotation(r)
 		}
-	case height(r.rightSon)-height(r.leftSon) == 2:
-		if height(r.rightSon.rightSon) > height(r.rightSon.leftSon) {
+	case height(r.right)-height(r.left) == 2:
+		if height(r.right.right) > height(r.right.left) {
 			r = rightSingelRotation(r)
 		} else {
 			r = rightDoubleRotation(r)
 		}
 	default:
-		panic(fmt.Sprintf("rotation: |height(leftSon) - height(rightSon)| == |%v - %v| != 2", height(r.leftSon), height(r.rightSon)))
+		panic(fmt.Sprintf("rotation: |height(left) - height(right)| == |%v - %v| != 2", height(r.left), height(r.right)))
 	}
 	return r
 }
 
 func leftSingelRotation(k2 *node) *node {
-	k1 := k2.leftSon
-	k2.leftSon = k1.rightSon
-	k1.rightSon = k2
-	k2.height = max(height(k2.leftSon), height(k2.rightSon)) + 1
-	k1.height = max(height(k1.leftSon), height(k1.rightSon)) + 1
+	k1 := k2.left
+	k2.left = k1.right
+	k1.right = k2
+	k2.height = max(height(k2.left), height(k2.right)) + 1
+	k1.height = max(height(k1.left), height(k1.right)) + 1
 	return k1
 }
 
 func rightSingelRotation(k2 *node) *node {
-	k1 := k2.rightSon
-	k2.rightSon = k1.leftSon
-	k1.leftSon = k2
-	k2.height = max(height(k2.leftSon), height(k2.rightSon)) + 1
-	k1.height = max(height(k1.leftSon), height(k1.rightSon)) + 1
+	k1 := k2.right
+	k2.right = k1.left
+	k1.left = k2
+	k2.height = max(height(k2.left), height(k2.right)) + 1
+	k1.height = max(height(k1.left), height(k1.right)) + 1
 	return k1
 }
 
 func leftDoubleRotation(k3 *node) *node {
-	k3.leftSon = rightSingelRotation(k3.leftSon)
+	k3.left = rightSingelRotation(k3.left)
 	return leftSingelRotation(k3)
 }
 
 func rightDoubleRotation(k3 *node) *node {
-	k3.rightSon = leftSingelRotation(k3.rightSon)
+	k3.right = leftSingelRotation(k3.right)
 	return rightSingelRotation(k3)
 }
 
@@ -156,10 +157,10 @@ func (n *node) find(key int) *node {
 		return nil
 	}
 	if key > n.key {
-		return n.rightSon.find(key)
+		return n.right.find(key)
 	}
 	if key < n.key {
-		return n.leftSon.find(key)
+		return n.left.find(key)
 	}
 	return n
 }
@@ -168,8 +169,8 @@ func (n *node) findMin() *node {
 	if n == nil {
 		return nil
 	}
-	for n.leftSon != nil {
-		n = n.leftSon
+	for n.left != nil {
+		n = n.left
 	}
 	return n
 }
@@ -178,8 +179,8 @@ func (n *node) findMax() *node {
 	if n == nil {
 		return nil
 	}
-	for n.rightSon != nil {
-		n = n.rightSon
+	for n.right != nil {
+		n = n.right
 	}
 	return n
 }
@@ -190,35 +191,35 @@ func (n *node) delete(key int) *node {
 		return nil
 	}
 	if key < n.key {
-		n.leftSon = n.leftSon.delete(key)
-		n.height = max(height(n.leftSon), height(n.rightSon)) + 1
-		if height(n.rightSon)-height(n.leftSon) > 1 {
+		n.left = n.left.delete(key)
+		n.height = max(height(n.left), height(n.right)) + 1
+		if height(n.right)-height(n.left) > 1 {
 			n = rotation(n)
 		}
 		return n
 	}
 	if key > n.key {
-		n.rightSon = n.rightSon.delete(key)
-		n.height = max(height(n.leftSon), height(n.rightSon)) + 1
-		if height(n.leftSon)-height(n.rightSon) > 1 {
+		n.right = n.right.delete(key)
+		n.height = max(height(n.left), height(n.right)) + 1
+		if height(n.left)-height(n.right) > 1 {
 			n = rotation(n)
 		}
 		return n
 	}
 
 	// delete n
-	if n.leftSon == nil {
-		return n.rightSon
+	if n.left == nil {
+		return n.right
 	}
-	if n.rightSon == nil {
-		return n.leftSon
+	if n.right == nil {
+		return n.left
 	}
 	deleted := n
-	n = n.rightSon.findMin()
-	n.rightSon = deleted.rightSon.delete(n.key)
-	n.leftSon = deleted.leftSon
-	n.height = max(height(n.leftSon), height(n.rightSon)) + 1
-	if height(n.leftSon)-height(n.rightSon) > 1 {
+	n = n.right.findMin()
+	n.right = deleted.right.delete(n.key)
+	n.left = deleted.left
+	n.height = max(height(n.left), height(n.right)) + 1
+	if height(n.left)-height(n.right) > 1 {
 		n = rotation(n)
 	}
 	return n
