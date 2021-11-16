@@ -91,26 +91,27 @@ func (n *node) insert(k int, v T) *node {
 }
 
 func rotation(r *node) *node {
+	diff := height(r.left) - height(r.right)
 	switch true {
-	case height(r.left)-height(r.right) == 2:
+	case diff == 2:
 		if height(r.left.left) > height(r.left.right) {
-			r = leftSingelRotation(r)
+			r = leftSingleRotation(r)
 		} else {
 			r = leftDoubleRotation(r)
 		}
-	case height(r.right)-height(r.left) == 2:
+	case diff == -2:
 		if height(r.right.right) > height(r.right.left) {
-			r = rightSingelRotation(r)
+			r = rightSingleRotation(r)
 		} else {
 			r = rightDoubleRotation(r)
 		}
 	default:
-		panic(fmt.Sprintf("rotation: |height(left) - height(right)| == |%v - %v| != 2", height(r.left), height(r.right)))
+		panic(fmt.Sprintf("|diff| == |%v - %v| != 2", height(r.left), height(r.right)))
 	}
 	return r
 }
 
-func leftSingelRotation(k2 *node) *node {
+func leftSingleRotation(k2 *node) *node {
 	k1 := k2.left
 	k2.left = k1.right
 	k1.right = k2
@@ -119,7 +120,7 @@ func leftSingelRotation(k2 *node) *node {
 	return k1
 }
 
-func rightSingelRotation(k2 *node) *node {
+func rightSingleRotation(k2 *node) *node {
 	k1 := k2.right
 	k2.right = k1.left
 	k1.left = k2
@@ -129,13 +130,13 @@ func rightSingelRotation(k2 *node) *node {
 }
 
 func leftDoubleRotation(k3 *node) *node {
-	k3.left = rightSingelRotation(k3.left)
-	return leftSingelRotation(k3)
+	k3.left = rightSingleRotation(k3.left)
+	return leftSingleRotation(k3)
 }
 
 func rightDoubleRotation(k3 *node) *node {
-	k3.right = leftSingelRotation(k3.right)
-	return rightSingelRotation(k3)
+	k3.right = leftSingleRotation(k3.right)
+	return rightSingleRotation(k3)
 }
 
 func height(n *node) int8 {
