@@ -6,6 +6,7 @@ import (
 	"github.com/howz97/algorithm/queue"
 )
 
+// Three direction trie tree
 type TSTNode struct {
 	r                rune
 	v                T

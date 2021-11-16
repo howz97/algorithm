@@ -6,6 +6,7 @@ import (
 	"github.com/howz97/algorithm/queue"
 )
 
+// R direction trie tree
 type SliceNode struct {
 	val  T
 	next []*SliceNode

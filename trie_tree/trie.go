@@ -52,11 +52,15 @@ func (t *Trie) Find(k string) T {
 	return t.tree.Find(t.a, []rune(k))
 }
 
+// Update or set a value
+// Insert a new node if the node not exists
 func (t *Trie) Upsert(k string, v T) {
 	t.tree.Upsert(t.a, []rune(k), v)
 	t.size++ // fixme: update do not inc size
 }
 
+// Update or set a value
+// Can not insert any new node
 func (t *Trie) Update(k string, v T) {
 	node, runes := t.tree.Locate(t.a, []rune(k))
 	if node == nil || len(runes) != 0 {

@@ -6,6 +6,7 @@ import (
 	"github.com/howz97/algorithm/util"
 )
 
+// Three direction trie tree that is compressible
 type TSTC struct {
 	TSTCNode
 	compressed bool
