@@ -4,7 +4,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/alphabet"
 	"github.com/howz97/algorithm/trie_tree"
 )
 
@@ -26,14 +25,15 @@ var dict = map[string]string{
 }
 
 func main() {
-	trie := trietree.NewTrie(alphabet.Ascii)
+	//trie := trietree.NewTrie(alphabet.Ascii)
 	//trie := trietree.NewTST()
+	trie := trietree.NewTSTC()
 	for k, v := range dict {
 		trie.Upsert(k, v)
 	}
 	fmt.Println("all keys:", trie.Keys())
 
-	pattern := "a......"
+	pattern := "b.te"
 	fmt.Printf("keys match '%s': %v\n", pattern, trie.KeysMatch(pattern))
 
 	prefix := "bi"
@@ -44,8 +44,8 @@ func main() {
 }
 
 /*
-all keys: [a abandon abnormal am an apollo archive are automatic best bit bitcoin bite byte]
-keys match 'a......': [abandon archive]
+all keys: [a abandon abnormal am an apollo are archive automatic best bit bitcoin bite byte]
+keys match 'b.te': [byte bite]
 keys with prefix 'bi': [bit bitcoin bite]
 longest key with prefix 'bitcoins': bitcoin
 */
