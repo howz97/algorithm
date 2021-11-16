@@ -1,4 +1,4 @@
-package binarytree
+package leetcode
 
 type queue struct {
 	head *linkNode

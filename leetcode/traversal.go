@@ -1,6 +1,8 @@
-package binarytree
+package leetcode
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func preOrder(n *Node) {
 	if n == nil {

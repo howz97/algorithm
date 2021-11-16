@@ -1,4 +1,4 @@
-package searchtree
+package binarytree
 
 import (
 	"fmt"

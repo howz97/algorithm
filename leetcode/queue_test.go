@@ -1,6 +1,8 @@
-package binarytree
+package leetcode
 
-import "testing"
+import (
+	"testing"
+)
 
 func Test_queue(t *testing.T) {
 	q := new(queue)
