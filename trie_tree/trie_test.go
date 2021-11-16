@@ -48,6 +48,7 @@ func TestTSTC_Compress(t *testing.T) {
 	for _, l := range DataChn.long {
 		LongestPrefixOf(t, trie, l)
 	}
+	UpdateAndFind(t, trie, DataChn.m)
 	Delete(t, trie, DataChn.m)
 }
 
@@ -105,8 +106,6 @@ var DataChn = Data{
 
 func TrieTreeTest(t *testing.T, trie *Trie, data Data) {
 	UpsertAndFind(t, trie, data.m)
-	Delete(t, trie, data.m)
-	UpsertAndFind(t, trie, data.m)
 	for _, pre := range data.prefix {
 		KeysWithPrefix(t, trie, pre)
 	}
@@ -116,6 +115,8 @@ func TrieTreeTest(t *testing.T, trie *Trie, data Data) {
 	for _, l := range data.long {
 		LongestPrefixOf(t, trie, l)
 	}
+	UpdateAndFind(t, trie, data.m)
+	Delete(t, trie, data.m)
 }
 
 func Delete(t *testing.T, trie *Trie, m map[string]string) {
@@ -137,6 +138,25 @@ func UpsertAndFind(t *testing.T, trie *Trie, m map[string]string) {
 		got := trie.Find(k).(string)
 		if got != v {
 			t.Fatalf("Find(%s)==%s, should be %s", k, got, v)
+		}
+	}
+}
+
+func UpdateAndFind(t *testing.T, trie *Trie, m map[string]string) {
+	for k, v := range m {
+		trie.Update(k, v+"#")
+	}
+	for k, v := range m {
+		v = v + "#"
+		got := trie.Find(k).(string)
+		if got != v {
+			t.Fatalf("Find(%s)==%s, should be %s", k, got, v)
+		}
+
+		invalidKey := k + "@invalid_suffix"
+		trie.Update(invalidKey, "1")
+		if trie.Find(invalidKey) == "1" {
+			t.Fatalf("shoud not succeed to update")
 		}
 	}
 }

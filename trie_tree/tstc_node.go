@@ -145,7 +145,7 @@ func (t *TSTCNode) Find(_ alphabet.Interface, k []rune) T {
 
 func (t *TSTCNode) Locate(_ alphabet.Interface, k []rune) (TrieNode, []rune) {
 	if len(k) < len(t.rs) {
-		if equal(k, t.rs[:len(k)]) {
+		if isRunesEqual2(k, t.rs[:len(k)]) {
 			return t, t.rs[len(k):]
 		}
 		return nil, nil
@@ -261,7 +261,11 @@ func (t *TSTCNode) Compress() error {
 	panic("should not be called")
 }
 
-func equal(a, b []rune) bool {
+func (t *TSTCNode) SetVal(v T) {
+	t.v = v
+}
+
+func isRunesEqual2(a, b []rune) bool {
 	if len(a) != len(b) {
 		return false
 	}

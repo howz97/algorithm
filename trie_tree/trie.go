@@ -8,6 +8,7 @@ import (
 type T interface{}
 
 type TrieNode interface {
+	SetVal(v T)
 	Find(a alphabet.Interface, k []rune) T
 	Upsert(a alphabet.Interface, k []rune, v T)
 	Delete(a alphabet.Interface, k []rune)
@@ -53,7 +54,15 @@ func (t *Trie) Find(k string) T {
 
 func (t *Trie) Upsert(k string, v T) {
 	t.tree.Upsert(t.a, []rune(k), v)
-	t.size++
+	t.size++ // fixme: update do not inc size
+}
+
+func (t *Trie) Update(k string, v T) {
+	node, runes := t.tree.Locate(t.a, []rune(k))
+	if node == nil || len(runes) != 0 {
+		return
+	}
+	node.SetVal(v)
 }
 
 func (t *Trie) Delete(k string) {

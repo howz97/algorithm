@@ -179,3 +179,7 @@ func (t *TSTNode) Compress() error {
 func (t *TSTNode) IsCompressed() bool {
 	return false
 }
+
+func (t *TSTNode) SetVal(v T) {
+	t.v = v
+}

@@ -126,3 +126,7 @@ func (t *SliceNode) Compress() error {
 func (t *SliceNode) IsCompressed() bool {
 	return false
 }
+
+func (t *SliceNode) SetVal(v T) {
+	t.val = v
+}
