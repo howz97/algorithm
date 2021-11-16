@@ -244,7 +244,7 @@ func (t *TSTCNode) KeysMatch(_ alphabet.Interface, pattern []rune, prefix string
 				keys.PushBack(prefix + string(t.rs))
 			}
 		} else if t.mid != nil {
-			t.mid.KeysMatch(nil, pattern[len(t.rs)-1:], prefix+string(t.rs), keys)
+			t.mid.KeysMatch(nil, pattern[len(t.rs):], prefix+string(t.rs), keys)
 		}
 	}
 }

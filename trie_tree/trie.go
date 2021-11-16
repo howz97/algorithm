@@ -104,3 +104,11 @@ func (t *Trie) KeysMatch(p string) []string {
 func (t *Trie) Size() int {
 	return t.size
 }
+
+func (t *Trie) Compress() error {
+	return t.tree.Compress()
+}
+
+func (t *Trie) IsCompressed() bool {
+	return t.tree.IsCompressed()
+}

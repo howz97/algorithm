@@ -10,25 +10,56 @@ import (
 
 func TestSliceNode(t *testing.T) {
 	trie := NewTrie(alphabet.Ascii)
-	ASCIIKeys(t, trie)
+	TrieTreeTest(t, trie, DataASCII)
 }
 
 func TestTSTNode(t *testing.T) {
 	trie := NewTST()
-	ASCIIKeys(t, trie)
+	TrieTreeTest(t, trie, DataASCII)
 	trie = NewTST()
-	UnicodeKeys(t, trie)
+	TrieTreeTest(t, trie, DataChn)
 }
 
 func TestTSTCNode(t *testing.T) {
 	trie := NewTSTC()
-	ASCIIKeys(t, trie)
+	TrieTreeTest(t, trie, DataASCII)
 	trie = NewTSTC()
-	UnicodeKeys(t, trie)
+	TrieTreeTest(t, trie, DataChn)
 }
 
-func ASCIIKeys(t *testing.T, trie *Trie) {
-	var dict = map[string]string{
+func TestTSTC_Compress(t *testing.T) {
+	trie := NewTSTC()
+	UpsertAndFind(t, trie, DataChn.m)
+	if trie.IsCompressed() {
+		t.Fatalf("compress failed")
+	}
+	if err := trie.Compress(); err != nil {
+		t.Fatal(err)
+	}
+	if !trie.IsCompressed() {
+		t.Fatalf("compress failed")
+	}
+	for _, pre := range DataChn.prefix {
+		KeysWithPrefix(t, trie, pre)
+	}
+	for _, p := range DataChn.pattern {
+		KeysMatch(t, trie, p)
+	}
+	for _, l := range DataChn.long {
+		LongestPrefixOf(t, trie, l)
+	}
+	Delete(t, trie, DataChn.m)
+}
+
+type Data struct {
+	m       map[string]string
+	prefix  []string
+	pattern []string
+	long    []string
+}
+
+var DataASCII = Data{
+	m: map[string]string{
 		"a":         "一个",
 		"an":        "一个",
 		"abandon":   "遗弃",
@@ -45,15 +76,14 @@ func ASCIIKeys(t *testing.T, trie *Trie) {
 		"by":        "通过",
 		"byte":      "字节",
 		"bytes":     "字节(复数)",
-	}
-	prefix := []string{"a", "ab", "ar", "am", "arm", "b", "bit", "byte", "x", "hello"}
-	pattern := []string{".", "..", "....", "a.", "b.te", "b..", "................", "hello"}
-	long := []string{"bitcoins", "byte dance", "arm", "hello"}
-	TrieTreeTest(t, trie, dict, prefix, pattern, long)
+	},
+	prefix:  []string{"a", "ab", "ar", "am", "arm", "b", "bit", "byte", "x", "hello"},
+	pattern: []string{".", "..", "....", "a.", "b.te", "b..", "................", "hello"},
+	long:    []string{"bitcoins", "byte dance", "arm", "hello"},
 }
 
-func UnicodeKeys(t *testing.T, trie *Trie) {
-	var dict = map[string]string{
+var DataChn = Data{
+	m: map[string]string{
 		"风":      "1",
 		"风牛马":    "3",
 		"风牛马不相及": "6",
@@ -67,24 +97,23 @@ func UnicodeKeys(t *testing.T, trie *Trie) {
 		"风儿吹":    "3",
 		"往事随风":   "4",
 		"往事":     "2",
-	}
-	prefix := []string{"风", "风牛", "风度", "风蚀地貌", "往", "往事", "张"}
-	pattern := []string{".", "..", "....", "风.", "风.绝代", "风..", "往.", "................", "hello"}
-	long := []string{"风牛马不相及！", "芳华绝代", "风度翩翩～"}
-	TrieTreeTest(t, trie, dict, prefix, pattern, long)
+	},
+	prefix:  []string{"风", "风牛", "风度", "风蚀地貌", "往", "往事", "张"},
+	pattern: []string{".", "..", "....", "风.", "风.绝代", "风..", "往.", "................", "hello"},
+	long:    []string{"风牛马不相及！", "芳华绝代", "风度翩翩～"},
 }
 
-func TrieTreeTest(t *testing.T, trie *Trie, m map[string]string, prefix []string, pattern []string, long []string) {
-	UpsertAndFind(t, trie, m)
-	Delete(t, trie, m)
-	UpsertAndFind(t, trie, m)
-	for _, pre := range prefix {
+func TrieTreeTest(t *testing.T, trie *Trie, data Data) {
+	UpsertAndFind(t, trie, data.m)
+	Delete(t, trie, data.m)
+	UpsertAndFind(t, trie, data.m)
+	for _, pre := range data.prefix {
 		KeysWithPrefix(t, trie, pre)
 	}
-	for _, p := range pattern {
+	for _, p := range data.pattern {
 		KeysMatch(t, trie, p)
 	}
-	for _, l := range long {
+	for _, l := range data.long {
 		LongestPrefixOf(t, trie, l)
 	}
 }

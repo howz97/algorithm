@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/alphabet"
 	"github.com/howz97/algorithm/trie_tree"
 )
 
@@ -24,14 +23,15 @@ var dict = map[string]string{
 }
 
 func main() {
-	trie := trietree.NewTrie(alphabet.Ascii)
+	//trie := trietree.NewTrie(alphabet.Ascii)
 	//trie := trietree.NewTST()
+	trie := trietree.NewTSTC()
 	for k, v := range dict {
 		trie.Upsert(k, v)
 	}
 	fmt.Println("all keys:", trie.Keys())
 
-	pattern := "a......"
+	pattern := "b.te"
 	fmt.Printf("keys match '%s': %v\n", pattern, trie.KeysMatch(pattern))
 
 	prefix := "bi"
