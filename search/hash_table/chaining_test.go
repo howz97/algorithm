@@ -2,6 +2,7 @@ package hash_table
 
 import (
 	"fmt"
+	. "github.com/howz97/algorithm/search"
 	"testing"
 )
 

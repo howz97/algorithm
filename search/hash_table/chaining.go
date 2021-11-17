@@ -1,12 +1,14 @@
 package hash_table
 
+import . "github.com/howz97/algorithm/search"
+
 const (
 	maxLoadFactor = 8
 	minLoadFactor = 1
 )
 
 type ChainHT struct {
-	kvNum int
+	kvNum uint
 	tbl   table
 }
 
@@ -63,15 +65,15 @@ func (ht *ChainHT) Delete(k Key) {
 	}
 }
 
-func (ht *ChainHT) TblSize() int {
+func (ht *ChainHT) TblSize() uint {
 	return ht.tbl.size()
 }
 
-func (ht *ChainHT) Size() int {
+func (ht *ChainHT) Size() uint {
 	return ht.kvNum
 }
 
-func (ht *ChainHT) LoadFactor() int {
+func (ht *ChainHT) LoadFactor() uint {
 	return ht.Size() / ht.TblSize()
 }
 
@@ -118,8 +120,8 @@ func (t table) delete(k Key) bool {
 	return t[k.Hash()%t.size()].delete(k)
 }
 
-func (t table) size() int {
-	return len(t)
+func (t table) size() uint {
+	return uint(len(t))
 }
 
 type bucket struct {
@@ -153,7 +155,7 @@ func (n *node) put(k Key, v T) *node {
 			v: v,
 		}
 	}
-	if k.Equal(n.k) {
+	if k.Cmp(n.k) == Equal {
 		n.v = v
 	} else {
 		n.next = n.next.put(k, v)
@@ -165,7 +167,7 @@ func (n *node) get(k Key) T {
 	if n == nil {
 		return nil
 	}
-	if k.Equal(n.k) {
+	if k.Cmp(n.k) == Equal {
 		return n.v
 	}
 	return n.next.get(k)
@@ -175,7 +177,7 @@ func (n *node) delete(k Key) (*node, bool) {
 	if n == nil {
 		return nil, false
 	}
-	if k.Equal(n.k) {
+	if k.Cmp(n.k) == Equal {
 		return n.next, true
 	}
 	var deleted bool
