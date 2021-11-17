@@ -87,32 +87,3 @@ func BulkDelete(t *testing.T, s search.Searcher, cnt int, gen func() (search.Cmp
 		}
 	}
 }
-
-func SearcherFloats(t *testing.T, s search.Searcher) {
-	for i := float64(0); i < n; i++ {
-		s.Insert(search.Float(i/10000), i)
-	}
-	for i := float64(0); i < n; i++ {
-		v := s.Find(search.Float(i / 10000))
-		if v.(float64) != i {
-			t.Fatalf("get wrong value %v, should be %v", v, i)
-		}
-	}
-}
-
-func SearcherStr(t *testing.T, s search.Searcher) {
-	m := make(map[string]int)
-	for i := 0; i < n; i++ {
-		key := alphabet.Ascii.RandString(20)
-		m[key] = i
-	}
-	for k, v := range m {
-		s.Insert(search.Str(k), v)
-	}
-	for k, v := range m {
-		vGot := s.Find(search.Str(k))
-		if vGot.(int) != v {
-			t.Fatalf("get wrong value %v, should be %d", vGot, v)
-		}
-	}
-}
