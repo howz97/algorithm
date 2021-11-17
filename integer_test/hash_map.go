@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/hash_table"
+	"github.com/howz97/algorithm/search/hash_table"
 )
 
 func main() {

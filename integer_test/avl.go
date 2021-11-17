@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/avltree"
+	"github.com/howz97/algorithm/search/avltree"
 )
 
 var pairs = []string{
