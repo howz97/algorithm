@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-const n = 1000
+const n = 100
 
 func TestAVL(t *testing.T) {
 	DifferentKVType(t, func() search.Searcher {
@@ -52,7 +52,7 @@ func StrIntKV() (search.Cmp, search.T) {
 }
 
 func LoopTest(t *testing.T, s search.Searcher, kvfn func() (search.Cmp, search.T)) {
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 1000; i++ {
 		BulkInsert(t, s, n, kvfn)
 		BulkDelete(t, s, n, kvfn)
 	}
