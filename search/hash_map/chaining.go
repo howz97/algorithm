@@ -1,4 +1,4 @@
-package hash_table
+package hash_map
 
 import . "github.com/howz97/algorithm/search"
 
@@ -7,12 +7,12 @@ const (
 	minLoadFactor = 1
 )
 
-type ChainHT struct {
-	kvNum uint
-	tbl   table
+type Chaining struct {
+	Num uint
+	tbl table
 }
 
-func New(args ...uint) *ChainHT {
+func New(args ...uint) *Chaining {
 	if len(args) > 1 {
 		panic("too many arguments")
 	}
@@ -23,29 +23,29 @@ func New(args ...uint) *ChainHT {
 	if size == 0 {
 		size = 1
 	}
-	return &ChainHT{
+	return &Chaining{
 		tbl: makeTable(size),
 	}
 }
 
-func (ht *ChainHT) Get(k Key) T {
-	return ht.tbl.get(k)
+func (c *Chaining) Get(k Key) T {
+	return c.tbl.get(k)
 }
 
-func (ht *ChainHT) Put(k Key, v T) {
+func (c *Chaining) Put(k Key, v T) {
 	if v == nil {
-		ht.Delete(k)
+		c.Delete(k)
 		return
 	}
-	if ht.LoadFactor() >= maxLoadFactor {
-		ht.expand()
+	if c.LoadFactor() >= maxLoadFactor {
+		c.expand()
 	}
-	ht.tbl.put(k, v)
-	ht.kvNum++
+	c.tbl.put(k, v)
+	c.Num++
 }
 
-func (ht *ChainHT) Range(fn func(key Key, val T) bool) {
-	for _, bkt := range ht.tbl {
+func (c *Chaining) Range(fn func(key Key, val T) bool) {
+	for _, bkt := range c.tbl {
 		nd := bkt.head
 		for nd != nil {
 			if goOn := fn(nd.k, nd.v); !goOn {
@@ -56,40 +56,40 @@ func (ht *ChainHT) Range(fn func(key Key, val T) bool) {
 	}
 }
 
-func (ht *ChainHT) Delete(k Key) {
-	if ht.tbl.delete(k) {
-		ht.kvNum--
-		if ht.LoadFactor() < minLoadFactor {
-			ht.shrink()
+func (c *Chaining) Delete(k Key) {
+	if c.tbl.delete(k) {
+		c.Num--
+		if c.LoadFactor() < minLoadFactor {
+			c.shrink()
 		}
 	}
 }
 
-func (ht *ChainHT) TblSize() uint {
-	return ht.tbl.size()
+func (c *Chaining) TblSize() uint {
+	return c.tbl.size()
 }
 
-func (ht *ChainHT) Size() uint {
-	return ht.kvNum
+func (c *Chaining) Size() uint {
+	return c.Num
 }
 
-func (ht *ChainHT) LoadFactor() uint {
-	return ht.Size() / ht.TblSize()
+func (c *Chaining) LoadFactor() uint {
+	return c.Size() / c.TblSize()
 }
 
-func (ht *ChainHT) expand() {
-	newTbl := make([]bucket, ht.TblSize()*2)
-	tblMove(ht.tbl, newTbl)
-	ht.tbl = newTbl
+func (c *Chaining) expand() {
+	newTbl := make([]bucket, c.TblSize()*2)
+	tblMove(c.tbl, newTbl)
+	c.tbl = newTbl
 }
 
-func (ht *ChainHT) shrink() {
-	if ht.TblSize() == 1 {
+func (c *Chaining) shrink() {
+	if c.TblSize() == 1 {
 		return
 	}
-	newTbl := make([]bucket, ht.TblSize()/2)
-	tblMove(ht.tbl, newTbl)
-	ht.tbl = newTbl
+	newTbl := make([]bucket, c.TblSize()/2)
+	tblMove(c.tbl, newTbl)
+	c.tbl = newTbl
 }
 
 func tblMove(src table, dst table) {

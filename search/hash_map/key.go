@@ -1,4 +1,4 @@
-package hash_table
+package hash_map
 
 import "github.com/howz97/algorithm/search"
 

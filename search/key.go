@@ -2,20 +2,6 @@ package search
 
 import "unsafe"
 
-type T interface{}
-
-type Result int
-
-const (
-	Equal Result = iota
-	Less
-	More
-)
-
-type Cmp interface {
-	Cmp(other Cmp) Result
-}
-
 type Integer int
 
 func (v Integer) Hash() uint {
