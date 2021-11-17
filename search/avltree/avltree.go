@@ -2,6 +2,7 @@ package avltree
 
 import (
 	"fmt"
+	. "github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/util"
 )
 
@@ -15,11 +16,11 @@ func New() *AVL {
 
 // Insert insert a k-v pair into this dictionary
 // if value is nil, is is a vitual deletion operation
-func (avl *AVL) Insert(key int, value T) {
+func (avl *AVL) Insert(key Cmp, value T) {
 	avl.root = avl.root.insert(key, value)
 }
 
-func (avl *AVL) Find(key int) T {
+func (avl *AVL) Find(key Cmp) T {
 	n := avl.root.find(key)
 	if n == nil {
 		return nil
@@ -39,7 +40,7 @@ func (avl *AVL) FindMax() T {
 	return avl.root.findMax().value
 }
 
-func (avl *AVL) Delete(key int) {
+func (avl *AVL) Delete(key Cmp) {
 	avl.root = avl.root.delete(key)
 }
 
@@ -47,35 +48,36 @@ func (avl *AVL) IsEmpty() bool {
 	return avl.root == nil
 }
 
-type T interface{}
-
 type node struct {
-	key   int
+	key   Cmp
 	value T
 	h     int8
 	left  *node
 	right *node
 }
 
-func (n *node) insert(k int, v T) *node {
+func (n *node) insert(k Cmp, v T) *node {
 	if n == nil {
 		n = new(node)
 		n.key = k
 		n.value = v
-	} else if k == n.key {
-		n.value = v
-	} else if k < n.key {
+		return n
+	}
+	switch k.Cmp(n.key) {
+	case Less:
 		n.left = n.left.insert(k, v)
 		if n.diff() > 1 {
 			n = rotation(n)
 		}
 		n.updateHeight()
-	} else {
+	case More:
 		n.right = n.right.insert(k, v)
 		if n.diff() < -1 {
 			n = rotation(n)
 		}
 		n.updateHeight()
+	default:
+		n.value = v
 	}
 	return n
 }
@@ -144,17 +146,18 @@ func (n *node) height() int8 {
 	return n.h
 }
 
-func (n *node) find(key int) *node {
+func (n *node) find(k Cmp) *node {
 	if n == nil {
 		return nil
 	}
-	if key > n.key {
-		return n.right.find(key)
+	switch k.Cmp(n.key) {
+	case Less:
+		return n.left.find(k)
+	case More:
+		return n.right.find(k)
+	default:
+		return n
 	}
-	if key < n.key {
-		return n.left.find(key)
-	}
-	return n
 }
 
 func (n *node) findMin() *node {
@@ -177,41 +180,38 @@ func (n *node) findMax() *node {
 	return n
 }
 
-func (n *node) delete(key int) *node {
+func (n *node) delete(k Cmp) *node {
 	if n == nil {
 		return nil
 	}
-	if key < n.key {
-		n.left = n.left.delete(key)
+	switch k.Cmp(n.key) {
+	case Less:
+		n.left = n.left.delete(k)
 		n.updateHeight()
 		if n.diff() < -1 {
 			n = rotation(n)
 		}
-		return n
-	}
-	if key > n.key {
-		n.right = n.right.delete(key)
+	case More:
+		n.right = n.right.delete(k)
 		n.updateHeight()
 		if n.diff() > 1 {
 			n = rotation(n)
 		}
-		return n
-	}
-
-	// delete n
-	if n.left == nil {
-		return n.right
-	}
-	if n.right == nil {
-		return n.left
-	}
-	deleted := n
-	n = n.right.findMin()
-	n.right = deleted.right.delete(n.key)
-	n.left = deleted.left
-	n.updateHeight()
-	if n.diff() > 1 {
-		n = rotation(n)
+	default:
+		if n.left == nil {
+			return n.right
+		}
+		if n.right == nil {
+			return n.left
+		}
+		deleted := n
+		n = n.right.findMin()
+		n.right = deleted.right.delete(n.key)
+		n.left = deleted.left
+		n.updateHeight()
+		if n.diff() > 1 {
+			n = rotation(n)
+		}
 	}
 	return n
 }

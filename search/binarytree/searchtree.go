@@ -1,28 +1,23 @@
 package binarytree
 
 import (
-	"fmt"
+	. "github.com/howz97/algorithm/search"
 	"time"
 )
 
-// SearchTree -
 type SearchTree struct {
 	root *node
 }
 
-// New return an empty dictionary
 func New() *SearchTree {
 	return new(SearchTree)
 }
 
-// Insert insert a k-v pair into this dictionary
-// if value is nil, is is a virtual deletion operation
-func (st *SearchTree) Insert(key int, value interface{}) {
-	st.root = st.root.insert(key, value)
+func (st *SearchTree) Insert(key Cmp, val T) {
+	st.root = st.root.insert(key, val)
 }
 
-// Find -
-func (st *SearchTree) Find(key int) interface{} {
+func (st *SearchTree) Find(key Cmp) T {
 	n := st.root.find(key)
 	if n == nil {
 		return nil
@@ -34,56 +29,52 @@ func (st *SearchTree) Find(key int) interface{} {
 	return n.value
 }
 
-// FindMin -
-func (st *SearchTree) FindMin() interface{} {
+func (st *SearchTree) FindMin() T {
 	return st.root.findMin().value
 }
 
-// FindMax -
-func (st *SearchTree) FindMax() interface{} {
+func (st *SearchTree) FindMax() T {
 	return st.root.findMax().value
 }
 
-// Delete -
-func (st *SearchTree) Delete(key int) {
+func (st *SearchTree) Delete(key Cmp) {
 	st.root = st.root.delete(key)
 }
 
 type node struct {
-	value    interface{}
-	key      int
+	value    T
+	key      Cmp
 	leftSon  *node
 	rightSon *node
 }
 
-func (n *node) insert(k int, v interface{}) *node {
+func (n *node) insert(k Cmp, v T) *node {
 	if n == nil {
 		n = new(node)
 		n.key = k
 		n.value = v
 		return n
 	}
-	if k < n.key {
+	switch k.Cmp(n.key) {
+	case Less:
 		n.leftSon = n.leftSon.insert(k, v)
-		return n
-	}
-	if k > n.key {
+	case More:
 		n.rightSon = n.rightSon.insert(k, v)
-		return n
+	default:
+		n.value = v
 	}
-	n.value = v
 	return n
 }
 
-func (n *node) find(key int) *node {
+func (n *node) find(k Cmp) *node {
 	if n == nil {
 		return nil
 	}
-	if key < n.key {
-		return n.leftSon.find(key)
-	}
-	if key > n.key {
-		return n.rightSon.find(key)
+	switch k.Cmp(n.key) {
+	case Less:
+		n = n.leftSon.find(k)
+	case More:
+		n = n.rightSon.find(k)
 	}
 	return n
 }
@@ -108,36 +99,33 @@ func (n *node) findMax() *node {
 	return n
 }
 
-func (n *node) delete(key int) *node {
+func (n *node) delete(k Cmp) *node {
 	if n == nil {
-		fmt.Printf("avltree: delete not existed key(%v)", key)
 		return nil
 	}
-	if key < n.key {
-		n.leftSon = n.leftSon.delete(key)
-		return n
-	}
-	if key > n.key {
-		n.rightSon = n.rightSon.delete(key)
-		return n
-	}
-
-	if n.leftSon == nil {
-		return n.rightSon
-	}
-	if n.rightSon == nil {
-		return n.leftSon
-	}
-	deleted := n
-	// to make it randomly
-	if time.Now().UnixNano()&1 == 1 {
-		n = n.leftSon.findMax()
-		n.leftSon = deleted.leftSon.delete(n.key)
-		n.rightSon = deleted.rightSon
-	} else {
-		n = n.rightSon.findMin()
-		n.rightSon = deleted.rightSon.delete(n.key)
-		n.leftSon = deleted.leftSon
+	switch k.Cmp(n.key) {
+	case Less:
+		n.leftSon = n.leftSon.delete(k)
+	case More:
+		n.rightSon = n.rightSon.delete(k)
+	default:
+		if n.leftSon == nil {
+			return n.rightSon
+		}
+		if n.rightSon == nil {
+			return n.leftSon
+		}
+		deleted := n
+		// to make it randomly
+		if time.Now().UnixNano()&1 == 1 {
+			n = n.leftSon.findMax()
+			n.leftSon = deleted.leftSon.delete(n.key)
+			n.rightSon = deleted.rightSon
+		} else {
+			n = n.rightSon.findMin()
+			n.rightSon = deleted.rightSon.delete(n.key)
+			n.leftSon = deleted.leftSon
+		}
 	}
 	return n
 }
