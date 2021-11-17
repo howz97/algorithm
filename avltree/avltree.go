@@ -1,19 +1,14 @@
 package avltree
 
-/*
-NOTE:
-	1. 使用uint类型的前提：该值永远为正，且不会做减法运算！
-	   比如这里node里面的length，虽然一定为正，但是会做减法运算！那就很容易发生向下溢出
-*/
+import (
+	"fmt"
+	"github.com/howz97/algorithm/util"
+)
 
-import "fmt"
-
-// AVL is an AVL tree
 type AVL struct {
 	root *node
 }
 
-// New new an empty AVL tree
 func New() *AVL {
 	return new(AVL)
 }
@@ -24,7 +19,6 @@ func (avl *AVL) Insert(key int, value T) {
 	avl.root = avl.root.insert(key, value)
 }
 
-// Find -
 func (avl *AVL) Find(key int) T {
 	n := avl.root.find(key)
 	if n == nil {
@@ -37,34 +31,30 @@ func (avl *AVL) Find(key int) T {
 	return n.value
 }
 
-// FindMin -
 func (avl *AVL) FindMin() T {
 	return avl.root.findMin().value
 }
 
-// FindMax -
 func (avl *AVL) FindMax() T {
 	return avl.root.findMax().value
 }
 
-// Delete -
 func (avl *AVL) Delete(key int) {
 	avl.root = avl.root.delete(key)
 }
 
-// Empty return true if it is an emoty tree
-func (avl *AVL) Empty() bool {
+func (avl *AVL) IsEmpty() bool {
 	return avl.root == nil
 }
 
 type T interface{}
 
 type node struct {
-	key    int
-	value  T
-	height int8
-	left   *node
-	right  *node
+	key   int
+	value T
+	h     int8
+	left  *node
+	right *node
 }
 
 func (n *node) insert(k int, v T) *node {
@@ -91,30 +81,30 @@ func (n *node) insert(k int, v T) *node {
 }
 
 func (n *node) diff() int8 {
-	return height(n.left)-height(n.right)
+	return n.left.height() - n.right.height()
 }
 
 func (n *node) updateHeight() {
-	n.height = max(height(n.left), height(n.right)) + 1
+	n.h = util.MaxInt8(n.left.height(), n.right.height()) + 1
 }
 
 func rotation(r *node) *node {
 	diff := r.diff()
 	switch true {
 	case diff == 2:
-		if height(r.left.left) > height(r.left.right) {
+		if r.left.left.height() > r.left.right.height() {
 			r = leftSingleRotation(r)
 		} else {
 			r = leftDoubleRotation(r)
 		}
 	case diff == -2:
-		if height(r.right.right) > height(r.right.left) {
+		if r.right.right.height() > r.right.left.height() {
 			r = rightSingleRotation(r)
 		} else {
 			r = rightDoubleRotation(r)
 		}
 	default:
-		panic(fmt.Sprintf("|diff| == |%v - %v| != 2", height(r.left), height(r.right)))
+		panic(fmt.Sprintf("|diff| == |%v - %v| != 2", r.left.height(), r.right.height()))
 	}
 	return r
 }
@@ -123,8 +113,8 @@ func leftSingleRotation(k2 *node) *node {
 	k1 := k2.left
 	k2.left = k1.right
 	k1.right = k2
-	k2.height = max(height(k2.left), height(k2.right)) + 1
-	k1.height = max(height(k1.left), height(k1.right)) + 1
+	k2.updateHeight()
+	k1.updateHeight()
 	return k1
 }
 
@@ -132,8 +122,8 @@ func rightSingleRotation(k2 *node) *node {
 	k1 := k2.right
 	k2.right = k1.left
 	k1.left = k2
-	k2.height = max(height(k2.left), height(k2.right)) + 1
-	k1.height = max(height(k1.left), height(k1.right)) + 1
+	k2.updateHeight()
+	k1.updateHeight()
 	return k1
 }
 
@@ -147,18 +137,11 @@ func rightDoubleRotation(k3 *node) *node {
 	return rightSingleRotation(k3)
 }
 
-func height(n *node) int8 {
+func (n *node) height() int8 {
 	if n == nil {
 		return -1
 	}
-	return n.height
-}
-
-func max(a, b int8) int8 {
-	if a > b {
-		return a
-	}
-	return b
+	return n.h
 }
 
 func (n *node) find(key int) *node {
@@ -196,13 +179,12 @@ func (n *node) findMax() *node {
 
 func (n *node) delete(key int) *node {
 	if n == nil {
-		fmt.Printf("avltree: delete not existed key(%v)", key)
 		return nil
 	}
 	if key < n.key {
 		n.left = n.left.delete(key)
 		n.updateHeight()
-		if height(n.right)-height(n.left) > 1 {
+		if n.diff() < -1 {
 			n = rotation(n)
 		}
 		return n
@@ -210,7 +192,7 @@ func (n *node) delete(key int) *node {
 	if key > n.key {
 		n.right = n.right.delete(key)
 		n.updateHeight()
-		if height(n.left)-height(n.right) > 1 {
+		if n.diff() > 1 {
 			n = rotation(n)
 		}
 		return n
@@ -228,7 +210,7 @@ func (n *node) delete(key int) *node {
 	n.right = deleted.right.delete(n.key)
 	n.left = deleted.left
 	n.updateHeight()
-	if height(n.left)-height(n.right) > 1 {
+	if n.diff() > 1 {
 		n = rotation(n)
 	}
 	return n

@@ -46,3 +46,10 @@ func IsRunesMatch(pattern, runes []rune) bool {
 func IsRuneMatch(p, r rune) bool {
 	return p == '.' || p == r
 }
+
+func MaxInt8(a, b int8) int8 {
+	if a > b {
+		return a
+	}
+	return b
+}
