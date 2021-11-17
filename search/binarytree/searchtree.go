@@ -5,19 +5,19 @@ import (
 	"time"
 )
 
-type SearchTree struct {
+type BinaryTree struct {
 	root *node
 }
 
-func New() *SearchTree {
-	return new(SearchTree)
+func New() *BinaryTree {
+	return new(BinaryTree)
 }
 
-func (st *SearchTree) Insert(key Cmp, val T) {
+func (st *BinaryTree) Insert(key Cmp, val T) {
 	st.root = st.root.insert(key, val)
 }
 
-func (st *SearchTree) Find(key Cmp) T {
+func (st *BinaryTree) Find(key Cmp) T {
 	n := st.root.find(key)
 	if n == nil {
 		return nil
@@ -29,15 +29,15 @@ func (st *SearchTree) Find(key Cmp) T {
 	return n.value
 }
 
-func (st *SearchTree) FindMin() T {
+func (st *BinaryTree) FindMin() T {
 	return st.root.findMin().value
 }
 
-func (st *SearchTree) FindMax() T {
+func (st *BinaryTree) FindMax() T {
 	return st.root.findMax().value
 }
 
-func (st *SearchTree) Delete(key Cmp) {
+func (st *BinaryTree) Delete(key Cmp) {
 	st.root = st.root.delete(key)
 }
 
