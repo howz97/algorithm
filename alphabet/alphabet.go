@@ -112,6 +112,14 @@ func (a *alphabetImpl) Rand() rune {
 	return a.i2r[rand.Intn(len(a.i2r))]
 }
 
+func (a *alphabetImpl) RandString(l int) string {
+	str := ""
+	for i := 0; i < l; i++ {
+		str += string(a.Rand())
+	}
+	return str
+}
+
 type unicodeImpl struct{}
 
 func (u *unicodeImpl) ToRune(i rune) rune {

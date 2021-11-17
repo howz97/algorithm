@@ -8,6 +8,7 @@ import (
 
 type AVL struct {
 	root *node
+	size uint
 }
 
 func New() *AVL {
@@ -15,9 +16,12 @@ func New() *AVL {
 }
 
 // Insert insert a k-v pair into this dictionary
-// if value is nil, is is a vitual deletion operation
 func (avl *AVL) Insert(key Cmp, value T) {
-	avl.root = avl.root.insert(key, value)
+	var newNode bool
+	avl.root, newNode = avl.root.insert(key, value)
+	if newNode {
+		avl.size++
+	}
 }
 
 func (avl *AVL) Find(key Cmp) T {
@@ -44,8 +48,8 @@ func (avl *AVL) Delete(key Cmp) {
 	avl.root = avl.root.delete(key)
 }
 
-func (avl *AVL) IsEmpty() bool {
-	return avl.root == nil
+func (avl *AVL) Size() uint {
+	return avl.size
 }
 
 type node struct {
@@ -56,22 +60,23 @@ type node struct {
 	right *node
 }
 
-func (n *node) insert(k Cmp, v T) *node {
+func (n *node) insert(k Cmp, v T) (*node, bool) {
 	if n == nil {
 		n = new(node)
 		n.key = k
 		n.value = v
-		return n
+		return n, true
 	}
+	var newNode bool
 	switch k.Cmp(n.key) {
 	case Less:
-		n.left = n.left.insert(k, v)
+		n.left, newNode = n.left.insert(k, v)
 		if n.diff() > 1 {
 			n = rotation(n)
 		}
 		n.updateHeight()
 	case More:
-		n.right = n.right.insert(k, v)
+		n.right, newNode = n.right.insert(k, v)
 		if n.diff() < -1 {
 			n = rotation(n)
 		}
@@ -79,7 +84,7 @@ func (n *node) insert(k Cmp, v T) *node {
 	default:
 		n.value = v
 	}
-	return n
+	return n, newNode
 }
 
 func (n *node) diff() int8 {

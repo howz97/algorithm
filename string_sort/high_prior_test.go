@@ -30,20 +30,12 @@ func TestCreateInput(t *testing.T) {
 		prefix += "A"
 	}
 	CreateInputStrings(t, "./long.txt", func() string {
-		return prefix + RandString(10)
+		return prefix + alpha.RandString(10)
 	})
 
 	//CreateInputStrings(t, "./length_rand.txt", func() string {
 	//	return RandString(rand.Intn(100))
 	//})
-}
-
-func RandString(length int) string {
-	str := ""
-	for i := 0; i < length; i++ {
-		str += string(alpha.Rand())
-	}
-	return str
 }
 
 func CreateInputStrings(t *testing.T, filename string, fn func() string) {
@@ -118,7 +110,7 @@ func LoopTest(t *testing.T, fn func([]string), desc string) {
 }
 
 func TestStringCompare(t *testing.T) {
-	str1 := RandString(200000)
+	str1 := alpha.RandString(200000)
 	str2 := str1
 	b := true
 
