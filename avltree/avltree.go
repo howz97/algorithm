@@ -76,22 +76,30 @@ func (n *node) insert(k int, v T) *node {
 		n.value = v
 	} else if k < n.key {
 		n.left = n.left.insert(k, v)
-		if height(n.left)-height(n.right) > 1 {
+		if n.diff() > 1 {
 			n = rotation(n)
 		}
-		n.height = max(height(n.left), height(n.right)) + 1
+		n.updateHeight()
 	} else {
 		n.right = n.right.insert(k, v)
-		if height(n.right)-height(n.left) > 1 {
+		if n.diff() < -1 {
 			n = rotation(n)
 		}
-		n.height = max(height(n.left), height(n.right)) + 1
+		n.updateHeight()
 	}
 	return n
 }
 
+func (n *node) diff() int8 {
+	return height(n.left)-height(n.right)
+}
+
+func (n *node) updateHeight() {
+	n.height = max(height(n.left), height(n.right)) + 1
+}
+
 func rotation(r *node) *node {
-	diff := height(r.left) - height(r.right)
+	diff := r.diff()
 	switch true {
 	case diff == 2:
 		if height(r.left.left) > height(r.left.right) {
@@ -193,7 +201,7 @@ func (n *node) delete(key int) *node {
 	}
 	if key < n.key {
 		n.left = n.left.delete(key)
-		n.height = max(height(n.left), height(n.right)) + 1
+		n.updateHeight()
 		if height(n.right)-height(n.left) > 1 {
 			n = rotation(n)
 		}
@@ -201,7 +209,7 @@ func (n *node) delete(key int) *node {
 	}
 	if key > n.key {
 		n.right = n.right.delete(key)
-		n.height = max(height(n.left), height(n.right)) + 1
+		n.updateHeight()
 		if height(n.left)-height(n.right) > 1 {
 			n = rotation(n)
 		}
@@ -219,7 +227,7 @@ func (n *node) delete(key int) *node {
 	n = n.right.findMin()
 	n.right = deleted.right.delete(n.key)
 	n.left = deleted.left
-	n.height = max(height(n.left), height(n.right)) + 1
+	n.updateHeight()
 	if height(n.left)-height(n.right) > 1 {
 		n = rotation(n)
 	}
