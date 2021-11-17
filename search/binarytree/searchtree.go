@@ -42,10 +42,10 @@ func (st *BinaryTree) Delete(key Cmp) {
 }
 
 type node struct {
-	value    T
-	key      Cmp
-	leftSon  *node
-	rightSon *node
+	value T
+	key   Cmp
+	left  *node
+	right *node
 }
 
 func (n *node) insert(k Cmp, v T) *node {
@@ -57,9 +57,9 @@ func (n *node) insert(k Cmp, v T) *node {
 	}
 	switch k.Cmp(n.key) {
 	case Less:
-		n.leftSon = n.leftSon.insert(k, v)
+		n.left = n.left.insert(k, v)
 	case More:
-		n.rightSon = n.rightSon.insert(k, v)
+		n.right = n.right.insert(k, v)
 	default:
 		n.value = v
 	}
@@ -72,9 +72,9 @@ func (n *node) find(k Cmp) *node {
 	}
 	switch k.Cmp(n.key) {
 	case Less:
-		n = n.leftSon.find(k)
+		n = n.left.find(k)
 	case More:
-		n = n.rightSon.find(k)
+		n = n.right.find(k)
 	}
 	return n
 }
@@ -83,8 +83,8 @@ func (n *node) findMin() *node {
 	if n == nil {
 		return nil
 	}
-	for n.leftSon != nil {
-		n = n.leftSon
+	for n.left != nil {
+		n = n.left
 	}
 	return n
 }
@@ -93,8 +93,8 @@ func (n *node) findMax() *node {
 	if n == nil {
 		return nil
 	}
-	for n.rightSon != nil {
-		n = n.rightSon
+	for n.right != nil {
+		n = n.right
 	}
 	return n
 }
@@ -105,26 +105,26 @@ func (n *node) delete(k Cmp) *node {
 	}
 	switch k.Cmp(n.key) {
 	case Less:
-		n.leftSon = n.leftSon.delete(k)
+		n.left = n.left.delete(k)
 	case More:
-		n.rightSon = n.rightSon.delete(k)
+		n.right = n.right.delete(k)
 	default:
-		if n.leftSon == nil {
-			return n.rightSon
+		if n.left == nil {
+			return n.right
 		}
-		if n.rightSon == nil {
-			return n.leftSon
+		if n.right == nil {
+			return n.left
 		}
 		deleted := n
 		// to make it randomly
 		if time.Now().UnixNano()&1 == 1 {
-			n = n.leftSon.findMax()
-			n.leftSon = deleted.leftSon.delete(n.key)
-			n.rightSon = deleted.rightSon
+			n = n.left.findMax()
+			n.left = deleted.left.delete(n.key)
+			n.right = deleted.right
 		} else {
-			n = n.rightSon.findMin()
-			n.rightSon = deleted.rightSon.delete(n.key)
-			n.leftSon = deleted.leftSon
+			n = n.right.findMin()
+			n.right = deleted.right.delete(n.key)
+			n.left = deleted.left
 		}
 	}
 	return n
@@ -138,14 +138,14 @@ func DeleteMin(st *Node) *Node {
 		// do nothing and return nil
 	} else {
 		min = st
-		for min.leftSon != nil {
+		for min.left != nil {
 			pOfMin = min
-			min = min.leftSon
+			min = min.left
 		}
-		if min.rightSon != nil {
-			pOfMin.leftSon = min.rightSon
+		if min.right != nil {
+			pOfMin.left = min.right
 		} else {
-			pOfMin.leftSon = nil
+			pOfMin.left = nil
 		}
 	}
 	return min
@@ -158,14 +158,14 @@ func DeleteMax(st *Node) *Node {
 		// do nothing and return nil
 	} else {
 		max = st
-		for max.rightSon != nil {
+		for max.right != nil {
 			pOfMax = max
-			max = max.rightSon
+			max = max.right
 		}
-		if max.leftSon != nil {
-			pOfMax.rightSon = max.leftSon
+		if max.left != nil {
+			pOfMax.right = max.left
 		} else {
-			pOfMax.rightSon = nil
+			pOfMax.right = nil
 		}
 	}
 	return max
@@ -180,71 +180,71 @@ func delete(st *Node, id int, p *Node, leftOfP bool) *Node {
 	if st == nil {
 		// do nothing and return nil
 	} else if id < st.Elem.ID() {
-		deleted = delete(st.leftSon, id, st, true)
+		deleted = delete(st.left, id, st, true)
 	} else if id > st.Elem.ID() {
-		deleted = delete(st.rightSon, id, st, false)
+		deleted = delete(st.right, id, st, false)
 	} else { // delete st node
-		if st.leftSon == nil && st.rightSon == nil {
+		if st.left == nil && st.right == nil {
 			// 要删除的节点是叶子节点
 			if p != nil { // 有父节点
 				if leftOfP {
-					p.leftSon = nil
+					p.left = nil
 				} else {
-					p.rightSon = nil
+					p.right = nil
 				}
 				deleted = st
 			} else { // 无父节点
 				deleted = st
 				st.Elem = nil // 因为st是调用者持有的指针的副本，没法修改调用者持有的指针，只好这样做
 			}
-		} else if st.leftSon != nil {
+		} else if st.left != nil {
 			// 要删除的节点有左儿子
 			if p != nil { // 有父节点
 				if leftOfP {
-					p.leftSon = st.leftSon
+					p.left = st.left
 				} else {
-					p.rightSon = st.leftSon
+					p.right = st.left
 				}
-				st.leftSon = nil
+				st.left = nil
 				deleted = st
 			} else { // 无父节点
 				deleted = new(Node)
 				*deleted = *st
-				*st = *st.leftSon
+				*st = *st.left
 			}
-		} else if st.rightSon != nil {
+		} else if st.right != nil {
 			// 要删除的节点有右儿子
 			if p != nil { // 有父节点
 				if leftOfP {
-					p.leftSon = st.rightSon
+					p.left = st.right
 				} else {
-					p.rightSon = st.rightSon
+					p.right = st.right
 				}
-				st.rightSon = nil
+				st.right = nil
 				deleted = st
 			} else { // 无父节点
 				deleted = new(Node)
 				*deleted = *st
-				*st = *st.rightSon
+				*st = *st.right
 			}
 		} else {
 			// 要删除的节点有左 右儿子
 			if p != nil { // 有父节点
-				replace := DeleteMin(st.rightSon)
-				replace.leftSon = st.leftSon
-				replace.rightSon = st.rightSon
+				replace := DeleteMin(st.right)
+				replace.left = st.left
+				replace.right = st.right
 				if leftOfP {
-					p.leftSon = replace
+					p.left = replace
 				} else {
-					p.rightSon = replace
+					p.right = replace
 				}
-				st.leftSon = nil
-				st.rightSon = nil
+				st.left = nil
+				st.right = nil
 				deleted = st
 			} else { // 无父节点
-				replace := DeleteMin(st.rightSon)
-				replace.leftSon = st.leftSon
-				replace.rightSon = st.rightSon
+				replace := DeleteMin(st.right)
+				replace.left = st.left
+				replace.right = st.right
 				deleted = new(Node)
 				*deleted = *st
 				*st = *replace
