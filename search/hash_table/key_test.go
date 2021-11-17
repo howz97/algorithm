@@ -23,7 +23,7 @@ func TestStr_HashCode(t *testing.T) {
 	rang := 97
 	count := make([]int, rang)
 	for i := range words {
-		count[(Str(words[i]).HashCode()&0x7fffffffffffffff)%rang]++
+		count[(Str(words[i]).Hash()&0x7fffffffffffffff)%rang]++
 	}
 	sort.QuickSort(count)
 	fmt.Println(count)

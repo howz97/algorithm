@@ -107,15 +107,15 @@ func makeTable(size uint) table {
 }
 
 func (t table) put(k Key, v T) {
-	t[k.HashCode()%t.size()].put(k, v)
+	t[k.Hash()%t.size()].put(k, v)
 }
 
 func (t table) get(k Key) T {
-	return t[k.HashCode()%t.size()].get(k)
+	return t[k.Hash()%t.size()].get(k)
 }
 
 func (t table) delete(k Key) bool {
-	return t[k.HashCode()%t.size()].delete(k)
+	return t[k.Hash()%t.size()].delete(k)
 }
 
 func (t table) size() int {
