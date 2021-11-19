@@ -1,7 +1,7 @@
 package binarytree
 
 import (
-	. "github.com/howz97/algorithm/search"
+	"github.com/howz97/algorithm/search"
 	"time"
 )
 
@@ -13,11 +13,11 @@ func New() *BinaryTree {
 	return new(BinaryTree)
 }
 
-func (st *BinaryTree) Insert(key Cmp, val T) {
+func (st *BinaryTree) Insert(key search.Cmp, val search.T) {
 	st.root = st.root.insert(key, val)
 }
 
-func (st *BinaryTree) Find(key Cmp) T {
+func (st *BinaryTree) Find(key search.Cmp) search.T {
 	n := st.root.find(key)
 	if n == nil {
 		return nil
@@ -29,26 +29,26 @@ func (st *BinaryTree) Find(key Cmp) T {
 	return n.value
 }
 
-func (st *BinaryTree) FindMin() T {
+func (st *BinaryTree) FindMin() search.T {
 	return st.root.findMin().value
 }
 
-func (st *BinaryTree) FindMax() T {
+func (st *BinaryTree) FindMax() search.T {
 	return st.root.findMax().value
 }
 
-func (st *BinaryTree) Delete(key Cmp) {
+func (st *BinaryTree) Delete(key search.Cmp) {
 	st.root = st.root.delete(key)
 }
 
 type node struct {
-	value T
-	key   Cmp
+	value search.T
+	key   search.Cmp
 	left  *node
 	right *node
 }
 
-func (n *node) insert(k Cmp, v T) *node {
+func (n *node) insert(k search.Cmp, v search.T) *node {
 	if n == nil {
 		n = new(node)
 		n.key = k
@@ -56,9 +56,9 @@ func (n *node) insert(k Cmp, v T) *node {
 		return n
 	}
 	switch k.Cmp(n.key) {
-	case Less:
+	case search.Less:
 		n.left = n.left.insert(k, v)
-	case More:
+	case search.More:
 		n.right = n.right.insert(k, v)
 	default:
 		n.value = v
@@ -66,14 +66,14 @@ func (n *node) insert(k Cmp, v T) *node {
 	return n
 }
 
-func (n *node) find(k Cmp) *node {
+func (n *node) find(k search.Cmp) *node {
 	if n == nil {
 		return nil
 	}
 	switch k.Cmp(n.key) {
-	case Less:
+	case search.Less:
 		n = n.left.find(k)
-	case More:
+	case search.More:
 		n = n.right.find(k)
 	}
 	return n
@@ -99,14 +99,14 @@ func (n *node) findMax() *node {
 	return n
 }
 
-func (n *node) delete(k Cmp) *node {
+func (n *node) delete(k search.Cmp) *node {
 	if n == nil {
 		return nil
 	}
 	switch k.Cmp(n.key) {
-	case Less:
+	case search.Less:
 		n.left = n.left.delete(k)
-	case More:
+	case search.More:
 		n.right = n.right.delete(k)
 	default:
 		if n.left == nil {

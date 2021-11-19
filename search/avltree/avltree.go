@@ -52,6 +52,10 @@ func (avl *AVL) Size() uint {
 	return avl.size
 }
 
+func (avl *AVL) GetIBinaryTree() IBinaryTree {
+	return avl.root
+}
+
 type node struct {
 	key   Cmp
 	value T
@@ -219,4 +223,12 @@ func (n *node) delete(k Cmp) *node {
 		}
 	}
 	return n
+}
+
+func (n *node) Left() IBinaryTree {
+	return n.left
+}
+
+func (n *node) Right() IBinaryTree {
+	return n.right
 }

@@ -1,6 +1,8 @@
 package hash_map
 
-import . "github.com/howz97/algorithm/search"
+import (
+	"github.com/howz97/algorithm/search"
+)
 
 const (
 	maxLoadFactor = 8
@@ -28,11 +30,11 @@ func New(args ...uint) *Chaining {
 	}
 }
 
-func (c *Chaining) Get(k Key) T {
+func (c *Chaining) Get(k Key) search.T {
 	return c.tbl.get(k)
 }
 
-func (c *Chaining) Put(k Key, v T) {
+func (c *Chaining) Put(k Key, v search.T) {
 	if v == nil {
 		c.Delete(k)
 		return
@@ -44,7 +46,7 @@ func (c *Chaining) Put(k Key, v T) {
 	c.Num++
 }
 
-func (c *Chaining) Range(fn func(key Key, val T) bool) {
+func (c *Chaining) Range(fn func(key Key, val search.T) bool) {
 	for _, bkt := range c.tbl {
 		nd := bkt.head
 		for nd != nil {
@@ -108,11 +110,11 @@ func makeTable(size uint) table {
 	return make(table, size)
 }
 
-func (t table) put(k Key, v T) {
+func (t table) put(k Key, v search.T) {
 	t[k.Hash()%t.size()].put(k, v)
 }
 
-func (t table) get(k Key) T {
+func (t table) get(k Key) search.T {
 	return t[k.Hash()%t.size()].get(k)
 }
 
@@ -128,11 +130,11 @@ type bucket struct {
 	head *node
 }
 
-func (b *bucket) put(k Key, v T) {
+func (b *bucket) put(k Key, v search.T) {
 	b.head = b.head.put(k, v)
 }
 
-func (b *bucket) get(k Key) T {
+func (b *bucket) get(k Key) search.T {
 	return b.head.get(k)
 }
 
@@ -144,18 +146,18 @@ func (b *bucket) delete(k Key) bool {
 
 type node struct {
 	k    Key
-	v    T
+	v    search.T
 	next *node
 }
 
-func (n *node) put(k Key, v T) *node {
+func (n *node) put(k Key, v search.T) *node {
 	if n == nil {
 		return &node{
 			k: k,
 			v: v,
 		}
 	}
-	if k.Cmp(n.k) == Equal {
+	if k.Cmp(n.k) == search.Equal {
 		n.v = v
 	} else {
 		n.next = n.next.put(k, v)
@@ -163,11 +165,11 @@ func (n *node) put(k Key, v T) *node {
 	return n
 }
 
-func (n *node) get(k Key) T {
+func (n *node) get(k Key) search.T {
 	if n == nil {
 		return nil
 	}
-	if k.Cmp(n.k) == Equal {
+	if k.Cmp(n.k) == search.Equal {
 		return n.v
 	}
 	return n.next.get(k)
@@ -177,7 +179,7 @@ func (n *node) delete(k Key) (*node, bool) {
 	if n == nil {
 		return nil, false
 	}
-	if k.Cmp(n.k) == Equal {
+	if k.Cmp(n.k) == search.Equal {
 		return n.next, true
 	}
 	var deleted bool

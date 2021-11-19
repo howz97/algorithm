@@ -2,7 +2,7 @@ package hash_map
 
 import (
 	"fmt"
-	. "github.com/howz97/algorithm/search"
+	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/sort"
 	"os"
 	stdsort "sort"
@@ -25,7 +25,7 @@ func TestStr_HashCode(t *testing.T) {
 	rang := uint(97)
 	count := make([]int, rang)
 	for i := range words {
-		count[(Str(words[i]).Hash()&0x7fffffffffffffff)%rang]++
+		count[(search.Str(words[i]).Hash()&0x7fffffffffffffff)%rang]++
 	}
 	sort.QuickSort(stdsort.IntSlice(count))
 	fmt.Println(count)

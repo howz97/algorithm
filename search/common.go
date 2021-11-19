@@ -20,3 +20,15 @@ type Searcher interface {
 	Delete(key Cmp)
 	//Size() uint
 }
+
+type IBinaryTree interface {
+	Left() IBinaryTree
+	Right() IBinaryTree
+}
+
+type BinaryNode struct {
+	Key   Cmp
+	Val   T
+	Left  *BinaryNode
+	Right *BinaryNode
+}
