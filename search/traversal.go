@@ -33,10 +33,10 @@ func SufOrder(bt ITraversal, order *queue.LinkedQueue) {
 }
 
 func LevelOrder(bt ITraversal) *queue.LinkedQueue {
-	if bt.IsNil() {
-		return nil
-	}
 	order := queue.NewLinkedQueue()
+	if bt.IsNil() {
+		return order
+	}
 	q := queue.NewLinkedQueue()
 	q.PushBack(bt)
 	for !q.IsEmpty() {

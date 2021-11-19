@@ -42,6 +42,10 @@ func (st *BinaryTree) Delete(key search.Cmp) {
 	st.root = st.root.delete(key)
 }
 
+func (st *BinaryTree) Clean() {
+	st.root = nil
+}
+
 func (st *BinaryTree) GetITraversal() search.ITraversal {
 	return st.root
 }

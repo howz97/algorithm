@@ -13,23 +13,18 @@ import (
 const n = 100
 
 func TestAVL(t *testing.T) {
-	DifferentKVType(t, func() search.Searcher {
-		return avltree.New()
-	})
+	DifferentKVType(t, avltree.New())
 }
 
 func TestBinaryTree(t *testing.T) {
-	DifferentKVType(t, func() search.Searcher {
-		return binarytree.New()
-	})
+	DifferentKVType(t, binarytree.New())
 }
 
-func DifferentKVType(t *testing.T, newFn func() search.Searcher) {
-	s := newFn()
+func DifferentKVType(t *testing.T, s search.Searcher) {
 	LoopTest(t, s, IntStrKV)
-	s = newFn()
+	s.Clean()
 	LoopTest(t, s, FloatIntKV)
-	s = newFn()
+	s.Clean()
 	LoopTest(t, s, StrIntKV)
 }
 
@@ -61,6 +56,7 @@ func LoopTest(t *testing.T, s search.Searcher, kvfn func() (search.Cmp, search.T
 func BulkInsert(t *testing.T, s search.Searcher, cnt int, kvfn func() (search.Cmp, search.T)) {
 	inserted := make(map[search.Cmp]search.T)
 	for i := 0; i < cnt; i++ {
+		//search.PrintBinaryTree(s.GetITraversal())
 		k, v := kvfn()
 		s.Insert(k, v)
 		inserted[k] = v
@@ -77,6 +73,7 @@ func BulkDelete(t *testing.T, s search.Searcher, cnt int, gen func() (search.Cmp
 	deleted := make(map[search.Cmp]struct{})
 	for i := 0; i < cnt; i++ {
 		k, _ := gen()
+		//search.PrintBinaryTree(s.GetITraversal())
 		s.Delete(k)
 		deleted[k] = struct{}{}
 	}

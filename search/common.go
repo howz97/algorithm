@@ -20,6 +20,8 @@ type Searcher interface {
 	Insert(key Cmp, value T)
 	Find(k Cmp) T
 	Delete(key Cmp)
+	Clean()
+	GetITraversal() ITraversal
 	//Size() uint
 }
 

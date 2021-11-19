@@ -52,6 +52,10 @@ func (avl *AVL) Size() uint {
 	return avl.size
 }
 
+func (avl *AVL) Clean() {
+	avl.root = nil
+}
+
 func (avl *AVL) GetITraversal() ITraversal {
 	return avl.root
 }
