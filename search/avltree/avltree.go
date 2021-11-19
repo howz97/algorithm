@@ -45,6 +45,12 @@ func (avl *AVL) FindMax() T {
 }
 
 func (avl *AVL) Delete(key Cmp) {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("deleting", key)
+			panic(err)
+		}
+	}()
 	avl.root = avl.root.delete(key)
 }
 
@@ -217,10 +223,10 @@ func (n *node) delete(k Cmp) *node {
 		if n.right == nil {
 			return n.left
 		}
-		deleted := n
+		del := n
 		n = n.right.findMin()
-		n.right = deleted.right.delete(n.key)
-		n.left = deleted.left
+		n.right = del.right.delete(n.key)
+		n.left = del.left
 		n.updateHeight()
 		if n.diff() > 1 {
 			n = rotation(n)
@@ -245,5 +251,5 @@ func (n *node) String() string {
 	if n == nil {
 		return "#"
 	}
-	return fmt.Sprintf("(%v)", n.key)
+	return fmt.Sprintf("(%v_h%d)", n.key, n.h)
 }

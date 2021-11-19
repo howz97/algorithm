@@ -73,7 +73,7 @@ func BulkDelete(t *testing.T, s search.Searcher, cnt int, gen func() (search.Cmp
 	deleted := make(map[search.Cmp]struct{})
 	for i := 0; i < cnt; i++ {
 		k, _ := gen()
-		//search.PrintBinaryTree(s.GetITraversal())
+		search.PrintBinaryTree(s.GetITraversal())
 		s.Delete(k)
 		deleted[k] = struct{}{}
 	}
