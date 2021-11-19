@@ -1,5 +1,7 @@
 package search
 
+import "fmt"
+
 const (
 	Equal Result = iota
 	Less
@@ -21,14 +23,9 @@ type Searcher interface {
 	//Size() uint
 }
 
-type IBinaryTree interface {
-	Left() IBinaryTree
-	Right() IBinaryTree
-}
-
-type BinaryNode struct {
-	Key   Cmp
-	Val   T
-	Left  *BinaryNode
-	Right *BinaryNode
+type ITraversal interface {
+	IsNil() bool
+	Left() ITraversal
+	Right() ITraversal
+	fmt.Stringer
 }

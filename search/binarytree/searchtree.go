@@ -1,6 +1,7 @@
 package binarytree
 
 import (
+	"fmt"
 	"github.com/howz97/algorithm/search"
 	"time"
 )
@@ -39,6 +40,10 @@ func (st *BinaryTree) FindMax() search.T {
 
 func (st *BinaryTree) Delete(key search.Cmp) {
 	st.root = st.root.delete(key)
+}
+
+func (st *BinaryTree) GetITraversal() search.ITraversal {
+	return st.root
 }
 
 type node struct {
@@ -128,6 +133,25 @@ func (n *node) delete(k search.Cmp) *node {
 		}
 	}
 	return n
+}
+
+func (n *node) Left() search.ITraversal {
+	return n.left
+}
+
+func (n *node) Right() search.ITraversal {
+	return n.right
+}
+
+func (n *node) IsNil() bool {
+	return n == nil
+}
+
+func (n *node) String() string {
+	if n == nil {
+		return "#"
+	}
+	return fmt.Sprintf("(%v)", n.key)
 }
 
 /* 开始写成了这样... 搞的太复杂了! 要学会使用递归

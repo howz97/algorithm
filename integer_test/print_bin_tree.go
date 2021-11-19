@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/search/avltree"
 )
 
@@ -20,12 +20,7 @@ var pairs = []string{
 func main() {
 	tree := avltree.New()
 	for k, v := range pairs {
-		tree.Insert(k, v)
+		tree.Insert(search.Float(float64(k)/100), v)
 	}
-	for k, v := range pairs {
-		if tree.Find(k) != v {
-			panic("key-value not match")
-		}
-	}
-	fmt.Printf("min:%s, max:%s\n", tree.FindMin(), tree.FindMax())
+	search.PrintBinaryTree(tree.GetITraversal())
 }

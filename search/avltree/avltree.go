@@ -52,7 +52,7 @@ func (avl *AVL) Size() uint {
 	return avl.size
 }
 
-func (avl *AVL) GetIBinaryTree() IBinaryTree {
+func (avl *AVL) GetITraversal() ITraversal {
 	return avl.root
 }
 
@@ -225,10 +225,21 @@ func (n *node) delete(k Cmp) *node {
 	return n
 }
 
-func (n *node) Left() IBinaryTree {
+func (n *node) Left() ITraversal {
 	return n.left
 }
 
-func (n *node) Right() IBinaryTree {
+func (n *node) Right() ITraversal {
 	return n.right
+}
+
+func (n *node) IsNil() bool {
+	return n == nil
+}
+
+func (n *node) String() string {
+	if n == nil {
+		return "#"
+	}
+	return fmt.Sprintf("(%v)", n.key)
 }
