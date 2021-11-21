@@ -227,7 +227,7 @@ func (n *node) IsNil() bool {
 
 func (n *node) String() string {
 	if n == nil {
-		return "#"
+		return StrNilNode
 	}
 	return fmt.Sprintf("(%v_h%d)", n.key, n.h)
 }

@@ -2,6 +2,8 @@ package search
 
 import "fmt"
 
+const StrNilNode = "#"
+
 const (
 	Equal Result = iota
 	Less

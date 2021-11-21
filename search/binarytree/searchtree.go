@@ -153,7 +153,7 @@ func (n *node) IsNil() bool {
 
 func (n *node) String() string {
 	if n == nil {
-		return "#"
+		return search.StrNilNode
 	}
 	return fmt.Sprintf("(%v)", n.key)
 }
