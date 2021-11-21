@@ -5,6 +5,7 @@ import (
 	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/search/avltree"
 	"github.com/howz97/algorithm/search/binarytree"
+	"github.com/howz97/algorithm/search/redblack"
 	"math/rand"
 	"strconv"
 	"testing"
@@ -18,6 +19,10 @@ func TestAVL(t *testing.T) {
 
 func TestBinaryTree(t *testing.T) {
 	DifferentKVType(t, binarytree.New())
+}
+
+func TestRedBlack(t *testing.T) {
+	DifferentKVType(t, redblack.New())
 }
 
 func DifferentKVType(t *testing.T, s search.Searcher) {

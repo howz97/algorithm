@@ -1,5 +1,7 @@
 package redblack
 
+import . "github.com/howz97/algorithm/search"
+
 const (
 	red   = true
 	black = false
@@ -17,7 +19,7 @@ func New() *RedBlack {
 
 // Insert insert a k-v pair into this dictionary
 // if value is nil, is is a vitual deletion operation
-func (rb *RedBlack) Insert(key int, value interface{}) {
+func (rb *RedBlack) Insert(key Cmp, value T) {
 	rb.root = rb.root.insert(key, value)
 	if rb.root.isRed() {
 		rb.root.color = black
@@ -25,7 +27,7 @@ func (rb *RedBlack) Insert(key int, value interface{}) {
 }
 
 // Find -
-func (rb *RedBlack) Find(key int) interface{} {
+func (rb *RedBlack) Find(key Cmp) T {
 	n := rb.root.find(key)
 	if n == nil {
 		return nil
@@ -38,12 +40,12 @@ func (rb *RedBlack) Find(key int) interface{} {
 }
 
 // FindMin -
-func (rb *RedBlack) FindMin() interface{} {
+func (rb *RedBlack) FindMin() T {
 	return rb.root.findMin().value
 }
 
 // FindMax -
-func (rb *RedBlack) FindMax() interface{} {
+func (rb *RedBlack) FindMax() T {
 	return rb.root.findMax().value
 }
 
@@ -76,7 +78,7 @@ func (rb *RedBlack) DelMax() {
 }
 
 // Delete -
-func (rb *RedBlack) Delete(key int) {
+func (rb *RedBlack) Delete(key Cmp) {
 	if rb.root == nil {
 		return
 	}
@@ -102,18 +104,22 @@ func (rb *RedBlack) Size() int {
 	return rb.root.size
 }
 
+func (rb *RedBlack) Clean() {
+	rb.root = nil
+}
+
 /*=============================================================================*/
 
 type node struct {
-	key      int
-	value    interface{}
+	key      Cmp
+	value    T
 	color    bool
 	size     int
 	leftSon  *node
 	rightSon *node
 }
 
-func (n *node) insert(k int, v interface{}) *node {
+func (n *node) insert(k Cmp, v T) *node {
 	if n == nil {
 		return &node{
 			key:   k,
@@ -122,10 +128,10 @@ func (n *node) insert(k int, v interface{}) *node {
 			size:  1,
 		}
 	}
-	switch true {
-	case k < n.key:
+	switch k.Cmp(n.key) {
+	case Less:
 		n.leftSon = n.leftSon.insert(k, v)
-	case k > n.key:
+	case More:
 		n.rightSon = n.rightSon.insert(k, v)
 	default:
 		n.value = v
@@ -143,17 +149,18 @@ func (n *node) insert(k int, v interface{}) *node {
 	return n
 }
 
-func (n *node) find(key int) *node {
+func (n *node) find(key Cmp) *node {
 	if n == nil {
 		return nil
 	}
-	if key > n.key {
-		return n.rightSon.find(key)
-	}
-	if key < n.key {
+	switch key.Cmp(n.key) {
+	case Less:
 		return n.leftSon.find(key)
+	case More:
+		return n.rightSon.find(key)
+	default:
+		return n
 	}
-	return n
 }
 
 func (n *node) findMin() *node {
@@ -241,8 +248,8 @@ func flipColors2(r *node) {
 	r.rightSon.color = red
 }
 
-func (n *node) delete(k int) *node {
-	if k < n.key {
+func (n *node) delete(k Cmp) *node {
+	if k.Cmp(n.key) == Less {
 		if !n.leftSon.isRed() && !n.leftSon.leftSon.isRed() {
 			n = moveRedLeft(n)
 		}
@@ -251,13 +258,13 @@ func (n *node) delete(k int) *node {
 		if n.leftSon.isRed() {
 			n = rotateRight(n)
 		}
-		if k == n.key && n.rightSon == nil {
+		if k.Cmp(n.key) == Equal && n.rightSon == nil {
 			return nil
 		}
 		if !n.rightSon.isRed() && !n.rightSon.leftSon.isRed() {
 			n = moveRedRight(n)
 		}
-		if k == n.key {
+		if k.Cmp(n.key) == Equal {
 			min := n.rightSon.findMin()
 			n.value = min.value
 			n.key = min.key
@@ -313,11 +320,4 @@ func flipColors(root *node) {
 	root.leftSon.color = black
 	root.rightSon.color = black
 	root.color = red
-}
-
-func key(n *node) int {
-	if n == nil {
-		return 0
-	}
-	return n.key
 }
