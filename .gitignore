@@ -2,3 +2,4 @@
 .idea
 alg_rust/target
 string_sort/*.txt
+tmp.txt

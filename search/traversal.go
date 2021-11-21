@@ -6,7 +6,7 @@ import (
 )
 
 func PreOrder(bt ITraversal, order *queue.LinkedQueue) {
-	if bt == nil {
+	if bt.IsNil() {
 		return
 	}
 	order.PushBack(bt)
@@ -15,7 +15,7 @@ func PreOrder(bt ITraversal, order *queue.LinkedQueue) {
 }
 
 func InOrder(bt ITraversal, order *queue.LinkedQueue) {
-	if bt == nil {
+	if bt.IsNil() {
 		return
 	}
 	InOrder(bt.Left(), order)
@@ -24,7 +24,7 @@ func InOrder(bt ITraversal, order *queue.LinkedQueue) {
 }
 
 func SufOrder(bt ITraversal, order *queue.LinkedQueue) {
-	if bt == nil {
+	if bt.IsNil() {
 		return
 	}
 	SufOrder(bt.Left(), order)
@@ -57,5 +57,5 @@ func PrintBinaryTree(bt ITraversal) {
 	for !order.IsEmpty() {
 		sli = append(sli, order.Front().(ITraversal).String())
 	}
-	btprinter.PrintTreeLevelOrder(sli)
+	btprinter.PrintTree(sli)
 }

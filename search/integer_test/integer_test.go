@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-const n = 100
+const n = 1000
 
 func TestAVL(t *testing.T) {
 	DifferentKVType(t, avltree.New())
@@ -21,11 +21,15 @@ func TestBinaryTree(t *testing.T) {
 }
 
 func DifferentKVType(t *testing.T, s search.Searcher) {
+	t.Logf("start test different types of k-v ...")
 	LoopTest(t, s, IntStrKV)
+	t.Logf("int-str passed")
 	s.Clean()
 	LoopTest(t, s, FloatIntKV)
+	t.Logf("float-int passed")
 	s.Clean()
 	LoopTest(t, s, StrIntKV)
+	t.Logf("str-int passed")
 }
 
 func IntStrKV() (search.Cmp, search.T) {
@@ -47,7 +51,7 @@ func StrIntKV() (search.Cmp, search.T) {
 }
 
 func LoopTest(t *testing.T, s search.Searcher, kvfn func() (search.Cmp, search.T)) {
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 200; i++ {
 		BulkInsert(t, s, n, kvfn)
 		BulkDelete(t, s, n, kvfn)
 	}
@@ -73,7 +77,6 @@ func BulkDelete(t *testing.T, s search.Searcher, cnt int, gen func() (search.Cmp
 	deleted := make(map[search.Cmp]struct{})
 	for i := 0; i < cnt; i++ {
 		k, _ := gen()
-		search.PrintBinaryTree(s.GetITraversal())
 		s.Delete(k)
 		deleted[k] = struct{}{}
 	}

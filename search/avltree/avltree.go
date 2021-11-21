@@ -45,13 +45,8 @@ func (avl *AVL) FindMax() T {
 }
 
 func (avl *AVL) Delete(key Cmp) {
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Println("deleting", key)
-			panic(err)
-		}
-	}()
 	avl.root = avl.root.delete(key)
+	avl.size--
 }
 
 func (avl *AVL) Size() uint {
@@ -113,17 +108,17 @@ func rotation(r *node) *node {
 	diff := r.diff()
 	switch true {
 	case diff == 2:
-		if r.left.left.height() > r.left.right.height() {
-			r = leftSingleRotation(r)
-		} else {
-			r = leftDoubleRotation(r)
+		left := r.left
+		if left.left.height() < left.right.height() {
+			r.left = rightSingleRotation(left)
 		}
+		r = leftSingleRotation(r)
 	case diff == -2:
-		if r.right.right.height() > r.right.left.height() {
-			r = rightSingleRotation(r)
-		} else {
-			r = rightDoubleRotation(r)
+		right := r.right
+		if right.left.height() > right.right.height() {
+			r.right = leftSingleRotation(right)
 		}
+		r = rightSingleRotation(r)
 	default:
 		panic(fmt.Sprintf("|diff| == |%v - %v| != 2", r.left.height(), r.right.height()))
 	}
@@ -146,16 +141,6 @@ func rightSingleRotation(k2 *node) *node {
 	k2.updateHeight()
 	k1.updateHeight()
 	return k1
-}
-
-func leftDoubleRotation(k3 *node) *node {
-	k3.left = rightSingleRotation(k3.left)
-	return leftSingleRotation(k3)
-}
-
-func rightDoubleRotation(k3 *node) *node {
-	k3.right = leftSingleRotation(k3.right)
-	return rightSingleRotation(k3)
 }
 
 func (n *node) height() int8 {
