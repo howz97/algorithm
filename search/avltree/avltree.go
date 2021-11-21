@@ -191,16 +191,8 @@ func (n *node) delete(k Cmp) *node {
 	switch k.Cmp(n.key) {
 	case Less:
 		n.left = n.left.delete(k)
-		n.updateHeight()
-		if n.diff() < -1 {
-			n = rotation(n)
-		}
 	case More:
 		n.right = n.right.delete(k)
-		n.updateHeight()
-		if n.diff() > 1 {
-			n = rotation(n)
-		}
 	default:
 		if n.left == nil {
 			return n.right
@@ -208,14 +200,15 @@ func (n *node) delete(k Cmp) *node {
 		if n.right == nil {
 			return n.left
 		}
-		del := n
-		n = n.right.findMin()
-		n.right = del.right.delete(n.key)
-		n.left = del.left
-		n.updateHeight()
-		if n.diff() > 1 {
-			n = rotation(n)
-		}
+		candi := n.right.findMin()
+		n.right = n.right.delete(candi.key)
+		candi.left = n.left
+		candi.right = n.right
+		n = candi
+	}
+	n.updateHeight()
+	if !n.isBalance() {
+		n = rotation(n)
 	}
 	return n
 }
@@ -237,4 +230,9 @@ func (n *node) String() string {
 		return "#"
 	}
 	return fmt.Sprintf("(%v_h%d)", n.key, n.h)
+}
+
+func (n *node) isBalance() bool {
+	diff := n.diff()
+	return diff > -2 && diff < 2
 }
