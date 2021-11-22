@@ -22,5 +22,5 @@ func main() {
 	for k, v := range pairs {
 		tree.Put(search.Float(float64(k)/100), v)
 	}
-	search.PrintBinaryTree(tree.GetITraversal())
+	search.PrintBinaryTree(tree)
 }

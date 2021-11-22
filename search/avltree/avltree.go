@@ -56,10 +56,6 @@ func (avl *AVL) Clean() {
 	avl.node = nil
 }
 
-func (avl *AVL) GetITraversal() ITraversal {
-	return avl.node
-}
-
 type node struct {
 	key   Cmp
 	value T

@@ -45,10 +45,6 @@ func (st *BinaryTree) Clean() {
 	st.node = nil
 }
 
-func (st *BinaryTree) GetITraversal() search.ITraversal {
-	return st.node
-}
-
 type node struct {
 	value search.T
 	key   search.Cmp
