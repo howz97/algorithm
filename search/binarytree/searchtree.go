@@ -14,31 +14,27 @@ func New() *BinaryTree {
 }
 
 func (st *BinaryTree) Put(key search.Cmp, val search.T) {
-	st.node = st.node.insert(key, val)
+	st.node = st.insert(key, val)
 }
 
 func (st *BinaryTree) Get(key search.Cmp) search.T {
-	n := st.node.find(key)
+	n := st.find(key)
 	if n == nil {
-		return nil
-	}
-	if n.value == nil {
-		st.Del(n.key) // 删除value为nil的节点
 		return nil
 	}
 	return n.value
 }
 
 func (st *BinaryTree) GetMin() search.T {
-	return st.node.findMin().value
+	return st.findMin().value
 }
 
 func (st *BinaryTree) GetMax() search.T {
-	return st.node.findMax().value
+	return st.findMax().value
 }
 
 func (st *BinaryTree) Del(key search.Cmp) {
-	st.node = st.node.delete(key)
+	st.node = st.delete(key)
 }
 
 func (st *BinaryTree) Clean() {

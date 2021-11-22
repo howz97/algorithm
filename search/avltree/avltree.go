@@ -17,34 +17,30 @@ func New() *AVL {
 
 func (avl *AVL) Put(key Cmp, val T) {
 	var newNode bool
-	avl.node, newNode = avl.node.insert(key, val)
+	avl.node, newNode = avl.insert(key, val)
 	if newNode {
 		avl.size++
 	}
 }
 
 func (avl *AVL) Get(key Cmp) T {
-	n := avl.node.find(key)
+	n := avl.find(key)
 	if n == nil {
-		return nil
-	}
-	if n.value == nil {
-		avl.Del(n.key) // 删除value为nil的节点
 		return nil
 	}
 	return n.value
 }
 
 func (avl *AVL) GetMin() T {
-	return avl.node.findMin().value
+	return avl.findMin().value
 }
 
 func (avl *AVL) GetMax() T {
-	return avl.node.findMax().value
+	return avl.findMax().value
 }
 
 func (avl *AVL) Del(key Cmp) {
-	avl.node = avl.node.delete(key)
+	avl.node = avl.delete(key)
 	avl.size--
 }
 
