@@ -191,11 +191,11 @@ func (n *node) delete(k Cmp) *node {
 		if n.right == nil {
 			return n.left
 		}
-		candi := n.right.findMin()
-		n.right = n.right.delete(candi.key)
-		candi.left = n.left
-		candi.right = n.right
-		n = candi
+		replacer := n.right.findMin()
+		n.right = n.right.delete(replacer.key)
+		replacer.left = n.left
+		replacer.right = n.right
+		n = replacer
 	}
 	n.updateHeight()
 	if !n.isBalance() {

@@ -115,17 +115,17 @@ func (n *node) delete(k search.Cmp) *node {
 		if n.right == nil {
 			return n.left
 		}
-		deleted := n
-		// to make it randomly
-		if time.Now().UnixNano()&1 == 1 {
-			n = n.left.findMax()
-			n.left = deleted.left.delete(n.key)
-			n.right = deleted.right
+		var replacer *node
+		if time.Now().UnixNano()&1 == 1 { // to make it randomly
+			replacer = n.left.findMax()
+			n.left = n.left.delete(replacer.key)
 		} else {
-			n = n.right.findMin()
-			n.right = deleted.right.delete(n.key)
-			n.left = deleted.left
+			replacer = n.right.findMin()
+			n.right = n.right.delete(replacer.key)
 		}
+		replacer.left = n.left
+		replacer.right = n.right
+		n = replacer
 	}
 	return n
 }
