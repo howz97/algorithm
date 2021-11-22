@@ -15,8 +15,7 @@ func New() *AVL {
 	return new(AVL)
 }
 
-// Insert insert a k-v pair into this dictionary
-func (avl *AVL) Insert(key Cmp, value T) {
+func (avl *AVL) Put(key Cmp, value T) {
 	var newNode bool
 	avl.root, newNode = avl.root.insert(key, value)
 	if newNode {
@@ -24,27 +23,27 @@ func (avl *AVL) Insert(key Cmp, value T) {
 	}
 }
 
-func (avl *AVL) Find(key Cmp) T {
+func (avl *AVL) Get(key Cmp) T {
 	n := avl.root.find(key)
 	if n == nil {
 		return nil
 	}
 	if n.value == nil {
-		avl.Delete(n.key) // 删除value为nil的节点
+		avl.Del(n.key) // 删除value为nil的节点
 		return nil
 	}
 	return n.value
 }
 
-func (avl *AVL) FindMin() T {
+func (avl *AVL) GetMin() T {
 	return avl.root.findMin().value
 }
 
-func (avl *AVL) FindMax() T {
+func (avl *AVL) GetMax() T {
 	return avl.root.findMax().value
 }
 
-func (avl *AVL) Delete(key Cmp) {
+func (avl *AVL) Del(key Cmp) {
 	avl.root = avl.root.delete(key)
 	avl.size--
 }

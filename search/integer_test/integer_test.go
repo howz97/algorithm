@@ -67,11 +67,11 @@ func BulkInsert(t *testing.T, s search.Searcher, cnt int, kvfn func() (search.Cm
 	for i := 0; i < cnt; i++ {
 		//search.PrintBinaryTree(s.GetITraversal())
 		k, v := kvfn()
-		s.Insert(k, v)
+		s.Put(k, v)
 		inserted[k] = v
 	}
 	for k, v := range inserted {
-		vGot := s.Find(k)
+		vGot := s.Get(k)
 		if vGot != v {
 			t.Fatalf("get wrong value %v, should be %d", vGot, v)
 		}
@@ -82,11 +82,11 @@ func BulkDelete(t *testing.T, s search.Searcher, cnt int, gen func() (search.Cmp
 	deleted := make(map[search.Cmp]struct{})
 	for i := 0; i < cnt; i++ {
 		k, _ := gen()
-		s.Delete(k)
+		s.Del(k)
 		deleted[k] = struct{}{}
 	}
 	for k := range deleted {
-		v := s.Find(k)
+		v := s.Get(k)
 		if v != nil {
 			t.Fatalf("delete failed")
 		}

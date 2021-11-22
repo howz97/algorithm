@@ -19,9 +19,9 @@ type Cmp interface {
 }
 
 type Searcher interface {
-	Insert(key Cmp, value T)
-	Find(k Cmp) T
-	Delete(key Cmp)
+	Put(key Cmp, value T)
+	Get(k Cmp) T
+	Del(key Cmp)
 	Clean()
 	//Size() uint
 }

@@ -7,49 +7,41 @@ const (
 	black = false
 )
 
-// RedBlack is a dictionary implemented by read-black tree
 type RedBlack struct {
 	root *node
 }
 
-// New new an empty read-black tree
 func New() *RedBlack {
 	return new(RedBlack)
 }
 
-// Insert insert a k-v pair into this dictionary
-// if value is nil, is is a vitual deletion operation
-func (rb *RedBlack) Insert(key Cmp, value T) {
+func (rb *RedBlack) Put(key Cmp, value T) {
 	rb.root = rb.root.insert(key, value)
 	if rb.root.isRed() {
 		rb.root.color = black
 	}
 }
 
-// Find -
-func (rb *RedBlack) Find(key Cmp) T {
+func (rb *RedBlack) Get(key Cmp) T {
 	n := rb.root.find(key)
 	if n == nil {
 		return nil
 	}
 	if n.value == nil {
-		rb.Delete(n.key) // 删除value为nil的节点
+		rb.Del(n.key) // 删除value为nil的节点
 		return nil
 	}
 	return n.value
 }
 
-// FindMin -
-func (rb *RedBlack) FindMin() T {
+func (rb *RedBlack) GetMin() T {
 	return rb.root.findMin().value
 }
 
-// FindMax -
-func (rb *RedBlack) FindMax() T {
+func (rb *RedBlack) GetMax() T {
 	return rb.root.findMax().value
 }
 
-// DelMin -
 func (rb *RedBlack) DelMin() {
 	if rb.root == nil {
 		return
@@ -63,7 +55,6 @@ func (rb *RedBlack) DelMin() {
 	}
 }
 
-// DelMax -
 func (rb *RedBlack) DelMax() {
 	if rb.root == nil {
 		return
@@ -77,8 +68,7 @@ func (rb *RedBlack) DelMax() {
 	}
 }
 
-// Delete -
-func (rb *RedBlack) Delete(key Cmp) {
+func (rb *RedBlack) Del(key Cmp) {
 	if rb.root == nil {
 		return
 	}
@@ -91,12 +81,10 @@ func (rb *RedBlack) Delete(key Cmp) {
 	}
 }
 
-// Empty return true if it is an emoty tree
 func (rb *RedBlack) Empty() bool {
 	return rb.root == nil
 }
 
-// Size -
 func (rb *RedBlack) Size() int {
 	if rb.root == nil {
 		return 0

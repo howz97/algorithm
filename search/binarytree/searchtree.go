@@ -14,31 +14,31 @@ func New() *BinaryTree {
 	return new(BinaryTree)
 }
 
-func (st *BinaryTree) Insert(key search.Cmp, val search.T) {
+func (st *BinaryTree) Put(key search.Cmp, val search.T) {
 	st.root = st.root.insert(key, val)
 }
 
-func (st *BinaryTree) Find(key search.Cmp) search.T {
+func (st *BinaryTree) Get(key search.Cmp) search.T {
 	n := st.root.find(key)
 	if n == nil {
 		return nil
 	}
 	if n.value == nil {
-		st.Delete(n.key) // 删除value为nil的节点
+		st.Del(n.key) // 删除value为nil的节点
 		return nil
 	}
 	return n.value
 }
 
-func (st *BinaryTree) FindMin() search.T {
+func (st *BinaryTree) GetMin() search.T {
 	return st.root.findMin().value
 }
 
-func (st *BinaryTree) FindMax() search.T {
+func (st *BinaryTree) GetMax() search.T {
 	return st.root.findMax().value
 }
 
-func (st *BinaryTree) Delete(key search.Cmp) {
+func (st *BinaryTree) Del(key search.Cmp) {
 	st.root = st.root.delete(key)
 }
 

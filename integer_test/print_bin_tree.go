@@ -20,7 +20,7 @@ var pairs = []string{
 func main() {
 	tree := avltree.New()
 	for k, v := range pairs {
-		tree.Insert(search.Float(float64(k)/100), v)
+		tree.Put(search.Float(float64(k)/100), v)
 	}
 	search.PrintBinaryTree(tree.GetITraversal())
 }
