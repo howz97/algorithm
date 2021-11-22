@@ -36,7 +36,7 @@ func (c *Chaining) Get(k Key) search.T {
 
 func (c *Chaining) Put(k Key, v search.T) {
 	if v == nil {
-		c.Delete(k)
+		c.Del(k)
 		return
 	}
 	if c.LoadFactor() >= maxLoadFactor {
@@ -58,7 +58,7 @@ func (c *Chaining) Range(fn func(key Key, val search.T) bool) {
 	}
 }
 
-func (c *Chaining) Delete(k Key) {
+func (c *Chaining) Del(k Key) {
 	if c.tbl.delete(k) {
 		c.Num--
 		if c.LoadFactor() < minLoadFactor {

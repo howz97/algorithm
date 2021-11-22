@@ -18,9 +18,9 @@ func main() {
 		return true
 	})
 
-	ht.Delete(hash_map.Str("d"))
-	ht.Delete(hash_map.Str("f"))
-	ht.Delete(hash_map.Str("x"))
+	ht.Del(hash_map.Str("d"))
+	ht.Del(hash_map.Str("f"))
+	ht.Del(hash_map.Str("x"))
 	fmt.Println("after delete (d/f/x) ...")
 	ht.Range(func(key hash_map.Key, val hash_map.T) bool {
 		fmt.Println(key, "->", val)
@@ -28,7 +28,7 @@ func main() {
 	})
 
 	ht.Range(func(key hash_map.Key, _ hash_map.T) bool {
-		ht.Delete(key)
+		ht.Del(key)
 		return true
 	})
 	fmt.Println("after delete all ...", ht.Size(), ht.TblSize())
