@@ -6,8 +6,8 @@ import (
 	"github.com/waiyva/binary-tree/btprinter"
 )
 
-func PreOrder(bt ITraversal, fn func(k Cmp, v T) bool) bool {
-	if !fn(bt.Key(), bt.Val()) {
+func PreOrder(bt ITraversal, fn func(ITraversal) bool) bool {
+	if !fn(bt) {
 		return false
 	}
 	if !bt.Left().IsNil() {
@@ -23,13 +23,13 @@ func PreOrder(bt ITraversal, fn func(k Cmp, v T) bool) bool {
 	return true
 }
 
-func InOrder(bt ITraversal, fn func(k Cmp, v T) bool) bool {
+func InOrder(bt ITraversal, fn func(ITraversal) bool) bool {
 	if !bt.Left().IsNil() {
 		if !InOrder(bt.Left(), fn) {
 			return false
 		}
 	}
-	if !fn(bt.Key(), bt.Val()) {
+	if !fn(bt) {
 		return false
 	}
 	if !bt.Right().IsNil() {
@@ -40,7 +40,7 @@ func InOrder(bt ITraversal, fn func(k Cmp, v T) bool) bool {
 	return true
 }
 
-func SufOrder(bt ITraversal, fn func(k Cmp, v T) bool) bool {
+func SufOrder(bt ITraversal, fn func(ITraversal) bool) bool {
 	if !bt.Left().IsNil() {
 		if !SufOrder(bt.Left(), fn) {
 			return false
@@ -51,10 +51,10 @@ func SufOrder(bt ITraversal, fn func(k Cmp, v T) bool) bool {
 			return false
 		}
 	}
-	return fn(bt.Key(), bt.Val())
+	return fn(bt)
 }
 
-func LevelOrder(bt ITraversal, fn func(k Cmp, v T) bool) {
+func LevelOrder(bt ITraversal, fn func(ITraversal) bool) {
 	if bt.IsNil() {
 		return
 	}
@@ -62,7 +62,7 @@ func LevelOrder(bt ITraversal, fn func(k Cmp, v T) bool) {
 	q.PushBack(bt)
 	for !q.IsEmpty() {
 		bt = q.Front().(ITraversal)
-		if !fn(bt.Key(), bt.Val()) {
+		if !fn(bt) {
 			break
 		}
 		if !bt.Left().IsNil() {
@@ -74,13 +74,13 @@ func LevelOrder(bt ITraversal, fn func(k Cmp, v T) bool) {
 	}
 }
 
-func ReverseOrder(bt ITraversal, fn func(k Cmp, v T) bool) bool {
+func ReverseOrder(bt ITraversal, fn func(ITraversal) bool) bool {
 	if !bt.Right().IsNil() {
 		if !ReverseOrder(bt.Right(), fn) {
 			return false
 		}
 	}
-	if !fn(bt.Key(), bt.Val()) {
+	if !fn(bt) {
 		return false
 	}
 	if !bt.Left().IsNil() {

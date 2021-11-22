@@ -16,36 +16,36 @@ func TestTraversal(t *testing.T) {
 	search.PrintBinaryTree(avl)
 
 	str := ""
-	search.ReverseOrder(avl, func(_ search.Cmp, v search.T) bool {
-		str += fmt.Sprint(v)
+	search.ReverseOrder(avl, func(t search.ITraversal) bool {
+		str += fmt.Sprint(t.Val())
 		return true
 	})
 	t.Logf("ReverseOrder: %s", str)
 
 	str = ""
-	search.InOrder(avl, func(_ search.Cmp, v search.T) bool {
-		str += fmt.Sprint(v)
+	search.InOrder(avl, func(t search.ITraversal) bool {
+		str += fmt.Sprint(t.Val())
 		return true
 	})
 	t.Logf("InOrder: %s", str)
 
 	str = ""
-	search.PreOrder(avl, func(_ search.Cmp, v search.T) bool {
-		str += fmt.Sprint(v)
+	search.PreOrder(avl, func(t search.ITraversal) bool {
+		str += fmt.Sprint(t.Val())
 		return true
 	})
 	t.Logf("PreOrder: %s", str)
 
 	str = ""
-	search.SufOrder(avl, func(_ search.Cmp, v search.T) bool {
-		str += fmt.Sprint(v)
+	search.SufOrder(avl, func(t search.ITraversal) bool {
+		str += fmt.Sprint(t.Val())
 		return true
 	})
 	t.Logf("SufOrder: %s", str)
 
 	str = ""
-	search.LevelOrder(avl, func(_ search.Cmp, v search.T) bool {
-		str += fmt.Sprint(v)
+	search.LevelOrder(avl, func(t search.ITraversal) bool {
+		str += fmt.Sprint(t.Val())
 		return true
 	})
 	t.Logf("LevelOrder: %s", str)

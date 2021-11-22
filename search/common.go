@@ -19,7 +19,6 @@ type Searcher interface {
 	Get(key Cmp) T
 	Del(key Cmp)
 	Clean()
-	//Size() uint
 }
 
 type ITraversal interface {
