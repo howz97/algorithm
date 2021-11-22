@@ -109,22 +109,22 @@ func rotation(r *node) *node {
 	case diff == 2:
 		left := r.left
 		if left.left.height() < left.right.height() {
-			r.left = rightSingleRotation(left)
+			r.left = rightRotation(left)
 		}
-		r = leftSingleRotation(r)
+		r = leftRotation(r)
 	case diff == -2:
 		right := r.right
 		if right.left.height() > right.right.height() {
-			r.right = leftSingleRotation(right)
+			r.right = leftRotation(right)
 		}
-		r = rightSingleRotation(r)
+		r = rightRotation(r)
 	default:
 		panic(fmt.Sprintf("|diff| == |%v - %v| != 2", r.left.height(), r.right.height()))
 	}
 	return r
 }
 
-func leftSingleRotation(k2 *node) *node {
+func leftRotation(k2 *node) *node {
 	k1 := k2.left
 	k2.left = k1.right
 	k1.right = k2
@@ -133,7 +133,7 @@ func leftSingleRotation(k2 *node) *node {
 	return k1
 }
 
-func rightSingleRotation(k2 *node) *node {
+func rightRotation(k2 *node) *node {
 	k1 := k2.right
 	k2.right = k1.left
 	k1.left = k2

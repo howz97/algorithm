@@ -28,3 +28,16 @@ type ITraversal interface {
 	Left() ITraversal
 	Right() ITraversal
 }
+
+type KeyVal struct {
+	key   Cmp
+	value T
+}
+
+func (kv *KeyVal) Key() Cmp {
+	return kv.key
+}
+
+func (kv *KeyVal) Val() T {
+	return kv.value
+}
