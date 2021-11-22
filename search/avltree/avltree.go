@@ -116,22 +116,22 @@ func rotation(r *node) *node {
 	return r
 }
 
-func leftRotation(k2 *node) *node {
-	k1 := k2.left
-	k2.left = k1.right
-	k1.right = k2
-	k2.updateHeight()
-	k1.updateHeight()
-	return k1
+func leftRotation(n *node) *node {
+	replacer := n.left
+	n.left = replacer.right
+	replacer.right = n
+	n.updateHeight()
+	replacer.updateHeight()
+	return replacer
 }
 
-func rightRotation(k2 *node) *node {
-	k1 := k2.right
-	k2.right = k1.left
-	k1.left = k2
-	k2.updateHeight()
-	k1.updateHeight()
-	return k1
+func rightRotation(n *node) *node {
+	replacer := n.right
+	n.right = replacer.left
+	replacer.left = n
+	n.updateHeight()
+	replacer.updateHeight()
+	return replacer
 }
 
 func (n *node) height() int8 {
