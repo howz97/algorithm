@@ -6,6 +6,7 @@ import (
 	"github.com/howz97/algorithm/util"
 )
 
+// AVL is a strictly balanced binary search tree
 type AVL struct {
 	*node
 	size uint
@@ -17,14 +18,14 @@ func New() *AVL {
 
 func (avl *AVL) Put(key Cmp, val T) {
 	exist := false
-	avl.node, exist = avl.insert(key, val)
+	avl.node, exist = avl.put(key, val)
 	if !exist {
 		avl.size++
 	}
 }
 
 func (avl *AVL) Get(key Cmp) T {
-	n := avl.find(key)
+	n := avl.get(key)
 	if n == nil {
 		return nil
 	}
@@ -32,16 +33,16 @@ func (avl *AVL) Get(key Cmp) T {
 }
 
 func (avl *AVL) GetMin() T {
-	return avl.findMin().value
+	return avl.getMin().value
 }
 
 func (avl *AVL) GetMax() T {
-	return avl.findMax().value
+	return avl.getMax().value
 }
 
 func (avl *AVL) Del(key Cmp) {
 	exist := false
-	avl.node, exist = avl.delete(key)
+	avl.node, exist = avl.del(key)
 	if exist {
 		avl.size--
 	}
@@ -64,7 +65,7 @@ type node struct {
 	right *node
 }
 
-func (n *node) insert(k Cmp, v T) (*node, bool) {
+func (n *node) put(k Cmp, v T) (*node, bool) {
 	if n == nil {
 		n = new(node)
 		n.key = k
@@ -74,13 +75,13 @@ func (n *node) insert(k Cmp, v T) (*node, bool) {
 	var exist bool
 	switch k.Cmp(n.key) {
 	case Less:
-		n.left, exist = n.left.insert(k, v)
+		n.left, exist = n.left.put(k, v)
 		if n.diff() > 1 {
 			n = rotation(n)
 		}
 		n.updateHeight()
 	case More:
-		n.right, exist = n.right.insert(k, v)
+		n.right, exist = n.right.put(k, v)
 		if n.diff() < -1 {
 			n = rotation(n)
 		}
@@ -146,21 +147,21 @@ func (n *node) height() int8 {
 	return n.h
 }
 
-func (n *node) find(k Cmp) *node {
+func (n *node) get(k Cmp) *node {
 	if n == nil {
 		return nil
 	}
 	switch k.Cmp(n.key) {
 	case Less:
-		return n.left.find(k)
+		return n.left.get(k)
 	case More:
-		return n.right.find(k)
+		return n.right.get(k)
 	default:
 		return n
 	}
 }
 
-func (n *node) findMin() *node {
+func (n *node) getMin() *node {
 	if n == nil {
 		return nil
 	}
@@ -170,7 +171,7 @@ func (n *node) findMin() *node {
 	return n
 }
 
-func (n *node) findMax() *node {
+func (n *node) getMax() *node {
 	if n == nil {
 		return nil
 	}
@@ -180,16 +181,16 @@ func (n *node) findMax() *node {
 	return n
 }
 
-func (n *node) delete(k Cmp) (*node, bool) {
+func (n *node) del(k Cmp) (*node, bool) {
 	if n == nil {
 		return nil, false
 	}
 	var exist bool
 	switch k.Cmp(n.key) {
 	case Less:
-		n.left, exist = n.left.delete(k)
+		n.left, exist = n.left.del(k)
 	case More:
-		n.right, exist = n.right.delete(k)
+		n.right, exist = n.right.del(k)
 	default:
 		if n.left == nil {
 			return n.right, true
@@ -198,8 +199,8 @@ func (n *node) delete(k Cmp) (*node, bool) {
 			return n.left, true
 		}
 		exist = true
-		replacer := n.right.findMin()
-		n.right, _ = n.right.delete(replacer.key)
+		replacer := n.right.getMin()
+		n.right, _ = n.right.del(replacer.key)
 		replacer.left = n.left
 		replacer.right = n.right
 		n = replacer
