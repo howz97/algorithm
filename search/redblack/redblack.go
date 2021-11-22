@@ -85,7 +85,7 @@ func (rb *RedBlack) Empty() bool {
 	return rb.root == nil
 }
 
-func (rb *RedBlack) Size() int {
+func (rb *RedBlack) Size() uint {
 	if rb.root == nil {
 		return 0
 	}
@@ -102,7 +102,7 @@ type node struct {
 	key      Cmp
 	value    T
 	color    bool
-	size     int
+	size     uint
 	leftSon  *node
 	rightSon *node
 }
@@ -271,7 +271,7 @@ func (n *node) isRed() bool {
 	return n.color == red
 }
 
-func size(n *node) int {
+func size(n *node) uint {
 	if n == nil {
 		return 0
 	}
