@@ -9,6 +9,11 @@ const (
 	minLoadFactor = 1
 )
 
+type Key interface {
+	Hash() uint
+	search.Cmp
+}
+
 type Chaining struct {
 	Num uint
 	tbl table
@@ -65,6 +70,11 @@ func (c *Chaining) Del(k Key) {
 			c.shrink()
 		}
 	}
+}
+
+func (c *Chaining) Clean() {
+	c.Num = 0
+	c.tbl = makeTable(1)
 }
 
 func (c *Chaining) TblSize() uint {

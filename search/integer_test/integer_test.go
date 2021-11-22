@@ -1,4 +1,4 @@
-package integer_test
+package integer
 
 import (
 	"github.com/howz97/algorithm/alphabet"
@@ -23,6 +23,10 @@ func TestBinaryTree(t *testing.T) {
 
 func TestRedBlack(t *testing.T) {
 	DifferentKVType(t, redblack.New())
+}
+
+func TestHashMap(t *testing.T) {
+	DifferentKVType(t, NewHashMap())
 }
 
 func DifferentKVType(t *testing.T, s search.Searcher) {

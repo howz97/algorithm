@@ -15,9 +15,9 @@ func New() *AVL {
 	return new(AVL)
 }
 
-func (avl *AVL) Put(key Cmp, value T) {
+func (avl *AVL) Put(key Cmp, val T) {
 	var newNode bool
-	avl.root, newNode = avl.root.insert(key, value)
+	avl.root, newNode = avl.root.insert(key, val)
 	if newNode {
 		avl.size++
 	}

@@ -15,8 +15,8 @@ func New() *RedBlack {
 	return new(RedBlack)
 }
 
-func (rb *RedBlack) Put(key Cmp, value T) {
-	rb.root = rb.root.insert(key, value)
+func (rb *RedBlack) Put(key Cmp, val T) {
+	rb.root = rb.root.insert(key, val)
 	if rb.root.isRed() {
 		rb.root.color = black
 	}
