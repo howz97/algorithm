@@ -1,13 +1,12 @@
 package binarytree
 
 import (
-	"fmt"
 	"github.com/howz97/algorithm/search"
 	"time"
 )
 
 type BinaryTree struct {
-	root *node
+	*node
 }
 
 func New() *BinaryTree {
@@ -15,11 +14,11 @@ func New() *BinaryTree {
 }
 
 func (st *BinaryTree) Put(key search.Cmp, val search.T) {
-	st.root = st.root.insert(key, val)
+	st.node = st.node.insert(key, val)
 }
 
 func (st *BinaryTree) Get(key search.Cmp) search.T {
-	n := st.root.find(key)
+	n := st.node.find(key)
 	if n == nil {
 		return nil
 	}
@@ -31,23 +30,23 @@ func (st *BinaryTree) Get(key search.Cmp) search.T {
 }
 
 func (st *BinaryTree) GetMin() search.T {
-	return st.root.findMin().value
+	return st.node.findMin().value
 }
 
 func (st *BinaryTree) GetMax() search.T {
-	return st.root.findMax().value
+	return st.node.findMax().value
 }
 
 func (st *BinaryTree) Del(key search.Cmp) {
-	st.root = st.root.delete(key)
+	st.node = st.node.delete(key)
 }
 
 func (st *BinaryTree) Clean() {
-	st.root = nil
+	st.node = nil
 }
 
 func (st *BinaryTree) GetITraversal() search.ITraversal {
-	return st.root
+	return st.node
 }
 
 type node struct {
@@ -151,11 +150,12 @@ func (n *node) IsNil() bool {
 	return n == nil
 }
 
-func (n *node) String() string {
-	if n == nil {
-		return search.StrNilNode
-	}
-	return fmt.Sprintf("(%v)", n.key)
+func (n *node) Key() search.Cmp {
+	return n.key
+}
+
+func (n *node) Val() search.T {
+	return n.value
 }
 
 /* 开始写成了这样... 搞的太复杂了! 要学会使用递归

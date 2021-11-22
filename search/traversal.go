@@ -1,61 +1,109 @@
 package search
 
 import (
+	"fmt"
 	"github.com/howz97/algorithm/queue"
 	"github.com/waiyva/binary-tree/btprinter"
 )
 
-func PreOrder(bt ITraversal, order *queue.LinkedQueue) {
-	if bt.IsNil() {
-		return
+func PreOrder(bt ITraversal, fn func(k Cmp, v T) bool) bool {
+	if !fn(bt.Key(), bt.Val()) {
+		return false
 	}
-	order.PushBack(bt)
-	PreOrder(bt.Left(), order)
-	PreOrder(bt.Right(), order)
+	if !bt.Left().IsNil() {
+		if !PreOrder(bt.Left(), fn) {
+			return false
+		}
+	}
+	if !bt.Right().IsNil() {
+		if !PreOrder(bt.Right(), fn) {
+			return false
+		}
+	}
+	return true
 }
 
-func InOrder(bt ITraversal, order *queue.LinkedQueue) {
-	if bt.IsNil() {
-		return
+func InOrder(bt ITraversal, fn func(k Cmp, v T) bool) bool {
+	if !bt.Left().IsNil() {
+		if !InOrder(bt.Left(), fn) {
+			return false
+		}
 	}
-	InOrder(bt.Left(), order)
-	order.PushBack(bt)
-	InOrder(bt.Right(), order)
+	if !fn(bt.Key(), bt.Val()) {
+		return false
+	}
+	if !bt.Right().IsNil() {
+		if !InOrder(bt.Right(), fn) {
+			return false
+		}
+	}
+	return true
 }
 
-func SufOrder(bt ITraversal, order *queue.LinkedQueue) {
-	if bt.IsNil() {
-		return
+func SufOrder(bt ITraversal, fn func(k Cmp, v T) bool) bool {
+	if !bt.Left().IsNil() {
+		if !SufOrder(bt.Left(), fn) {
+			return false
+		}
 	}
-	SufOrder(bt.Left(), order)
-	SufOrder(bt.Right(), order)
-	order.PushBack(bt)
+	if !bt.Right().IsNil() {
+		if !SufOrder(bt.Right(), fn) {
+			return false
+		}
+	}
+	return fn(bt.Key(), bt.Val())
 }
 
-func LevelOrder(bt ITraversal) *queue.LinkedQueue {
-	order := queue.NewLinkedQueue()
+func LevelOrder(bt ITraversal, fn func(k Cmp, v T) bool) {
 	if bt.IsNil() {
-		return order
+		return
 	}
 	q := queue.NewLinkedQueue()
 	q.PushBack(bt)
 	for !q.IsEmpty() {
 		bt = q.Front().(ITraversal)
-		order.PushBack(bt)
-		if bt.IsNil() {
-			continue
+		if !fn(bt.Key(), bt.Val()) {
+			break
 		}
-		q.PushBack(bt.Left())
-		q.PushBack(bt.Right())
+		if !bt.Left().IsNil() {
+			q.PushBack(bt.Left())
+		}
+		if !bt.Right().IsNil() {
+			q.PushBack(bt.Right())
+		}
 	}
-	return order
+}
+
+func ReverseOrder(bt ITraversal, fn func(k Cmp, v T) bool) bool {
+	if !bt.Right().IsNil() {
+		if !ReverseOrder(bt.Right(), fn) {
+			return false
+		}
+	}
+	if !fn(bt.Key(), bt.Val()) {
+		return false
+	}
+	if !bt.Left().IsNil() {
+		if !ReverseOrder(bt.Left(), fn) {
+			return false
+		}
+	}
+	return true
 }
 
 func PrintBinaryTree(bt ITraversal) {
-	order := LevelOrder(bt)
 	var sli []string
-	for !order.IsEmpty() {
-		sli = append(sli, order.Front().(ITraversal).String())
+	q := queue.NewLinkedQueue()
+	q.PushBack(bt)
+	for !q.IsEmpty() {
+		bt = q.Front().(ITraversal)
+		if bt.IsNil() {
+			sli = append(sli, "#")
+			continue
+		}
+		sli = append(sli, fmt.Sprint(bt.Val()))
+		q.PushBack(bt.Left())
+		q.PushBack(bt.Right())
 	}
 	btprinter.PrintTree(sli)
 }

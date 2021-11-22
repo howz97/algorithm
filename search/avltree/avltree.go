@@ -7,7 +7,7 @@ import (
 )
 
 type AVL struct {
-	root *node
+	*node
 	size uint
 }
 
@@ -17,14 +17,14 @@ func New() *AVL {
 
 func (avl *AVL) Put(key Cmp, val T) {
 	var newNode bool
-	avl.root, newNode = avl.root.insert(key, val)
+	avl.node, newNode = avl.node.insert(key, val)
 	if newNode {
 		avl.size++
 	}
 }
 
 func (avl *AVL) Get(key Cmp) T {
-	n := avl.root.find(key)
+	n := avl.node.find(key)
 	if n == nil {
 		return nil
 	}
@@ -36,15 +36,15 @@ func (avl *AVL) Get(key Cmp) T {
 }
 
 func (avl *AVL) GetMin() T {
-	return avl.root.findMin().value
+	return avl.node.findMin().value
 }
 
 func (avl *AVL) GetMax() T {
-	return avl.root.findMax().value
+	return avl.node.findMax().value
 }
 
 func (avl *AVL) Del(key Cmp) {
-	avl.root = avl.root.delete(key)
+	avl.node = avl.node.delete(key)
 	avl.size--
 }
 
@@ -53,11 +53,11 @@ func (avl *AVL) Size() uint {
 }
 
 func (avl *AVL) Clean() {
-	avl.root = nil
+	avl.node = nil
 }
 
 func (avl *AVL) GetITraversal() ITraversal {
-	return avl.root
+	return avl.node
 }
 
 type node struct {
@@ -224,11 +224,12 @@ func (n *node) IsNil() bool {
 	return n == nil
 }
 
-func (n *node) String() string {
-	if n == nil {
-		return StrNilNode
-	}
-	return fmt.Sprintf("(%v_h%d)", n.key, n.h)
+func (n *node) Key() Cmp {
+	return n.key
+}
+
+func (n *node) Val() T {
+	return n.value
 }
 
 func (n *node) isBalance() bool {

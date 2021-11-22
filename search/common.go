@@ -1,9 +1,5 @@
 package search
 
-import "fmt"
-
-const StrNilNode = "#"
-
 const (
 	Equal Result = iota
 	Less
@@ -28,7 +24,8 @@ type Searcher interface {
 
 type ITraversal interface {
 	IsNil() bool
+	Key() Cmp
+	Val() T
 	Left() ITraversal
 	Right() ITraversal
-	fmt.Stringer
 }
