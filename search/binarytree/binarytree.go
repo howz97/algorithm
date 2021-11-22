@@ -53,6 +53,7 @@ func (st *BinaryTree) Size() uint {
 
 func (st *BinaryTree) Clean() {
 	st.node = nil
+	st.size = 0
 }
 
 type node struct {

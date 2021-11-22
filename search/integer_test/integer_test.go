@@ -33,10 +33,10 @@ func DifferentKVType(t *testing.T, s search.Searcher) {
 	t.Logf("start test different types of k-v ...")
 	LoopTest(t, s, IntStrKV)
 	t.Logf("int-str passed")
-	s.Clean()
+
 	LoopTest(t, s, FloatIntKV)
 	t.Logf("float-int passed")
-	s.Clean()
+
 	LoopTest(t, s, StrIntKV)
 	t.Logf("str-int passed")
 }
@@ -54,45 +54,46 @@ func FloatIntKV() (search.Cmp, search.T) {
 }
 
 func StrIntKV() (search.Cmp, search.T) {
-	k := alphabet.Ascii.RandString(20)
+	k := alphabet.Ascii.RandString(2) // length of string hugely affect cost of BST
 	v := rand.Intn(n)
 	return search.Str(k), v
 }
 
 func LoopTest(t *testing.T, s search.Searcher, kvfn func() (search.Cmp, search.T)) {
+	s.Clean()
+	verify := make(map[search.Cmp]search.T)
 	for i := 0; i < 200; i++ {
-		BulkInsert(t, s, n, kvfn)
-		BulkDelete(t, s, n, kvfn)
+		BulkInsert(verify, s, n, kvfn)
+		VerifyResult(t, verify, s)
+		BulkDelete(verify, s, n, kvfn)
+		VerifyResult(t, verify, s)
 	}
 }
 
-func BulkInsert(t *testing.T, s search.Searcher, cnt int, kvfn func() (search.Cmp, search.T)) {
-	inserted := make(map[search.Cmp]search.T)
+func BulkInsert(verify map[search.Cmp]search.T, s search.Searcher, cnt int, kvfn func() (search.Cmp, search.T)) {
 	for i := 0; i < cnt; i++ {
-		//search.PrintBinaryTree(s.GetITraversal())
 		k, v := kvfn()
 		s.Put(k, v)
-		inserted[k] = v
-	}
-	for k, v := range inserted {
-		vGot := s.Get(k)
-		if vGot != v {
-			t.Fatalf("get wrong value %v, should be %d", vGot, v)
-		}
+		verify[k] = v
 	}
 }
 
-func BulkDelete(t *testing.T, s search.Searcher, cnt int, gen func() (search.Cmp, search.T)) {
-	deleted := make(map[search.Cmp]struct{})
+func BulkDelete(verify map[search.Cmp]search.T, s search.Searcher, cnt int, gen func() (search.Cmp, search.T)) {
 	for i := 0; i < cnt; i++ {
 		k, _ := gen()
 		s.Del(k)
-		deleted[k] = struct{}{}
+		delete(verify, k)
 	}
-	for k := range deleted {
-		v := s.Get(k)
-		if v != nil {
-			t.Fatalf("delete failed")
+}
+
+func VerifyResult(t *testing.T, verify map[search.Cmp]search.T, s search.Searcher) {
+	if uint(len(verify)) != s.Size() {
+		t.Fatalf("size not equal %d != %d", len(verify), s.Size())
+	}
+	for k, v := range verify {
+		vGot := s.Get(k)
+		if vGot != v {
+			t.Fatalf("get wrong value %v, should be %d", vGot, v)
 		}
 	}
 }
