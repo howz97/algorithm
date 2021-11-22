@@ -16,9 +16,9 @@ func New() *AVL {
 }
 
 func (avl *AVL) Put(key Cmp, val T) {
-	var newNode bool
-	avl.node, newNode = avl.insert(key, val)
-	if newNode {
+	exist := false
+	avl.node, exist = avl.insert(key, val)
+	if !exist {
 		avl.size++
 	}
 }
@@ -40,8 +40,11 @@ func (avl *AVL) GetMax() T {
 }
 
 func (avl *AVL) Del(key Cmp) {
-	avl.node = avl.delete(key)
-	avl.size--
+	exist := false
+	avl.node, exist = avl.delete(key)
+	if exist {
+		avl.size--
+	}
 }
 
 func (avl *AVL) Size() uint {
@@ -50,6 +53,7 @@ func (avl *AVL) Size() uint {
 
 func (avl *AVL) Clean() {
 	avl.node = nil
+	avl.size = 0
 }
 
 type node struct {
@@ -65,26 +69,27 @@ func (n *node) insert(k Cmp, v T) (*node, bool) {
 		n = new(node)
 		n.key = k
 		n.value = v
-		return n, true
+		return n, false
 	}
-	var newNode bool
+	var exist bool
 	switch k.Cmp(n.key) {
 	case Less:
-		n.left, newNode = n.left.insert(k, v)
+		n.left, exist = n.left.insert(k, v)
 		if n.diff() > 1 {
 			n = rotation(n)
 		}
 		n.updateHeight()
 	case More:
-		n.right, newNode = n.right.insert(k, v)
+		n.right, exist = n.right.insert(k, v)
 		if n.diff() < -1 {
 			n = rotation(n)
 		}
 		n.updateHeight()
 	default:
 		n.value = v
+		exist = true
 	}
-	return n, newNode
+	return n, exist
 }
 
 func (n *node) diff() int8 {
@@ -175,24 +180,26 @@ func (n *node) findMax() *node {
 	return n
 }
 
-func (n *node) delete(k Cmp) *node {
+func (n *node) delete(k Cmp) (*node, bool) {
 	if n == nil {
-		return nil
+		return nil, false
 	}
+	var exist bool
 	switch k.Cmp(n.key) {
 	case Less:
-		n.left = n.left.delete(k)
+		n.left, exist = n.left.delete(k)
 	case More:
-		n.right = n.right.delete(k)
+		n.right, exist = n.right.delete(k)
 	default:
 		if n.left == nil {
-			return n.right
+			return n.right, true
 		}
 		if n.right == nil {
-			return n.left
+			return n.left, true
 		}
+		exist = true
 		replacer := n.right.findMin()
-		n.right = n.right.delete(replacer.key)
+		n.right, _ = n.right.delete(replacer.key)
 		replacer.left = n.left
 		replacer.right = n.right
 		n = replacer
@@ -201,7 +208,7 @@ func (n *node) delete(k Cmp) *node {
 	if !n.isBalance() {
 		n = rotation(n)
 	}
-	return n
+	return n, exist
 }
 
 func (n *node) Left() ITraversal {
