@@ -53,3 +53,9 @@ func MaxInt8(a, b int8) int8 {
 	}
 	return b
 }
+
+func ExecCost(fn func()) time.Duration {
+	t := time.Now()
+	fn()
+	return time.Since(t)
+}
