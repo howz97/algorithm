@@ -249,6 +249,7 @@ func (n *node) delete(k Cmp) *node {
 		if k.Cmp(n.key) == Equal && n.rightSon == nil {
 			return nil
 		}
+		// fixme: panic
 		if !n.rightSon.isRed() && !n.rightSon.leftSon.isRed() {
 			n = moveRedRight(n)
 		}
