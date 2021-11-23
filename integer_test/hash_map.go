@@ -2,38 +2,34 @@ package main
 
 import (
 	"fmt"
+	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/search/hash_map"
 )
 
 func main() {
-	ht := hash_map.New(1)
-	ht.Put(hash_map.Str("a"), "A")
-	ht.Put(hash_map.Str("b"), "B")
-	ht.Put(hash_map.Str("c"), "C")
-	ht.Put(hash_map.Str("d"), "D")
-	ht.Put(hash_map.Str("e"), "E")
-	ht.Put(hash_map.Str("f"), "F")
-	ht.Range(func(key hash_map.Key, val hash_map.T) bool {
-		fmt.Println(key, "->", val)
-		return true
-	})
+	hm := hash_map.New(1)
+	hm.Put(search.Str("a"), "A")
+	hm.Put(search.Str("b"), "B")
+	hm.Put(search.Str("c"), "C")
+	hm.Put(search.Str("d"), "D")
+	hm.Put(search.Str("e"), "E")
+	hm.Put(search.Str("f"), "F")
+	hm.Put(search.Str("g"), "G")
+	hm.Put(search.Str("h"), "H")
+	hm.Put(search.Str("i"), "I")
+	fmt.Println(hm.String())
 
-	ht.Del(hash_map.Str("d"))
-	ht.Del(hash_map.Str("f"))
-	ht.Del(hash_map.Str("x"))
-	fmt.Println("after delete (d/f/x) ...")
-	ht.Range(func(key hash_map.Key, val hash_map.T) bool {
-		fmt.Println(key, "->", val)
-		return true
-	})
+	fmt.Println("delete (d/f/g/x) ...")
+	hm.Del(search.Str("d"))
+	hm.Del(search.Str("f"))
+	hm.Del(search.Str("g"))
+	hm.Del(search.Str("x"))
+	fmt.Println(hm.String())
 
-	ht.Range(func(key hash_map.Key, _ hash_map.T) bool {
-		ht.Del(key)
+	fmt.Println("delete all ...")
+	hm.Range(func(key hash_map.Key, _ search.T) bool {
+		hm.Del(key)
 		return true
 	})
-	fmt.Println("after delete all ...", ht.Size(), ht.TblSize())
-	ht.Range(func(key hash_map.Key, val hash_map.T) bool {
-		fmt.Println(key, "->", val)
-		return true
-	})
+	fmt.Println(hm.String())
 }

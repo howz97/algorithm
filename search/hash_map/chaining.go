@@ -1,12 +1,15 @@
 package hash_map
 
 import (
+	"fmt"
 	"github.com/howz97/algorithm/search"
 )
 
 const (
 	maxLoadFactor = 8
 	minLoadFactor = 1
+
+	MinSizeTbl = 1
 )
 
 type Key interface {
@@ -27,11 +30,11 @@ func New(args ...uint) *Chaining {
 	if len(args) == 1 {
 		size = args[0]
 	}
-	if size == 0 {
-		size = 1
+	if size < MinSizeTbl {
+		size = MinSizeTbl
 	}
 	return &Chaining{
-		tbl: makeTable(size),
+		tbl: make(table, size),
 	}
 }
 
@@ -40,31 +43,18 @@ func (c *Chaining) Get(k Key) search.T {
 }
 
 func (c *Chaining) Put(k Key, v search.T) {
-	if v == nil {
-		c.Del(k)
-		return
-	}
-	if c.LoadFactor() >= maxLoadFactor {
-		c.expand()
-	}
-	c.tbl.put(k, v)
-	c.Num++
-}
-
-func (c *Chaining) Range(fn func(key Key, val search.T) bool) {
-	for _, bkt := range c.tbl {
-		nd := bkt.head
-		for nd != nil {
-			if goOn := fn(nd.k, nd.v); !goOn {
-				return
-			}
-			nd = nd.next
+	exist := c.tbl.put(k, v)
+	if !exist {
+		c.Num++
+		if c.LoadFactor() >= maxLoadFactor {
+			c.expand()
 		}
 	}
 }
 
 func (c *Chaining) Del(k Key) {
-	if c.tbl.delete(k) {
+	exist := c.tbl.del(k)
+	if exist {
 		c.Num--
 		if c.LoadFactor() < minLoadFactor {
 			c.shrink()
@@ -74,7 +64,7 @@ func (c *Chaining) Del(k Key) {
 
 func (c *Chaining) Clean() {
 	c.Num = 0
-	c.tbl = makeTable(1)
+	c.tbl = make(table, MinSizeTbl)
 }
 
 func (c *Chaining) TblSize() uint {
@@ -96,12 +86,31 @@ func (c *Chaining) expand() {
 }
 
 func (c *Chaining) shrink() {
-	if c.TblSize() == 1 {
+	size := c.TblSize() >> 1
+	if size < MinSizeTbl {
 		return
 	}
-	newTbl := make([]bucket, c.TblSize()/2)
+	newTbl := make([]bucket, size)
 	tblMove(c.tbl, newTbl)
 	c.tbl = newTbl
+}
+
+func (c *Chaining) Range(fn func(key Key, val search.T) bool) {
+	c.tbl.Range(fn)
+}
+
+func (c *Chaining) String() string {
+	str := fmt.Sprintf("size=%d\n", c.Size())
+	for i, b := range c.tbl {
+		str += fmt.Sprintf("bucket%d: ", i)
+		n := b.head
+		for n != nil {
+			str += fmt.Sprintf("(%v:%v) -> ", n.k, n.v)
+			n = n.next
+		}
+		str += "nil\n"
+	}
+	return str
 }
 
 func tblMove(src table, dst table) {
@@ -116,42 +125,32 @@ func tblMove(src table, dst table) {
 
 type table []bucket
 
-func makeTable(size uint) table {
-	return make(table, size)
-}
-
-func (t table) put(k Key, v search.T) {
-	t[k.Hash()%t.size()].put(k, v)
+func (t table) put(k Key, v search.T) bool {
+	return t[k.Hash()%t.size()].put(k, v)
 }
 
 func (t table) get(k Key) search.T {
 	return t[k.Hash()%t.size()].get(k)
 }
 
-func (t table) delete(k Key) bool {
-	return t[k.Hash()%t.size()].delete(k)
+func (t table) del(k Key) bool {
+	return t[k.Hash()%t.size()].del(k)
 }
 
 func (t table) size() uint {
 	return uint(len(t))
 }
 
-type bucket struct {
-	head *node
-}
-
-func (b *bucket) put(k Key, v search.T) {
-	b.head = b.head.put(k, v)
-}
-
-func (b *bucket) get(k Key) search.T {
-	return b.head.get(k)
-}
-
-func (b *bucket) delete(k Key) bool {
-	var deleted bool
-	b.head, deleted = b.head.delete(k)
-	return deleted
+func (t table) Range(fn func(key Key, val search.T) bool) {
+	for _, bkt := range t {
+		nd := bkt.head
+		for nd != nil {
+			if goOn := fn(nd.k, nd.v); !goOn {
+				return
+			}
+			nd = nd.next
+		}
+	}
 }
 
 type node struct {
@@ -160,39 +159,67 @@ type node struct {
 	next *node
 }
 
-func (n *node) put(k Key, v search.T) *node {
-	if n == nil {
-		return &node{
+type bucket struct {
+	head *node
+}
+
+func (b *bucket) put(k Key, v search.T) bool {
+	if b.head == nil {
+		b.head = &node{
 			k: k,
 			v: v,
 		}
+		return false
 	}
-	if k.Cmp(n.k) == search.Equal {
-		n.v = v
-	} else {
-		n.next = n.next.put(k, v)
+	if b.head.k.Cmp(k) == search.Equal {
+		b.head.v = v
+		return true
 	}
-	return n
+	pre := b.head
+	n := b.head.next
+	for n != nil {
+		if n.k.Cmp(k) == search.Equal {
+			n.v = v
+			return true
+		}
+		pre = n
+		n = n.next
+	}
+	pre.next = &node{
+		k: k,
+		v: v,
+	}
+	return false
 }
 
-func (n *node) get(k Key) search.T {
-	if n == nil {
-		return nil
+func (b *bucket) get(k Key) search.T {
+	n := b.head
+	for n != nil {
+		if n.k.Cmp(k) == search.Equal {
+			return n.v
+		}
+		n = n.next
 	}
-	if k.Cmp(n.k) == search.Equal {
-		return n.v
-	}
-	return n.next.get(k)
+	return nil
 }
 
-func (n *node) delete(k Key) (*node, bool) {
-	if n == nil {
-		return nil, false
+func (b *bucket) del(k Key) bool {
+	if b.head == nil {
+		return false
 	}
-	if k.Cmp(n.k) == search.Equal {
-		return n.next, true
+	if b.head.k.Cmp(k) == search.Equal {
+		b.head = b.head.next
+		return true
 	}
-	var deleted bool
-	n.next, deleted = n.next.delete(k)
-	return n, deleted
+	pre := b.head
+	n := b.head.next
+	for n != nil {
+		if n.k.Cmp(k) == search.Equal {
+			pre.next = n.next
+			return true
+		}
+		pre = n
+		n = n.next
+	}
+	return false
 }

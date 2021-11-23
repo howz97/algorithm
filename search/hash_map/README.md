@@ -4,54 +4,50 @@ package main
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/hash_table"
+	"github.com/howz97/algorithm/search"
+	"github.com/howz97/algorithm/search/hash_map"
 )
 
 func main() {
-	ht := hash_table.New(1)
-	ht.Put(hash_table.Str("a"), "A")
-	ht.Put(hash_table.Str("b"), "B")
-	ht.Put(hash_table.Str("c"), "C")
-	ht.Put(hash_table.Str("d"), "D")
-	ht.Put(hash_table.Str("e"), "E")
-	ht.Put(hash_table.Str("f"), "F")
-	ht.Range(func(key hash_table.Key, val hash_table.T) bool {
-		fmt.Println(key, "->", val)
-		return true
-	})
+	hm := hash_map.New(1)
+	hm.Put(search.Str("a"), "A")
+	hm.Put(search.Str("b"), "B")
+	hm.Put(search.Str("c"), "C")
+	hm.Put(search.Str("d"), "D")
+	hm.Put(search.Str("e"), "E")
+	hm.Put(search.Str("f"), "F")
+	hm.Put(search.Str("g"), "G")
+	hm.Put(search.Str("h"), "H")
+	hm.Put(search.Str("i"), "I")
+	fmt.Println(hm.String())
 
-	ht.Delete(hash_table.Str("d"))
-	ht.Delete(hash_table.Str("f"))
-	ht.Delete(hash_table.Str("x"))
-	fmt.Println("after delete (d/f/x) ...")
-	ht.Range(func(key hash_table.Key, val hash_table.T) bool {
-		fmt.Println(key, "->", val)
-		return true
-	})
+	fmt.Println("delete (d/f/g/x) ...")
+	hm.Del(search.Str("d"))
+	hm.Del(search.Str("f"))
+	hm.Del(search.Str("g"))
+	hm.Del(search.Str("x"))
+	fmt.Println(hm.String())
 
-	ht.Range(func(key hash_table.Key, _ hash_table.T) bool {
-		ht.Delete(key)
+	fmt.Println("delete all ...")
+	hm.Range(func(key hash_map.Key, _ search.T) bool {
+		hm.Del(key)
 		return true
 	})
-	fmt.Println("after delete all ...", ht.Size(), ht.TblSize())
-	ht.Range(func(key hash_table.Key, val hash_table.T) bool {
-		fmt.Println(key, "->", val)
-		return true
-	})
+	fmt.Println(hm.String())
 }
 
 /*
-a -> A
-b -> B
-c -> C
-d -> D
-e -> E
-f -> F
-after delete (d/f/x) ...
-a -> A
-b -> B
-c -> C
-e -> E
-after delete all ... 0 1
+size=9
+bucket0: (b:B) -> (d:D) -> (f:F) -> (h:H) -> nil
+bucket1: (a:A) -> (c:C) -> (e:E) -> (g:G) -> (i:I) -> nil
+
+delete (d/f/g) ...
+size=6
+bucket0: (b:B) -> (h:H) -> nil
+bucket1: (a:A) -> (c:C) -> (e:E) -> (i:I) -> nil
+
+delete all ...
+size=0
+bucket0: nil
 */
 ```

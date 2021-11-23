@@ -87,13 +87,13 @@ func BulkDelete(verify map[search.Cmp]search.T, s search.Searcher, cnt int, gen 
 }
 
 func VerifyResult(t *testing.T, verify map[search.Cmp]search.T, s search.Searcher) {
-	if uint(len(verify)) != s.Size() {
-		t.Fatalf("size not equal %d != %d", len(verify), s.Size())
-	}
 	for k, v := range verify {
 		vGot := s.Get(k)
 		if vGot != v {
-			t.Fatalf("get wrong value %v, should be %d", vGot, v)
+			t.Fatalf("key %v has wrong value %v, should be %v", k, vGot, v)
 		}
+	}
+	if uint(len(verify)) != s.Size() {
+		t.Fatalf("size not equal %d != %d", len(verify), s.Size())
 	}
 }
