@@ -9,7 +9,7 @@ https://github.com/howz97/algorithm/tree/master/trie_tree
 * 子字符串查找 (KMP/BoyerMoore/RabinKarp)
 https://github.com/howz97/algorithm/tree/master/string_search
 * 平衡二叉树
-https://github.com/howz97/algorithm/tree/master/search
+https://github.com/howz97/algorithm/tree/master/search/avltree
 * 链式哈希表
 https://github.com/howz97/algorithm/tree/master/search/hash_map
 * 带权重有向图的最短路径算法 (Dijkstra/Topological/BellmanFord)
