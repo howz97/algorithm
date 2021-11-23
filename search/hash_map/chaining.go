@@ -46,7 +46,7 @@ func (c *Chaining) Put(k Key, v search.T) {
 	exist := c.tbl.put(k, v)
 	if !exist {
 		c.Num++
-		if c.LoadFactor() >= maxLoadFactor {
+		if c.loadFactor() >= maxLoadFactor {
 			c.expand()
 		}
 	}
@@ -56,7 +56,7 @@ func (c *Chaining) Del(k Key) {
 	exist := c.tbl.del(k)
 	if exist {
 		c.Num--
-		if c.LoadFactor() < minLoadFactor {
+		if c.loadFactor() < minLoadFactor {
 			c.shrink()
 		}
 	}
@@ -67,7 +67,7 @@ func (c *Chaining) Clean() {
 	c.tbl = make(table, MinSizeTbl)
 }
 
-func (c *Chaining) TblSize() uint {
+func (c *Chaining) numBuckets() uint {
 	return c.tbl.size()
 }
 
@@ -75,18 +75,18 @@ func (c *Chaining) Size() uint {
 	return c.Num
 }
 
-func (c *Chaining) LoadFactor() uint {
-	return c.Size() / c.TblSize()
+func (c *Chaining) loadFactor() uint {
+	return c.Size() / c.numBuckets()
 }
 
 func (c *Chaining) expand() {
-	newTbl := make([]bucket, c.TblSize()*2)
+	newTbl := make([]bucket, c.numBuckets()*2)
 	tblMove(c.tbl, newTbl)
 	c.tbl = newTbl
 }
 
 func (c *Chaining) shrink() {
-	size := c.TblSize() >> 1
+	size := c.numBuckets() >> 1
 	if size < MinSizeTbl {
 		return
 	}
