@@ -40,17 +40,31 @@ var match = map[string][2][]string{
 
 func main() {
 	for pattern, sli := range match {
+		re, err := regexp.Compile(pattern)
+		if err != nil {
+			panic(err)
+		}
 		for _, str := range sli[Match] {
-			if !regexp.IsMatch(pattern, str) {
+			if !re.Match(str) {
 				panic(fmt.Sprintf("%s not match %s", pattern, str))
 			}
 		}
 		for _, str := range sli[UnMatch] {
-			if regexp.IsMatch(pattern, str) {
+			if re.Match(str) {
 				panic(fmt.Sprintf("%s match %s", pattern, str))
 			}
 		}
 	}
+
+	invalid := []string{`\u12`, `{123)`}
+	for _, p := range invalid {
+		_, err := regexp.Compile(p)
+		fmt.Println(p, err)
+		if err == nil {
+			panic(fmt.Sprintf("compile %s should not pass", p))
+		}
+	}
+	fmt.Println("Passed!")
 }
 ```
 
