@@ -11,25 +11,24 @@ import (
 	"unicode/utf8"
 )
 
-// IsMatch return whether the txt is match with the pattern
 func IsMatch(pattern, txt string) bool {
-	symbolTbl := parsePattern(pattern)
-	g := createNFA(symbolTbl)
-	reachableStatus := getStartStatus(g)
+	table := makeSymbolTable(compile([]rune(pattern)))
+	nfa := makeNFA(table)
+	reachableStatus := getStartStatus(nfa)
 	for _, r := range txt {
 		statusAfterMatch := set.NewIntSet()
 		for !reachableStatus.IsEmpty() {
 			status := reachableStatus.RemoveOne()
-			if status < len(symbolTbl) && match(symbolTbl[status], r) {
+			if status < len(table) && match(table[status], r) {
 				statusAfterMatch.Add(status + 1)
 			}
 		}
 		if statusAfterMatch.IsEmpty() {
 			return false
 		}
-		getReachableStatus(g, statusAfterMatch, reachableStatus)
+		getReachableStatus(nfa, statusAfterMatch, reachableStatus)
 	}
-	return reachableStatus.Contains(len(symbolTbl))
+	return reachableStatus.Contains(len(table))
 }
 
 func match(s symbol, r rune) bool {
@@ -41,33 +40,31 @@ type symbol struct {
 	r       rune
 }
 
-func parsePattern(pattern string) []symbol {
-	// this can only transfer \( \) \| \* \. \\
-	pttrnRunes := compile([]rune(pattern))
-	numRunes := len(pttrnRunes)
-	symbolTable := make([]symbol, 0, numRunes)
-	for i := 0; i < numRunes; i++ {
-		if pttrnRunes[i] == '\\' {
+func makeSymbolTable(compiled []rune) []symbol {
+	symbols := make([]symbol, 0, len(compiled))
+	for i := 0; i < len(compiled); i++ {
+		if compiled[i] == '\\' {
 			i++
-			if !canBeTransferred(pttrnRunes[i]) {
-				panic(fmt.Sprintf("invalid transfer: \\%v", string(pttrnRunes[i])))
+			if !canBeTransferred(compiled[i]) {
+				panic(fmt.Sprintf("invalid transfer: \\%v", string(compiled[i])))
 			}
-			symbolTable = append(symbolTable, symbol{
+			symbols = append(symbols, symbol{
 				isPrime: false,
-				r:       pttrnRunes[i],
+				r:       compiled[i],
 			})
 			continue
 		}
-		symbolTable = append(symbolTable, symbol{
-			isPrime: isPrimeRune(pttrnRunes[i]),
-			r:       pttrnRunes[i],
+		symbols = append(symbols, symbol{
+			isPrime: isPrimeRune(compiled[i]),
+			r:       compiled[i],
 		})
 	}
-	return symbolTable
+	return symbols
 }
 
+// compile high-level grammar into low-level grammar
 func compile(pattern []rune) []rune {
-	handled := make([]rune, 0, len(pattern)*2)
+	compiled := make([]rune, 0, len(pattern)*2)
 	lp := 0
 	lpStack := stack.NewStackInt(10) // 随意设定
 	for i := 0; i < len(pattern); i++ {
@@ -75,22 +72,24 @@ func compile(pattern []rune) []rune {
 		case '\\': // must put \ on top case
 			lp = i
 			i++
-			handled = append(handled, '\\', pattern[i])
+			compiled = append(compiled, '\\', pattern[i])
 		case '(':
-			lpStack.Push(len(handled))
-			handled = append(handled, '(')
+			lpStack.Push(len(compiled))
+			compiled = append(compiled, '(')
 		case ')':
 			lp = lpStack.Pop()
-			handled = append(handled, ')')
+			compiled = append(compiled, ')')
 		case '+':
-			handled = append(handled, handled[lp:]...)
-			handled = append(handled, '*')
+			// "(regexp)+" -> "(regexp)(regexp)*"
+			compiled = append(compiled, compiled[lp:]...)
+			compiled = append(compiled, '*')
 		case '?':
-			lastRegExp := make([]rune, len(handled[lp:]))
-			copy(lastRegExp, handled[lp:])
-			handled = append(handled[:lp], '(')
-			handled = append(handled, lastRegExp...)
-			handled = append(handled, '|', ')')
+			// "(regexp)?" -> "(regexp|)"
+			lastRegExp := make([]rune, len(compiled[lp:]))
+			copy(lastRegExp, compiled[lp:])
+			compiled = append(compiled[:lp], '(')
+			compiled = append(compiled, lastRegExp...)
+			compiled = append(compiled, '|', ')')
 		case '{':
 			rb := indexRune(pattern[i:], '}')
 			if rb < 0 {
@@ -102,9 +101,11 @@ func compile(pattern []rune) []rune {
 				panic(fmt.Sprintf("[surround %v] nothing in bracket", i))
 			}
 			hyphen := indexRune(inBrackets, '-')
-			lastRegExp := make([]rune, len(handled[lp:]))
-			copy(lastRegExp, handled[lp:])
-			if hyphen < 0 { // a number in brackets: {n}
+			lastRegExp := make([]rune, len(compiled[lp:]))
+			copy(lastRegExp, compiled[lp:])
+			if hyphen < 0 {
+				// repeat regexp for n times
+				// example: "(regexp){3}" -> "(regexp)(regexp)(regexp)"
 				n, err := strconv.Atoi(string(inBrackets))
 				if err != nil {
 					panic(fmt.Sprintf("[surround %v] not a number in bracket: %v", i, err.Error()))
@@ -112,37 +113,39 @@ func compile(pattern []rune) []rune {
 				if n < 1 {
 					panic(fmt.Sprintf("[surround %v] number in bracket less than 1", i))
 				}
-				handled = append(handled, repeatRunes(lastRegExp, n-1)...)
-			} else { // a range in brackets: {n-m}
-				lowerLimit, err := strconv.Atoi(string(inBrackets[:hyphen]))
+				compiled = append(compiled, repeatRunes(lastRegExp, n-1)...)
+			} else {
+				// repeat regexp for lo-hi times
+				// example: "(regexp){1-3}" -> "((regexp)|(regexp)(regexp)|(regexp)(regexp)(regexp))"
+				lo, err := strconv.Atoi(string(inBrackets[:hyphen]))
 				if err != nil {
 					panic(fmt.Sprintf("[surround %v] invalid range in bracket: %v", i, err.Error()))
 				}
-				if lowerLimit < 0 {
+				if lo < 0 {
 					panic(fmt.Sprintf("[surround %v] invalid range in bracket", i))
 				}
-				upperLimit, err := strconv.Atoi(string(inBrackets[hyphen+1:]))
+				hi, err := strconv.Atoi(string(inBrackets[hyphen+1:]))
 				if err != nil {
 					panic(fmt.Sprintf("[surround %v] invalid range in bracket: %v", i, err.Error()))
 				}
-				if upperLimit <= lowerLimit {
+				if hi <= lo {
 					panic(fmt.Sprintf("[surround %v] invalid range in bracket", i))
 				}
-				handled = append(handled[:lp], '(')
-				for j := lowerLimit; j <= upperLimit; j++ {
-					handled = append(handled, repeatRunes(lastRegExp, j)...)
-					if j != upperLimit {
-						handled = append(handled, '|')
+				compiled = append(compiled[:lp], '(')
+				for j := lo; j <= hi; j++ {
+					compiled = append(compiled, repeatRunes(lastRegExp, j)...)
+					if j != hi {
+						compiled = append(compiled, '|')
 					}
 				}
-				handled = append(handled, ')')
+				compiled = append(compiled, ')')
 			}
 		default:
-			handled = append(handled, pattern[i])
+			compiled = append(compiled, pattern[i])
 			lp = i
 		}
 	}
-	return handled
+	return compiled
 }
 
 // characterSetConv convert character set to multiple OR.
@@ -199,7 +202,7 @@ func getStartStatus(g digraph.Digraph) set.IntSet {
 	return startStatus
 }
 
-func createNFA(symbolTable []symbol) digraph.Digraph {
+func makeNFA(symbolTable []symbol) digraph.Digraph {
 	tblSize := len(symbolTable)
 	g := digraph.NewDigraph(tblSize + 1)
 	stck := stack.NewStackInt(tblSize)
