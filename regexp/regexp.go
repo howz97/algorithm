@@ -1,6 +1,7 @@
 package regexp
 
 import (
+	"errors"
 	"fmt"
 	"github.com/howz97/algorithm/graphs/digraph"
 	"github.com/howz97/algorithm/queue"
@@ -11,33 +12,79 @@ import (
 	"unicode/utf8"
 )
 
-func IsMatch(pattern, txt string) bool {
-	table := makeSymbolTable(compile([]rune(pattern)))
-	nfa := makeNFA(table)
-	reachableStatus := getStartStatus(nfa)
-	for _, r := range txt {
-		statusAfterMatch := set.NewIntSet()
-		for !reachableStatus.IsEmpty() {
-			status := reachableStatus.RemoveOne()
-			if status < len(table) && match(table[status], r) {
-				statusAfterMatch.Add(status + 1)
-			}
-		}
-		if statusAfterMatch.IsEmpty() {
+type Regexp struct {
+	table []symbol
+	nfa   digraph.Digraph
+	start *digraph.DFS
+}
+
+func (re *Regexp) Match(str string) bool {
+	curStatus := re.startStatus()
+	for _, r := range str {
+		arrived := re.forwardStatus(curStatus, r)
+		if arrived.IsEmpty() {
 			return false
 		}
-		getReachableStatus(nfa, statusAfterMatch, reachableStatus)
+		curStatus = re.updateCurStatus(arrived)
 	}
-	return reachableStatus.Contains(len(table))
+	return curStatus.Contains(len(re.table))
 }
 
-func match(s symbol, r rune) bool {
-	return isWildCard(s) || (!s.isPrime && s.r == r)
+func (re *Regexp) startStatus() set.IntSet {
+	if re.start == nil {
+		re.start = digraph.NewDFS(re.nfa, 0)
+	}
+	start := set.NewIntSet()
+	rvQ := re.start.ReachableVertices() // todo optimize
+	for !rvQ.IsEmpty() {
+		start.Add(rvQ.Front())
+	}
+	return start
 }
 
-type symbol struct {
-	isPrime bool
-	r       rune
+func (re *Regexp) forwardStatus(curStatus set.IntSet, r rune) set.IntSet {
+	arrived := set.NewIntSet()
+	for !curStatus.IsEmpty() {
+		s := curStatus.RemoveOne()
+		if re.table[s].match(r) {
+			arrived.Add(s + 1)
+		}
+	}
+	return arrived
+}
+
+func (re *Regexp) updateCurStatus(src set.IntSet) set.IntSet {
+	// todo optimize
+	tc := digraph.NewTransitiveClosure(re.nfa)
+	srcQ := queue.NewIntQ()
+	for !src.IsEmpty() {
+		srcQ.PushBack(src.RemoveOne())
+	}
+	reachable := set.NewIntSet()
+	reachableQ := tc.ReachableVertices(srcQ)
+	for !reachableQ.IsEmpty() {
+		reachable.Add(reachableQ.Front())
+	}
+	return reachable
+}
+
+func Compile(pattern string) (*Regexp, error) {
+	compiled, err := compile([]rune(pattern))
+	if err != nil {
+		return nil, err
+	}
+	re := new(Regexp)
+	re.table = makeSymbolTable(compiled)
+	re.nfa = makeNFA(re.table)
+	return re, nil
+}
+
+func Match(pattern, str string) (bool, error) {
+	re, err := Compile(pattern)
+	if err != nil {
+		return false, err
+	}
+	return re.Match(str), nil
 }
 
 func makeSymbolTable(compiled []rune) []symbol {
@@ -45,9 +92,6 @@ func makeSymbolTable(compiled []rune) []symbol {
 	for i := 0; i < len(compiled); i++ {
 		if compiled[i] == '\\' {
 			i++
-			if !canBeTransferred(compiled[i]) {
-				panic(fmt.Sprintf("invalid transfer: \\%v", string(compiled[i])))
-			}
 			symbols = append(symbols, symbol{
 				isPrime: false,
 				r:       compiled[i],
@@ -62,56 +106,59 @@ func makeSymbolTable(compiled []rune) []symbol {
 	return symbols
 }
 
-// compile high-level grammar into low-level grammar
-func compile(pattern []rune) []rune {
-	compiled := make([]rune, 0, len(pattern)*2)
-	lp := 0
-	lpStack := stack.NewStackInt(10) // 随意设定
+// compile high-level grammar into low-level grammar fixme: detect invalid pattern
+func compile(pattern []rune) ([]rune, error) {
+	compiled := make([]rune, 0, len(pattern)<<1)
+	left := 0
+	lpStack := stack.NewStackInt(0)
 	for i := 0; i < len(pattern); i++ {
 		switch pattern[i] {
 		case '\\': // must put \ on top case
-			lp = i
+			left = i
 			i++
+			if !isTransferable(pattern[i]) {
+				return nil, errors.New(fmt.Sprintf("invalid transfer: \\%v", string(pattern[i])))
+			}
 			compiled = append(compiled, '\\', pattern[i])
 		case '(':
 			lpStack.Push(len(compiled))
 			compiled = append(compiled, '(')
 		case ')':
-			lp = lpStack.Pop()
+			left = lpStack.Pop()
 			compiled = append(compiled, ')')
 		case '+':
 			// "(regexp)+" -> "(regexp)(regexp)*"
-			compiled = append(compiled, compiled[lp:]...)
+			compiled = append(compiled, compiled[left:]...)
 			compiled = append(compiled, '*')
 		case '?':
 			// "(regexp)?" -> "(regexp|)"
-			lastRegExp := make([]rune, len(compiled[lp:]))
-			copy(lastRegExp, compiled[lp:])
-			compiled = append(compiled[:lp], '(')
+			lastRegExp := make([]rune, len(compiled[left:]))
+			copy(lastRegExp, compiled[left:])
+			compiled = append(compiled[:left], '(')
 			compiled = append(compiled, lastRegExp...)
 			compiled = append(compiled, '|', ')')
 		case '{':
 			rb := indexRune(pattern[i:], '}')
 			if rb < 0 {
-				panic(fmt.Sprintf("[surround %v] no corresponding right bracket", i))
+				return nil, errors.New(fmt.Sprintf("[surround %v] no corresponding right bracket", i))
 			}
 			inBrackets := pattern[i+1 : rb+i]
 			i += rb
 			if len(inBrackets) == 0 {
-				panic(fmt.Sprintf("[surround %v] nothing in bracket", i))
+				return nil, errors.New(fmt.Sprintf("[surround %v] nothing in bracket", i))
 			}
 			hyphen := indexRune(inBrackets, '-')
-			lastRegExp := make([]rune, len(compiled[lp:]))
-			copy(lastRegExp, compiled[lp:])
+			lastRegExp := make([]rune, len(compiled[left:]))
+			copy(lastRegExp, compiled[left:])
 			if hyphen < 0 {
 				// repeat regexp for n times
 				// example: "(regexp){3}" -> "(regexp)(regexp)(regexp)"
 				n, err := strconv.Atoi(string(inBrackets))
 				if err != nil {
-					panic(fmt.Sprintf("[surround %v] not a number in bracket: %v", i, err.Error()))
+					return nil, errors.New(fmt.Sprintf("[surround %v] not a number in bracket: %v", i, err.Error()))
 				}
 				if n < 1 {
-					panic(fmt.Sprintf("[surround %v] number in bracket less than 1", i))
+					return nil, errors.New(fmt.Sprintf("[surround %v] number in bracket less than 1", i))
 				}
 				compiled = append(compiled, repeatRunes(lastRegExp, n-1)...)
 			} else {
@@ -119,19 +166,19 @@ func compile(pattern []rune) []rune {
 				// example: "(regexp){1-3}" -> "((regexp)|(regexp)(regexp)|(regexp)(regexp)(regexp))"
 				lo, err := strconv.Atoi(string(inBrackets[:hyphen]))
 				if err != nil {
-					panic(fmt.Sprintf("[surround %v] invalid range in bracket: %v", i, err.Error()))
+					return nil, errors.New(fmt.Sprintf("[surround %v] invalid range in bracket: %v", i, err.Error()))
 				}
 				if lo < 0 {
-					panic(fmt.Sprintf("[surround %v] invalid range in bracket", i))
+					return nil, errors.New(fmt.Sprintf("[surround %v] invalid range in bracket", i))
 				}
 				hi, err := strconv.Atoi(string(inBrackets[hyphen+1:]))
 				if err != nil {
-					panic(fmt.Sprintf("[surround %v] invalid range in bracket: %v", i, err.Error()))
+					return nil, errors.New(fmt.Sprintf("[surround %v] invalid range in bracket: %v", i, err.Error()))
 				}
 				if hi <= lo {
-					panic(fmt.Sprintf("[surround %v] invalid range in bracket", i))
+					return nil, errors.New(fmt.Sprintf("[surround %v] invalid range in bracket", i))
 				}
-				compiled = append(compiled[:lp], '(')
+				compiled = append(compiled[:left], '(')
 				for j := lo; j <= hi; j++ {
 					compiled = append(compiled, repeatRunes(lastRegExp, j)...)
 					if j != hi {
@@ -142,10 +189,10 @@ func compile(pattern []rune) []rune {
 			}
 		default:
 			compiled = append(compiled, pattern[i])
-			lp = i
+			left = i
 		}
 	}
-	return compiled
+	return compiled, nil
 }
 
 // characterSetConv convert character set to multiple OR.
@@ -176,49 +223,27 @@ func isPrimeRune(r rune) bool {
 	return r == '(' || r == ')' || r == '|' || r == '*' || r == '.'
 }
 
-func canBeTransferred(r rune) bool {
+func isTransferable(r rune) bool {
 	return r == '(' || r == ')' || r == '|' || r == '*' || r == '.' || r == '\\'
 }
 
-func getReachableStatus(g digraph.Digraph, src, reachable set.IntSet) {
-	tc := digraph.NewTransitiveClosure(g)
-	srcQ := queue.NewIntQ()
-	for !src.IsEmpty() {
-		srcQ.PushBack(src.RemoveOne())
-	}
-	reachableQ := tc.ReachableVertices(srcQ)
-	for !reachableQ.IsEmpty() {
-		reachable.Add(reachableQ.Front())
-	}
-}
-
-func getStartStatus(g digraph.Digraph) set.IntSet {
-	startStatus := set.NewIntSet()
-	dfs := digraph.NewDFS(g, 0)
-	rvQ := dfs.ReachableVertices()
-	for !rvQ.IsEmpty() {
-		startStatus.Add(rvQ.Front())
-	}
-	return startStatus
-}
-
-func makeNFA(symbolTable []symbol) digraph.Digraph {
-	tblSize := len(symbolTable)
-	g := digraph.NewDigraph(tblSize + 1)
-	stck := stack.NewStackInt(tblSize)
-	for i, symbl := range symbolTable {
+func makeNFA(table []symbol) digraph.Digraph {
+	size := len(table)
+	g := digraph.NewDigraph(size + 1)
+	stk := stack.NewStackInt(size)
+	for i, syb := range table {
 		leftBracket := i
-		if symbl.isPrime && (symbl.r == '(' || symbl.r == ')' || symbl.r == '*') {
+		if syb.isPrime && (syb.r == '(' || syb.r == ')' || syb.r == '*') {
 			g.AddEdge(i, i+1)
 		}
-		if symbl.isPrime && (symbl.r == '(' || symbl.r == '|') {
-			stck.Push(i)
+		if syb.isPrime && (syb.r == '(' || syb.r == '|') {
+			stk.Push(i)
 		}
-		if symbl.isPrime && symbl.r == ')' {
+		if syb.isPrime && syb.r == ')' {
 			allOr := queue.NewIntQ()
-			for !stck.IsEmpty() {
-				out := stck.Pop()
-				if symbolTable[out].r == '|' {
+			for !stk.IsEmpty() {
+				out := stk.Pop()
+				if table[out].r == '|' {
 					allOr.PushBack(out)
 				} else { // got '('
 					leftBracket = out
@@ -231,7 +256,7 @@ func makeNFA(symbolTable []symbol) digraph.Digraph {
 				g.AddEdge(or, i)
 			}
 		}
-		if i+1 < tblSize && isClosure(symbolTable[i+1]) {
+		if i+1 < size && table[i+1].isClosure() {
 			g.AddEdge(leftBracket, i+1)
 			g.AddEdge(i+1, leftBracket)
 		}
@@ -239,10 +264,23 @@ func makeNFA(symbolTable []symbol) digraph.Digraph {
 	return g
 }
 
-func isWildCard(s symbol) bool {
+type symbol struct {
+	isPrime bool
+	r       rune
+}
+
+func (s symbol) match(r rune) bool {
+	return s.equal(r) || s.isWildCard()
+}
+
+func (s symbol) isWildCard() bool {
 	return s.isPrime && s.r == '.'
 }
 
-func isClosure(s symbol) bool {
+func (s symbol) equal(r rune) bool {
+	return !s.isPrime && s.r == r
+}
+
+func (s symbol) isClosure() bool {
 	return s.isPrime && s.r == '*'
 }
