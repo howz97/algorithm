@@ -99,7 +99,7 @@ func makeSymbolTable(compiled []rune) []symbol {
 			continue
 		}
 		symbols = append(symbols, symbol{
-			isPrime: isPrimeRune(compiled[i]),
+			isPrime: isPrime(compiled[i]),
 			r:       compiled[i],
 		})
 	}
@@ -195,12 +195,12 @@ func compile(pattern []rune) ([]rune, error) {
 	return compiled, nil
 }
 
-// characterSetConv convert character set to multiple OR.
-// [abc] => (a|b|c)
-// [0-9] => (0|1|2|3|4|5|6|7|8|9)
-// [^abc] => complement of (a|b|c)
-func characterSetConv(cs []rune) []rune {
-	return nil
+func isPrime(r rune) bool {
+	return r == '(' || r == ')' || r == '|' || r == '*' || r == '.'
+}
+
+func isTransferable(r rune) bool {
+	return isPrime(r) || r == '\\'
 }
 
 func repeatRunes(runes []rune, count int) []rune {
@@ -219,49 +219,47 @@ func indexRune(runes []rune, r rune) int {
 	return -1
 }
 
-func isPrimeRune(r rune) bool {
-	return r == '(' || r == ')' || r == '|' || r == '*' || r == '.'
-}
-
-func isTransferable(r rune) bool {
-	return r == '(' || r == ')' || r == '|' || r == '*' || r == '.' || r == '\\'
-}
-
 func makeNFA(table []symbol) digraph.Digraph {
 	size := len(table)
-	g := digraph.NewDigraph(size + 1)
+	nfa := digraph.NewDigraph(size + 1)
 	stk := stack.NewStackInt(size)
 	for i, syb := range table {
-		leftBracket := i
-		if syb.isPrime && (syb.r == '(' || syb.r == ')' || syb.r == '*') {
-			g.AddEdge(i, i+1)
-		}
-		if syb.isPrime && (syb.r == '(' || syb.r == '|') {
-			stk.Push(i)
-		}
-		if syb.isPrime && syb.r == ')' {
-			allOr := queue.NewIntQ()
-			for !stk.IsEmpty() {
-				out := stk.Pop()
-				if table[out].r == '|' {
-					allOr.PushBack(out)
-				} else { // got '('
-					leftBracket = out
-					break
+		left := i
+		if syb.isPrime {
+			switch syb.r {
+			case '(':
+				nfa.AddEdge(i, i+1)
+				stk.Push(i)
+			case ')':
+				nfa.AddEdge(i, i+1)
+				allOr := queue.NewIntQ()
+				for !stk.IsEmpty() {
+					out := stk.Pop()
+					if table[out].r == '|' {
+						allOr.PushBack(out)
+					} else {
+						// got '('
+						left = out
+						break
+					}
 				}
-			}
-			for !allOr.IsEmpty() {
-				or := allOr.Front()
-				g.AddEdge(leftBracket, or+1)
-				g.AddEdge(or, i)
+				for !allOr.IsEmpty() {
+					or := allOr.Front()
+					nfa.AddEdge(left, or+1)
+					nfa.AddEdge(or, i)
+				}
+			case '*':
+				nfa.AddEdge(i, i+1)
+			case '|':
+				stk.Push(i)
 			}
 		}
 		if i+1 < size && table[i+1].isClosure() {
-			g.AddEdge(leftBracket, i+1)
-			g.AddEdge(i+1, leftBracket)
+			nfa.AddEdge(left, i+1)
+			nfa.AddEdge(i+1, left)
 		}
 	}
-	return g
+	return nfa
 }
 
 type symbol struct {
