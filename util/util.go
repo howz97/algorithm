@@ -59,3 +59,12 @@ func ExecCost(fn func()) time.Duration {
 	fn()
 	return time.Since(t)
 }
+
+func IndexInt(ints []int, n int) int {
+	for i, e := range ints {
+		if e == n {
+			return i
+		}
+	}
+	return -1
+}

@@ -1,52 +1,23 @@
 package digraph
 
-import "github.com/howz97/algorithm/queue"
-
-type DFS struct {
-	g      Digraph
-	marked []bool
-}
-
-func (g Digraph) DFS(src int) *DFS {
-	dfs := &DFS{
-		g:      g,
-		marked: make([]bool, g.NumV()),
+func (g Digraph) DFS(src int) []int {
+	marked := make([]bool, g.NumV())
+	doDFS(src, g, marked)
+	var arrived []int
+	for v, m := range marked {
+		if m {
+			arrived = append(arrived, v)
+		}
 	}
-	dfs.doDFS(src)
-	return dfs
+	return arrived
 }
 
-func (dfs *DFS) doDFS(v int) {
-	dfs.marked[v] = true
-	adj := dfs.g.Adjacent(v)
+func doDFS(v int, g Digraph, marked []bool) {
+	marked[v] = true
+	adj := g.Adjacent(v)
 	for _, w := range adj {
-		if !dfs.marked[w] {
-			dfs.doDFS(w)
-		}
-	}
-}
-
-func (dfs *DFS) CanReach(dst int) bool {
-	return dfs.marked[dst]
-}
-
-func (dfs *DFS) ReachableVertices() *queue.IntQ {
-	q := queue.NewIntQ()
-	for i, b := range dfs.marked {
-		if b {
-			q.PushBack(i)
-		}
-	}
-	return q
-}
-
-func (dfs *DFS) Range(fn func(v int) bool) {
-	for v, b := range dfs.marked {
-		if !b {
-			continue
-		}
-		if !fn(v) {
-			break
+		if !marked[w] {
+			doDFS(w, g, marked)
 		}
 	}
 }

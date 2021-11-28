@@ -1,51 +1,50 @@
 package digraph
 
-import "github.com/howz97/algorithm/queue"
-
 type TransitiveClosure struct {
-	g   Digraph
-	all []*DFS
+	locate   []int   // vertical -> closureID
+	closures [][]int // closureID -> all vertices
 }
 
 func (g Digraph) TransitiveClosure() *TransitiveClosure {
 	tc := &TransitiveClosure{
-		g:   g,
-		all: make([]*DFS, g.NumV()),
+		locate: make([]int, g.NumV()),
 	}
-	for i := range tc.all {
-		// todo optimize: reduce DFS
-		tc.all[i] = g.DFS(i)
+	for i := range tc.locate {
+		tc.locate[i] = -1
+	}
+
+	closureID := 0
+	for i, c := range tc.locate {
+		if c < 0 {
+			dfs := g.DFS(i)
+			for _, v := range dfs {
+				tc.locate[v] = closureID
+			}
+			tc.closures = append(tc.closures, dfs)
+			closureID++
+		}
 	}
 	return tc
 }
 
 func (tc *TransitiveClosure) IsReachable(src, dst int) bool {
-	if !tc.g.HasV(src) || !tc.g.HasV(dst) {
-		panic(ErrVertexNotExist)
+	if !tc.hasV(src) || !tc.hasV(dst) {
+		return false
 	}
-	return tc.all[src].CanReach(dst)
-}
-
-func (tc *TransitiveClosure) ReachableVertices(src *queue.IntQ) *queue.IntQ {
-	vertices := queue.NewIntQ()
-	marked := make([]bool, tc.g.NumV())
-	for !src.IsEmpty() {
-		rv := tc.all[src.Front()].ReachableVertices()
-		for !rv.IsEmpty() {
-			marked[rv.Front()] = true
-		}
-	}
-	for i, b := range marked {
-		if b {
-			vertices.PushBack(i)
-		}
-	}
-	return vertices
+	return tc.locate[src] == tc.locate[dst]
 }
 
 func (tc *TransitiveClosure) Range(v int, fn func(v int) bool) {
-	if v < 0 || v >= len(tc.all) {
+	if !tc.hasV(v) {
 		return
 	}
-	tc.all[v].Range(fn)
+	for _, v := range tc.closures[tc.locate[v]] {
+		if !fn(v) {
+			break
+		}
+	}
+}
+
+func (tc *TransitiveClosure) hasV(v int) bool {
+	return v >= 0 || v < len(tc.closures)
 }
