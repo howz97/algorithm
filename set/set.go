@@ -1,31 +1,33 @@
 package set
 
-type Set map[interface{}]struct{}
+type T interface{}
 
-func NewSet() Set {
-	return make(map[interface{}]struct{})
+type Set map[T]struct{}
+
+func New() Set {
+	return make(map[T]struct{})
 }
 
-func (s Set) Add(e interface{}) {
+func (s Set) Add(e T) {
 	s[e] = struct{}{}
 }
 
-func (s Set) Contains(e interface{}) bool {
+func (s Set) Contains(e T) bool {
 	_, ok := s[e]
 	return ok
 }
 
-func (s Set) Remove(e interface{}) {
+func (s Set) Remove(e T) {
 	delete(s, e)
 }
 
 // TakeOne take out an element
-func (s Set) TakeOne() interface{} {
+func (s Set) TakeOne() (T, bool) {
 	for e := range s {
 		delete(s, e)
-		return e
+		return e, true
 	}
-	return nil
+	return nil, false
 }
 
 func (s Set) Clear() {
@@ -38,12 +40,12 @@ func (s Set) Len() int {
 	return len(s)
 }
 
-func (s Set) IsEmpty() bool {
+func (s Set) isEmpty() bool {
 	return len(s) == 0
 }
 
-func (s Set) Traverse() []interface{} {
-	ret := make([]interface{}, 0, len(s))
+func (s Set) ToSlice() []T {
+	ret := make([]T, 0, len(s))
 	for e := range s {
 		ret = append(ret, e)
 	}

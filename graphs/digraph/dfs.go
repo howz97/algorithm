@@ -2,13 +2,12 @@ package digraph
 
 import "github.com/howz97/algorithm/queue"
 
-// Digraph does not support self-loop, but assume the source vertex can reach itself
 type DFS struct {
 	g      Digraph
 	marked []bool
 }
 
-func NewDFS(g Digraph, src int) *DFS {
+func (g Digraph) DFS(src int) *DFS {
 	dfs := &DFS{
 		g:      g,
 		marked: make([]bool, g.NumV()),
@@ -27,8 +26,8 @@ func (dfs *DFS) doDFS(v int) {
 	}
 }
 
-func (dfs *DFS) CanReach(v int) bool {
-	return dfs.marked[v]
+func (dfs *DFS) CanReach(dst int) bool {
+	return dfs.marked[dst]
 }
 
 func (dfs *DFS) ReachableVertices() *queue.IntQ {
@@ -39,4 +38,15 @@ func (dfs *DFS) ReachableVertices() *queue.IntQ {
 		}
 	}
 	return q
+}
+
+func (dfs *DFS) Range(fn func(v int) bool) {
+	for v, b := range dfs.marked {
+		if !b {
+			continue
+		}
+		if !fn(v) {
+			break
+		}
+	}
 }

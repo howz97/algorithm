@@ -7,13 +7,14 @@ type TransitiveClosure struct {
 	all []*DFS
 }
 
-func NewTransitiveClosure(g Digraph) *TransitiveClosure {
+func (g Digraph) TransitiveClosure() *TransitiveClosure {
 	tc := &TransitiveClosure{
 		g:   g,
 		all: make([]*DFS, g.NumV()),
 	}
 	for i := range tc.all {
-		tc.all[i] = NewDFS(g, i)
+		// todo optimize: reduce DFS
+		tc.all[i] = g.DFS(i)
 	}
 	return tc
 }
@@ -40,4 +41,11 @@ func (tc *TransitiveClosure) ReachableVertices(src *queue.IntQ) *queue.IntQ {
 		}
 	}
 	return vertices
+}
+
+func (tc *TransitiveClosure) Range(v int, fn func(v int) bool) {
+	if v < 0 || v >= len(tc.all) {
+		return
+	}
+	tc.all[v].Range(fn)
 }

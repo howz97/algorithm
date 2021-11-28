@@ -15,14 +15,19 @@ import (
 type Regexp struct {
 	table []symbol
 	nfa   digraph.Digraph
-	start *digraph.DFS
+	tc    *digraph.TransitiveClosure
 }
 
 func (re *Regexp) Match(str string) bool {
+	// lazy init
+	if re.tc == nil {
+		re.tc = re.nfa.TransitiveClosure()
+	}
+
 	curStatus := re.startStatus()
 	for _, r := range str {
 		arrived := re.forwardStatus(curStatus, r)
-		if arrived.IsEmpty() {
+		if arrived.Len() == 0 {
 			return false
 		}
 		curStatus = re.updateCurStatus(arrived)
@@ -30,22 +35,23 @@ func (re *Regexp) Match(str string) bool {
 	return curStatus.Contains(len(re.table))
 }
 
-func (re *Regexp) startStatus() set.IntSet {
-	if re.start == nil {
-		re.start = digraph.NewDFS(re.nfa, 0)
-	}
-	start := set.NewIntSet()
-	rvQ := re.start.ReachableVertices() // todo optimize
-	for !rvQ.IsEmpty() {
-		start.Add(rvQ.Front())
-	}
+func (re *Regexp) startStatus() set.Set {
+	start := set.New()
+	re.tc.Range(0, func(v int) bool {
+		start.Add(v)
+		return true
+	})
 	return start
 }
 
-func (re *Regexp) forwardStatus(curStatus set.IntSet, r rune) set.IntSet {
-	arrived := set.NewIntSet()
-	for !curStatus.IsEmpty() {
-		s := curStatus.RemoveOne()
+func (re *Regexp) forwardStatus(curStatus set.Set, r rune) set.Set {
+	arrived := set.New()
+	for {
+		v, ok := curStatus.TakeOne()
+		if !ok {
+			break
+		}
+		s := v.(int)
 		if re.table[s].match(r) {
 			arrived.Add(s + 1)
 		}
@@ -53,17 +59,18 @@ func (re *Regexp) forwardStatus(curStatus set.IntSet, r rune) set.IntSet {
 	return arrived
 }
 
-func (re *Regexp) updateCurStatus(src set.IntSet) set.IntSet {
-	// todo optimize
-	tc := digraph.NewTransitiveClosure(re.nfa)
-	srcQ := queue.NewIntQ()
-	for !src.IsEmpty() {
-		srcQ.PushBack(src.RemoveOne())
-	}
-	reachable := set.NewIntSet()
-	reachableQ := tc.ReachableVertices(srcQ)
-	for !reachableQ.IsEmpty() {
-		reachable.Add(reachableQ.Front())
+func (re *Regexp) updateCurStatus(src set.Set) set.Set {
+	reachable := set.New()
+	for {
+		e, ok := src.TakeOne()
+		if !ok {
+			break
+		}
+		vSrc := e.(int)
+		re.tc.Range(vSrc, func(v int) bool {
+			reachable.Add(v)
+			return true
+		})
 	}
 	return reachable
 }
