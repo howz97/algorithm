@@ -46,10 +46,18 @@ func TestEWD_Integer(t *testing.T) {
 }
 
 func isPathEqual(s0, s1 *stack.Stack) bool {
-	for !s0.IsEmpty() {
-		e0 := s0.Pop().(*Edge)
-		e1 := s1.Pop().(*Edge)
-		if e0.From() != e1.From() || e0.To() != e1.To() {
+	if s0.Size() != s1.Size() {
+		return false
+	}
+	for {
+		e0, ok := s0.Pop()
+		if !ok {
+			break
+		}
+		eg0 := e0.(*Edge)
+		e1, _ := s1.Pop()
+		eg1 := e1.(*Edge)
+		if eg0.From() != eg1.From() || eg0.To() != eg1.To() {
 			return false
 		}
 	}

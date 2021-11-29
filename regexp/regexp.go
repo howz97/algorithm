@@ -117,7 +117,7 @@ func makeSymbolTable(compiled []rune) []symbol {
 func compile(pattern []rune) ([]rune, error) {
 	compiled := make([]rune, 0, len(pattern)<<1)
 	left := 0
-	lpStack := stack.NewStackInt(0)
+	lpStack := stack.NewInt(0)
 	for i := 0; i < len(pattern); i++ {
 		switch pattern[i] {
 		case '\\': // must put \ on top case
@@ -131,7 +131,11 @@ func compile(pattern []rune) ([]rune, error) {
 			lpStack.Push(len(compiled))
 			compiled = append(compiled, '(')
 		case ')':
-			left = lpStack.Pop()
+			var ok bool
+			left, ok = lpStack.Pop()
+			if !ok {
+				return nil, errors.New("'(' missing")
+			}
 			compiled = append(compiled, ')')
 		case '+':
 			// "(regexp)+" -> "(regexp)(regexp)*"
@@ -229,7 +233,7 @@ func indexRune(runes []rune, r rune) int {
 func makeNFA(table []symbol) digraph.Digraph {
 	size := len(table)
 	nfa := digraph.NewDigraph(size + 1)
-	stk := stack.NewStackInt(size)
+	stk := stack.NewInt(size)
 	for i, syb := range table {
 		left := i
 		if syb.isPrime {
@@ -240,8 +244,11 @@ func makeNFA(table []symbol) digraph.Digraph {
 			case ')':
 				nfa.AddEdge(i, i+1)
 				allOr := queue.NewIntQ()
-				for !stk.IsEmpty() {
-					out := stk.Pop()
+				for {
+					out, ok := stk.Pop()
+					if !ok {
+						panic("symbol '(' missing, this should be detected at compile stage")
+					}
 					if table[out].r == '|' {
 						allOr.PushBack(out)
 					} else {

@@ -14,8 +14,11 @@ func NewSCC(g Digraph) *SCC {
 		g:      g,
 	}
 	topOrderStack := ReversePostOrder(g.Reverse())
-	for !topOrderStack.IsEmpty() {
-		v := topOrderStack.Pop()
+	for {
+		v, ok := topOrderStack.Pop()
+		if !ok {
+			break
+		}
 		if !scc.marked[v] {
 			scc.markID(v, scc.count)
 			scc.count++

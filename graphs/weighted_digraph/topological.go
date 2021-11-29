@@ -2,9 +2,9 @@ package weighted_digraph
 
 import "github.com/howz97/algorithm/stack"
 
-func (g EdgeWeightedDigraph) ReversePostOrder() *stack.StackInt {
+func (g EdgeWeightedDigraph) ReversePostOrder() *stack.IntStack {
 	marked := make([]bool, g.NumV())
-	result := stack.NewStackInt(g.NumV())
+	result := stack.NewInt(g.NumV())
 	for i, b := range marked {
 		if !b {
 			g.reversePostDFS(i, marked, result)
@@ -13,7 +13,7 @@ func (g EdgeWeightedDigraph) ReversePostOrder() *stack.StackInt {
 	return result
 }
 
-func (g EdgeWeightedDigraph) reversePostDFS(v int, marked []bool, result *stack.StackInt) {
+func (g EdgeWeightedDigraph) reversePostDFS(v int, marked []bool, result *stack.IntStack) {
 	marked[v] = true
 	adj := g.Adjacent(v)
 	for _, e := range adj {
@@ -24,7 +24,7 @@ func (g EdgeWeightedDigraph) reversePostDFS(v int, marked []bool, result *stack.
 	result.Push(v)
 }
 
-func (g EdgeWeightedDigraph) TopologicalSort() *stack.StackInt {
+func (g EdgeWeightedDigraph) TopologicalSort() *stack.IntStack {
 	if !g.DetectDirCycle() {
 		return g.ReversePostOrder()
 	}

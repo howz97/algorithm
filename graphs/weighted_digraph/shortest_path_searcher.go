@@ -77,9 +77,13 @@ func (s *ShortestPathSearcher) Path(src, dst int) *stack.Stack {
 func (s *ShortestPathSearcher) PrintPath(src, dst int) {
 	p := s.Path(src, dst)
 	fmt.Print("PATH: ", src)
-	for !p.IsEmpty() {
-		e := p.Pop().(*Edge)
-		fmt.Print("->", e.to)
+	for {
+		e, ok := p.Pop()
+		if !ok {
+			break
+		}
+		eg := e.(*Edge)
+		fmt.Print("->", eg.to)
 	}
 	fmt.Printf(" (distance %v)\n", s.Distance(src, dst))
 }

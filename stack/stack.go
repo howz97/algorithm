@@ -1,16 +1,22 @@
 package stack
 
+const (
+	minCap = 2
+)
+
+type T interface{}
+
 type Stack struct {
-	elems []interface{}
+	elems []T
 	top   int
 }
 
-func NewStack(initCap int) *Stack {
-	if initCap < 2 {
-		initCap = defaultInitCap
+func New(c int) *Stack {
+	if c < minCap {
+		c = minCap
 	}
 	return &Stack{
-		elems: make([]interface{}, initCap),
+		elems: make([]T, c),
 		top:   0,
 	}
 }
@@ -19,23 +25,23 @@ func (s *Stack) Size() int {
 	return s.top
 }
 
-func (s *Stack) IsEmpty() bool {
-	return s == nil || s.top == 0
+func (s *Stack) Cap() int {
+	return len(s.elems)
 }
 
-func (s *Stack) Pop() interface{} {
-	if s.IsEmpty() {
-		panic("pop from empty stack")
+func (s *Stack) Pop() (T, bool) {
+	if s.Size() <= 0 {
+		return nil, false
 	}
 	s.top--
-	return s.elems[s.top]
+	return s.elems[s.top], true
 }
 
-func (s *Stack) Push(elem interface{}) {
+func (s *Stack) Push(e T) {
 	if s.isFull() {
-		s.elems = append(s.elems, elem)
+		s.elems = append(s.elems, e)
 	} else {
-		s.elems[s.top] = elem
+		s.elems[s.top] = e
 	}
 	s.top++
 }

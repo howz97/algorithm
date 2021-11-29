@@ -50,7 +50,7 @@ func (spt *ShortestPathTree) PathTo(dst int) *stack.Stack {
 	if !spt.g.HasV(dst) {
 		return nil
 	}
-	s := stack.NewStack(spt.g.NumV() - 1)
+	s := stack.New(spt.g.NumV() - 1)
 	for spt.edgeTo[dst] != nil {
 		s.Push(spt.edgeTo[dst])
 		dst = spt.edgeTo[dst].from
@@ -89,10 +89,14 @@ func dijkstraRelax(g EdgeWeightedDigraph, v int, edgeTo []*Edge, distTo []float6
 
 func (spt *ShortestPathTree) InitTopological() {
 	marked := make([]bool, spt.g.NumV())
-	topoSortStack := stack.NewStackInt(spt.g.NumV())
+	topoSortStack := stack.NewInt(spt.g.NumV())
 	spt.g.reversePostDFS(spt.src, marked, topoSortStack)
-	for !topoSortStack.IsEmpty() {
-		topologicalRelax(spt.g, topoSortStack.Pop(), spt.edgeTo, spt.distTo)
+	for {
+		e, ok := topoSortStack.Pop()
+		if !ok {
+			break
+		}
+		topologicalRelax(spt.g, e, spt.edgeTo, spt.distTo)
 	}
 }
 
@@ -114,9 +118,13 @@ type NegativeCycle struct {
 
 func (nc NegativeCycle) Error() string {
 	s := ""
-	for !nc.Stack.IsEmpty() {
-		e := nc.Stack.Pop().(*Edge)
-		s += strconv.Itoa(e.from) + "->" + strconv.Itoa(e.to) + "  "
+	for {
+		e, ok := nc.Stack.Pop()
+		if !ok {
+			break
+		}
+		eg := e.(*Edge)
+		s += strconv.Itoa(eg.from) + "->" + strconv.Itoa(eg.to) + "  "
 	}
 	return "weight negative cycle: " + s
 }
@@ -149,7 +157,7 @@ func (spt *ShortestPathTree) findNegativeCycle() *stack.Stack {
 		}
 	}
 	marked := make([]bool, spt.g.NumV())
-	s := stack.NewStack(spt.g.NumV())
+	s := stack.New(spt.g.NumV())
 	onS := make([]bool, spt.g.NumV())
 	for i := 0; i < spt.g.NumV(); i++ {
 		if !marked[i] {
@@ -163,18 +171,26 @@ func (spt *ShortestPathTree) findNegativeCycle() *stack.Stack {
 
 func findNC(g EdgeWeightedDigraph, v int, marked []bool, s *stack.Stack, onS []bool, edgeTo []*Edge) *stack.Stack {
 	if onS[v] {
-		c := stack.NewStack(g.NumV())
+		c := stack.New(g.NumV())
 		var weight float64
-		for !s.IsEmpty() {
-			e := s.Pop().(*Edge)
-			weight += e.weight
-			c.Push(e)
+		for {
+			e, ok := s.Pop()
+			if !ok {
+				break
+			}
+			eg := e.(*Edge)
+			weight += eg.weight
+			c.Push(eg)
 		}
 		if weight < 0 {
 			return c
 		}
-		for !c.IsEmpty() {
-			s.Push(c.Pop().(*Edge))
+		for {
+			e, ok := c.Pop()
+			if !ok {
+				break
+			}
+			s.Push(e)
 		}
 		return nil
 	}

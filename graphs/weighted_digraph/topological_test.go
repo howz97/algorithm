@@ -11,7 +11,11 @@ func TestTopologicalSort(t *testing.T) {
 		t.Fatal(err)
 	}
 	s := g.TopologicalSort()
-	for !s.IsEmpty() {
-		fmt.Print(s.Pop(), " ")
+	for {
+		e, ok := s.Pop()
+		if !ok {
+			break
+		}
+		fmt.Print(e, " ")
 	}
 }
