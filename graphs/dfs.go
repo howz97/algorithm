@@ -1,12 +1,15 @@
 package graphs
 
 type IGraph interface {
-	HasDir() bool
+	HasVertical(v int) bool
 	NumVertical() int
 	RangeAdj(v int, fn func(v int) bool)
 }
 
 func RangeDFS(g IGraph, src int, fn func(int) bool) {
+	if !g.HasVertical(src) {
+		return
+	}
 	marked := make([]bool, g.NumVertical())
 	doDFS(g, src, marked, fn)
 }
@@ -29,12 +32,18 @@ func doDFS(g IGraph, v int, marked []bool, fn func(int) bool) bool {
 }
 
 func DFSMarked(g IGraph, src int) []bool {
+	if !g.HasVertical(src) {
+		return nil
+	}
 	marked := make([]bool, g.NumVertical())
 	doDFS(g, src, marked, func(_ int) bool { return true })
 	return marked
 }
 
 func DFSReachable(g IGraph, src int) []int {
+	if !g.HasVertical(src) {
+		return nil
+	}
 	var arrived []int
 	RangeDFS(g, src, func(v int) bool {
 		arrived = append(arrived, v)

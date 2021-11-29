@@ -39,7 +39,7 @@ func (dg Digraph) NumVertical() int {
 	return len(dg)
 }
 
-func (dg Digraph) HasV(v int) bool {
+func (dg Digraph) HasVertical(v int) bool {
 	return v >= 0 && v < dg.NumVertical()
 }
 
@@ -52,7 +52,7 @@ func (dg Digraph) NumEdge() int {
 }
 
 func (dg Digraph) AddEdge(v1, v2 int) error {
-	if !dg.HasV(v1) || !dg.HasV(v2) {
+	if !dg.HasVertical(v1) || !dg.HasVertical(v2) {
 		return ErrVertexNotExist
 	}
 	if v1 == v2 {
@@ -63,21 +63,21 @@ func (dg Digraph) AddEdge(v1, v2 int) error {
 }
 
 func (dg Digraph) HasEdge(v1, v2 int) bool {
-	if !dg.HasV(v1) || !dg.HasV(v2) {
+	if !dg.HasVertical(v1) || !dg.HasVertical(v2) {
 		panic(ErrVertexNotExist)
 	}
 	return dg[v1].Contains(v2)
 }
 
 func (dg Digraph) Adjacent(v int) []int {
-	if !dg.HasV(v) {
+	if !dg.HasVertical(v) {
 		panic(ErrVertexNotExist)
 	}
 	return dg[v].Traverse()
 }
 
 func (dg Digraph) RangeAdj(v int, fn func(v int) bool) {
-	if !dg.HasV(v) {
+	if !dg.HasVertical(v) {
 		return
 	}
 	dg[v].Range(fn)

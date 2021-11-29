@@ -29,7 +29,7 @@ func (g Graph) TransitiveClosure() *TransitiveClosure {
 	return tc
 }
 
-func (tc *TransitiveClosure) IsReachable(src, dst int) bool {
+func (tc *TransitiveClosure) CanReach(src, dst int) bool {
 	if !tc.hasV(src) || !tc.hasV(dst) {
 		return false
 	}

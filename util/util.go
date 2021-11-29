@@ -2,6 +2,7 @@ package util
 
 import (
 	"io/ioutil"
+	"sort"
 	"strings"
 	"time"
 )
@@ -79,4 +80,25 @@ func SliceEqual(a, b []int) bool {
 		}
 	}
 	return true
+}
+
+type Reversible interface {
+	// Len is the number of elements in the collection.
+	Len() int
+	// Swap swaps the elements with indexes i and j.
+	Swap(i, j int)
+}
+
+func ReverseSlice(data Reversible) {
+	m := data.Len() / 2
+	j := data.Len() - 1
+	for i := 0; i < m; {
+		data.Swap(i, j)
+		i++
+		j--
+	}
+}
+
+func ReverseInts(data []int) {
+	ReverseSlice(sort.IntSlice(data))
 }

@@ -1,19 +1,17 @@
-package graph
+package graphs
 
 import (
 	"github.com/howz97/algorithm/queue"
-	"github.com/howz97/algorithm/sort"
+	"github.com/howz97/algorithm/util"
 )
 
 type BFS struct {
 	src    int
 	marked []bool
-
-	// the adjacent vertical (edgeTo[i]) of the destination vertical (i) on the shortest path
 	edgeTo []int
 }
 
-func (g Graph) BFS(src int) *BFS {
+func NewBFS(g IGraph, src int) *BFS {
 	if !g.HasVertical(src) {
 		return nil
 	}
@@ -27,43 +25,43 @@ func (g Graph) BFS(src int) *BFS {
 	q.PushBack(src)
 	for !q.IsEmpty() {
 		edge := q.Front()
-		adjs := g.Adjacent(edge)
-		for _, adj := range adjs {
-			if bfs.marked[adj] {
-				continue
+		g.RangeAdj(edge, func(adj int) bool {
+			if !bfs.marked[adj] {
+				bfs.edgeTo[adj] = edge
+				bfs.marked[adj] = true
+				q.PushBack(adj)
 			}
-			bfs.edgeTo[adj] = edge
-			bfs.marked[adj] = true
-			q.PushBack(adj)
-		}
+			return true
+		})
 	}
 	return bfs
 }
 
-func (bfs *BFS) IsMarked(v int) bool {
-	if !bfs.checkVertical(v) {
+func (bfs *BFS) CanReach(dst int) bool {
+	if !bfs.checkVertical(dst) {
 		return false
 	}
-	return bfs.marked[v]
-}
-
-func (bfs *BFS) checkVertical(v int) bool {
-	return v >= 0 && v < len(bfs.marked)
+	return bfs.marked[dst]
 }
 
 func (bfs *BFS) ShortestPathTo(dst int) []int {
-	if !bfs.checkVertical(dst) || !bfs.marked[dst] {
+	if !bfs.CanReach(dst) {
 		return nil
 	}
 	if dst == bfs.src {
 		return []int{dst}
 	}
-	path := append(make([]int, 0, 2), dst)
+	path := make([]int, 0, 2)
+	path = append(path, dst)
 	for bfs.edgeTo[dst] != bfs.src {
 		dst = bfs.edgeTo[dst]
 		path = append(path, dst)
 	}
 	path = append(path, bfs.src)
-	sort.Reverse(path)
+	util.ReverseInts(path)
 	return path
+}
+
+func (bfs *BFS) checkVertical(v int) bool {
+	return v >= 0 && v < len(bfs.marked)
 }
