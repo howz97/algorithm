@@ -2,19 +2,18 @@ package graph
 
 import (
 	"errors"
-	"fmt"
 	"github.com/howz97/algorithm/set"
 	"strconv"
 )
 
 var (
-	errVerticalNotExist   = errors.New("vertical not exist")
-	errNotSupportSelfLoop = errors.New("not support self loop")
+	ErrVerticalNotExist = errors.New("vertical not exist")
+	ErrSelfLoop         = errors.New("not support self loop")
 )
 
 type Graph []set.IntSet
 
-func NewGraph(numV int) Graph {
+func New(numV int) Graph {
 	g := make(Graph, numV)
 	for i := range g {
 		g[i] = make(set.IntSet)
@@ -23,55 +22,59 @@ func NewGraph(numV int) Graph {
 }
 
 func NewByImport(filename string) Graph {
-	// TODO
-	fmt.Println("NewByImport not support")
+	// todo
 	return nil
 }
 
-// NumV is the number of verticals in graph
-func (g Graph) NumV() int {
+func (g Graph) NumVertical() int {
 	return len(g)
 }
 
-func (g Graph) HasV(v int) bool {
-	return v >= 0 && v < g.NumV()
+func (g Graph) HasVertical(v int) bool {
+	return v >= 0 && v < len(g)
 }
 
-// NumEdge is the number of edge in graph
 func (g Graph) NumEdge() int {
-	nume := 0
+	num := 0
 	for i := range g {
-		nume += g[i].Len()
+		num += g[i].Len()
 	}
-	return nume / 2
+	return num / 2
 }
 
 // AddEdge add edge v1-v2
 func (g Graph) AddEdge(v1, v2 int) error {
-	if !g.HasV(v1) || !g.HasV(v2) {
-		return errVerticalNotExist
+	if !g.HasVertical(v1) || !g.HasVertical(v2) {
+		return ErrVerticalNotExist
 	}
 	if v1 == v2 {
-		return errNotSupportSelfLoop
+		return ErrSelfLoop
 	}
 	g[v1].Add(v2)
 	g[v2].Add(v1)
 	return nil
 }
 
-func (g Graph) HasEdge(v1, v2 int) (bool, error) {
-	if !g.HasV(v1) || !g.HasV(v2) {
-		return false, errVerticalNotExist
+func (g Graph) HasEdge(v1, v2 int) bool {
+	if !g.HasVertical(v1) || !g.HasVertical(v2) {
+		return false
 	}
-	return g[v1].Contains(v2), nil
+	return g[v1].Contains(v2)
 }
 
 // Adjacent is the adjacent verticals of v
-func (g Graph) Adjacent(v int) ([]int, error) {
-	if !g.HasV(v) {
-		return nil, errVerticalNotExist
+func (g Graph) Adjacent(v int) []int {
+	if !g.HasVertical(v) {
+		return nil
 	}
-	return g[v].Traverse(), nil
+	return g[v].Traverse()
+}
+
+func (g Graph) RangeAdj(v int, fn func(v int) bool) {
+	if !g.HasVertical(v) {
+		return
+	}
+	g[v].Range(fn)
 }
 
 func (g Graph) String() string {
@@ -88,57 +91,57 @@ func (g Graph) String() string {
 	return out
 }
 
-func HasCycle(g Graph) bool {
-	marked := make([]bool, g.NumV())
+func (g Graph) HasCycle() bool {
+	marked := make([]bool, g.NumVertical())
 	for i, b := range marked {
 		if b {
 			continue
 		}
-		if hasCycleDFS(g, i, i, marked) {
+		if g.hasCycleDFS(i, i, marked) {
 			return true
 		}
 	}
 	return false
 }
 
-func hasCycleDFS(g Graph, last, cur int, marked []bool) bool {
+func (g Graph) hasCycleDFS(last, cur int, marked []bool) bool {
 	if marked[cur] {
 		return true
 	}
 	marked[cur] = true
-	adjs, _ := g.Adjacent(cur)
+	adjs := g.Adjacent(cur)
 	for _, adj := range adjs {
 		if adj == last {
 			continue
 		}
-		if hasCycleDFS(g, cur, adj, marked) {
+		if g.hasCycleDFS(cur, adj, marked) {
 			return true
 		}
 	}
 	return false
 }
 
-func IsBipartiteGraph(g Graph) bool {
-	marked := make([]bool, g.NumV())
-	colors := make([]bool, g.NumV())
+func (g Graph) IsBipartiteGraph() bool {
+	marked := make([]bool, g.NumVertical())
+	colors := make([]bool, g.NumVertical())
 	for i, b := range marked {
 		if b {
 			continue
 		}
-		if !isBipartiteDFS(g, i, true, colors, marked) {
+		if !g.isBipartiteDFS(i, true, colors, marked) {
 			return false
 		}
 	}
 	return true
 }
 
-func isBipartiteDFS(g Graph, cur int, color bool, colors []bool, marked []bool) bool {
+func (g Graph) isBipartiteDFS(cur int, color bool, colors []bool, marked []bool) bool {
 	if !marked[cur] {
 		marked[cur] = true
 		colors[cur] = color
-		adjs, _ := g.Adjacent(cur)
+		adjs := g.Adjacent(cur)
 		for _, adj := range adjs {
-			if !isBipartiteDFS(g, adj, !color, colors, marked) {
+			if !g.isBipartiteDFS(adj, !color, colors, marked) {
 				return false
 			}
 		}
@@ -146,4 +149,8 @@ func isBipartiteDFS(g Graph, cur int, color bool, colors []bool, marked []bool) 
 	} else {
 		return colors[cur] == color
 	}
+}
+
+func (g Graph) HasDir() bool {
+	return false
 }

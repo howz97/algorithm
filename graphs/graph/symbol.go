@@ -46,7 +46,7 @@ func NewSymbolGraph(filename string) (*SymbolGraph, error) {
 			sg.st[s] = len(sg.st)
 		}
 	}
-	sg.g = NewGraph(len(sg.st))
+	sg.g = New(len(sg.st))
 	v := 0
 	for _, s := range dataSpltd {
 		if s == "" {
@@ -69,7 +69,7 @@ func (sg *SymbolGraph) Graph() Graph {
 }
 
 func (sg *SymbolGraph) NumV() int {
-	return sg.g.NumV()
+	return sg.g.NumVertical()
 }
 
 func (sg *SymbolGraph) NumEdge() int {
@@ -80,25 +80,25 @@ func (sg *SymbolGraph) AddEdge(v1, v2 string) error {
 	return sg.g.AddEdge(sg.index(v1), sg.index(v2))
 }
 
-func (sg *SymbolGraph) HasEdge(v1, v2 string) (bool, error) {
+func (sg *SymbolGraph) HasEdge(v1, v2 string) bool {
 	return sg.g.HasEdge(sg.index(v1), sg.index(v2))
 }
 
-func (sg *SymbolGraph) Adjacent(v string) ([]string, error) {
-	adjInts, err := sg.g.Adjacent(sg.index(v))
-	if err != nil {
-		return nil, err
+func (sg *SymbolGraph) Adjacent(v string) []string {
+	adjInts := sg.g.Adjacent(sg.index(v))
+	if len(adjInts) == 0 {
+		return nil
 	}
 	adj := make([]string, len(adjInts))
 	for i := range adj {
 		adj[i] = sg.name(adjInts[i])
 	}
-	return adj, nil
+	return adj
 }
 
 func (sg *SymbolGraph) name(i int) string {
 	if i < 0 || i >= sg.NumV() {
-		panic(errVerticalNotExist)
+		panic(ErrVerticalNotExist)
 	}
 	return sg.rst[i]
 }

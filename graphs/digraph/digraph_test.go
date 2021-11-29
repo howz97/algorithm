@@ -6,7 +6,7 @@ import (
 )
 
 func TestSCC_IsStronglyConnected(t *testing.T) {
-	g := NewDigraph(13)
+	g := New(13)
 	g.AddEdge(0, 1)
 	g.AddEdge(0, 5)
 	g.AddEdge(5, 4)
@@ -31,7 +31,7 @@ func TestSCC_IsStronglyConnected(t *testing.T) {
 	fmt.Println("number of edge: ", g.NumEdge())
 	scc := NewSCC(g)
 	fmt.Println("number of SCC:", scc.NumSCC())
-	for i := 0; i < g.NumV(); i++ {
+	for i := 0; i < g.NumVertical(); i++ {
 		fmt.Printf("SCC ID of vertical(%v): %v\n", i, scc.GetID(i))
 	}
 	if !scc.IsStronglyConnected(1, 1) {

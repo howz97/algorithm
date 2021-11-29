@@ -13,7 +13,7 @@ var (
 
 type Digraph []set.IntSet
 
-func NewDigraph(numV int) Digraph {
+func New(numV int) Digraph {
 	g := make(Digraph, numV)
 	for i := range g {
 		g[i] = make(set.IntSet)
@@ -21,51 +21,73 @@ func NewDigraph(numV int) Digraph {
 	return g
 }
 
-func (g Digraph) NumV() int {
-	return len(g)
+func NewBy2DSli(sli [][]int) (Digraph, error) {
+	dg := New(len(sli))
+	var err error
+	for src, s := range sli {
+		for _, dst := range s {
+			err = dg.AddEdge(src, dst)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return dg, nil
 }
 
-func (g Digraph) HasV(v int) bool {
-	return v >= 0 && v < g.NumV()
+func (dg Digraph) NumVertical() int {
+	return len(dg)
 }
 
-func (g Digraph) NumEdge() int {
+func (dg Digraph) HasV(v int) bool {
+	return v >= 0 && v < dg.NumVertical()
+}
+
+func (dg Digraph) NumEdge() int {
 	nume := 0
-	for i := range g {
-		nume += g[i].Len()
+	for i := range dg {
+		nume += dg[i].Len()
 	}
 	return nume
 }
 
-func (g Digraph) AddEdge(v1, v2 int) {
-	if !g.HasV(v1) || !g.HasV(v2) {
-		panic(ErrVertexNotExist)
+func (dg Digraph) AddEdge(v1, v2 int) error {
+	if !dg.HasV(v1) || !dg.HasV(v2) {
+		return ErrVertexNotExist
 	}
 	if v1 == v2 {
-		panic(ErrNotSupportSelfLoop)
+		return ErrNotSupportSelfLoop
 	}
-	g[v1].Add(v2)
+	dg[v1].Add(v2)
+	return nil
 }
 
-func (g Digraph) HasEdge(v1, v2 int) bool {
-	if !g.HasV(v1) || !g.HasV(v2) {
+func (dg Digraph) HasEdge(v1, v2 int) bool {
+	if !dg.HasV(v1) || !dg.HasV(v2) {
 		panic(ErrVertexNotExist)
 	}
-	return g[v1].Contains(v2)
+	return dg[v1].Contains(v2)
 }
 
-func (g Digraph) Adjacent(v int) []int {
-	if !g.HasV(v) {
+func (dg Digraph) Adjacent(v int) []int {
+	if !dg.HasV(v) {
 		panic(ErrVertexNotExist)
 	}
-	return g[v].Traverse()
+	return dg[v].Traverse()
 }
 
-func (g Digraph) String() string {
+func (dg Digraph) RangeAdj(v int, fn func(v int) bool) {
+	if !dg.HasV(v) {
+		return
+	}
+	dg[v].Range(fn)
+}
+
+func (dg Digraph) String() string {
 	out := ""
-	for i := range g {
+	for i := range dg {
 		out += strconv.Itoa(i) + " :"
-		adj := g.Adjacent(i)
+		adj := dg.Adjacent(i)
 		for _, j := range adj {
 			out += " " + strconv.Itoa(j)
 		}
@@ -75,13 +97,17 @@ func (g Digraph) String() string {
 	return out
 }
 
-func (g Digraph) Reverse() Digraph {
-	rg := NewDigraph(g.NumV())
-	for v := 0; v < g.NumV(); v++ {
-		adj := g.Adjacent(v)
+func (dg Digraph) Reverse() Digraph {
+	rg := New(dg.NumVertical())
+	for v := 0; v < dg.NumVertical(); v++ {
+		adj := dg.Adjacent(v)
 		for _, w := range adj {
 			rg.AddEdge(w, v)
 		}
 	}
 	return rg
+}
+
+func (dg Digraph) HasDir() bool {
+	return true
 }

@@ -1,50 +1,38 @@
 package digraph
 
-type TransitiveClosure struct {
-	locate   []int   // vertical -> closureID
-	closures [][]int // closureID -> all vertices
-}
+import "github.com/howz97/algorithm/graphs"
 
-func (g Digraph) TransitiveClosure() *TransitiveClosure {
-	tc := &TransitiveClosure{
-		locate: make([]int, g.NumV()),
-	}
-	for i := range tc.locate {
-		tc.locate[i] = -1
-	}
+type TransitiveClosure [][]bool
 
-	closureID := 0
-	for i, c := range tc.locate {
-		if c < 0 {
-			dfs := g.DFS(i)
-			for _, v := range dfs {
-				tc.locate[v] = closureID
-			}
-			tc.closures = append(tc.closures, dfs)
-			closureID++
-		}
+func (dg Digraph) TransitiveClosure() TransitiveClosure {
+	tc := make(TransitiveClosure, dg.NumVertical())
+	for v := range tc {
+		tc[v] = graphs.DFSMarked(dg, v)
 	}
 	return tc
 }
 
-func (tc *TransitiveClosure) IsReachable(src, dst int) bool {
+func (tc TransitiveClosure) IsReachable(src, dst int) bool {
 	if !tc.hasV(src) || !tc.hasV(dst) {
 		return false
 	}
-	return tc.locate[src] == tc.locate[dst]
+	return tc[src][dst]
 }
 
-func (tc *TransitiveClosure) Range(v int, fn func(v int) bool) {
+func (tc TransitiveClosure) Range(v int, fn func(v int) bool) {
 	if !tc.hasV(v) {
 		return
 	}
-	for _, v := range tc.closures[tc.locate[v]] {
-		if !fn(v) {
+	for w, marked := range tc[v] {
+		if !marked {
+			continue
+		}
+		if !fn(w) {
 			break
 		}
 	}
 }
 
-func (tc *TransitiveClosure) hasV(v int) bool {
-	return v >= 0 || v < len(tc.closures)
+func (tc TransitiveClosure) hasV(v int) bool {
+	return v >= 0 || v < len(tc)
 }

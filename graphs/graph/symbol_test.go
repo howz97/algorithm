@@ -11,22 +11,22 @@ func TestNewSymbolGraph(t *testing.T) {
 	}
 	t.Log(sg.NumV())
 	t.Log(sg.NumEdge())
-	if b, _ := sg.HasEdge("A", "E"); b {
+	if sg.HasEdge("A", "E") {
 		t.Fatal()
 	}
 	if err := sg.AddEdge("A", "E"); err != nil {
 		t.Fatal(err)
 	}
 	t.Log(sg.NumEdge())
-	if b, _ := sg.HasEdge("A", "E"); !b {
+	if sg.HasEdge("A", "E") {
 		t.Fatal()
 	}
-	adj, _ := sg.Adjacent("A")
+	adj := sg.Adjacent("A")
 	t.Log("A -> ", adj)
 }
 
 func TestNewGraph(t *testing.T) {
-	g := NewGraph(7)
+	g := New(7)
 	g.AddEdge(0, 1)
 	g.AddEdge(0, 2)
 	g.AddEdge(0, 5)
@@ -35,9 +35,9 @@ func TestNewGraph(t *testing.T) {
 	g.AddEdge(2, 4)
 	g.AddEdge(3, 4)
 	g.AddEdge(3, 5)
-	bfs, err := NewBFS(g, 0)
-	if err != nil {
-		t.Fatal(err)
+	bfs := g.BFS(0)
+	if bfs == nil {
+		t.Fatal("make BFS failed")
 	}
 	if !bfs.IsMarked(3) {
 		t.Fatal()
@@ -59,11 +59,11 @@ func TestNewGraph(t *testing.T) {
 	id, _ = cd.SubGraphIDOf(6)
 	t.Logf("subGraph ID of %v: %v", 6, id)
 
-	if !HasCycle(g) {
+	if !g.HasCycle() {
 		t.Fatal()
 	}
 
-	if IsBipartiteGraph(g) {
+	if g.IsBipartiteGraph() {
 		t.Fatal()
 	}
 }

@@ -58,6 +58,14 @@ func (s IntSet) Traverse() []int {
 	return result
 }
 
+func (s IntSet) Range(fn func(e int) bool) {
+	for e := range s {
+		if !fn(e) {
+			break
+		}
+	}
+}
+
 func (s IntSet) SortTraverse() []int {
 	result := s.Traverse()
 	sort.Ints(result)

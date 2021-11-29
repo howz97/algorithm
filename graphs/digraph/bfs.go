@@ -19,8 +19,8 @@ func NewBFS(g Digraph, src int) *BFS {
 	}
 	bfs := &BFS{
 		src:    src,
-		marked: make([]bool, g.NumV()),
-		edgeTo: make([]int, g.NumV()),
+		marked: make([]bool, g.NumVertical()),
+		edgeTo: make([]int, g.NumVertical()),
 	}
 	q := queue.NewIntQ()
 	bfs.marked[src] = true

@@ -3,7 +3,7 @@ package digraph
 import "github.com/howz97/algorithm/set"
 
 func DetectDirCycle(g Digraph) bool {
-	marked := make([]bool, g.NumV())
+	marked := make([]bool, g.NumVertical())
 	s := set.NewIntSet()
 	for i, b := range marked {
 		if !b {

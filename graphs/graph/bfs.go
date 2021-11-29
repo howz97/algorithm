@@ -13,21 +13,21 @@ type BFS struct {
 	edgeTo []int
 }
 
-func NewBFS(g Graph, src int) (*BFS, error) {
-	if !g.HasV(src) {
-		return nil, errVerticalNotExist
+func (g Graph) BFS(src int) *BFS {
+	if !g.HasVertical(src) {
+		return nil
 	}
 	bfs := &BFS{
 		src:    src,
-		marked: make([]bool, g.NumV()),
-		edgeTo: make([]int, g.NumV()),
+		marked: make([]bool, g.NumVertical()),
+		edgeTo: make([]int, g.NumVertical()),
 	}
 	q := queue.NewIntQ()
 	bfs.marked[src] = true
 	q.PushBack(src)
 	for !q.IsEmpty() {
 		edge := q.Front()
-		adjs, _ := g.Adjacent(edge)
+		adjs := g.Adjacent(edge)
 		for _, adj := range adjs {
 			if bfs.marked[adj] {
 				continue
@@ -37,18 +37,22 @@ func NewBFS(g Graph, src int) (*BFS, error) {
 			q.PushBack(adj)
 		}
 	}
-	return bfs, nil
+	return bfs
 }
 
 func (bfs *BFS) IsMarked(v int) bool {
-	if v < 0 || v >= len(bfs.marked) {
+	if !bfs.checkVertical(v) {
 		return false
 	}
 	return bfs.marked[v]
 }
 
+func (bfs *BFS) checkVertical(v int) bool {
+	return v >= 0 && v < len(bfs.marked)
+}
+
 func (bfs *BFS) ShortestPathTo(dst int) []int {
-	if dst < 0 || dst >= len(bfs.marked) || !bfs.marked[dst] {
+	if !bfs.checkVertical(dst) || !bfs.marked[dst] {
 		return nil
 	}
 	if dst == bfs.src {

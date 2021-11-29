@@ -3,8 +3,8 @@ package digraph
 import "github.com/howz97/algorithm/stack"
 
 func ReversePostOrder(g Digraph) *stack.IntStack {
-	marked := make([]bool, g.NumV())
-	result := stack.NewInt(g.NumV())
+	marked := make([]bool, g.NumVertical())
+	result := stack.NewInt(g.NumVertical())
 	for i, b := range marked {
 		if !b {
 			reversePostDFS(g, i, marked, result)

@@ -9,8 +9,8 @@ type SCC struct {
 
 func NewSCC(g Digraph) *SCC {
 	scc := &SCC{
-		marked: make([]bool, g.NumV()),
-		id:     make([]int, g.NumV()),
+		marked: make([]bool, g.NumVertical()),
+		id:     make([]int, g.NumVertical()),
 		g:      g,
 	}
 	topOrderStack := ReversePostOrder(g.Reverse())
