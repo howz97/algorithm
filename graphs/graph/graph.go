@@ -109,16 +109,18 @@ func (g Graph) hasCycleDFS(last, cur int, marked []bool) bool {
 		return true
 	}
 	marked[cur] = true
-	adjs := g.Adjacent(cur)
-	for _, adj := range adjs {
+	hasCycle := false
+	g.RangeAdj(cur, func(adj int) bool {
 		if adj == last {
-			continue
-		}
-		if g.hasCycleDFS(cur, adj, marked) {
 			return true
 		}
-	}
-	return false
+		if g.hasCycleDFS(cur, adj, marked) {
+			hasCycle = true
+			return false
+		}
+		return true
+	})
+	return hasCycle
 }
 
 func (g Graph) IsBipartiteGraph() bool {
@@ -149,8 +151,4 @@ func (g Graph) isBipartiteDFS(cur int, color bool, colors []bool, marked []bool)
 	} else {
 		return colors[cur] == color
 	}
-}
-
-func (g Graph) HasDir() bool {
-	return false
 }

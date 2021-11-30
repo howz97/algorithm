@@ -7,7 +7,7 @@ type TransitiveClosure [][]bool
 func (dg Digraph) TransitiveClosure() TransitiveClosure {
 	tc := make(TransitiveClosure, dg.NumVertical())
 	for v := range tc {
-		tc[v] = graphs.DFSMarked(dg, v)
+		tc[v] = graphs.ReachableBits(dg, v)
 	}
 	return tc
 }

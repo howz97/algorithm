@@ -1,7 +1,9 @@
 package util
 
 import (
+	"bufio"
 	"io/ioutil"
+	"os"
 	"sort"
 	"strings"
 	"time"
@@ -13,6 +15,20 @@ func ReadAllLines(filename string) []string {
 		panic(err)
 	}
 	return strings.Split(string(content), "\n")
+}
+
+func RangeFileLines(filename string, fn func(string) bool) error {
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	scan := bufio.NewScanner(file)
+	for scan.Scan() {
+		if !fn(scan.Text()) {
+			break
+		}
+	}
+	return nil
 }
 
 func AverageDuration(dur []time.Duration) (avg time.Duration) {

@@ -6,23 +6,37 @@ type IGraph interface {
 	RangeAdj(v int, fn func(v int) bool)
 }
 
-func RangeDFS(g IGraph, src int, fn func(int) bool) {
+// DFS will infinitely perform recursion if there is ring in graph
+func DFS(g IGraph, src int, fn func(int) bool) bool {
+	goon := true
+	g.RangeAdj(src, func(adj int) bool {
+		if !fn(adj) {
+			goon = false
+			return false
+		}
+		goon = DFS(g, adj, fn)
+		return goon
+	})
+	return goon
+}
+
+func RangeReachable(g IGraph, src int, fn func(int) bool) {
 	if !g.HasVertical(src) {
 		return
 	}
 	marked := make([]bool, g.NumVertical())
-	doDFS(g, src, marked, fn)
+	rangeReachable(g, src, marked, fn)
 }
 
-func doDFS(g IGraph, v int, marked []bool, fn func(int) bool) bool {
+func rangeReachable(g IGraph, v int, marked []bool, fn func(int) bool) bool {
 	marked[v] = true
 	if !fn(v) {
 		return false
 	}
 	goon := true // continue DFS or abort
-	g.RangeAdj(v, func(v int) bool {
-		if !marked[v] {
-			if !doDFS(g, v, marked, fn) {
+	g.RangeAdj(v, func(adj int) bool {
+		if !marked[adj] {
+			if !rangeReachable(g, adj, marked, fn) {
 				goon = false
 			}
 		}
@@ -31,21 +45,21 @@ func doDFS(g IGraph, v int, marked []bool, fn func(int) bool) bool {
 	return goon
 }
 
-func DFSMarked(g IGraph, src int) []bool {
+func ReachableBits(g IGraph, src int) []bool {
 	if !g.HasVertical(src) {
 		return nil
 	}
 	marked := make([]bool, g.NumVertical())
-	doDFS(g, src, marked, func(_ int) bool { return true })
+	rangeReachable(g, src, marked, func(_ int) bool { return true })
 	return marked
 }
 
-func DFSReachable(g IGraph, src int) []int {
+func ReachableSlice(g IGraph, src int) []int {
 	if !g.HasVertical(src) {
 		return nil
 	}
 	var arrived []int
-	RangeDFS(g, src, func(v int) bool {
+	RangeReachable(g, src, func(v int) bool {
 		arrived = append(arrived, v)
 		return true
 	})

@@ -18,7 +18,7 @@ func (g Graph) TransitiveClosure() *TransitiveClosure {
 	subGraphID := 0
 	for i, c := range tc.locate {
 		if c < 0 {
-			dfs := graphs.DFSReachable(g, i)
+			dfs := graphs.ReachableSlice(g, i)
 			for _, v := range dfs {
 				tc.locate[v] = subGraphID
 			}
