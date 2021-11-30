@@ -1,7 +1,8 @@
-package graph
+package graphs
 
 import (
 	"errors"
+	"github.com/howz97/algorithm/graphs/graph"
 	"github.com/howz97/algorithm/util"
 	"strings"
 )
@@ -11,7 +12,7 @@ var ErrFormat = errors.New("input format error")
 type SymbolGraph struct {
 	str2int map[string]int
 	int2str []string
-	*Graph
+	Graph   IGraph
 }
 
 func NewSymbolGraph(filename string) (*SymbolGraph, error) {
@@ -28,7 +29,7 @@ func NewSymbolGraph(filename string) (*SymbolGraph, error) {
 			sg.scanVertical(v)
 		}
 	}
-	sg.Graph = New(len(sg.int2str))
+	sg.Graph = graph.New(len(sg.int2str)) // todo
 	for _, row := range input {
 		if len(row) == 0 {
 			continue
@@ -44,11 +45,11 @@ func NewSymbolGraph(filename string) (*SymbolGraph, error) {
 func (sg *SymbolGraph) AddEdge(src, dst string) error {
 	iSrc, ok := sg.str2int[src]
 	if !ok {
-		return ErrVerticalNotExist
+		return graph.ErrVerticalNotExist
 	}
 	iDst, ok := sg.str2int[dst]
 	if !ok {
-		return ErrVerticalNotExist
+		return graph.ErrVerticalNotExist
 	}
 	return sg.Graph.AddEdge(iSrc, iDst)
 }
