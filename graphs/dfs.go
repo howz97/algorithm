@@ -6,8 +6,11 @@ type IGraph interface {
 	RangeAdj(v int, fn func(v int) bool)
 }
 
-// DFS will infinitely perform recursion if there is ring in graph
+// DFS will infinitely perform recursion on meeting a ring
 func DFS(g IGraph, src int, fn func(int) bool) bool {
+	if !fn(src) {
+		return false
+	}
 	goon := true
 	g.RangeAdj(src, func(adj int) bool {
 		if !fn(adj) {

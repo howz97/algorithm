@@ -1,6 +1,7 @@
-package graphs
+package integer_test
 
 import (
+	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/graphs/digraph"
 	"github.com/howz97/algorithm/graphs/graph"
 	"github.com/howz97/algorithm/sort"
@@ -85,9 +86,9 @@ func TestDFS_Digraph(t *testing.T) {
 	checkDFSResults(t, dg, dfsResults)
 }
 
-func checkDFSResults(t *testing.T, g IGraph, dfsResults [][]int) {
+func checkDFSResults(t *testing.T, g graphs.IGraph, dfsResults [][]int) {
 	for src := range dfsResults {
-		reach := ReachableSlice(g, src)
+		reach := graphs.ReachableSlice(g, src)
 		sort.QuickSort(stdsort.IntSlice(reach))
 		if !util.SliceEqual(reach, dfsResults[src]) {
 			t.Fatalf("v %d reach %v not equal %v", src, reach, dfsResults[src])

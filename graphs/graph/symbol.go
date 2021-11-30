@@ -11,7 +11,7 @@ var ErrFormat = errors.New("input format error")
 type SymbolGraph struct {
 	str2int map[string]int
 	int2str []string
-	Graph
+	*Graph
 }
 
 func NewSymbolGraph(filename string) (*SymbolGraph, error) {

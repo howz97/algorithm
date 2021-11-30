@@ -7,7 +7,7 @@ type TransitiveClosure struct {
 	subGraphs [][]int // subGraphID -> all vertices
 }
 
-func (g Graph) TransitiveClosure() *TransitiveClosure {
+func (g *Graph) TransitiveClosure() *TransitiveClosure {
 	tc := &TransitiveClosure{
 		locate: make([]int, g.NumVertical()),
 	}

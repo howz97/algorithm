@@ -13,8 +13,8 @@ var (
 
 type Digraph []set.IntSet
 
-func New(numV int) Digraph {
-	g := make(Digraph, numV)
+func New(size int) Digraph {
+	g := make(Digraph, size)
 	for i := range g {
 		g[i] = make(set.IntSet)
 	}
@@ -44,11 +44,11 @@ func (dg Digraph) HasVertical(v int) bool {
 }
 
 func (dg Digraph) NumEdge() int {
-	nume := 0
+	n := 0
 	for i := range dg {
-		nume += dg[i].Len()
+		n += dg[i].Len()
 	}
-	return nume
+	return n
 }
 
 func (dg Digraph) AddEdge(v1, v2 int) error {
@@ -64,14 +64,14 @@ func (dg Digraph) AddEdge(v1, v2 int) error {
 
 func (dg Digraph) HasEdge(v1, v2 int) bool {
 	if !dg.HasVertical(v1) || !dg.HasVertical(v2) {
-		panic(ErrVertexNotExist)
+		return false
 	}
 	return dg[v1].Contains(v2)
 }
 
 func (dg Digraph) Adjacent(v int) []int {
 	if !dg.HasVertical(v) {
-		panic(ErrVertexNotExist)
+		return nil
 	}
 	return dg[v].Traverse()
 }
