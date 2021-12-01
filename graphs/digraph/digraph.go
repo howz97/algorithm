@@ -110,15 +110,15 @@ func (dg Digraph) HasCycle() bool {
 }
 
 func (dg Digraph) GetCycle() []int {
-	stk := dg.getCycle()
-	if stk == nil {
+	pathStack := dg.getCycle()
+	if pathStack == nil {
 		return nil
 	}
-	path := make([]int, 0, stk.Size())
-	w, _ := stk.Pop()
+	path := make([]int, 0, pathStack.Size())
+	w, _ := pathStack.Pop()
 	path = append(path, w)
 	for {
-		v, _ := stk.Pop()
+		v, _ := pathStack.Pop()
 		path = append(path, v)
 		if v == w {
 			break
@@ -130,36 +130,52 @@ func (dg Digraph) GetCycle() []int {
 
 func (dg Digraph) getCycle() *stack.IntStack {
 	marks := make([]bool, dg.NumVertical())
-	s := stack.NewInt(4)
+	path := stack.NewInt(4)
 	for v, m := range marks {
 		if !m {
-			if dg.detectCycleDFS(v, marks, s) {
-				return s
+			if dg.detectCycleDFS(v, marks, path) {
+				return path
 			}
 		}
 	}
 	return nil
 }
 
-func (dg Digraph) detectCycleDFS(v int, marked []bool, s *stack.IntStack) bool {
-	s.Push(v)
+func (dg Digraph) detectCycleDFS(v int, marked []bool, path *stack.IntStack) bool {
+	path.Push(v)
 	found := false
 	dg.RangeAdj(v, func(w int) bool {
 		if !marked[w] {
 			return true
 		}
-		if s.Contains(w) {
-			s.Push(w)
+		if path.Contains(w) {
+			path.Push(w)
 			found = true
 			return false
 		}
-		found = dg.detectCycleDFS(w, marked, s)
+		found = dg.detectCycleDFS(w, marked, path)
 		return !found
 	})
 	if found {
 		return true
 	}
-	s.Pop()
+	path.Pop()
 	marked[v] = true
 	return false
+}
+
+func (dg Digraph) ReversePostOrder() *stack.IntStack {
+	order := stack.NewInt(dg.NumVertical())
+	graphs.RevDFSAll(dg, func(v int) bool {
+		order.Push(v)
+		return true
+	})
+	return order
+}
+
+func (dg Digraph) Topological() *stack.IntStack {
+	if dg.HasCycle() {
+		return nil
+	}
+	return dg.ReversePostOrder()
 }

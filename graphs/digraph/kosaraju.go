@@ -1,61 +1,64 @@
 package digraph
 
+import "github.com/howz97/algorithm/graphs"
+
+// SCC is strong connected components of digraph
+// vertices in the same component can access each other
 type SCC struct {
-	marked []bool
-	id     []int
-	g      Digraph
-	count  int
+	locate     []int   // vertical -> componentID
+	components [][]int // componentID -> vertices
 }
 
-func NewSCC(g Digraph) *SCC {
+// SCC calculate strong connected components of digraph with kosaraju algorithm
+func (dg Digraph) SCC() *SCC {
 	scc := &SCC{
-		marked: make([]bool, g.NumVertical()),
-		id:     make([]int, g.NumVertical()),
-		g:      g,
+		locate: make([]int, dg.NumVertical()),
 	}
-	topOrderStack := ReversePostOrder(g.Reverse())
-	for {
-		v, ok := topOrderStack.Pop()
-		if !ok {
-			break
+	marked := make([]bool, dg.NumVertical())
+	graphs.RevDFSAll(dg, func(v int) bool {
+		if !marked[v] {
+			c := make([]int, 0, 8)
+			graphs.RangeUnMarkDFS(dg, v, marked, func(w int) bool {
+				scc.locate[w] = len(scc.components)
+				c = append(c, w)
+				return true
+			})
+			scc.components = append(scc.components, c)
 		}
-		if !scc.marked[v] {
-			scc.markID(v, scc.count)
-			scc.count++
-		}
-	}
+		return true
+	})
 	return scc
 }
 
-func (scc *SCC) markID(v, sccid int) {
-	scc.marked[v] = true
-	scc.id[v] = sccid
-	adj := scc.g.Adjacent(v)
-	for _, w := range adj {
-		if !scc.marked[w] {
-			scc.markID(w, sccid)
+func (scc *SCC) IsStronglyConn(src, dst int) bool {
+	if !scc.has(src) || !scc.has(dst) {
+		return false
+	}
+	return scc.locate[src] == scc.locate[dst]
+}
+
+func (scc *SCC) GetCompID(v int) int {
+	if !scc.has(v) {
+		return -1
+	}
+	return scc.locate[v]
+}
+
+func (scc *SCC) RangeComponent(v int, fn func(int) bool) {
+	if !scc.has(v) {
+		return
+	}
+	for _, w := range scc.components[scc.locate[v]] {
+		if !fn(w) {
+			break
 		}
 	}
 }
 
-func (scc *SCC) IsStronglyConnected(src, dst int) bool {
-	if !scc.has(src) || !scc.has(dst) {
-		return false
-	}
-	return scc.id[src] == scc.id[dst]
-}
-
-func (scc *SCC) GetID(v int) int {
-	if !scc.has(v) {
-		panic("invalid vertical")
-	}
-	return scc.id[v]
-}
-
-func (scc *SCC) NumSCC() int {
-	return scc.count
+func (scc *SCC) NumComponents() int {
+	return len(scc.components)
 }
 
 func (scc *SCC) has(v int) bool {
-	return v >= 0 && v < len(scc.marked)
+	return v >= 0 && v < len(scc.locate)
 }
