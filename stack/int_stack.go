@@ -17,7 +17,3 @@ func (s *IntStack) Pop() (int, bool) {
 	}
 	return e.(int), true
 }
-
-func (s *IntStack) Push(e int) {
-	s.Stack.Push(e)
-}

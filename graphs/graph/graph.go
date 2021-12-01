@@ -1,13 +1,8 @@
 package graph
 
 import (
-	"errors"
+	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/graphs/digraph"
-)
-
-var (
-	ErrVerticalNotExist = errors.New("vertical not exist")
-	ErrSelfLoop         = errors.New("not support self loop")
 )
 
 type Graph struct {
@@ -27,10 +22,10 @@ func (g *Graph) NumEdge() int {
 // AddEdge add edge v1-v2
 func (g *Graph) AddEdge(v1, v2 int) error {
 	if !g.HasVertical(v1) || !g.HasVertical(v2) {
-		return ErrVerticalNotExist
+		return graphs.ErrVerticalNotExist
 	}
 	if v1 == v2 {
-		return ErrSelfLoop
+		return graphs.ErrSelfLoop
 	}
 	g.Digraph[v1].Add(v2)
 	g.Digraph[v2].Add(v1)

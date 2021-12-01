@@ -1,14 +1,11 @@
 package digraph
 
 import (
-	"errors"
+	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/set"
+	"github.com/howz97/algorithm/stack"
+	"github.com/howz97/algorithm/util"
 	"strconv"
-)
-
-var (
-	ErrVertexNotExist     = errors.New("vertex not exist")
-	ErrNotSupportSelfLoop = errors.New("not support self loop")
 )
 
 type Digraph []set.IntSet
@@ -53,10 +50,10 @@ func (dg Digraph) NumEdge() int {
 
 func (dg Digraph) AddEdge(v1, v2 int) error {
 	if !dg.HasVertical(v1) || !dg.HasVertical(v2) {
-		return ErrVertexNotExist
+		return graphs.ErrVerticalNotExist
 	}
 	if v1 == v2 {
-		return ErrNotSupportSelfLoop
+		return graphs.ErrSelfLoop
 	}
 	dg[v1].Add(v2)
 	return nil
@@ -87,10 +84,10 @@ func (dg Digraph) String() string {
 	out := ""
 	for i := range dg {
 		out += strconv.Itoa(i) + " :"
-		adj := dg.Adjacent(i)
-		for _, j := range adj {
+		dg.RangeAdj(i, func(j int) bool {
 			out += " " + strconv.Itoa(j)
-		}
+			return true
+		})
 		out += "\n"
 	}
 	out += "\n"
@@ -100,14 +97,69 @@ func (dg Digraph) String() string {
 func (dg Digraph) Reverse() Digraph {
 	rg := New(dg.NumVertical())
 	for v := 0; v < dg.NumVertical(); v++ {
-		adj := dg.Adjacent(v)
-		for _, w := range adj {
+		dg.RangeAdj(v, func(w int) bool {
 			rg.AddEdge(w, v)
-		}
+			return true
+		})
 	}
 	return rg
 }
 
-func (dg Digraph) HasDir() bool {
-	return true
+func (dg Digraph) HasCycle() bool {
+	return dg.getCycle() != nil
+}
+
+func (dg Digraph) GetCycle() []int {
+	stk := dg.getCycle()
+	if stk == nil {
+		return nil
+	}
+	path := make([]int, 0, stk.Size())
+	w, _ := stk.Pop()
+	path = append(path, w)
+	for {
+		v, _ := stk.Pop()
+		path = append(path, v)
+		if v == w {
+			break
+		}
+	}
+	util.ReverseInts(path)
+	return path
+}
+
+func (dg Digraph) getCycle() *stack.IntStack {
+	marks := make([]bool, dg.NumVertical())
+	s := stack.NewInt(4)
+	for v, m := range marks {
+		if !m {
+			if dg.detectCycleDFS(v, marks, s) {
+				return s
+			}
+		}
+	}
+	return nil
+}
+
+func (dg Digraph) detectCycleDFS(v int, marked []bool, s *stack.IntStack) bool {
+	s.Push(v)
+	found := false
+	dg.RangeAdj(v, func(w int) bool {
+		if !marked[w] {
+			return true
+		}
+		if s.Contains(w) {
+			s.Push(w)
+			found = true
+			return false
+		}
+		found = dg.detectCycleDFS(w, marked, s)
+		return !found
+	})
+	if found {
+		return true
+	}
+	s.Pop()
+	marked[v] = true
+	return false
 }

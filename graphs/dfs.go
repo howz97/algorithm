@@ -1,13 +1,5 @@
 package graphs
 
-type IGraph interface {
-	HasVertical(v int) bool
-	NumVertical() int
-	AddEdge(v1, v2 int) error
-	HasEdge(v1, v2 int) bool
-	RangeAdj(v int, fn func(v int) bool)
-}
-
 // DFS will infinitely perform recursion on meeting a ring
 func DFS(g IGraph, src int, fn func(int) bool) bool {
 	if !fn(src) {

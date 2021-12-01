@@ -49,3 +49,12 @@ func (s *Stack) Push(e T) {
 func (s *Stack) isFull() bool {
 	return s.top == len(s.elems)
 }
+
+func (s *Stack) Contains(e T) bool {
+	for i := 0; i < s.top; i++ {
+		if s.elems[i] == e {
+			return true
+		}
+	}
+	return false
+}

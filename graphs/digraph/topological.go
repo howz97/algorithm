@@ -25,7 +25,7 @@ func reversePostDFS(g Digraph, v int, marked []bool, result *stack.IntStack) {
 }
 
 func TopologicalSort(g Digraph) *stack.IntStack {
-	if !DetectDirCycle(g) {
+	if !g.HasCycle() {
 		return ReversePostOrder(g)
 	}
 	return nil

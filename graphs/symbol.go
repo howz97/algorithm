@@ -2,7 +2,6 @@ package graphs
 
 import (
 	"errors"
-	"github.com/howz97/algorithm/graphs/graph"
 	"github.com/howz97/algorithm/util"
 	"strings"
 )
@@ -15,8 +14,8 @@ type SymbolGraph struct {
 	Graph   IGraph
 }
 
-func NewSymbolGraph(filename string) (*SymbolGraph, error) {
-	input, err := ScanInput(filename)
+func NewSymbolGraph(filename string, scanFn func(string) ([][]string, error), newFn func(int) IGraph) (*SymbolGraph, error) {
+	input, err := scanFn(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +28,7 @@ func NewSymbolGraph(filename string) (*SymbolGraph, error) {
 			sg.scanVertical(v)
 		}
 	}
-	sg.Graph = graph.New(len(sg.int2str)) // todo
+	sg.Graph = newFn(len(sg.int2str))
 	for _, row := range input {
 		if len(row) == 0 {
 			continue
@@ -45,11 +44,11 @@ func NewSymbolGraph(filename string) (*SymbolGraph, error) {
 func (sg *SymbolGraph) AddEdge(src, dst string) error {
 	iSrc, ok := sg.str2int[src]
 	if !ok {
-		return graph.ErrVerticalNotExist
+		return ErrVerticalNotExist
 	}
 	iDst, ok := sg.str2int[dst]
 	if !ok {
-		return graph.ErrVerticalNotExist
+		return ErrVerticalNotExist
 	}
 	return sg.Graph.AddEdge(iSrc, iDst)
 }
