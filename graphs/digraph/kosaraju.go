@@ -31,21 +31,21 @@ func (dg Digraph) SCC() *SCC {
 }
 
 func (scc *SCC) IsStronglyConn(src, dst int) bool {
-	if !scc.has(src) || !scc.has(dst) {
+	if !scc.hasVertical(src) || !scc.hasVertical(dst) {
 		return false
 	}
 	return scc.locate[src] == scc.locate[dst]
 }
 
 func (scc *SCC) GetCompID(v int) int {
-	if !scc.has(v) {
+	if !scc.hasVertical(v) {
 		return -1
 	}
 	return scc.locate[v]
 }
 
 func (scc *SCC) RangeComponent(v int, fn func(int) bool) {
-	if !scc.has(v) {
+	if !scc.hasVertical(v) {
 		return
 	}
 	for _, w := range scc.components[scc.locate[v]] {
@@ -59,6 +59,6 @@ func (scc *SCC) NumComponents() int {
 	return len(scc.components)
 }
 
-func (scc *SCC) has(v int) bool {
+func (scc *SCC) hasVertical(v int) bool {
 	return v >= 0 && v < len(scc.locate)
 }

@@ -13,26 +13,25 @@ func (dg Digraph) TransitiveClosure() TransitiveClosure {
 }
 
 func (tc TransitiveClosure) CanReach(src, dst int) bool {
-	if !tc.hasV(src) || !tc.hasV(dst) {
+	if !tc.hasVertical(src) || !tc.hasVertical(dst) {
 		return false
 	}
 	return tc[src][dst]
 }
 
 func (tc TransitiveClosure) Range(v int, fn func(v int) bool) {
-	if !tc.hasV(v) {
+	if !tc.hasVertical(v) {
 		return
 	}
 	for w, marked := range tc[v] {
-		if !marked {
-			continue
-		}
-		if !fn(w) {
-			break
+		if marked {
+			if !fn(w) {
+				break
+			}
 		}
 	}
 }
 
-func (tc TransitiveClosure) hasV(v int) bool {
+func (tc TransitiveClosure) hasVertical(v int) bool {
 	return v >= 0 || v < len(tc)
 }

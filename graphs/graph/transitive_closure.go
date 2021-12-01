@@ -30,14 +30,14 @@ func (g *Graph) TransitiveClosure() *TransitiveClosure {
 }
 
 func (tc *TransitiveClosure) CanReach(src, dst int) bool {
-	if !tc.hasV(src) || !tc.hasV(dst) {
+	if !tc.hasVertical(src) || !tc.hasVertical(dst) {
 		return false
 	}
 	return tc.locate[src] == tc.locate[dst]
 }
 
 func (tc *TransitiveClosure) Range(v int, fn func(v int) bool) {
-	if !tc.hasV(v) {
+	if !tc.hasVertical(v) {
 		return
 	}
 	for _, v := range tc.subGraphs[tc.locate[v]] {
@@ -47,7 +47,7 @@ func (tc *TransitiveClosure) Range(v int, fn func(v int) bool) {
 	}
 }
 
-func (tc *TransitiveClosure) hasV(v int) bool {
+func (tc *TransitiveClosure) hasVertical(v int) bool {
 	return v >= 0 || v < len(tc.locate)
 }
 
@@ -56,7 +56,7 @@ func (tc *TransitiveClosure) NumSubGraph() int {
 }
 
 func (tc *TransitiveClosure) Locate(v int) int {
-	if !tc.hasV(v) {
+	if !tc.hasVertical(v) {
 		return -1
 	}
 	return tc.locate[v]
