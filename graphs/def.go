@@ -5,6 +5,7 @@ import "errors"
 var (
 	ErrVerticalNotExist = errors.New("vertical not exist")
 	ErrSelfLoop         = errors.New("not support self loop")
+	ErrInputFormat      = errors.New("input format error")
 )
 
 type IGraph interface {

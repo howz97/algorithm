@@ -1,12 +1,9 @@
 package graphs
 
 import (
-	"errors"
 	"github.com/howz97/algorithm/util"
 	"strings"
 )
-
-var ErrFormat = errors.New("input format error")
 
 type SymbolGraph struct {
 	str2int map[string]int
@@ -104,17 +101,17 @@ func ScanInput(filename string) (input [][]string, err error) {
 		}
 		split := strings.Split(line, ":")
 		if len(split) != 2 {
-			err = ErrFormat
+			err = ErrInputFormat
 			return false
 		}
 		src := strings.TrimSpace(split[0])
 		if src == "" {
-			err = ErrFormat
+			err = ErrInputFormat
 			return false
 		}
 		dsts := strings.Split(split[1], ",")
 		if len(dsts) == 0 {
-			err = ErrFormat
+			err = ErrInputFormat
 			return false
 		}
 		row := []string{src}
