@@ -1,4 +1,4 @@
-package weighted_graph
+package wdigraph
 
 type edgeSet map[*Edge]struct{}
 

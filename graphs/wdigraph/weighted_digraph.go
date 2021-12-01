@@ -1,4 +1,4 @@
-package weighted_digraph
+package wdigraph
 
 import (
 	"bytes"

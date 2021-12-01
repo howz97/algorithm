@@ -2,10 +2,10 @@
 ```go
 package main
 
-import wDigraph "github.com/howz97/algorithm/graphs/weighted_digraph"
+import wDigraph "github.com/howz97/algorithm/graphs/wdigraph"
 
 func main() {
-	g, err := wDigraph.ImportEWD("../graphs/weighted_digraph/tinyEWD.txt")
+	g, err := wDigraph.ImportEWD("../graphs/wdigraph/tinyEWD.txt")
 	if err != nil {
 		panic(err)
 	}

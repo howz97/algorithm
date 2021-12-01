@@ -1,4 +1,4 @@
-package weighted_digraph
+package wdigraph
 
 import "github.com/howz97/algorithm/stack"
 
