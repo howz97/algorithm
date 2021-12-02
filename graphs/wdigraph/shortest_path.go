@@ -7,17 +7,17 @@ import (
 )
 
 type ShortestPathSearcher struct {
-	g   EdgeWeightedDigraph
+	g   WDigraph
 	spt []*ShortestPathTree
 }
 
-func (g EdgeWeightedDigraph) GenSearcherDijkstra() (*ShortestPathSearcher, error) {
+func (g WDigraph) GenSearcherDijkstra() (*ShortestPathSearcher, error) {
 	if g.HasNegativeEdge() {
 		return nil, errors.New("this digraph contains negative edge")
 	}
 	sps := &ShortestPathSearcher{
 		g:   g,
-		spt: make([]*ShortestPathTree, g.NumV()),
+		spt: make([]*ShortestPathTree, g.NumVertical()),
 	}
 	for v := range sps.spt {
 		tree := g.NewShortestPathTree(v)
@@ -27,13 +27,13 @@ func (g EdgeWeightedDigraph) GenSearcherDijkstra() (*ShortestPathSearcher, error
 	return sps, nil
 }
 
-func (g EdgeWeightedDigraph) GenSearcherTopological() (*ShortestPathSearcher, error) {
+func (g WDigraph) GenSearcherTopological() (*ShortestPathSearcher, error) {
 	if g.DetectDirCycle() {
 		return nil, errors.New("this digraph contains directed cycle")
 	}
 	sps := &ShortestPathSearcher{
 		g:   g,
-		spt: make([]*ShortestPathTree, g.NumV()),
+		spt: make([]*ShortestPathTree, g.NumVertical()),
 	}
 	for v := range sps.spt {
 		tree := g.NewShortestPathTree(v)
@@ -43,10 +43,10 @@ func (g EdgeWeightedDigraph) GenSearcherTopological() (*ShortestPathSearcher, er
 	return sps, nil
 }
 
-func (g EdgeWeightedDigraph) GenSearcherBellmanFord() (*ShortestPathSearcher, error) {
+func (g WDigraph) GenSearcherBellmanFord() (*ShortestPathSearcher, error) {
 	sps := &ShortestPathSearcher{
 		g:   g,
-		spt: make([]*ShortestPathTree, g.NumV()),
+		spt: make([]*ShortestPathTree, g.NumVertical()),
 	}
 	var err error
 	for v := range sps.spt {
@@ -61,14 +61,14 @@ func (g EdgeWeightedDigraph) GenSearcherBellmanFord() (*ShortestPathSearcher, er
 }
 
 func (s *ShortestPathSearcher) Distance(src, dst int) float64 {
-	if !s.g.HasV(src) && !s.g.HasV(dst) {
+	if !s.g.HasVertical(src) && !s.g.HasVertical(dst) {
 		panic(ErrVerticalNotExist)
 	}
 	return s.spt[src].DistanceTo(dst)
 }
 
 func (s *ShortestPathSearcher) Path(src, dst int) *stack.Stack {
-	if !s.g.HasV(src) && !s.g.HasV(dst) {
+	if !s.g.HasVertical(src) && !s.g.HasVertical(dst) {
 		panic(ErrVerticalNotExist)
 	}
 	return s.spt[src].PathTo(dst)

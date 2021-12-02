@@ -1,6 +1,6 @@
 package graphs
 
-func IsBipartiteGraph(g IGraph) bool {
+func IsBipartiteGraph(g ITraverse) bool {
 	marks := make([]bool, g.NumVertical())
 	colors := make([]bool, g.NumVertical())
 	for i, m := range marks {
@@ -14,7 +14,7 @@ func IsBipartiteGraph(g IGraph) bool {
 	return true
 }
 
-func isBipartiteDFS(g IGraph, cur int, color bool, colors []bool, marked []bool) bool {
+func isBipartiteDFS(g ITraverse, cur int, color bool, colors []bool, marked []bool) bool {
 	isBip := true
 	if !marked[cur] {
 		marked[cur] = true

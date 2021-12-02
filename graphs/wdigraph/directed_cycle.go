@@ -2,8 +2,8 @@ package wdigraph
 
 import "github.com/howz97/algorithm/set"
 
-func (g EdgeWeightedDigraph) DetectDirCycle() bool {
-	marked := make([]bool, g.NumV())
+func (g WDigraph) DetectDirCycle() bool {
+	marked := make([]bool, g.NumVertical())
 	s := set.NewIntSet()
 	for i, b := range marked {
 		if !b {
@@ -15,7 +15,7 @@ func (g EdgeWeightedDigraph) DetectDirCycle() bool {
 	return false
 }
 
-func (g EdgeWeightedDigraph) detectDirCycle(v int, marked []bool, s set.IntSet) bool {
+func (g WDigraph) detectDirCycle(v int, marked []bool, s set.IntSet) bool {
 	if s.Contains(v) {
 		return true
 	}

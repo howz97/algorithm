@@ -48,14 +48,14 @@ func (dg Digraph) NumEdge() int {
 	return n
 }
 
-func (dg Digraph) AddEdge(v1, v2 int) error {
-	if !dg.HasVertical(v1) || !dg.HasVertical(v2) {
+func (dg Digraph) AddEdge(src, dst int) error {
+	if !dg.HasVertical(src) || !dg.HasVertical(dst) {
 		return graphs.ErrVerticalNotExist
 	}
-	if v1 == v2 {
+	if src == dst {
 		return graphs.ErrSelfLoop
 	}
-	dg[v1].Add(v2)
+	dg[src].Add(dst)
 	return nil
 }
 

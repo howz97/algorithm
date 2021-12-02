@@ -2,7 +2,7 @@ package search
 
 import "unsafe"
 
-type Integer int
+type Integer int // todo: rename to Int
 
 func (v Integer) Hash() uint {
 	return uint(v)

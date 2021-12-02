@@ -11,7 +11,7 @@ type BFS struct {
 	edgeTo []int
 }
 
-func NewBFS(g IGraph, src int) *BFS {
+func NewBFS(g ITraverse, src int) *BFS {
 	if !g.HasVertical(src) {
 		return nil
 	}
