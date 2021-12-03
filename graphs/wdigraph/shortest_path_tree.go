@@ -107,19 +107,19 @@ func (spt *ShortestPathTree) InitTopological() {
 		return true
 	})
 	for {
-		e, ok := order.Pop()
+		v, ok := order.Pop()
 		if !ok {
 			break
 		}
-		topologicalRelax(spt.g, e, spt.edgeTo, spt.distTo)
+		topologicalRelax(spt.g, v, spt.edgeTo, spt.distTo)
 	}
 }
 
 func topologicalRelax(g *WDigraph, v int, edgeTo []int, distTo []float64) {
-	g.RangeWAdj(v, func(adj int, w float64) bool {
-		if distTo[v]+w < distTo[adj] {
-			edgeTo[adj] = v
-			distTo[adj] = distTo[v] + w
+	g.RangeWAdj(v, func(a int, w float64) bool {
+		if distTo[v]+w < distTo[a] {
+			edgeTo[a] = v
+			distTo[a] = distTo[v] + w
 		}
 		return true
 	})
