@@ -7,7 +7,7 @@ import (
 )
 
 func TestEWD_Integer(t *testing.T) {
-	g, err := LoadWDigraph("w_digraph.yml")
+	g, err := LoadWDigraph("w_digraph_no_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,31 +34,32 @@ func TestEWD_Integer(t *testing.T) {
 			p0 := spsDijkstra.Path(src, dst)
 			p1 := spsTop.Path(src, dst)
 			if !isPathEqual(p0, p1) {
-				t.Fatal("path not equal")
+				t.Errorf("path(%d->%d) not equal: \np0=%s, \np1=%s \n", src, dst, p0.String(), p1.String())
 			}
 
 			p0 = spsDijkstra.Path(src, dst)
 			p1 = spsBF.Path(src, dst)
 			if !isPathEqual(p0, p1) {
-				t.Fatal("path not equal")
+				t.Errorf("path(%d->%d) not equal: \np0=%s, \np1=%s \n", src, dst, p0.String(), p1.String())
 			}
 		}
 	}
 }
 
 func isPathEqual(s0, s1 *stack.Stack) bool {
-	if s0.Size() != s1.Size() {
+	if stack.SizeOf(s0) != stack.SizeOf(s1) {
 		return false
+	}
+	if s0 == nil {
+		return true
 	}
 	for {
 		e0, ok := s0.Pop()
 		if !ok {
 			break
 		}
-		eg0 := e0.(*Edge)
 		e1, _ := s1.Pop()
-		eg1 := e1.(*Edge)
-		if eg0.From() != eg1.From() || eg0.To() != eg1.To() {
+		if e0 != e1 {
 			return false
 		}
 	}
@@ -96,20 +97,13 @@ func TestNewSPS_Topological(t *testing.T) {
 }
 
 func TestNewSPS_BellmanFord(t *testing.T) {
-	g, err := ImportEWD("./tinyEWDnc.txt")
+	g, err := LoadWDigraph("negative_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
-	sps, err := g.GenSearcherBellmanFord()
-	if err != nil {
-		fmt.Println(err)
-		return
+	_, err = g.GenSearcherBellmanFord()
+	if err == nil {
+		t.Fatal("negative cycle exist, error should be received")
 	}
-
-	num := g.NumVertical()
-	for src := 0; src < num; src++ {
-		for dst := 0; dst < num; dst++ {
-			sps.PrintPath(src, dst)
-		}
-	}
+	fmt.Println(err)
 }

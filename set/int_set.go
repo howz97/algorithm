@@ -58,7 +58,7 @@ func (s IntSet) Traverse() []int {
 	return result
 }
 
-func (s IntSet) Range(fn func(int) bool) {
+func (s IntSet) Iterate(fn func(int) bool) {
 	for e := range s {
 		if !fn(e) {
 			break

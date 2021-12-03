@@ -77,7 +77,7 @@ func (dg Digraph) RangeAdj(v int, fn func(int) bool) {
 	if !dg.HasVertical(v) {
 		return
 	}
-	dg[v].Range(fn)
+	dg[v].Iterate(fn)
 }
 
 func (dg Digraph) String() string {
@@ -114,7 +114,7 @@ func (dg Digraph) GetCycle() []int {
 	if pathStack == nil {
 		return nil
 	}
-	path := parseCycleInStack(pathStack)
+	path := ParseCycleInStack(pathStack)
 	return path
 }
 
@@ -123,7 +123,7 @@ func (dg Digraph) getCycle() *stack.IntStack {
 	path := stack.NewInt(4)
 	for v, m := range marks {
 		if !m {
-			if dg.detectCycleDFS(v, marks, path) {
+			if dg.DetectCycleDFS(v, marks, path) {
 				return path
 			}
 		}
@@ -141,20 +141,33 @@ func (dg Digraph) GetCycleBy(v int) []int {
 	if pathStack == nil {
 		return nil
 	}
-	path := parseCycleInStack(pathStack)
+	path := ParseCycleInStack(pathStack)
 	return path
+}
+
+func (dg Digraph) IterateEdge(fn func(int, int) bool) {
+	for src, adj := range dg {
+		goon := true
+		adj.Iterate(func(dst int) bool {
+			goon = fn(src, dst)
+			return goon
+		})
+		if !goon {
+			break
+		}
+	}
 }
 
 func (dg Digraph) getCycleBy(v int) *stack.IntStack {
 	marks := make([]bool, dg.NumVertical())
 	path := stack.NewInt(4)
-	if dg.detectCycleDFS(v, marks, path) {
+	if dg.DetectCycleDFS(v, marks, path) {
 		return path
 	}
 	return nil
 }
 
-func parseCycleInStack(stk *stack.IntStack) []int {
+func ParseCycleInStack(stk *stack.IntStack) []int {
 	path := make([]int, 0, stk.Size())
 	w, _ := stk.Pop()
 	path = append(path, w)
@@ -169,11 +182,11 @@ func parseCycleInStack(stk *stack.IntStack) []int {
 	return path
 }
 
-func (dg Digraph) detectCycleDFS(v int, marked []bool, path *stack.IntStack) bool {
+func (dg Digraph) DetectCycleDFS(v int, marked []bool, path *stack.IntStack) bool {
 	path.Push(v)
 	found := false
 	dg.RangeAdj(v, func(w int) bool {
-		if !marked[w] {
+		if marked[w] {
 			return true
 		}
 		if path.Contains(w) {
@@ -181,15 +194,14 @@ func (dg Digraph) detectCycleDFS(v int, marked []bool, path *stack.IntStack) boo
 			found = true
 			return false
 		}
-		found = dg.detectCycleDFS(w, marked, path)
+		found = dg.DetectCycleDFS(w, marked, path)
 		return !found
 	})
-	if found {
-		return true
-	}
-	path.Pop()
 	marked[v] = true
-	return false
+	if !found {
+		path.Pop()
+	}
+	return found
 }
 
 // Topological return a stack that pop vertices in topological order

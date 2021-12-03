@@ -8,6 +8,7 @@ import (
 	"github.com/howz97/algorithm/graphs/digraph"
 	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/search/hash_map"
+	"github.com/howz97/algorithm/stack"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
@@ -138,6 +139,28 @@ func (g *WDigraph) String() string {
 		return err.Error()
 	}
 	return string(bytes)
+}
+
+func (g *WDigraph) IterateEdge(fn func(int, int, float64) bool) {
+	g.Digraph.IterateEdge(func(src int, dst int) bool {
+		return fn(src, dst, g.getWeight(src, dst))
+	})
+}
+
+func (g *WDigraph) AnyNegativeCycle() *stack.IntStack {
+	marked := make([]bool, g.NumVertical())
+	path := stack.NewInt(4)
+	g.IterateEdge(func(src int, dst int, w float64) bool {
+		if w < 0 {
+			if !marked[src] {
+				if g.DetectCycleDFS(src, marked, path) {
+					return false
+				}
+			}
+		}
+		return true
+	})
+	return path
 }
 
 type Edge struct {

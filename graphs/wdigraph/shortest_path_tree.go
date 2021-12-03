@@ -7,7 +7,6 @@ import (
 	"github.com/howz97/algorithm/queue"
 	"github.com/howz97/algorithm/stack"
 	"math"
-	"strconv"
 )
 
 type ShortestPathTree struct {
@@ -129,20 +128,11 @@ func topologicalRelax(g *WDigraph, v int, edgeTo []int, distTo []float64) {
 // ============================ BellmanFord ============================
 
 type NegativeCycle struct {
-	Stack *stack.Stack
+	Stack *stack.IntStack
 }
 
 func (nc NegativeCycle) Error() string {
-	s := ""
-	for {
-		e, ok := nc.Stack.Pop()
-		if !ok {
-			break
-		}
-		eg := e.(*Edge)
-		s += strconv.Itoa(eg.from) + "->" + strconv.Itoa(eg.to) + "  "
-	}
-	return "weight negative cycle: " + s
+	return "weight negative cycle: " + nc.Stack.String()
 }
 
 func (spt *ShortestPathTree) InitBellmanFord() error {
@@ -157,7 +147,7 @@ func (spt *ShortestPathTree) InitBellmanFord() error {
 		bellmanFordRelax(spt.g, v, spt.edgeTo, spt.distTo, needRelax, onQ)
 		relaxTimes++
 		if relaxTimes%spt.g.NumVertical() == 0 {
-			if c := spt.findNegativeCycle(); c != nil {
+			if c := spt.findNegativeCycle(); c.Size() > 0 {
 				return NegativeCycle{Stack: c}
 			}
 		}
@@ -165,24 +155,19 @@ func (spt *ShortestPathTree) InitBellmanFord() error {
 	return nil
 }
 
-func (spt *ShortestPathTree) findNegativeCycle() *stack.Stack {
-	g := New(spt.g.NumVertical())
-	for dst, src := range spt.edgeTo {
-		if src > 0 {
-			g.AddEdge(src, dst, spt.g.getWeight(src, dst))
-		}
-	}
-	marked := make([]bool, spt.g.NumVertical())
-	s := stack.New(spt.g.NumVertical())
-	onS := make([]bool, spt.g.NumVertical())
-	for i := 0; i < spt.g.NumVertical(); i++ {
-		if !marked[i] {
-			if c := findNC(g, i, marked, s, onS, spt.edgeTo); c != nil {
-				return c
-			}
-		}
-	}
-	return nil
+func (spt *ShortestPathTree) findNegativeCycle() *stack.IntStack {
+	return spt.g.AnyNegativeCycle() // todo: optimize ?
+	//marked := make([]bool, spt.g.NumVertical())
+	//s := stack.New(spt.g.NumVertical())
+	//onS := make([]bool, spt.g.NumVertical())
+	//for i := 0; i < spt.g.NumVertical(); i++ {
+	//	if !marked[i] {
+	//		if c := findNC(spt.g, i, marked, s, onS, spt.edgeTo); c != nil {
+	//			return c
+	//		}
+	//	}
+	//}
+	//return nil
 }
 
 func findNC(g *WDigraph, v int, marked []bool, s *stack.Stack, onS []bool, edgeTo []int) *stack.Stack {

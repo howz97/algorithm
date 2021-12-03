@@ -61,18 +61,18 @@ func (s *Stack) Contains(e T) bool {
 	return false
 }
 
-func (s *Stack) Iterate(fn func(T)bool) {
+func (s *Stack) Iterate(fn func(T) bool) {
 	s.IterateRange(0, s.Size(), fn)
 }
 
-func (s *Stack) IterateRange(lo, hi int, fn func(T)bool) {
+func (s *Stack) IterateRange(lo, hi int, fn func(T) bool) {
 	if lo < 0 {
 		lo = 0
 	}
 	if hi > s.top {
 		hi = s.top
 	}
-	for ; lo < hi ; lo++ {
+	for ; lo < hi; lo++ {
 		if !fn(s.elems[lo]) {
 			break
 		}
@@ -80,11 +80,21 @@ func (s *Stack) IterateRange(lo, hi int, fn func(T)bool) {
 }
 
 func (s *Stack) String() string {
+	if s == nil {
+		return "<nil>"
+	}
 	str := ""
 	s.Iterate(func(v T) bool {
-		str += fmt.Sprint(v)
-		str += ","
+		str += fmt.Sprint(v) + "<"
 		return true
 	})
+	str += "(top)"
 	return str
+}
+
+func SizeOf(s *Stack) int {
+	if s == nil {
+		return -1
+	}
+	return s.Size()
 }
