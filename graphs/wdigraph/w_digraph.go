@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/graphs/digraph"
 	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/search/hash_map"
@@ -93,7 +94,7 @@ func ImportEWD(filename string) (*WDigraph, error) {
 	return ewd, nil
 }
 
-func (g WDigraph) AddEdge(src, dst int, w float64) error {
+func (g *WDigraph) AddEdge(src, dst int, w float64) error {
 	err := g.Digraph.AddEdge(src, dst)
 	if err != nil {
 		return err
@@ -103,14 +104,14 @@ func (g WDigraph) AddEdge(src, dst int, w float64) error {
 }
 
 // RangeWAdj range adjacent vertices of v
-func (g WDigraph) RangeWAdj(v int, fn func(int, float64) bool) {
+func (g *WDigraph) RangeWAdj(v int, fn func(int, float64) bool) {
 	g.RangeAdj(v, func(adj int) bool {
 		w := g.weight[v].Get(search.Integer(adj)).(float64)
 		return fn(adj, w)
 	})
 }
 
-func (g WDigraph) HasNegativeEdge() bool {
+func (g *WDigraph) HasNegativeEdge() bool {
 	found := false
 	for _, hm := range g.weight {
 		hm.Range(func(_ hash_map.Key, val search.T) bool {
@@ -122,6 +123,21 @@ func (g WDigraph) HasNegativeEdge() bool {
 		})
 	}
 	return found
+}
+
+func (g *WDigraph) getWeight(src, dst int) float64 {
+	if !g.HasEdge(src, dst) {
+		panic(fmt.Sprintf("edge %d->%d not exist: %s", src, dst, g.String()))
+	}
+	return g.weight[src].Get(search.Integer(dst)).(float64)
+}
+
+func (g *WDigraph) String() string {
+	bytes, err := graphs.MarshalWGraph(g)
+	if err != nil {
+		return err.Error()
+	}
+	return string(bytes)
 }
 
 type Edge struct {

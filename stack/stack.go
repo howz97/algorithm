@@ -1,5 +1,7 @@
 package stack
 
+import "fmt"
+
 const (
 	minCap = 2
 )
@@ -57,4 +59,32 @@ func (s *Stack) Contains(e T) bool {
 		}
 	}
 	return false
+}
+
+func (s *Stack) Iterate(fn func(T)bool) {
+	s.IterateRange(0, s.Size(), fn)
+}
+
+func (s *Stack) IterateRange(lo, hi int, fn func(T)bool) {
+	if lo < 0 {
+		lo = 0
+	}
+	if hi > s.top {
+		hi = s.top
+	}
+	for ; lo < hi ; lo++ {
+		if !fn(s.elems[lo]) {
+			break
+		}
+	}
+}
+
+func (s *Stack) String() string {
+	str := ""
+	s.Iterate(func(v T) bool {
+		str += fmt.Sprint(v)
+		str += ","
+		return true
+	})
+	return str
 }

@@ -1,8 +1,8 @@
 package wdigraph
 
 import (
+	"fmt"
 	"github.com/howz97/algorithm/graphs"
-	"github.com/howz97/algorithm/graphs/digraph"
 	pqueue "github.com/howz97/algorithm/pqueue/binaryheap"
 	"github.com/howz97/algorithm/queue"
 	"github.com/howz97/algorithm/stack"
@@ -166,10 +166,10 @@ func (spt *ShortestPathTree) InitBellmanFord() error {
 }
 
 func (spt *ShortestPathTree) findNegativeCycle() *stack.Stack {
-	g := digraph.New(spt.g.NumVertical())
+	g := New(spt.g.NumVertical())
 	for dst, src := range spt.edgeTo {
 		if src > 0 {
-			g.AddEdge(src, dst)
+			g.AddEdge(src, dst, spt.g.getWeight(src, dst))
 		}
 	}
 	marked := make([]bool, spt.g.NumVertical())
@@ -185,50 +185,49 @@ func (spt *ShortestPathTree) findNegativeCycle() *stack.Stack {
 	return nil
 }
 
-func findNC(g digraph.Digraph, v int, marked []bool, s *stack.Stack, onS []bool, edgeTo []int) *stack.Stack {
+func findNC(g *WDigraph, v int, marked []bool, s *stack.Stack, onS []bool, edgeTo []int) *stack.Stack {
 	if onS[v] {
-		c := stack.New(g.NumVertical())
+		fmt.Println("cycle found! stack is:", s.String(), v)
+
+		start := 0
+		s.Iterate(func(x stack.T) bool {
+			start++
+			if x.(int) == v {
+				return false
+			}
+			return true
+		})
+		s.Push(v)
+		src := v
 		var weight float64
-		for {
-			e, ok := s.Pop()
-			if !ok {
-				break
-			}
-			eg := e.(*Edge)
-			weight += eg.weight
-			c.Push(eg)
-		}
+		s.IterateRange(start, s.Size(), func(x stack.T) bool {
+			dst := x.(int)
+			weight += g.getWeight(src, dst)
+			src = dst
+			return true
+		})
 		if weight < 0 {
-			return c
-		}
-		for {
-			e, ok := c.Pop()
-			if !ok {
-				break
-			}
-			s.Push(e)
+			return s
 		}
 		return nil
 	}
-	if marked[v] {
-		return nil
-	}
-	marked[v] = true
 	onS[v] = true
 	s.Push(edgeTo[v])
 	var nc *stack.Stack
 	g.RangeAdj(v, func(a int) bool {
-		nc = findNC(g, a, marked, s, onS, edgeTo)
-		if nc != nil {
-			return false
+		if marked[a] {
+			return true
 		}
-		return true
+		//fmt.Printf("detect NC by path %d->%d \n", v, a)
+		nc = findNC(g, a, marked, s, onS, edgeTo)
+		return nc == nil
 	})
 	if nc != nil {
 		return nc
 	}
 	onS[v] = false
 	s.Pop()
+	marked[v] = true
 	return nil
 }
 
