@@ -16,10 +16,6 @@ import (
 	"strings"
 )
 
-var (
-	ErrVerticalNotExist = errors.New("vertical not exist")
-)
-
 // WDigraph is edge weighted digraph without self loop
 type WDigraph struct {
 	digraph.Digraph

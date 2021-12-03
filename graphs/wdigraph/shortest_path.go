@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/howz97/algorithm/stack"
+	"math"
 )
 
 type ShortestPathSearcher struct {
@@ -62,14 +63,14 @@ func (g WDigraph) GenSearcherBellmanFord() (*ShortestPathSearcher, error) {
 
 func (s *ShortestPathSearcher) Distance(src, dst int) float64 {
 	if !s.g.HasVertical(src) && !s.g.HasVertical(dst) {
-		panic(ErrVerticalNotExist)
+		return math.Inf(1)
 	}
 	return s.spt[src].DistanceTo(dst)
 }
 
 func (s *ShortestPathSearcher) Path(src, dst int) *stack.Stack {
 	if !s.g.HasVertical(src) && !s.g.HasVertical(dst) {
-		panic(ErrVerticalNotExist)
+		return nil
 	}
 	return s.spt[src].PathTo(dst)
 }
