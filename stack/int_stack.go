@@ -17,3 +17,15 @@ func (s *IntStack) Pop() (int, bool) {
 	}
 	return e.(int), true
 }
+
+func (s *IntStack) ToSlice() []int {
+	var sli []int
+	for {
+		v, ok := s.Pop()
+		if !ok {
+			break
+		}
+		sli = append(sli, v)
+	}
+	return sli
+}

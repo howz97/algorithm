@@ -2,12 +2,13 @@ package wdigraph
 
 import (
 	"fmt"
+	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/stack"
 	"testing"
 )
 
 func TestEWD_Integer(t *testing.T) {
-	g, err := LoadWDigraph("w_digraph_no_cycle.yml")
+	g, err := LoadWDigraph("no_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -83,7 +84,7 @@ func TestNewSPS_Dijkstra(t *testing.T) {
 }
 
 func TestNewSPS_Topological(t *testing.T) {
-	g, err := LoadWDigraph("w_digraph_no_cycle.yml")
+	g, err := LoadWDigraph("no_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,6 +95,27 @@ func TestNewSPS_Topological(t *testing.T) {
 			sps.PrintPath(src, dst)
 		}
 	}
+}
+
+func TestPathTree_Top(t *testing.T) {
+	g, err := LoadWDigraph("no_cycle.yml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	tree := g.NewShortestPathTree(1)
+	tree.InitTopological()
+	graphs.RangeDFS(tree.g, 1, func(dst int) bool {
+		if dst == 1 {
+			return true
+		}
+		path := tree.PathTo(dst)
+		if path == nil {
+			t.Errorf("failed to find shortest path from %d->%d\n", 1, dst)
+		} else {
+			t.Logf("path %d->%d: %s\n", 1, dst, path)
+		}
+		return true
+	})
 }
 
 func TestNewSPS_BellmanFord(t *testing.T) {
