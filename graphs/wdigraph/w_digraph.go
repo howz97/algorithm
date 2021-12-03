@@ -1,14 +1,14 @@
 package wdigraph
 
 import (
-	"bytes"
+	"bufio"
 	"errors"
 	"fmt"
-	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/graphs/digraph"
-	"github.com/howz97/algorithm/queue"
 	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/search/hash_map"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -24,7 +24,7 @@ type WDigraph struct {
 	weight []*hash_map.Chaining
 }
 
-func NewWDigraph(size int) *WDigraph {
+func New(size int) *WDigraph {
 	weight := make([]*hash_map.Chaining, size)
 	for i := range weight {
 		weight[i] = hash_map.New()
@@ -35,78 +35,63 @@ func NewWDigraph(size int) *WDigraph {
 	}
 }
 
-//func ImportEWD(filename string) (WDigraph, error) {
-//	f, err := os.Open(filename)
-//	if err != nil {
-//		return nil, err
-//	}
-//	stat, err := f.Stat()
-//	if err != nil {
-//		return nil, err
-//	}
-//	data := make([]byte, stat.Size())
-//	_, err = f.Read(data)
-//	if err != nil {
-//		return nil, err
-//	}
-//	r := newLineReader(data)
-//	headLine, eof := r.nextLine()
-//	if eof {
-//		panic(fmt.Sprintf("empty file: %v", filename))
-//	}
-//	headSli := strings.Split(string(headLine), " ")
-//	numV, err := strconv.Atoi(headSli[0])
-//	if err != nil {
-//		return nil, err
-//	}
-//	ewd := NewWDigraph(numV)
-//	for l, eof := r.nextLine(); !eof; l, eof = r.nextLine() {
-//		lineSli := strings.Split(string(l), " ")
-//		from, err := strconv.Atoi(lineSli[0])
-//		if err != nil {
-//			return nil, err
-//		}
-//		to, err := strconv.Atoi(lineSli[1])
-//		if err != nil {
-//			return nil, err
-//		}
-//		weight, err := strconv.ParseFloat(lineSli[2], 64)
-//		if err != nil {
-//			return nil, err
-//		}
-//		ewd.AddEdge(&Edge{
-//			from:   from,
-//			to:     to,
-//			weight: weight,
-//		})
-//	}
-//	return ewd, nil
-//}
-//
-//type lineReader struct {
-//	data []byte
-//}
-//
-//func newLineReader(data []byte) *lineReader {
-//	return &lineReader{
-//		data: data,
-//	}
-//}
-//
-//func (r *lineReader) nextLine() (data []byte, eof bool) {
-//	if len(r.data) == 0 {
-//		return nil, true
-//	}
-//	i := bytes.Index(r.data, []byte{'\n'})
-//	if i < 0 {
-//		data = r.data[:]
-//		r.data = nil
-//		return data, false
-//	}
-//	data = r.data[:i]
-//	r.data = r.data[i+1:]
-//	return data, false
-//}
+func LoadWDigraph(filename string) (*WDigraph, error) {
+	file, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	var m map[int]map[int]float64
+	err = yaml.Unmarshal(file, &m)
+	if err != nil {
+		return nil, err
+	}
+	g := New(len(m))
+	for src, adj := range m {
+		for dst, w := range adj {
+			err = g.AddEdge(src, dst, w)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return g, nil
+}
+
+func ImportEWD(filename string) (*WDigraph, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	scan := bufio.NewScanner(file)
+	if !scan.Scan() {
+		return nil, errors.New("eof")
+	}
+	headLine := scan.Text()
+	headSli := strings.Split(headLine, " ")
+	numV, err := strconv.Atoi(headSli[0])
+	if err != nil {
+		return nil, err
+	}
+	ewd := New(numV)
+	for scan.Scan() {
+		lineSli := strings.Split(scan.Text(), " ")
+		from, err := strconv.Atoi(lineSli[0])
+		if err != nil {
+			return nil, err
+		}
+		to, err := strconv.Atoi(lineSli[1])
+		if err != nil {
+			return nil, err
+		}
+		weight, err := strconv.ParseFloat(lineSli[2], 64)
+		if err != nil {
+			fmt.Println("can not parse float", lineSli[2])
+			return nil, err
+		}
+		ewd.AddEdge(from, to, weight)
+	}
+	return ewd, nil
+}
 
 func (g WDigraph) AddEdge(src, dst int, w float64) error {
 	err := g.Digraph.AddEdge(src, dst)
@@ -117,24 +102,26 @@ func (g WDigraph) AddEdge(src, dst int, w float64) error {
 	return nil
 }
 
-// todo: deprecated
-func (g WDigraph) Adjacent(v int) []*Edge {
-	if !g.HasVertical(v) {
-		return nil
-	}
-	return g[v].traverse()
+// RangeWAdj range adjacent vertices of v
+func (g WDigraph) RangeWAdj(v int, fn func(int, float64) bool) {
+	g.RangeAdj(v, func(adj int) bool {
+		w := g.weight[v].Get(search.Integer(adj)).(float64)
+		return fn(adj, w)
+	})
 }
 
 func (g WDigraph) HasNegativeEdge() bool {
-	for i := range g {
-		adj := g.Adjacent(i)
-		for _, e := range adj {
-			if e.weight < 0 {
-				return true
+	found := false
+	for _, hm := range g.weight {
+		hm.Range(func(_ hash_map.Key, val search.T) bool {
+			if val.(float64) < 0 {
+				found = true
+				return false
 			}
-		}
+			return true
+		})
 	}
-	return false
+	return found
 }
 
 type Edge struct {

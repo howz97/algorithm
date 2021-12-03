@@ -3,7 +3,7 @@ package main
 import "github.com/howz97/algorithm/graphs/wdigraph"
 
 func main() {
-	g, err := wdigraph.ImportEWD("../graphs/wdigraph/tinyEWD.txt")
+	g, err := wdigraph.LoadWDigraph("../graphs/wdigraph/w_digraph.yml")
 	if err != nil {
 		panic(err)
 	}

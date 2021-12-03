@@ -7,7 +7,7 @@ import (
 )
 
 func TestEWD_Integer(t *testing.T) {
-	g, err := ImportEWD("./tinyEWD.txt")
+	g, err := LoadWDigraph("w_digraph.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -28,8 +28,9 @@ func TestEWD_Integer(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for src := range g {
-		for dst := range g {
+	num := g.NumVertical()
+	for src := 0; src < num; src++ {
+		for dst := 0; dst < num; dst++ {
 			p0 := spsDijkstra.Path(src, dst)
 			p1 := spsTop.Path(src, dst)
 			if !isPathEqual(p0, p1) {
@@ -65,26 +66,30 @@ func isPathEqual(s0, s1 *stack.Stack) bool {
 }
 
 func TestNewSPS_Dijkstra(t *testing.T) {
-	g, err := ImportEWD("./tinyEWD.txt")
+	g, err := LoadWDigraph("w_digraph.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	sps, _ := g.GenSearcherDijkstra()
-	for src := range g {
-		for dst := range g {
+
+	num := g.NumVertical()
+	for src := 0; src < num; src++ {
+		for dst := 0; dst < num; dst++ {
 			sps.PrintPath(src, dst)
 		}
 	}
 }
 
 func TestNewSPS_Topological(t *testing.T) {
-	g, err := ImportEWD("./tinyEWDAG.txt")
+	g, err := LoadWDigraph("w_digraph_no_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
 	sps, _ := g.GenSearcherTopological()
-	for src := range g {
-		for dst := range g {
+	num := g.NumVertical()
+	for src := 0; src < num; src++ {
+		for dst := 0; dst < num; dst++ {
 			sps.PrintPath(src, dst)
 		}
 	}
@@ -100,8 +105,10 @@ func TestNewSPS_BellmanFord(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	for src := range g {
-		for dst := range g {
+
+	num := g.NumVertical()
+	for src := 0; src < num; src++ {
+		for dst := 0; dst < num; dst++ {
 			sps.PrintPath(src, dst)
 		}
 	}

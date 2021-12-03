@@ -1,6 +1,8 @@
 package wdigraph
 
 import (
+	"github.com/howz97/algorithm/graphs"
+	"github.com/howz97/algorithm/graphs/digraph"
 	pqueue "github.com/howz97/algorithm/pqueue/binaryheap"
 	"github.com/howz97/algorithm/queue"
 	"github.com/howz97/algorithm/stack"
@@ -9,26 +11,29 @@ import (
 )
 
 type ShortestPathTree struct {
-	g      WDigraph
+	g      *WDigraph
 	src    int
 	distTo []float64
-	edgeTo []*Edge
+	edgeTo []int
 }
 
-func (g WDigraph) NewShortestPathTree(src int) *ShortestPathTree {
+func (g *WDigraph) NewShortestPathTree(src int) *ShortestPathTree {
 	if !g.HasVertical(src) {
-		panic(ErrVerticalNotExist)
+		return nil
 	}
 	spt := &ShortestPathTree{
 		g:      g,
 		src:    src,
 		distTo: make([]float64, g.NumVertical()),
-		edgeTo: make([]*Edge, g.NumVertical()),
+		edgeTo: make([]int, g.NumVertical()),
 	}
 	for i := range spt.distTo {
 		spt.distTo[i] = math.Inf(1)
 	}
 	spt.distTo[src] = 0
+	for i := range spt.edgeTo {
+		spt.edgeTo[i] = -1
+	}
 	return spt
 }
 
@@ -50,12 +55,21 @@ func (spt *ShortestPathTree) PathTo(dst int) *stack.Stack {
 	if !spt.g.HasVertical(dst) {
 		return nil
 	}
-	s := stack.New(spt.g.NumVertical() - 1)
-	for spt.edgeTo[dst] != nil {
-		s.Push(spt.edgeTo[dst])
-		dst = spt.edgeTo[dst].from
+	src := spt.edgeTo[dst]
+	if src < 0 {
+		return nil
 	}
-	return s
+	path := stack.New(spt.g.NumVertical())
+	for {
+		path.Push(dst)
+		dst = src
+		src = spt.edgeTo[dst]
+		if src < 0 {
+			break
+		}
+	}
+	path.Push(spt.src)
+	return path
 }
 
 // ============================ Dijkstra ============================
@@ -69,30 +83,32 @@ func (spt *ShortestPathTree) InitDijkstra() {
 	}
 }
 
-func dijkstraRelax(g WDigraph, v int, edgeTo []*Edge, distTo []float64, pq *pqueue.BinHeap) {
-	adj := g.Adjacent(v)
-	for _, e := range adj {
-		if distTo[v]+e.weight < distTo[e.to] {
-			inPQ := distTo[e.to] != math.Inf(1)
-			edgeTo[e.to] = e
-			distTo[e.to] = distTo[v] + e.weight
+func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *pqueue.BinHeap) {
+	g.RangeWAdj(v, func(adj int, w float64) bool {
+		if distTo[v]+w < distTo[adj] {
+			inPQ := distTo[adj] != math.Inf(1)
+			edgeTo[adj] = v
+			distTo[adj] = distTo[v] + w
 			if inPQ {
-				pq.Update(int(distTo[e.to]), e.to)
+				pq.Update(int(distTo[adj]), adj)
 			} else {
-				pq.Insert(int(distTo[e.to]), e.to)
+				pq.Insert(int(distTo[adj]), adj)
 			}
 		}
-	}
+		return true
+	})
 }
 
 // ============================ Topological ============================
 
 func (spt *ShortestPathTree) InitTopological() {
-	marked := make([]bool, spt.g.NumVertical())
-	topoSortStack := stack.NewInt(spt.g.NumVertical())
-	spt.g.reversePostDFS(spt.src, marked, topoSortStack)
+	order := stack.NewInt(spt.g.NumVertical())
+	graphs.RevDFS(spt.g, spt.src, func(v int) bool {
+		order.Push(v)
+		return true
+	})
 	for {
-		e, ok := topoSortStack.Pop()
+		e, ok := order.Pop()
 		if !ok {
 			break
 		}
@@ -100,14 +116,14 @@ func (spt *ShortestPathTree) InitTopological() {
 	}
 }
 
-func topologicalRelax(g WDigraph, v int, edgeTo []*Edge, distTo []float64) {
-	adj := g.Adjacent(v)
-	for _, e := range adj {
-		if distTo[v]+e.weight < distTo[e.to] {
-			edgeTo[e.to] = e
-			distTo[e.to] = distTo[v] + e.weight
+func topologicalRelax(g *WDigraph, v int, edgeTo []int, distTo []float64) {
+	g.RangeWAdj(v, func(adj int, w float64) bool {
+		if distTo[v]+w < distTo[adj] {
+			edgeTo[adj] = v
+			distTo[adj] = distTo[v] + w
 		}
-	}
+		return true
+	})
 }
 
 // ============================ BellmanFord ============================
@@ -150,10 +166,10 @@ func (spt *ShortestPathTree) InitBellmanFord() error {
 }
 
 func (spt *ShortestPathTree) findNegativeCycle() *stack.Stack {
-	g := NewWDigraph(spt.g.NumVertical())
-	for _, e := range spt.edgeTo {
-		if e != nil {
-			g.AddEdge(e)
+	g := digraph.New(spt.g.NumVertical())
+	for dst, src := range spt.edgeTo {
+		if src > 0 {
+			g.AddEdge(src, dst)
 		}
 	}
 	marked := make([]bool, spt.g.NumVertical())
@@ -169,7 +185,7 @@ func (spt *ShortestPathTree) findNegativeCycle() *stack.Stack {
 	return nil
 }
 
-func findNC(g WDigraph, v int, marked []bool, s *stack.Stack, onS []bool, edgeTo []*Edge) *stack.Stack {
+func findNC(g digraph.Digraph, v int, marked []bool, s *stack.Stack, onS []bool, edgeTo []int) *stack.Stack {
 	if onS[v] {
 		c := stack.New(g.NumVertical())
 		var weight float64
@@ -200,28 +216,32 @@ func findNC(g WDigraph, v int, marked []bool, s *stack.Stack, onS []bool, edgeTo
 	marked[v] = true
 	onS[v] = true
 	s.Push(edgeTo[v])
-	adj := g.Adjacent(v)
-	for _, e := range adj {
-		c := findNC(g, e.to, marked, s, onS, edgeTo)
-		if c != nil {
-			return c
+	var nc *stack.Stack
+	g.RangeAdj(v, func(a int) bool {
+		nc = findNC(g, a, marked, s, onS, edgeTo)
+		if nc != nil {
+			return false
 		}
+		return true
+	})
+	if nc != nil {
+		return nc
 	}
 	onS[v] = false
 	s.Pop()
 	return nil
 }
 
-func bellmanFordRelax(g WDigraph, v int, edgeTo []*Edge, distTo []float64, needRelax *queue.IntQ, onQ []bool) {
-	adj := g.Adjacent(v)
-	for _, e := range adj {
-		if distTo[v]+e.weight < distTo[e.to] {
-			edgeTo[e.to] = e
-			distTo[e.to] = distTo[v] + e.weight
-			if !onQ[e.to] {
-				needRelax.PushBack(e.to)
-				onQ[e.to] = true
+func bellmanFordRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, needRelax *queue.IntQ, onQ []bool) {
+	g.RangeWAdj(v, func(adj int, w float64) bool {
+		if distTo[v]+w < distTo[adj] {
+			edgeTo[adj] = v
+			distTo[adj] = distTo[v] + w
+			if !onQ[adj] {
+				needRelax.PushBack(adj)
+				onQ[adj] = true
 			}
 		}
-	}
+		return true
+	})
 }

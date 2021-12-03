@@ -28,8 +28,8 @@ func (g WDigraph) GenSearcherDijkstra() (*ShortestPathSearcher, error) {
 }
 
 func (g WDigraph) GenSearcherTopological() (*ShortestPathSearcher, error) {
-	if g.DetectDirCycle() {
-		return nil, errors.New("this digraph contains directed cycle")
+	if g.HasCycle() {
+		return nil, errors.New(fmt.Sprintln("this digraph contains directed cycle", g.GetCycle()))
 	}
 	sps := &ShortestPathSearcher{
 		g:   g,
@@ -75,15 +75,22 @@ func (s *ShortestPathSearcher) Path(src, dst int) *stack.Stack {
 }
 
 func (s *ShortestPathSearcher) PrintPath(src, dst int) {
+	if src == dst {
+		return
+	}
 	p := s.Path(src, dst)
+	if p == nil {
+		fmt.Printf("%d can not access %d\n", src, dst)
+		return
+	}
+	p.Pop()
 	fmt.Print("PATH: ", src)
 	for {
-		e, ok := p.Pop()
+		v, ok := p.Pop()
 		if !ok {
 			break
 		}
-		eg := e.(*Edge)
-		fmt.Print("->", eg.to)
+		fmt.Print("->", v.(int))
 	}
 	fmt.Printf(" (distance %v)\n", s.Distance(src, dst))
 }

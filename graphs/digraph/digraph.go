@@ -73,7 +73,7 @@ func (dg Digraph) Adjacent(v int) []int {
 	return dg[v].Traverse()
 }
 
-func (dg Digraph) RangeAdj(v int, fn func(v int) bool) {
+func (dg Digraph) RangeAdj(v int, fn func(int) bool) {
 	if !dg.HasVertical(v) {
 		return
 	}
@@ -114,17 +114,7 @@ func (dg Digraph) GetCycle() []int {
 	if pathStack == nil {
 		return nil
 	}
-	path := make([]int, 0, pathStack.Size())
-	w, _ := pathStack.Pop()
-	path = append(path, w)
-	for {
-		v, _ := pathStack.Pop()
-		path = append(path, v)
-		if v == w {
-			break
-		}
-	}
-	util.ReverseInts(path)
+	path := parseCycleInStack(pathStack)
 	return path
 }
 
@@ -139,6 +129,44 @@ func (dg Digraph) getCycle() *stack.IntStack {
 		}
 	}
 	return nil
+}
+
+// IsOnCycle detect whether vertical locate on a cycle
+func (dg Digraph) IsOnCycle(v int) bool {
+	return dg.getCycleBy(v) != nil
+}
+
+func (dg Digraph) GetCycleBy(v int) []int {
+	pathStack := dg.getCycleBy(v)
+	if pathStack == nil {
+		return nil
+	}
+	path := parseCycleInStack(pathStack)
+	return path
+}
+
+func (dg Digraph) getCycleBy(v int) *stack.IntStack {
+	marks := make([]bool, dg.NumVertical())
+	path := stack.NewInt(4)
+	if dg.detectCycleDFS(v, marks, path) {
+		return path
+	}
+	return nil
+}
+
+func parseCycleInStack(stk *stack.IntStack) []int {
+	path := make([]int, 0, stk.Size())
+	w, _ := stk.Pop()
+	path = append(path, w)
+	for {
+		v, _ := stk.Pop()
+		path = append(path, v)
+		if v == w {
+			break
+		}
+	}
+	util.ReverseInts(path)
+	return path
 }
 
 func (dg Digraph) detectCycleDFS(v int, marked []bool, path *stack.IntStack) bool {
@@ -164,18 +192,15 @@ func (dg Digraph) detectCycleDFS(v int, marked []bool, path *stack.IntStack) boo
 	return false
 }
 
-func (dg Digraph) ReversePostOrder() *stack.IntStack {
+// Topological return a stack that pop vertices in topological order
+func (dg Digraph) Topological() *stack.IntStack {
+	if dg.HasCycle() {
+		return nil
+	}
 	order := stack.NewInt(dg.NumVertical())
 	graphs.RevDFSAll(dg, func(v int) bool {
 		order.Push(v)
 		return true
 	})
 	return order
-}
-
-func (dg Digraph) Topological() *stack.IntStack {
-	if dg.HasCycle() {
-		return nil
-	}
-	return dg.ReversePostOrder()
 }
