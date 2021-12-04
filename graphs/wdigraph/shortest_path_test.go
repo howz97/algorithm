@@ -2,7 +2,6 @@ package wdigraph
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/stack"
 	"testing"
 )
@@ -106,7 +105,7 @@ func TestPathTree_Top(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	graphs.IterateVetDFS(g, 1, func(dst int) bool {
+	g.IterateVetDFS(1, func(dst int) bool {
 		if dst == 1 {
 			return true
 		}

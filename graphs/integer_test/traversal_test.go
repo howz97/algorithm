@@ -1,7 +1,6 @@
 package integer
 
 import (
-	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/graphs/digraph"
 	"github.com/howz97/algorithm/graphs/graph"
 	"github.com/howz97/algorithm/sort"
@@ -53,7 +52,7 @@ func TestDFS_Graph(t *testing.T) {
 		7: {4, 7, 8},
 		8: {4, 7, 8},
 	}
-	checkDFSResults(t, g, dfsResults)
+	checkDFSResults(t, g.Digraph, dfsResults)
 }
 
 var digraph1 = [][]int{
@@ -87,9 +86,9 @@ func TestDFS_Digraph(t *testing.T) {
 	checkDFSResults(t, dg, dfsResults)
 }
 
-func checkDFSResults(t *testing.T, g graphs.IGraph, dfsResults [][]int) {
+func checkDFSResults(t *testing.T, g digraph.Digraph, dfsResults [][]int) {
 	for src := range dfsResults {
-		reach := graphs.ReachableSlice(g, src)
+		reach := g.ReachableSlice(src)
 		sort.QuickSort(stdsort.IntSlice(reach))
 		if !util.SliceEqual(reach, dfsResults[src]) {
 			t.Errorf("v %d reach %v not equal %v", src, reach, dfsResults[src])
@@ -102,7 +101,7 @@ func TestRevDFS(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	order := graphs.VetRDFSOrder(g, 0).ToSlice()
+	order := g.VetRDFSOrder(0).ToSlice()
 	correct := []int{0, 3, 6, 7}
 	if !util.SliceEqual(order, correct) {
 		t.Errorf("rev dfs order %v not equal %v", order, correct)

@@ -2,6 +2,7 @@ package digraph
 
 import (
 	"github.com/howz97/algorithm/graphs"
+	"github.com/howz97/algorithm/queue"
 	"github.com/howz97/algorithm/set"
 	"github.com/howz97/algorithm/stack"
 	"github.com/howz97/algorithm/util"
@@ -174,7 +175,7 @@ func (dg Digraph) Topological() *stack.IntStack {
 		return nil
 	}
 	order := stack.NewInt(dg.NumVertical())
-	graphs.IterateVetRDFS(dg, func(v int) bool {
+	dg.IterateVetRDFS(func(v int) bool {
 		order.Push(v)
 		return true
 	})
@@ -195,7 +196,7 @@ func (dg Digraph) IterateEdge(fn func(int, int) bool) {
 }
 
 func (dg Digraph) IterateEdgeFrom(v int, fn func(int, int) bool) {
-	graphs.IterateVetDFS(dg, v, func(v int) bool {
+	dg.IterateVetDFS(v, func(v int) bool {
 		goon := true
 		dg.RangeAdj(v, func(a int) bool {
 			goon = fn(v, a)
@@ -203,4 +204,161 @@ func (dg Digraph) IterateEdgeFrom(v int, fn func(int, int) bool) {
 		})
 		return goon
 	})
+}
+
+func (dg Digraph) IterateVetDFS(src int, fn func(int) bool) {
+	dg.IterateUnMarkVetDFS(src, nil, fn)
+}
+
+func (dg Digraph) IterateUnMarkVetDFS(src int, marked []bool, fn func(int) bool) {
+	if !dg.HasVertical(src) {
+		return
+	}
+	if len(marked) == 0 {
+		marked = make([]bool, dg.NumVertical())
+	}
+	dg.iterateUnMarkVetDFS(src, marked, fn)
+}
+
+func (dg Digraph) iterateUnMarkVetDFS(v int, marked []bool, fn func(int) bool) bool {
+	marked[v] = true
+	if !fn(v) {
+		return false
+	}
+	goon := true // continue DFS or abort
+	dg.RangeAdj(v, func(adj int) bool {
+		if !marked[adj] {
+			if !dg.iterateUnMarkVetDFS(adj, marked, fn) {
+				goon = false
+			}
+		}
+		return goon
+	})
+	return goon
+}
+
+func (dg Digraph) ReachableSlice(src int) []int {
+	if !dg.HasVertical(src) {
+		return nil
+	}
+	var arrived []int
+	dg.IterateVetDFS(src, func(v int) bool {
+		arrived = append(arrived, v)
+		return true
+	})
+	return arrived
+}
+
+func (dg Digraph) ReachableBits(src int) []bool {
+	if !dg.HasVertical(src) {
+		return nil
+	}
+	marked := make([]bool, dg.NumVertical())
+	dg.iterateUnMarkVetDFS(src, marked, func(_ int) bool { return true })
+	return marked
+}
+
+func (dg Digraph) IterateVetRDFS(fn func(int) bool) {
+	marked := make([]bool, dg.NumVertical())
+	for v := range marked {
+		if marked[v] {
+			continue
+		}
+		dg.revDFS(v, marked, fn)
+	}
+}
+
+func (dg Digraph) IterateVetFromRDFS(src int, fn func(int) bool) {
+	if !dg.HasVertical(src) {
+		return
+	}
+	marked := make([]bool, dg.NumVertical())
+	dg.revDFS(src, marked, fn)
+}
+
+func (dg Digraph) VetRDFSOrder(src int) *stack.IntStack {
+	order := stack.NewInt(dg.NumVertical())
+	dg.IterateVetFromRDFS(src, func(v int) bool {
+		order.Push(v)
+		return true
+	})
+	return order
+}
+
+func (dg Digraph) revDFS(v int, marked []bool, fn func(int) bool) bool {
+	marked[v] = true
+	goon := true // continue DFS or abort
+	dg.RangeAdj(v, func(a int) bool {
+		if !marked[a] {
+			if !dg.revDFS(a, marked, fn) {
+				goon = false
+			}
+		}
+		return goon
+	})
+	if !goon {
+		return false
+	}
+	return fn(v)
+}
+
+type BFS struct {
+	src    int
+	marked []bool
+	edgeTo []int
+}
+
+func (dg Digraph) NewBFS(src int) *BFS {
+	if !dg.HasVertical(src) {
+		return nil
+	}
+	bfs := &BFS{
+		src:    src,
+		marked: make([]bool, dg.NumVertical()),
+		edgeTo: make([]int, dg.NumVertical()),
+	}
+	q := queue.NewIntQ()
+	bfs.marked[src] = true
+	q.PushBack(src)
+	for !q.IsEmpty() {
+		edge := q.Front()
+		dg.RangeAdj(edge, func(adj int) bool {
+			if !bfs.marked[adj] {
+				bfs.edgeTo[adj] = edge
+				bfs.marked[adj] = true
+				q.PushBack(adj)
+			}
+			return true
+		})
+	}
+	return bfs
+}
+
+func (bfs *BFS) CanReach(dst int) bool {
+	if !bfs.checkVertical(dst) {
+		return false
+	}
+	return bfs.marked[dst]
+}
+
+func (bfs *BFS) ShortestPathTo(dst int) []int {
+	if !bfs.CanReach(dst) {
+		return nil
+	}
+	if dst == bfs.src {
+		return []int{dst}
+	}
+	path := make([]int, 0, 2)
+	path = append(path, dst)
+	for bfs.edgeTo[dst] != bfs.src {
+		dst = bfs.edgeTo[dst]
+		path = append(path, dst)
+	}
+	path = append(path, bfs.src)
+	util.ReverseInts(path)
+	return path
+}
+
+func (bfs *BFS) checkVertical(v int) bool {
+	return v >= 0 && v < len(bfs.marked)
 }

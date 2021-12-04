@@ -1,7 +1,5 @@
 package graph
 
-import "github.com/howz97/algorithm/graphs"
-
 type TransitiveClosure struct {
 	locate    []int   // vertical -> subGraphID
 	subGraphs [][]int // subGraphID -> all vertices
@@ -18,7 +16,7 @@ func (g *Graph) TransitiveClosure() *TransitiveClosure {
 	subGraphID := 0
 	for i, c := range tc.locate {
 		if c < 0 {
-			dfs := graphs.ReachableSlice(g, i)
+			dfs := g.ReachableSlice(i)
 			for _, v := range dfs {
 				tc.locate[v] = subGraphID
 			}

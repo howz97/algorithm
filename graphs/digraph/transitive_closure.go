@@ -1,13 +1,11 @@
 package digraph
 
-import "github.com/howz97/algorithm/graphs"
-
 type TransitiveClosure [][]bool
 
 func (dg Digraph) TransitiveClosure() TransitiveClosure {
 	tc := make(TransitiveClosure, dg.NumVertical())
 	for v := range tc {
-		tc[v] = graphs.ReachableBits(dg, v)
+		tc[v] = dg.ReachableBits(v)
 	}
 	return tc
 }

@@ -1,7 +1,5 @@
 package digraph
 
-import "github.com/howz97/algorithm/graphs"
-
 // SCC is strong connected components of digraph
 // vertices in the same component can access each other
 type SCC struct {
@@ -15,10 +13,10 @@ func (dg Digraph) SCC() *SCC {
 		locate: make([]int, dg.NumVertical()),
 	}
 	marked := make([]bool, dg.NumVertical())
-	graphs.IterateVetRDFS(dg, func(v int) bool {
+	dg.IterateVetRDFS(func(v int) bool {
 		if !marked[v] {
 			c := make([]int, 0, 8)
-			graphs.IterateUnMarkVetDFS(dg, v, marked, func(w int) bool {
+			dg.IterateUnMarkVetDFS(v, marked, func(w int) bool {
 				scc.locate[w] = len(scc.components)
 				c = append(c, w)
 				return true
