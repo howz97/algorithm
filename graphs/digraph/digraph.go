@@ -174,7 +174,7 @@ func (dg Digraph) Topological() *stack.IntStack {
 		return nil
 	}
 	order := stack.NewInt(dg.NumVertical())
-	graphs.RevDFSAll(dg, func(v int) bool {
+	graphs.IterateVetRDFS(dg, func(v int) bool {
 		order.Push(v)
 		return true
 	})
@@ -195,7 +195,7 @@ func (dg Digraph) IterateEdge(fn func(int, int) bool) {
 }
 
 func (dg Digraph) IterateEdgeFrom(v int, fn func(int, int) bool) {
-	graphs.RangeDFS(dg, v, func(v int) bool {
+	graphs.IterateVetDFS(dg, v, func(v int) bool {
 		goon := true
 		dg.RangeAdj(v, func(a int) bool {
 			goon = fn(v, a)

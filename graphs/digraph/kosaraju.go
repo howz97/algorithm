@@ -15,10 +15,10 @@ func (dg Digraph) SCC() *SCC {
 		locate: make([]int, dg.NumVertical()),
 	}
 	marked := make([]bool, dg.NumVertical())
-	graphs.RevDFSAll(dg, func(v int) bool {
+	graphs.IterateVetRDFS(dg, func(v int) bool {
 		if !marked[v] {
 			c := make([]int, 0, 8)
-			graphs.RangeUnMarkDFS(dg, v, marked, func(w int) bool {
+			graphs.IterateUnMarkVetDFS(dg, v, marked, func(w int) bool {
 				scc.locate[w] = len(scc.components)
 				c = append(c, w)
 				return true

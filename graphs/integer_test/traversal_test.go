@@ -102,7 +102,7 @@ func TestRevDFS(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	order := graphs.RevDFSOrder(g, 0).ToSlice()
+	order := graphs.VetRDFSOrder(g, 0).ToSlice()
 	correct := []int{0, 3, 6, 7}
 	if !util.SliceEqual(order, correct) {
 		t.Errorf("rev dfs order %v not equal %v", order, correct)

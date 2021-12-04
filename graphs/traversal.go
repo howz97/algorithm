@@ -67,21 +67,21 @@ func (bfs *BFS) checkVertical(v int) bool {
 	return v >= 0 && v < len(bfs.marked)
 }
 
-func RangeDFS(g ITraverse, src int, fn func(int) bool) {
-	RangeUnMarkDFS(g, src, nil, fn)
+func IterateVetDFS(g ITraverse, src int, fn func(int) bool) {
+	IterateUnMarkVetDFS(g, src, nil, fn)
 }
 
-func RangeUnMarkDFS(g ITraverse, src int, marked []bool, fn func(int) bool) {
+func IterateUnMarkVetDFS(g ITraverse, src int, marked []bool, fn func(int) bool) {
 	if !g.HasVertical(src) {
 		return
 	}
 	if len(marked) == 0 {
 		marked = make([]bool, g.NumVertical())
 	}
-	rangeDFS(g, src, marked, fn)
+	iterateUnMarkVetDFS(g, src, marked, fn)
 }
 
-func rangeDFS(g ITraverse, v int, marked []bool, fn func(int) bool) bool {
+func iterateUnMarkVetDFS(g ITraverse, v int, marked []bool, fn func(int) bool) bool {
 	marked[v] = true
 	if !fn(v) {
 		return false
@@ -89,7 +89,7 @@ func rangeDFS(g ITraverse, v int, marked []bool, fn func(int) bool) bool {
 	goon := true // continue DFS or abort
 	g.RangeAdj(v, func(adj int) bool {
 		if !marked[adj] {
-			if !rangeDFS(g, adj, marked, fn) {
+			if !iterateUnMarkVetDFS(g, adj, marked, fn) {
 				goon = false
 			}
 		}
@@ -98,7 +98,7 @@ func rangeDFS(g ITraverse, v int, marked []bool, fn func(int) bool) bool {
 	return goon
 }
 
-func RevDFSAll(g ITraverse, fn func(int) bool) {
+func IterateVetRDFS(g ITraverse, fn func(int) bool) {
 	marked := make([]bool, g.NumVertical())
 	for v := range marked {
 		if marked[v] {
@@ -108,7 +108,7 @@ func RevDFSAll(g ITraverse, fn func(int) bool) {
 	}
 }
 
-func RevDFS(g ITraverse, src int, fn func(int) bool) { // fixme
+func IterateVetFromRDFS(g ITraverse, src int, fn func(int) bool) {
 	if !g.HasVertical(src) {
 		return
 	}
@@ -116,9 +116,9 @@ func RevDFS(g ITraverse, src int, fn func(int) bool) { // fixme
 	revDFS(g, src, marked, fn)
 }
 
-func RevDFSOrder(g ITraverse, src int) *stack.IntStack {
+func VetRDFSOrder(g ITraverse, src int) *stack.IntStack {
 	order := stack.NewInt(g.NumVertical())
-	RevDFS(g, src, func(v int) bool {
+	IterateVetFromRDFS(g, src, func(v int) bool {
 		order.Push(v)
 		return true
 	})
@@ -147,7 +147,7 @@ func ReachableBits(g ITraverse, src int) []bool {
 		return nil
 	}
 	marked := make([]bool, g.NumVertical())
-	rangeDFS(g, src, marked, func(_ int) bool { return true })
+	iterateUnMarkVetDFS(g, src, marked, func(_ int) bool { return true })
 	return marked
 }
 
@@ -156,7 +156,7 @@ func ReachableSlice(g ITraverse, src int) []int {
 		return nil
 	}
 	var arrived []int
-	RangeDFS(g, src, func(v int) bool {
+	IterateVetDFS(g, src, func(v int) bool {
 		arrived = append(arrived, v)
 		return true
 	})
