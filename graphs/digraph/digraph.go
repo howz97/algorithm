@@ -131,21 +131,7 @@ func (dg Digraph) getCycle() *stack.IntStack {
 	return nil
 }
 
-// IsOnCycle detect whether vertical locate on a cycle
-func (dg Digraph) IsOnCycle(v int) bool {
-	return dg.getCycleBy(v) != nil
-}
-
-func (dg Digraph) GetCycleBy(v int) []int {
-	pathStack := dg.getCycleBy(v)
-	if pathStack == nil {
-		return nil
-	}
-	path := ParseCycleInStack(pathStack)
-	return path
-}
-
-func (dg Digraph) getCycleBy(v int) *stack.IntStack {
+func (dg Digraph) FindCycleFrom(v int) *stack.IntStack {
 	marks := make([]bool, dg.NumVertical())
 	path := stack.NewInt(4)
 	if dg.DetectCycleDFS(v, marks, path) {

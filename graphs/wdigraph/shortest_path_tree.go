@@ -51,7 +51,9 @@ func (g *WDigraph) NewShortestPathTree(src int, alg int) (*ShortestPathTree, err
 		}
 		spt.initDijkstra(g)
 	case Topological:
-
+		if cycle := g.FindCycleFrom(src); cycle != nil {
+			err = ErrCycle{Stack: cycle}
+		}
 		spt.initTopological(g)
 	case BellmanFord:
 		err = spt.InitBellmanFord()
@@ -152,11 +154,11 @@ func topologicalRelax(g *WDigraph, v int, edgeTo []int, distTo []float64) {
 
 // ============================ BellmanFord ============================
 
-type NegativeCycle struct {
+type ErrCycle struct {
 	Stack *stack.IntStack
 }
 
-func (nc NegativeCycle) Error() string {
+func (nc ErrCycle) Error() string {
 	return "weight negative cycle: " + nc.Stack.String()
 }
 
@@ -173,7 +175,7 @@ func (spt *ShortestPathTree) InitBellmanFord() error {
 		relaxTimes++
 		if relaxTimes%g.NumVertical() == 0 {
 			if c := spt.findNegativeCycle(); c.Size() > 0 {
-				return NegativeCycle{Stack: c}
+				return ErrCycle{Stack: c}
 			}
 		}
 	}
