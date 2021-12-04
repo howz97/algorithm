@@ -362,3 +362,35 @@ func (bfs *BFS) ShortestPathTo(dst int) []int {
 func (bfs *BFS) checkVertical(v int) bool {
 	return v >= 0 && v < len(bfs.marked)
 }
+
+func (dg Digraph) IsBipartiteGraph() bool {
+	marks := make([]bool, dg.NumVertical())
+	colors := make([]bool, dg.NumVertical())
+	for i, m := range marks {
+		if m {
+			continue
+		}
+		if !dg.isBipartiteDFS(i, true, colors, marks) {
+			return false
+		}
+	}
+	return true
+}
+
+func (dg Digraph) isBipartiteDFS(cur int, color bool, colors []bool, marked []bool) bool {
+	isBip := true
+	if !marked[cur] {
+		marked[cur] = true
+		colors[cur] = color
+		dg.RangeAdj(cur, func(adj int) bool {
+			if !dg.isBipartiteDFS(adj, !color, colors, marked) {
+				isBip = false
+				return false
+			}
+			return true
+		})
+	} else {
+		isBip = colors[cur] == color
+	}
+	return isBip
+}
