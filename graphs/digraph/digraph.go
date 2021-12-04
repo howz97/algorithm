@@ -145,19 +145,6 @@ func (dg Digraph) GetCycleBy(v int) []int {
 	return path
 }
 
-func (dg Digraph) IterateEdge(fn func(int, int) bool) {
-	for src, adj := range dg {
-		goon := true
-		adj.Iterate(func(dst int) bool {
-			goon = fn(src, dst)
-			return goon
-		})
-		if !goon {
-			break
-		}
-	}
-}
-
 func (dg Digraph) getCycleBy(v int) *stack.IntStack {
 	marks := make([]bool, dg.NumVertical())
 	path := stack.NewInt(4)
@@ -215,4 +202,28 @@ func (dg Digraph) Topological() *stack.IntStack {
 		return true
 	})
 	return order
+}
+
+func (dg Digraph) IterateEdge(fn func(int, int) bool) {
+	for src, adj := range dg {
+		goon := true
+		adj.Iterate(func(dst int) bool {
+			goon = fn(src, dst)
+			return goon
+		})
+		if !goon {
+			break
+		}
+	}
+}
+
+func (dg Digraph) IterateEdgeFrom(v int, fn func(int, int) bool) {
+	graphs.RangeDFS(dg, v, func(v int) bool {
+		goon := true
+		dg.RangeAdj(v, func(a int) bool {
+			goon = fn(v, a)
+			return goon
+		})
+		return goon
+	})
 }

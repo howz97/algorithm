@@ -1,6 +1,7 @@
 package wdigraph
 
 import (
+	"errors"
 	"fmt"
 	"github.com/howz97/algorithm/graphs"
 	pqueue "github.com/howz97/algorithm/pqueue/binaryheap"
@@ -9,19 +10,20 @@ import (
 	"math"
 )
 
+const (
+	Dijkstra = iota
+	Topological
+	BellmanFord
+)
+
 type ShortestPathTree struct {
-	g      *WDigraph
 	src    int
 	distTo []float64
 	edgeTo []int
 }
 
-func (g *WDigraph) NewShortestPathTree(src int) *ShortestPathTree {
-	if !g.HasVertical(src) {
-		return nil
-	}
+func newShortestPathTree(g *WDigraph, src int) *ShortestPathTree {
 	spt := &ShortestPathTree{
-		g:      g,
 		src:    src,
 		distTo: make([]float64, g.NumVertical()),
 		edgeTo: make([]int, g.NumVertical()),
@@ -36,29 +38,52 @@ func (g *WDigraph) NewShortestPathTree(src int) *ShortestPathTree {
 	return spt
 }
 
+func (g *WDigraph) NewShortestPathTree(src int, alg int) (*ShortestPathTree, error) {
+	if !g.HasVertical(src) {
+		return nil, graphs.ErrVerticalNotExist
+	}
+	var err error
+	spt := newShortestPathTree(g, src)
+	switch alg {
+	case Dijkstra:
+		if src, dst := g.FindNegativeEdgeFrom(src); src >= 0 {
+			err = errors.New(fmt.Sprintf("negative edge %d->%d", src, dst))
+		}
+		spt.initDijkstra(g)
+	case Topological:
+
+		spt.initTopological(g)
+	case BellmanFord:
+		err = spt.InitBellmanFord()
+	default:
+		err = errors.New(fmt.Sprintf("algorithm %v not supported", alg))
+	}
+	return spt, err
+}
+
 func (spt *ShortestPathTree) CanReach(dst int) bool {
-	if !spt.g.HasVertical(dst) {
+	if !g.HasVertical(dst) {
 		return false
 	}
 	return spt.distTo[dst] != math.Inf(1)
 }
 
 func (spt *ShortestPathTree) DistanceTo(dst int) float64 {
-	if !spt.g.HasVertical(dst) {
+	if !g.HasVertical(dst) {
 		return math.Inf(1)
 	}
 	return spt.distTo[dst]
 }
 
 func (spt *ShortestPathTree) PathTo(dst int) *stack.Stack {
-	if !spt.g.HasVertical(dst) {
+	if !g.HasVertical(dst) {
 		return nil
 	}
 	src := spt.edgeTo[dst]
 	if src < 0 {
 		return nil
 	}
-	path := stack.New(spt.g.NumVertical())
+	path := stack.New(g.NumVertical())
 	for {
 		path.Push(dst)
 		dst = src
@@ -73,12 +98,12 @@ func (spt *ShortestPathTree) PathTo(dst int) *stack.Stack {
 
 // ============================ Dijkstra ============================
 
-func (spt *ShortestPathTree) InitDijkstra() {
-	pq := pqueue.NewBinHeap(spt.g.NumVertical())
-	dijkstraRelax(spt.g, spt.src, spt.edgeTo, spt.distTo, pq)
+func (spt *ShortestPathTree) initDijkstra(g *WDigraph) {
+	pq := pqueue.NewBinHeap(g.NumVertical())
+	dijkstraRelax(g, spt.src, spt.edgeTo, spt.distTo, pq)
 	for !pq.IsEmpty() {
 		m := pq.DelMin().(int)
-		dijkstraRelax(spt.g, m, spt.edgeTo, spt.distTo, pq)
+		dijkstraRelax(g, m, spt.edgeTo, spt.distTo, pq)
 	}
 }
 
@@ -100,9 +125,9 @@ func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *pqueu
 
 // ============================ Topological ============================
 
-func (spt *ShortestPathTree) InitTopological() {
-	order := stack.NewInt(spt.g.NumVertical())
-	graphs.RevDFS(spt.g, spt.src, func(v int) bool {
+func (spt *ShortestPathTree) initTopological(g *WDigraph) {
+	order := stack.NewInt(g.NumVertical())
+	graphs.RevDFS(g, spt.src, func(v int) bool {
 		order.Push(v)
 		return true
 	})
@@ -111,7 +136,7 @@ func (spt *ShortestPathTree) InitTopological() {
 		if !ok {
 			break
 		}
-		topologicalRelax(spt.g, v, spt.edgeTo, spt.distTo)
+		topologicalRelax(g, v, spt.edgeTo, spt.distTo)
 	}
 }
 
@@ -137,16 +162,16 @@ func (nc NegativeCycle) Error() string {
 
 func (spt *ShortestPathTree) InitBellmanFord() error {
 	needRelax := queue.NewIntQ()
-	onQ := make([]bool, spt.g.NumVertical())
+	onQ := make([]bool, g.NumVertical())
 	needRelax.PushBack(spt.src)
 	onQ[spt.src] = true
 	relaxTimes := 0
 	for !needRelax.IsEmpty() {
 		v := needRelax.Front()
 		onQ[spt.src] = false
-		bellmanFordRelax(spt.g, v, spt.edgeTo, spt.distTo, needRelax, onQ)
+		bellmanFordRelax(g, v, spt.edgeTo, spt.distTo, needRelax, onQ)
 		relaxTimes++
-		if relaxTimes%spt.g.NumVertical() == 0 {
+		if relaxTimes%g.NumVertical() == 0 {
 			if c := spt.findNegativeCycle(); c.Size() > 0 {
 				return NegativeCycle{Stack: c}
 			}
@@ -155,14 +180,14 @@ func (spt *ShortestPathTree) InitBellmanFord() error {
 	return nil
 }
 
-func (spt *ShortestPathTree) findNegativeCycle() *stack.IntStack {
-	return spt.g.AnyNegativeCycle() // todo: optimize ?
-	//marked := make([]bool, spt.g.NumVertical())
-	//s := stack.New(spt.g.NumVertical())
-	//onS := make([]bool, spt.g.NumVertical())
-	//for i := 0; i < spt.g.NumVertical(); i++ {
+func (spt *ShortestPathTree) findNegativeCycle(g *WDigraph) *stack.IntStack {
+	return g.AnyNegativeCycle() // todo: optimize ?
+	//marked := make([]bool, g.NumVertical())
+	//s := stack.New(g.NumVertical())
+	//onS := make([]bool, g.NumVertical())
+	//for i := 0; i < g.NumVertical(); i++ {
 	//	if !marked[i] {
-	//		if c := findNC(spt.g, i, marked, s, onS, spt.edgeTo); c != nil {
+	//		if c := findNC(g, i, marked, s, onS, spt.edgeTo); c != nil {
 	//			return c
 	//		}
 	//	}

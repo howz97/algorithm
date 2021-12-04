@@ -143,6 +143,24 @@ func (g *WDigraph) IterateEdge(fn func(int, int, float64) bool) {
 	})
 }
 
+func (g *WDigraph) IterateEdgeFrom(v int, fn func(int, int, float64) bool) {
+	g.Digraph.IterateEdgeFrom(v, func(src int, dst int) bool {
+		return fn(src, dst, g.getWeight(src, dst))
+	})
+}
+
+func (g *WDigraph) FindNegativeEdgeFrom(from int) (src int, dst int) {
+	g.IterateEdgeFrom(from, func(v0 int, v1 int, w float64) bool {
+		if w < 0 {
+			src = v0
+			dst = v1
+			return false
+		}
+		return true
+	})
+	return -1, -1
+}
+
 func (g *WDigraph) AnyNegativeCycle() *stack.IntStack {
 	marked := make([]bool, g.NumVertical())
 	path := stack.NewInt(4)

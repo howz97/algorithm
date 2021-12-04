@@ -22,7 +22,7 @@ func (g WDigraph) GenSearcherDijkstra() (*ShortestPathSearcher, error) {
 	}
 	for v := range sps.spt {
 		tree := g.NewShortestPathTree(v)
-		tree.InitDijkstra()
+		tree.initDijkstra()
 		sps.spt[v] = tree
 	}
 	return sps, nil
@@ -38,7 +38,7 @@ func (g WDigraph) GenSearcherTopological() (*ShortestPathSearcher, error) {
 	}
 	for v := range sps.spt {
 		tree := g.NewShortestPathTree(v)
-		tree.InitTopological()
+		tree.initTopological()
 		sps.spt[v] = tree
 	}
 	return sps, nil
