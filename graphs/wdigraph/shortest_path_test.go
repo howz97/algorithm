@@ -102,9 +102,11 @@ func TestPathTree_Top(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	tree := g.NewShortestPathTree(1)
-	tree.initTopological()
-	graphs.RangeDFS(tree.g, 1, func(dst int) bool {
+	tree, err := g.NewShortestPathTree(1, Topological)
+	if err != nil {
+		t.Fatal(err)
+	}
+	graphs.RangeDFS(g, 1, func(dst int) bool {
 		if dst == 1 {
 			return true
 		}
