@@ -106,19 +106,10 @@ func (dg Digraph) Reverse() Digraph {
 }
 
 func (dg Digraph) HasCycle() bool {
-	return dg.getCycle() != nil
+	return dg.FindCycle() != nil
 }
 
-func (dg Digraph) GetCycle() []int {
-	pathStack := dg.getCycle()
-	if pathStack == nil {
-		return nil
-	}
-	path := ParseCycleInStack(pathStack)
-	return path
-}
-
-func (dg Digraph) getCycle() *stack.IntStack {
+func (dg Digraph) FindCycle() *stack.IntStack {
 	marks := make([]bool, dg.NumVertical())
 	path := stack.NewInt(4)
 	for v, m := range marks {

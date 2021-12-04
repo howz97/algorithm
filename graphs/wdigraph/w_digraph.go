@@ -108,18 +108,19 @@ func (g *WDigraph) RangeWAdj(v int, fn func(int, float64) bool) {
 	})
 }
 
-func (g *WDigraph) HasNegativeEdge() bool {
-	found := false
-	for _, hm := range g.weight {
-		hm.Range(func(_ hash_map.Key, val search.T) bool {
+func (g *WDigraph) FindNegativeEdge() (src, dst int) {
+	src, dst = -1, -1
+	for v0, hm := range g.weight {
+		hm.Range(func(key hash_map.Key, val search.T) bool {
 			if val.(float64) < 0 {
-				found = true
+				src = v0
+				dst = int(key.(search.Integer))
 				return false
 			}
 			return true
 		})
 	}
-	return found
+	return
 }
 
 func (g *WDigraph) getWeight(src, dst int) float64 {
