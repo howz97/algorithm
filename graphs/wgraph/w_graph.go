@@ -3,6 +3,7 @@ package wgraph
 import (
 	"errors"
 	"fmt"
+	"github.com/howz97/algorithm/graphs/wdigraph"
 	pqueue "github.com/howz97/algorithm/pqueue/binaryheap"
 	"github.com/howz97/algorithm/queue"
 	unionfind "github.com/howz97/algorithm/union-find"
@@ -13,50 +14,34 @@ var (
 	ErrNotSupportSelfLoop = errors.New("not support self loop")
 )
 
-type EdgeWeightedGraph []edgeSet
-
-func NewEWG(numV int) EdgeWeightedGraph {
-	g := make(EdgeWeightedGraph, numV)
-	for i := range g {
-		g[i] = NewEdgeSet()
-	}
-	return g
+type WGraph struct {
+	*wdigraph.WDigraph
 }
 
-func (g EdgeWeightedGraph) NumV() int {
-	return len(g)
+func NewWGraph(size int) *WGraph {
+	return &WGraph{WDigraph: wdigraph.New(size)}
 }
 
-func (g EdgeWeightedGraph) NumE() int {
-	nume := 0
-	for i := range g {
-		nume += g[i].len()
-	}
-	return nume / 2
+func (g WGraph) NumEdge() int {
+	return g.Digraph.NumEdge() / 2
 }
 
-func (g EdgeWeightedGraph) AddEdge(e *Edge) {
-	v1 := e.EitherV()
-	v2 := e.Another(v1)
-	if !g.HasV(v1) || !g.HasV(v2) {
-		panic(ErrVerticalNotExist)
+func (g WGraph) AddEdge(src, dst int, w float64) error {
+	if err := g.WDigraph.AddEdge(src, dst, w); err != nil {
+		return err
 	}
-	if v1 == v2 {
-		panic(ErrNotSupportSelfLoop)
-	}
-	g[v1].add(e)
-	g[v2].add(e)
+	return g.WDigraph.AddEdge(dst, src, w)
 }
 
-func (g EdgeWeightedGraph) Adjacent(v int) []*Edge {
-	if !g.HasV(v) {
+func (g WGraph) Adjacent(v int) []*Edge {
+	if !g.HasVertical(v) {
 		panic(ErrVerticalNotExist)
 	}
 	return g[v].traverse()
 }
 
-func (g EdgeWeightedGraph) AllEdges() *queue.Queen {
-	edges := queue.NewQueen(g.NumE())
+func (g WGraph) AllEdges() *queue.Queen {
+	edges := queue.NewQueen(g.NumEdge())
 	for i := range g {
 		adj := g.Adjacent(i)
 		for _, e := range adj {
@@ -68,35 +53,8 @@ func (g EdgeWeightedGraph) AllEdges() *queue.Queen {
 	return edges
 }
 
-func (g EdgeWeightedGraph) HasV(v int) bool {
-	return v >= 0 && v < g.NumV()
-}
-
-type Edge struct {
-	v, w   int
-	weight int
-}
-
-func (e *Edge) EitherV() int {
-	return e.v
-}
-
-func (e *Edge) Another(v int) int {
-	if v == e.v {
-		return e.w
-	} else if v == e.w {
-		return e.v
-	} else {
-		panic(fmt.Sprintf("Edge %v-%v(%v) does not contains vertical %v", e.v, e.w, e.weight, v))
-	}
-}
-
-func (e *Edge) GetWeight() int {
-	return e.weight
-}
-
-func (g EdgeWeightedGraph) LazyPrim() *MSTForest {
-	marked := make([]bool, g.NumV())
+func (g WGraph) LazyPrim() *MSTForest {
+	marked := make([]bool, g.NumVertical())
 	f := newMSTForest()
 	for i, b := range marked {
 		if !b {
@@ -106,8 +64,8 @@ func (g EdgeWeightedGraph) LazyPrim() *MSTForest {
 	return f
 }
 
-func lazyPrim(g EdgeWeightedGraph, v int, marked []bool) *queue.LinkedQueue {
-	pq := pqueue.NewBinHeap(g.NumE())
+func lazyPrim(g WGraph, v int, marked []bool) *queue.LinkedQueue {
+	pq := pqueue.NewBinHeap(g.NumEdge())
 	marked[v] = true
 	vadj := g.Adjacent(v)
 	mst := queue.NewLinkedQueue()
@@ -131,7 +89,7 @@ func lazyPrim(g EdgeWeightedGraph, v int, marked []bool) *queue.LinkedQueue {
 	return mst
 }
 
-func lazyPrimVisit(g EdgeWeightedGraph, v int, marked []bool, pq *pqueue.BinHeap) {
+func lazyPrimVisit(g WGraph, v int, marked []bool, pq *pqueue.BinHeap) {
 	marked[v] = true
 	vadj := g.Adjacent(v)
 	for _, e := range vadj {
@@ -141,9 +99,9 @@ func lazyPrimVisit(g EdgeWeightedGraph, v int, marked []bool, pq *pqueue.BinHeap
 	}
 }
 
-func (g EdgeWeightedGraph) Prim() *MSTForest {
-	marked := make([]bool, g.NumV())
-	edgeTo := make([]*Edge, g.NumV())
+func (g WGraph) Prim() *MSTForest {
+	marked := make([]bool, g.NumVertical())
+	edgeTo := make([]*Edge, g.NumVertical())
 	f := newMSTForest()
 	for i, b := range marked {
 		if !b {
@@ -153,8 +111,8 @@ func (g EdgeWeightedGraph) Prim() *MSTForest {
 	return f
 }
 
-func prim(g EdgeWeightedGraph, v int, marked []bool, edgeTo []*Edge) *queue.LinkedQueue {
-	pq := pqueue.NewBinHeap(g.NumV() - 1)
+func prim(g WGraph, v int, marked []bool, edgeTo []*Edge) *queue.LinkedQueue {
+	pq := pqueue.NewBinHeap(g.NumVertical() - 1)
 	marked[v] = true
 	adj := g.Adjacent(v)
 	for _, e := range adj {
@@ -172,7 +130,7 @@ func prim(g EdgeWeightedGraph, v int, marked []bool, edgeTo []*Edge) *queue.Link
 	return mst
 }
 
-func primVisit(g EdgeWeightedGraph, v int, marked []bool, pq *pqueue.BinHeap, edgeTo []*Edge) {
+func primVisit(g WGraph, v int, marked []bool, pq *pqueue.BinHeap, edgeTo []*Edge) {
 	marked[v] = true
 	adj := g.Adjacent(v)
 	for _, e := range adj {
@@ -191,10 +149,10 @@ func primVisit(g EdgeWeightedGraph, v int, marked []bool, pq *pqueue.BinHeap, ed
 }
 
 // Kruskal 该实现仅支持连通图
-func (g EdgeWeightedGraph) Kruskal() *queue.Queen {
-	mst := queue.NewQueen(g.NumV() - 1)
-	uf := unionfind.NewUF(g.NumV())
-	pq := pqueue.NewBinHeap(g.NumE())
+func (g WGraph) Kruskal() *queue.Queen {
+	mst := queue.NewQueen(g.NumVertical() - 1)
+	uf := unionfind.NewUF(g.NumVertical())
+	pq := pqueue.NewBinHeap(g.NumEdge())
 	allEdge := g.AllEdges()
 	for !allEdge.IsEmpty() {
 		e := allEdge.Front().(*Edge)
@@ -233,4 +191,27 @@ func (f *MSTForest) addMST(mst *queue.LinkedQueue) {
 
 func (f *MSTForest) NumConnectedComponent() int {
 	return len(*f)
+}
+
+type Edge struct {
+	v, w   int
+	weight int
+}
+
+func (e *Edge) EitherV() int {
+	return e.v
+}
+
+func (e *Edge) Another(v int) int {
+	if v == e.v {
+		return e.w
+	} else if v == e.w {
+		return e.v
+	} else {
+		panic(fmt.Sprintf("Edge %v-%v(%v) does not contains vertical %v", e.v, e.w, e.weight, v))
+	}
+}
+
+func (e *Edge) GetWeight() int {
+	return e.weight
 }

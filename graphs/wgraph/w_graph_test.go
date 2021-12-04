@@ -6,7 +6,7 @@ import (
 )
 
 func TestEdgeWeightedGraph_Kruskal(t *testing.T) {
-	g := NewEWG(8) // 算法4th P399 图4.3.10, 不同的是这里权重使用int
+	g := NewWGraph(8) // 算法4th P399 图4.3.10, 不同的是这里权重使用int
 	g.AddEdge(&Edge{v: 0, w: 2, weight: 26})
 	g.AddEdge(&Edge{v: 0, w: 4, weight: 38})
 	g.AddEdge(&Edge{v: 0, w: 6, weight: 58})
@@ -23,9 +23,9 @@ func TestEdgeWeightedGraph_Kruskal(t *testing.T) {
 	g.AddEdge(&Edge{v: 4, w: 6, weight: 93})
 	g.AddEdge(&Edge{v: 4, w: 7, weight: 37})
 	g.AddEdge(&Edge{v: 5, w: 7, weight: 28})
-	fmt.Printf("Number of edges: %v\n", g.NumE())
+	fmt.Printf("Number of edges: %v\n", g.NumEdge())
 	all := g.AllEdges()
-	if all.Size() != g.NumE() {
+	if all.Size() != g.NumEdge() {
 		t.Fatal()
 	}
 
@@ -39,7 +39,7 @@ func TestEdgeWeightedGraph_Kruskal(t *testing.T) {
 }
 
 func TestEdgeWeightedGraph_LazyPrim(t *testing.T) {
-	g := NewEWG(8) // 算法4th P399 图4.3.10, 不同的是这里权重使用int
+	g := NewWGraph(8) // 算法4th P399 图4.3.10, 不同的是这里权重使用int
 	g.AddEdge(&Edge{v: 0, w: 2, weight: 26})
 	g.AddEdge(&Edge{v: 0, w: 4, weight: 38})
 	g.AddEdge(&Edge{v: 0, w: 6, weight: 58})
@@ -68,7 +68,7 @@ func TestEdgeWeightedGraph_LazyPrim(t *testing.T) {
 }
 
 func TestEdgeWeightedGraph_Prim(t *testing.T) {
-	g := NewEWG(8) // 算法4th P399 图4.3.10, 不同的是这里权重使用int
+	g := NewWGraph(8) // 算法4th P399 图4.3.10, 不同的是这里权重使用int
 	g.AddEdge(&Edge{v: 0, w: 2, weight: 26})
 	g.AddEdge(&Edge{v: 0, w: 4, weight: 38})
 	g.AddEdge(&Edge{v: 0, w: 6, weight: 58})
