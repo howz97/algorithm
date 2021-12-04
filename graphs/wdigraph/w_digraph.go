@@ -1,9 +1,6 @@
 package wdigraph
 
 import (
-	"bufio"
-	"errors"
-	"fmt"
 	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/graphs/digraph"
 	"github.com/howz97/algorithm/search"
@@ -11,9 +8,6 @@ import (
 	"github.com/howz97/algorithm/stack"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-	"os"
-	"strconv"
-	"strings"
 )
 
 // WDigraph is edge weighted digraph without self loop
@@ -55,42 +49,6 @@ func LoadWDigraph(filename string) (*WDigraph, error) {
 	return g, nil
 }
 
-func ImportEWD(filename string) (*WDigraph, error) {
-	file, err := os.Open(filename)
-	if err != nil {
-		return nil, err
-	}
-	scan := bufio.NewScanner(file)
-	if !scan.Scan() {
-		return nil, errors.New("eof")
-	}
-	headLine := scan.Text()
-	headSli := strings.Split(headLine, " ")
-	numV, err := strconv.Atoi(headSli[0])
-	if err != nil {
-		return nil, err
-	}
-	ewd := New(numV)
-	for scan.Scan() {
-		lineSli := strings.Split(scan.Text(), " ")
-		from, err := strconv.Atoi(lineSli[0])
-		if err != nil {
-			return nil, err
-		}
-		to, err := strconv.Atoi(lineSli[1])
-		if err != nil {
-			return nil, err
-		}
-		weight, err := strconv.ParseFloat(lineSli[2], 64)
-		if err != nil {
-			fmt.Println("can not parse float", lineSli[2])
-			return nil, err
-		}
-		ewd.AddEdge(from, to, weight)
-	}
-	return ewd, nil
-}
-
 func (g *WDigraph) AddEdge(src, dst int, w float64) error {
 	err := g.Digraph.AddEdge(src, dst)
 	if err != nil {
@@ -123,10 +81,7 @@ func (g *WDigraph) FindNegativeEdge() (src, dst int) {
 	return
 }
 
-func (g *WDigraph) getWeight(src, dst int) float64 {
-	if !g.HasEdge(src, dst) {
-		panic(fmt.Sprintf("edge %d->%d not exist: %s", src, dst, g.String()))
-	}
+func (g *WDigraph) GetWeight(src, dst int) float64 {
 	return g.weight[src].Get(search.Integer(dst)).(float64)
 }
 
@@ -140,13 +95,13 @@ func (g *WDigraph) String() string {
 
 func (g *WDigraph) IterateEdge(fn func(int, int, float64) bool) {
 	g.Digraph.IterateEdge(func(src int, dst int) bool {
-		return fn(src, dst, g.getWeight(src, dst))
+		return fn(src, dst, g.GetWeight(src, dst))
 	})
 }
 
 func (g *WDigraph) IterateEdgeFrom(v int, fn func(int, int, float64) bool) {
 	g.Digraph.IterateEdgeFrom(v, func(src int, dst int) bool {
-		return fn(src, dst, g.getWeight(src, dst))
+		return fn(src, dst, g.GetWeight(src, dst))
 	})
 }
 
@@ -176,21 +131,4 @@ func (g *WDigraph) AnyNegativeCycle() *stack.IntStack {
 		return true
 	})
 	return path
-}
-
-type Edge struct {
-	from, to int
-	weight   float64
-}
-
-func (e *Edge) From() int {
-	return e.from
-}
-
-func (e *Edge) To() int {
-	return e.to
-}
-
-func (e *Edge) GetWeight() float64 {
-	return e.weight
 }

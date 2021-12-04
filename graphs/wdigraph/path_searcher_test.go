@@ -12,19 +12,19 @@ func TestEWD_Integer(t *testing.T) {
 		t.Fatal(err)
 	}
 	var (
-		spsDijkstra *ShortestPathSearcher
-		spsTop      *ShortestPathSearcher
-		spsBF       *ShortestPathSearcher
+		spsDijkstra *PathSearcher
+		spsTop      *PathSearcher
+		spsBF       *PathSearcher
 	)
-	spsDijkstra, err = g.GenSearcherDijkstra()
+	spsDijkstra, err = g.SearcherDijkstra()
 	if err != nil {
 		t.Fatal(err)
 	}
-	spsTop, err = g.GenSearcherTopological()
+	spsTop, err = g.SearcherTopological()
 	if err != nil {
 		t.Fatal(err)
 	}
-	spsBF, err = g.GenSearcherBellmanFord()
+	spsBF, err = g.SearcherBellmanFord()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -72,7 +72,7 @@ func TestNewSPS_Dijkstra(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	sps, _ := g.GenSearcherDijkstra()
+	sps, _ := g.SearcherDijkstra()
 
 	num := g.NumVertical()
 	for src := 0; src < num; src++ {
@@ -87,7 +87,7 @@ func TestNewSPS_Topological(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	sps, _ := g.GenSearcherTopological()
+	sps, _ := g.SearcherTopological()
 	num := g.NumVertical()
 	for src := 0; src < num; src++ {
 		for dst := 0; dst < num; dst++ {
@@ -124,7 +124,7 @@ func TestNewSPS_BellmanFord(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = g.GenSearcherBellmanFord()
+	_, err = g.SearcherBellmanFord()
 	if err == nil {
 		t.Fatal("negative cycle exist, error should be received")
 	}

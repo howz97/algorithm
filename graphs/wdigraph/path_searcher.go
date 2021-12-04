@@ -7,15 +7,15 @@ import (
 	"math"
 )
 
-type ShortestPathSearcher struct {
+type PathSearcher struct {
 	spt []*ShortestPathTree
 }
 
-func (g *WDigraph) GenSearcherDijkstra() (*ShortestPathSearcher, error) {
+func (g *WDigraph) SearcherDijkstra() (*PathSearcher, error) {
 	if src, dst := g.FindNegativeEdge(); src >= 0 {
 		return nil, errors.New(fmt.Sprintf("negative edge %d->%d", src, dst))
 	}
-	sps := &ShortestPathSearcher{
+	sps := &PathSearcher{
 		spt: make([]*ShortestPathTree, g.NumVertical()),
 	}
 	for v := range sps.spt {
@@ -26,11 +26,11 @@ func (g *WDigraph) GenSearcherDijkstra() (*ShortestPathSearcher, error) {
 	return sps, nil
 }
 
-func (g *WDigraph) GenSearcherTopological() (*ShortestPathSearcher, error) {
+func (g *WDigraph) SearcherTopological() (*PathSearcher, error) {
 	if cycle := g.FindCycle(); cycle != nil {
 		return nil, ErrCycle{Stack: cycle}
 	}
-	sps := &ShortestPathSearcher{
+	sps := &PathSearcher{
 		spt: make([]*ShortestPathTree, g.NumVertical()),
 	}
 	for v := range sps.spt {
@@ -41,8 +41,8 @@ func (g *WDigraph) GenSearcherTopological() (*ShortestPathSearcher, error) {
 	return sps, nil
 }
 
-func (g *WDigraph) GenSearcherBellmanFord() (*ShortestPathSearcher, error) {
-	sps := &ShortestPathSearcher{
+func (g *WDigraph) SearcherBellmanFord() (*PathSearcher, error) {
+	sps := &PathSearcher{
 		spt: make([]*ShortestPathTree, g.NumVertical()),
 	}
 	var err error
@@ -57,21 +57,21 @@ func (g *WDigraph) GenSearcherBellmanFord() (*ShortestPathSearcher, error) {
 	return sps, nil
 }
 
-func (s *ShortestPathSearcher) Distance(src, dst int) float64 {
+func (s *PathSearcher) Distance(src, dst int) float64 {
 	if !s.HasVertical(src) && !s.HasVertical(dst) {
 		return math.Inf(1)
 	}
 	return s.spt[src].DistanceTo(dst)
 }
 
-func (s *ShortestPathSearcher) Path(src, dst int) *stack.Stack {
+func (s *PathSearcher) Path(src, dst int) *stack.Stack {
 	if !s.HasVertical(src) && !s.HasVertical(dst) {
 		return nil
 	}
 	return s.spt[src].PathTo(dst)
 }
 
-func (s *ShortestPathSearcher) PrintPath(src, dst int) {
+func (s *PathSearcher) PrintPath(src, dst int) {
 	if src == dst {
 		return
 	}
@@ -92,6 +92,6 @@ func (s *ShortestPathSearcher) PrintPath(src, dst int) {
 	fmt.Printf(" (distance %v)\n", s.Distance(src, dst))
 }
 
-func (s *ShortestPathSearcher) HasVertical(v int) bool {
+func (s *PathSearcher) HasVertical(v int) bool {
 	return v >= 0 && v < len(s.spt)
 }

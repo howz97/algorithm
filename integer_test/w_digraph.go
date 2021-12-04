@@ -7,9 +7,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	pathSearcher, err := g.GenSearcherDijkstra()
-	//pathSearcher, err := g.GenSearcherTopological()
-	//pathSearcher, err := g.GenSearcherBellmanFord()
+	pathSearcher, err := g.SearcherDijkstra()
+	//pathSearcher, err := g.SearcherTopological()
+	//pathSearcher, err := g.SearcherBellmanFord()
 	if err != nil {
 		panic(err)
 	}

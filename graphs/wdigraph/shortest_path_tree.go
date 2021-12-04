@@ -222,7 +222,7 @@ func findNC(g *WDigraph, v int, marked []bool, s *stack.Stack, onS []bool, edgeT
 		var weight float64
 		s.IterateRange(start, s.Size(), func(x stack.T) bool {
 			dst := x.(int)
-			weight += g.getWeight(src, dst)
+			weight += g.GetWeight(src, dst)
 			src = dst
 			return true
 		})
