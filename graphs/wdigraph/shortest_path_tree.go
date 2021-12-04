@@ -56,7 +56,7 @@ func (g *WDigraph) NewShortestPathTree(src int, alg int) (*ShortestPathTree, err
 		}
 		spt.initTopological(g)
 	case BellmanFord:
-		err = spt.InitBellmanFord()
+		err = spt.InitBellmanFord(g)
 	default:
 		err = errors.New(fmt.Sprintf("algorithm %v not supported", alg))
 	}
@@ -64,28 +64,28 @@ func (g *WDigraph) NewShortestPathTree(src int, alg int) (*ShortestPathTree, err
 }
 
 func (spt *ShortestPathTree) CanReach(dst int) bool {
-	if !g.HasVertical(dst) {
+	if !spt.HasVertical(dst) {
 		return false
 	}
 	return spt.distTo[dst] != math.Inf(1)
 }
 
 func (spt *ShortestPathTree) DistanceTo(dst int) float64 {
-	if !g.HasVertical(dst) {
+	if !spt.HasVertical(dst) {
 		return math.Inf(1)
 	}
 	return spt.distTo[dst]
 }
 
 func (spt *ShortestPathTree) PathTo(dst int) *stack.Stack {
-	if !g.HasVertical(dst) {
+	if !spt.HasVertical(dst) {
 		return nil
 	}
 	src := spt.edgeTo[dst]
 	if src < 0 {
 		return nil
 	}
-	path := stack.New(g.NumVertical())
+	path := stack.New(spt.NumVertical())
 	for {
 		path.Push(dst)
 		dst = src
@@ -96,6 +96,14 @@ func (spt *ShortestPathTree) PathTo(dst int) *stack.Stack {
 	}
 	path.Push(spt.src)
 	return path
+}
+
+func (spt *ShortestPathTree) NumVertical() int {
+	return len(spt.distTo)
+}
+
+func (spt *ShortestPathTree) HasVertical(v int) bool {
+	return v >= 0 && v < len(spt.distTo)
 }
 
 // ============================ Dijkstra ============================
@@ -162,9 +170,9 @@ func (nc ErrCycle) Error() string {
 	return "weight negative cycle: " + nc.Stack.String()
 }
 
-func (spt *ShortestPathTree) InitBellmanFord() error {
+func (spt *ShortestPathTree) InitBellmanFord(g *WDigraph) error {
 	needRelax := queue.NewIntQ()
-	onQ := make([]bool, g.NumVertical())
+	onQ := make([]bool, spt.NumVertical())
 	needRelax.PushBack(spt.src)
 	onQ[spt.src] = true
 	relaxTimes := 0
@@ -174,7 +182,7 @@ func (spt *ShortestPathTree) InitBellmanFord() error {
 		bellmanFordRelax(g, v, spt.edgeTo, spt.distTo, needRelax, onQ)
 		relaxTimes++
 		if relaxTimes%g.NumVertical() == 0 {
-			if c := spt.findNegativeCycle(); c.Size() > 0 {
+			if c := spt.findNegativeCycle(g); c.Size() > 0 {
 				return ErrCycle{Stack: c}
 			}
 		}
