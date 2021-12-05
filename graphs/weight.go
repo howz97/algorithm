@@ -34,6 +34,29 @@ func (w Weight) FindNegativeEdge() (src, dst int) {
 	return
 }
 
+func (w Weight) Iterate(fn func(int,int,float64)bool) {
+	for src, hm := range w {
+		goon := true
+		hm.Range(func(dst hash_map.Key, v search.T) bool {
+			goon = fn(src, int(dst.(search.Integer)), v.(float64))
+			return goon
+		})
+		if !goon {
+			break
+		}
+	}
+}
+
+func (w Weight) IterateAdj(v int, fn func(int,int,float64)bool) {
+	w[v].Range(func(key hash_map.Key, val search.T) bool {
+		return fn(v, int(key.(search.Integer)), val.(float64))
+	})
+}
+
+func (w Weight) HasVet(v int) bool {
+	return v >= 0 && v < len(w)
+}
+
 func (w Weight) GetWeight(src, dst int) float64 {
 	return w[src].Get(search.Integer(dst)).(float64)
 }

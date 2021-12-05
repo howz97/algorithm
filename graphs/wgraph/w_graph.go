@@ -36,26 +36,6 @@ func (g WGraph) AddEdge(src, dst int, w float64) error {
 	return nil
 }
 
-func (g WGraph) Adjacent(v int) []*Edge {
-	if !g.HasVertical(v) {
-		panic(ErrVerticalNotExist)
-	}
-	return g[v].traverse()
-}
-
-func (g WGraph) AllEdges() *queue.Queen {
-	edges := queue.NewQueen(g.NumEdge())
-	for i := range g {
-		adj := g.Adjacent(i)
-		for _, e := range adj {
-			if e.Another(i) > i { // self-loop not supported
-				edges.PushBack(e)
-			}
-		}
-	}
-	return edges
-}
-
 func (g WGraph) LazyPrim() *MSTForest {
 	marked := make([]bool, g.NumVertical())
 	f := newMSTForest()
@@ -70,23 +50,27 @@ func (g WGraph) LazyPrim() *MSTForest {
 func lazyPrim(g WGraph, v int, marked []bool) *queue.LinkedQueue {
 	pq := pqueue.NewBinHeap(g.NumEdge())
 	marked[v] = true
-	vadj := g.Adjacent(v)
 	mst := queue.NewLinkedQueue()
-	for i := range vadj {
-		pq.Insert(vadj[i].weight, vadj[i])
-	}
+	g.IterateAdj(v, func(src int, dst int, w float64) bool {
+		pq.Insert(int(w), &Edge{ // fixme pq Cmp
+			from:   src,
+			to:     dst,
+			weight: int(w),
+		})
+		return true
+	})
 	for !pq.IsEmpty() {
 		m := pq.DelMin()
 		e := m.(*Edge)
-		if marked[e.v] && marked[e.w] {
+		if marked[e.from] && marked[e.to] {
 			continue
 		}
 		mst.PushBack(e)
-		if !marked[e.v] {
-			lazyPrimVisit(g, e.v, marked, pq)
+		if !marked[e.from] {
+			lazyPrimVisit(g, e.from, marked, pq)
 		}
-		if !marked[e.w] {
-			lazyPrimVisit(g, e.w, marked, pq)
+		if !marked[e.to] {
+			lazyPrimVisit(g, e.to, marked, pq)
 		}
 	}
 	return mst
@@ -94,12 +78,16 @@ func lazyPrim(g WGraph, v int, marked []bool) *queue.LinkedQueue {
 
 func lazyPrimVisit(g WGraph, v int, marked []bool, pq *pqueue.BinHeap) {
 	marked[v] = true
-	vadj := g.Adjacent(v)
-	for _, e := range vadj {
-		if !marked[e.Another(v)] {
-			pq.Insert(e.weight, e)
+	g.IterateAdj(v, func(_ int, a int, w float64) bool {
+		if !marked[a] {
+			pq.Insert(int(w), &Edge{
+				from:   v,
+				to:     a,
+				weight: int(w),
+			})
 		}
-	}
+		return true
+	})
 }
 
 func (g WGraph) Prim() *MSTForest {
@@ -117,12 +105,15 @@ func (g WGraph) Prim() *MSTForest {
 func prim(g WGraph, v int, marked []bool, edgeTo []*Edge) *queue.LinkedQueue {
 	pq := pqueue.NewBinHeap(g.NumVertical() - 1)
 	marked[v] = true
-	adj := g.Adjacent(v)
-	for _, e := range adj {
-		w := e.Another(v)
-		pq.Insert(e.weight, w)
-		edgeTo[w] = e
-	}
+	g.IterateAdj(v, func(_ int, a int, w float64) bool {
+		pq.Insert(int(w), a)
+		edgeTo[a] = &Edge{
+			from:   v,
+			to:     a,
+			weight: int(w),
+		}
+		return true
+	})
 	mst := queue.NewLinkedQueue()
 	for !pq.IsEmpty() {
 		m := pq.DelMin()
@@ -135,20 +126,24 @@ func prim(g WGraph, v int, marked []bool, edgeTo []*Edge) *queue.LinkedQueue {
 
 func primVisit(g WGraph, v int, marked []bool, pq *pqueue.BinHeap, edgeTo []*Edge) {
 	marked[v] = true
-	adj := g.Adjacent(v)
-	for _, e := range adj {
-		w := e.Another(v)
-		if marked[w] {
-			continue
+	g.IterateAdj(v, func(_ int, a int, wt float64) bool {
+		if marked[a] {
+			return true
 		}
-		if edgeTo[w] == nil {
-			pq.Insert(e.weight, w)
-			edgeTo[w] = e
-		} else if e.weight < edgeTo[w].weight {
-			pq.Update(e.weight, w)
-			edgeTo[w] = e
+		e := &Edge{
+			from:   v,
+			to:     a,
+			weight: int(wt),
 		}
-	}
+		if edgeTo[a] == nil {
+			pq.Insert(int(wt), a)
+			edgeTo[a] = e
+		} else if e.weight < edgeTo[a].weight {
+			pq.Update(e.weight, a)
+			edgeTo[a] = e
+		}
+		return true
+	})
 }
 
 // Kruskal 该实现仅支持连通图
@@ -156,19 +151,21 @@ func (g WGraph) Kruskal() *queue.Queen {
 	mst := queue.NewQueen(g.NumVertical() - 1)
 	uf := unionfind.NewUF(g.NumVertical())
 	pq := pqueue.NewBinHeap(g.NumEdge())
-
-	allEdge := g.AllEdges()
-	for !allEdge.IsEmpty() {
-		e := allEdge.Front().(*Edge)
-		pq.Insert(e.weight, e)
-	}
+	g.Iterate(func(src int, dst int, w float64) bool {
+		pq.Insert(int(w), &Edge{ // fixme pq Cmp Key
+			from:   src,
+			to:     dst,
+			weight: int(w),
+		})
+		return true
+	})
 	for !mst.IsFull() {
 		min := pq.DelMin()
 		minE := min.(*Edge)
-		if uf.IsConnected(minE.v, minE.w) {
+		if uf.IsConnected(minE.from, minE.to) {
 			continue
 		}
-		uf.Union(minE.v, minE.w)
+		uf.Union(minE.from, minE.to)
 		mst.PushBack(minE)
 	}
 	return mst
@@ -198,24 +195,6 @@ func (f *MSTForest) NumConnectedComponent() int {
 }
 
 type Edge struct {
-	v, w   int
-	weight int
-}
-
-func (e *Edge) EitherV() int {
-	return e.v
-}
-
-func (e *Edge) Another(v int) int {
-	if v == e.v {
-		return e.w
-	} else if v == e.w {
-		return e.v
-	} else {
-		panic(fmt.Sprintf("Edge %v-%v(%v) does not contains vertical %v", e.v, e.w, e.weight, v))
-	}
-}
-
-func (e *Edge) GetWeight() int {
-	return e.weight
+	from, to int
+	weight   int
 }
