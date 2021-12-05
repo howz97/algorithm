@@ -3,6 +3,7 @@ package graphs
 import (
 	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/search/hash_map"
+	"github.com/howz97/algorithm/util"
 )
 
 type Weight []*hash_map.Chaining
@@ -16,7 +17,7 @@ func NewWeight(size int) Weight {
 }
 
 func (w Weight) SetWeight(src, dst int, v float64) {
-	w[src].Put(search.Integer(dst), v)
+	w[src].Put(util.Integer(dst), v)
 }
 
 func (w Weight) FindNegativeEdge() (src, dst int) {
@@ -25,7 +26,7 @@ func (w Weight) FindNegativeEdge() (src, dst int) {
 		hm.Range(func(key hash_map.Key, val search.T) bool {
 			if val.(float64) < 0 {
 				src = v0
-				dst = int(key.(search.Integer))
+				dst = int(key.(util.Integer))
 				return false
 			}
 			return true
@@ -38,7 +39,7 @@ func (w Weight) Iterate(fn func(int,int,float64)bool) {
 	for src, hm := range w {
 		goon := true
 		hm.Range(func(dst hash_map.Key, v search.T) bool {
-			goon = fn(src, int(dst.(search.Integer)), v.(float64))
+			goon = fn(src, int(dst.(util.Integer)), v.(float64))
 			return goon
 		})
 		if !goon {
@@ -49,7 +50,7 @@ func (w Weight) Iterate(fn func(int,int,float64)bool) {
 
 func (w Weight) IterateAdj(v int, fn func(int,int,float64)bool) {
 	w[v].Range(func(key hash_map.Key, val search.T) bool {
-		return fn(v, int(key.(search.Integer)), val.(float64))
+		return fn(v, int(key.(util.Integer)), val.(float64))
 	})
 }
 
@@ -58,5 +59,5 @@ func (w Weight) HasVet(v int) bool {
 }
 
 func (w Weight) GetWeight(src, dst int) float64 {
-	return w[src].Get(search.Integer(dst)).(float64)
+	return w[src].Get(util.Integer(dst)).(float64)
 }

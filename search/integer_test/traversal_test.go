@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/search/avltree"
+	"github.com/howz97/algorithm/util"
 	"testing"
 )
 
@@ -11,7 +12,7 @@ func TestTraversal(t *testing.T) {
 	data := []string{"26", "-", "5", "*", "3", "+", "2"}
 	avl := avltree.New()
 	for i, v := range data {
-		avl.Put(search.Integer(i), v)
+		avl.Put(util.Integer(i), v)
 	}
 	search.PrintBinaryTree(avl)
 
