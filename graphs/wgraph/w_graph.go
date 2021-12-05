@@ -3,7 +3,8 @@ package wgraph
 import (
 	"errors"
 	"fmt"
-	"github.com/howz97/algorithm/graphs/wdigraph"
+	"github.com/howz97/algorithm/graphs"
+	"github.com/howz97/algorithm/graphs/graph"
 	pqueue "github.com/howz97/algorithm/pqueue/binaryheap"
 	"github.com/howz97/algorithm/queue"
 	unionfind "github.com/howz97/algorithm/union-find"
@@ -15,22 +16,24 @@ var (
 )
 
 type WGraph struct {
-	*wdigraph.WDigraph
+	graph.Graph
+	graphs.Weight
 }
 
 func NewWGraph(size int) *WGraph {
-	return &WGraph{WDigraph: wdigraph.New(size)}
-}
-
-func (g WGraph) NumEdge() int {
-	return g.Digraph.NumEdge() / 2
+	return &WGraph{
+		Graph: *graph.New(size),
+		Weight: graphs.NewWeight(size),
+	}
 }
 
 func (g WGraph) AddEdge(src, dst int, w float64) error {
-	if err := g.WDigraph.AddEdge(src, dst, w); err != nil {
+	if err := g.Graph.AddEdge(src, dst); err != nil {
 		return err
 	}
-	return g.WDigraph.AddEdge(dst, src, w)
+	g.SetWeight(src, dst, w)
+	g.SetWeight(dst, src, w)
+	return nil
 }
 
 func (g WGraph) Adjacent(v int) []*Edge {
@@ -153,6 +156,7 @@ func (g WGraph) Kruskal() *queue.Queen {
 	mst := queue.NewQueen(g.NumVertical() - 1)
 	uf := unionfind.NewUF(g.NumVertical())
 	pq := pqueue.NewBinHeap(g.NumEdge())
+
 	allEdge := g.AllEdges()
 	for !allEdge.IsEmpty() {
 		e := allEdge.Front().(*Edge)

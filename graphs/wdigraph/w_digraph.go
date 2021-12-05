@@ -3,8 +3,6 @@ package wdigraph
 import (
 	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/graphs/digraph"
-	"github.com/howz97/algorithm/search"
-	"github.com/howz97/algorithm/search/hash_map"
 	"github.com/howz97/algorithm/stack"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -13,17 +11,13 @@ import (
 // WDigraph is edge weighted digraph without self loop
 type WDigraph struct {
 	digraph.Digraph
-	weight []*hash_map.Chaining
+	graphs.Weight
 }
 
 func New(size int) *WDigraph {
-	weight := make([]*hash_map.Chaining, size)
-	for i := range weight {
-		weight[i] = hash_map.New()
-	}
 	return &WDigraph{
 		Digraph: digraph.New(size),
-		weight:  weight,
+		Weight:  graphs.NewWeight(size),
 	}
 }
 
@@ -54,35 +48,15 @@ func (g *WDigraph) AddEdge(src, dst int, w float64) error {
 	if err != nil {
 		return err
 	}
-	g.weight[src].Put(search.Integer(dst), w)
+	g.SetWeight(src, dst, w)
 	return nil
 }
 
 // RangeWAdj range adjacent vertices of v
 func (g *WDigraph) RangeWAdj(v int, fn func(int, float64) bool) {
-	g.RangeAdj(v, func(adj int) bool {
-		w := g.weight[v].Get(search.Integer(adj)).(float64)
-		return fn(adj, w)
+	g.RangeAdj(v, func(a int) bool {
+		return fn(a, g.GetWeight(v, a))
 	})
-}
-
-func (g *WDigraph) FindNegativeEdge() (src, dst int) {
-	src, dst = -1, -1
-	for v0, hm := range g.weight {
-		hm.Range(func(key hash_map.Key, val search.T) bool {
-			if val.(float64) < 0 {
-				src = v0
-				dst = int(key.(search.Integer))
-				return false
-			}
-			return true
-		})
-	}
-	return
-}
-
-func (g *WDigraph) GetWeight(src, dst int) float64 {
-	return g.weight[src].Get(search.Integer(dst)).(float64)
 }
 
 func (g *WDigraph) String() string {
