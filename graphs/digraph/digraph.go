@@ -2,7 +2,6 @@ package digraph
 
 import (
 	"github.com/howz97/algorithm/graphs"
-	"github.com/howz97/algorithm/queue"
 	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/search/hash_map"
 	"github.com/howz97/algorithm/stack"
@@ -12,7 +11,7 @@ import (
 
 type Digraph []*hash_map.Chaining
 
-func New(size int) Digraph {
+func NewDigraph(size int) Digraph {
 	dg := make([]*hash_map.Chaining, size)
 	for i := range dg {
 		dg[i] = hash_map.New()
@@ -20,8 +19,8 @@ func New(size int) Digraph {
 	return dg
 }
 
-func NewBy2DSli(sli [][]int) (Digraph, error) {
-	dg := New(len(sli))
+func NewDigraphBy2DSli(sli [][]int) (Digraph, error) {
+	dg := NewDigraph(len(sli))
 	var err error
 	for src, s := range sli {
 		for _, dst := range s {
@@ -32,27 +31,6 @@ func NewBy2DSli(sli [][]int) (Digraph, error) {
 		}
 	}
 	return dg, nil
-}
-
-func (dg Digraph) FindNegativeEdge() (src, dst int) {
-	src, dst = -1, -1
-	for v0, hm := range dg {
-		hm.Range(func(key hash_map.Key, val search.T) bool {
-			if val.(float64) < 0 {
-				src = v0
-				dst = int(key.(util.Integer))
-				return false
-			}
-			return true
-		})
-	}
-	return
-}
-
-func (dg Digraph) IterateAdj(v int, fn func(int, int, float64) bool) {
-	dg[v].Range(func(key hash_map.Key, val search.T) bool {
-		return fn(v, int(key.(util.Integer)), val.(float64))
-	})
 }
 
 func (dg Digraph) NumVertical() int {
@@ -94,11 +72,8 @@ func (dg Digraph) HasEdge(v1, v2 int) bool {
 }
 
 func (dg Digraph) RangeAdj(v int, fn func(int) bool) {
-	if !dg.HasVertical(v) {
-		return
-	}
-	dg[v].Range(func(key hash_map.Key, _ search.T) bool {
-		return fn(int(key.(util.Integer)))
+	dg.RangeWAdj(v, func(a int, _ float64) bool {
+		return fn(a)
 	})
 }
 
@@ -126,7 +101,7 @@ func (dg Digraph) String() string {
 }
 
 func (dg Digraph) Reverse() Digraph {
-	rg := New(dg.NumVertical())
+	rg := NewDigraph(dg.NumVertical())
 	for v := 0; v < dg.NumVertical(); v++ {
 		dg.RangeAdj(v, func(w int) bool {
 			rg.AddEdge(w, v)
@@ -134,6 +109,25 @@ func (dg Digraph) Reverse() Digraph {
 		})
 	}
 	return rg
+}
+
+func (dg Digraph) FindNegativeEdge() (src, dst int) {
+	src, dst = -1, -1
+	dg.IterateWEdge(func(v int, v2 int, w float64) bool {
+		if w < 0 {
+			src = v
+			dst = v2
+			return false
+		}
+		return true
+	})
+	return
+}
+
+func (dg Digraph) IterateAdj(v int, fn func(int, int, float64) bool) { // todo: unexported
+	dg[v].Range(func(key hash_map.Key, val search.T) bool {
+		return fn(v, int(key.(util.Integer)), val.(float64))
+	})
 }
 
 func (dg Digraph) HasCycle() bool {
@@ -306,33 +300,33 @@ func (dg Digraph) IterateVetRDFS(fn func(int) bool) {
 		if marked[v] {
 			continue
 		}
-		dg.revDFS(v, marked, fn)
+		dg.rDFS(v, marked, fn)
 	}
 }
 
-func (dg Digraph) IterateVetFromRDFS(src int, fn func(int) bool) {
+func (dg Digraph) IterateRDFSFromVet(src int, fn func(int) bool) {
 	if !dg.HasVertical(src) {
 		return
 	}
 	marked := make([]bool, dg.NumVertical())
-	dg.revDFS(src, marked, fn)
+	dg.rDFS(src, marked, fn)
 }
 
-func (dg Digraph) VetRDFSOrder(src int) *stack.IntStack {
+func (dg Digraph) RDFSOrderVertical(src int) *stack.IntStack {
 	order := stack.NewInt(dg.NumVertical())
-	dg.IterateVetFromRDFS(src, func(v int) bool {
+	dg.IterateRDFSFromVet(src, func(v int) bool {
 		order.Push(v)
 		return true
 	})
 	return order
 }
 
-func (dg Digraph) revDFS(v int, marked []bool, fn func(int) bool) bool {
+func (dg Digraph) rDFS(v int, marked []bool, fn func(int) bool) bool {
 	marked[v] = true
 	goon := true // continue DFS or abort
 	dg.RangeAdj(v, func(a int) bool {
 		if !marked[a] {
-			if !dg.revDFS(a, marked, fn) {
+			if !dg.rDFS(a, marked, fn) {
 				goon = false
 			}
 		}
@@ -342,67 +336,6 @@ func (dg Digraph) revDFS(v int, marked []bool, fn func(int) bool) bool {
 		return false
 	}
 	return fn(v)
-}
-
-type BFS struct {
-	src    int
-	marked []bool
-	edgeTo []int
-}
-
-func (dg Digraph) NewBFS(src int) *BFS {
-	if !dg.HasVertical(src) {
-		return nil
-	}
-	bfs := &BFS{
-		src:    src,
-		marked: make([]bool, dg.NumVertical()),
-		edgeTo: make([]int, dg.NumVertical()),
-	}
-	q := queue.NewIntQ()
-	bfs.marked[src] = true
-	q.PushBack(src)
-	for !q.IsEmpty() {
-		edge := q.Front()
-		dg.RangeAdj(edge, func(adj int) bool {
-			if !bfs.marked[adj] {
-				bfs.edgeTo[adj] = edge
-				bfs.marked[adj] = true
-				q.PushBack(adj)
-			}
-			return true
-		})
-	}
-	return bfs
-}
-
-func (bfs *BFS) CanReach(dst int) bool {
-	if !bfs.checkVertical(dst) {
-		return false
-	}
-	return bfs.marked[dst]
-}
-
-func (bfs *BFS) ShortestPathTo(dst int) []int {
-	if !bfs.CanReach(dst) {
-		return nil
-	}
-	if dst == bfs.src {
-		return []int{dst}
-	}
-	path := make([]int, 0, 2)
-	path = append(path, dst)
-	for bfs.edgeTo[dst] != bfs.src {
-		dst = bfs.edgeTo[dst]
-		path = append(path, dst)
-	}
-	path = append(path, bfs.src)
-	util.ReverseInts(path)
-	return path
-}
-
-func (bfs *BFS) checkVertical(v int) bool {
-	return v >= 0 && v < len(bfs.marked)
 }
 
 func (dg Digraph) IsBipartiteGraph() bool {

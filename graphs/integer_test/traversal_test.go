@@ -68,7 +68,7 @@ var digraph1 = [][]int{
 }
 
 func TestDFS_Digraph(t *testing.T) {
-	dg, err := digraph.NewBy2DSli(digraph1)
+	dg, err := digraph.NewDigraphBy2DSli(digraph1)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,11 +97,11 @@ func checkDFSResults(t *testing.T, g digraph.Digraph, dfsResults [][]int) {
 }
 
 func TestRevDFS(t *testing.T) {
-	g, err := digraph.NewBy2DSli(digraph1)
+	g, err := digraph.NewDigraphBy2DSli(digraph1)
 	if err != nil {
 		t.Fatal(err)
 	}
-	order := g.VetRDFSOrder(0).ToSlice()
+	order := g.RDFSOrderVertical(0).ToSlice()
 	correct := []int{0, 3, 6, 7}
 	if !util.SliceEqual(order, correct) {
 		t.Errorf("rev dfs order %v not equal %v", order, correct)

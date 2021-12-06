@@ -15,7 +15,7 @@ type WDigraph struct {
 
 func New(size int) *WDigraph {
 	return &WDigraph{
-		Digraph: digraph.New(size),
+		Digraph: digraph.NewDigraph(size),
 	}
 }
 

@@ -12,7 +12,7 @@ type Graph struct {
 
 func New(size int) *Graph {
 	return &Graph{
-		Digraph: digraph.New(size),
+		Digraph: digraph.NewDigraph(size),
 	}
 }
 

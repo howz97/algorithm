@@ -6,7 +6,7 @@ import (
 )
 
 func TestSCC_IsStronglyConnected(t *testing.T) {
-	g := New(13)
+	g := NewDigraph(13)
 	g.AddEdge(0, 1)
 	g.AddEdge(0, 5)
 	g.AddEdge(5, 4)

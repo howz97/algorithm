@@ -232,7 +232,7 @@ func indexRune(runes []rune, r rune) int {
 
 func makeNFA(table []symbol) digraph.Digraph {
 	size := len(table)
-	nfa := digraph.New(size + 1)
+	nfa := digraph.NewDigraph(size + 1)
 	stk := stack.NewInt(size)
 	for i, syb := range table {
 		left := i
