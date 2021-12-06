@@ -1,5 +1,7 @@
 package pqueue
 
+import "container/heap"
+
 type Elem struct {
 	p int
 	v interface{}
@@ -7,8 +9,8 @@ type Elem struct {
 
 // BinHeap -
 type BinHeap struct {
-	size int
-	arry []Elem
+	size  int
+	elems []Elem
 }
 
 // NewBinHeap -
@@ -17,9 +19,9 @@ func NewBinHeap(cap uint) *BinHeap {
 		panic("capacity less than 1")
 	}
 	h := &BinHeap{
-		arry: make([]Elem, cap+1),
+		elems: make([]Elem, cap+1),
 	}
-	h.arry[0].p = -1 << 63
+	h.elems[0].p = -1 << 63
 	return h
 }
 
@@ -29,14 +31,14 @@ func NewBinHeapWitArray(arry []Elem, cap int) *BinHeap {
 		panic("capacity less than 1")
 	}
 	h := &BinHeap{
-		arry: make([]Elem, cap+1),
+		elems: make([]Elem, cap+1),
 	}
-	h.arry[0].p = -1 << 63
+	h.elems[0].p = -1 << 63
 	if len(arry) >= cap {
-		copy(h.arry[1:], arry[:cap])
+		copy(h.elems[1:], arry[:cap])
 		h.size = cap
 	} else {
-		copy(h.arry[1:], arry[:])
+		copy(h.elems[1:], arry[:])
 		h.size = len(arry)
 	}
 	for i := h.size / 2; i > 0; i-- {
@@ -47,12 +49,13 @@ func NewBinHeapWitArray(arry []Elem, cap int) *BinHeap {
 
 // Size return the total amount of element in heap
 func (h *BinHeap) Size() int {
+	heap.Init()
 	return h.size
 }
 
 // Cap return the upper limit of the number of element in heap
 func (h *BinHeap) Cap() int {
-	return len(h.arry) - 1
+	return len(h.elems) - 1
 }
 
 func (h *BinHeap) Insert(p int, v interface{}) (ok bool) {
@@ -60,7 +63,7 @@ func (h *BinHeap) Insert(p int, v interface{}) (ok bool) {
 		return false
 	}
 	h.size++
-	h.arry[h.size] = Elem{p: p, v: v}
+	h.elems[h.size] = Elem{p: p, v: v}
 	h.percolateUp(h.size)
 	return true
 }
@@ -69,8 +72,8 @@ func (h *BinHeap) DelMin() interface{} {
 	if h.IsEmpty() {
 		panic("delete from empty heap")
 	}
-	del := h.arry[1]
-	h.arry[1] = h.arry[h.size]
+	del := h.elems[1]
+	h.elems[1] = h.elems[h.size]
 	h.size--
 	h.percolateDown(1)
 	return del.v
@@ -81,13 +84,13 @@ func (h *BinHeap) Delete(v interface{}) {
 	if i == -1 {
 		return
 	}
-	h.arry[i] = h.arry[h.size]
+	h.elems[i] = h.elems[h.size]
 	h.size--
 	h.percolateDown(i)
 }
 
 func (h *BinHeap) find(v interface{}) int {
-	for i, e := range h.arry {
+	for i, e := range h.elems {
 		if e.v == v {
 			return i
 		}
@@ -100,11 +103,11 @@ func (h *BinHeap) Update(p int, v interface{}) {
 	if i == -1 {
 		return
 	}
-	if p > h.arry[i].p {
-		h.arry[i].p = p
+	if p > h.elems[i].p {
+		h.elems[i].p = p
 		h.percolateDown(i)
 	} else {
-		h.arry[i].p = p
+		h.elems[i].p = p
 		h.percolateUp(i)
 	}
 }
@@ -118,7 +121,7 @@ func (h *BinHeap) IsFull() bool {
 }
 
 func (h *BinHeap) percolateDown(i int) {
-	arry := h.arry
+	arry := h.elems
 	downingElem := arry[i]
 	cavPointer := i
 	for {
@@ -139,11 +142,11 @@ func (h *BinHeap) percolateDown(i int) {
 }
 
 func (h *BinHeap) percolateUp(i int) {
-	arry := h.arry
+	arry := h.elems
 	uppingElem := arry[i]
 	cavPointer := i
 	for ; arry[cavPointer/2].p > uppingElem.p; cavPointer /= 2 {
-		h.arry[cavPointer] = h.arry[cavPointer/2]
+		h.elems[cavPointer] = h.elems[cavPointer/2]
 	}
 	arry[cavPointer] = uppingElem
 }
