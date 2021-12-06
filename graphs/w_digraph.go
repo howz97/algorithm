@@ -40,7 +40,7 @@ func LoadWDigraph(filename string) (*WDigraph, error) {
 }
 
 func (g *WDigraph) AddEdge(src, dst int, w float64) error {
-	return g.AddWEdge(src, dst, w)
+	return g.addWeightedEdge(src, dst, w)
 }
 
 func (g *WDigraph) String() string {

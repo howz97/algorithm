@@ -18,7 +18,7 @@ func NewWGraph(size int) *WGraph {
 }
 
 func (g WGraph) AddEdge(src, dst int, w float64) error {
-	return g.Graph.AddWEdge(src, dst, w)
+	return g.Graph.addWeightedEdge(src, dst, w)
 }
 
 func (g WGraph) LazyPrim() *MSTForest {
@@ -36,7 +36,7 @@ func lazyPrim(g WGraph, v int, marked []bool) *queue.LinkedQueue {
 	pq := pqueue.NewBinHeap(g.NumEdge())
 	marked[v] = true
 	mst := queue.NewLinkedQueue()
-	g.IterateAdj(v, func(src int, dst int, w float64) bool {
+	g.iterateAdj(v, func(src int, dst int, w float64) bool {
 		pq.Insert(int(w), &Edge{ // fixme pq Cmp
 			from:   src,
 			to:     dst,
@@ -63,7 +63,7 @@ func lazyPrim(g WGraph, v int, marked []bool) *queue.LinkedQueue {
 
 func lazyPrimVisit(g WGraph, v int, marked []bool, pq *pqueue.BinHeap) {
 	marked[v] = true
-	g.IterateAdj(v, func(_ int, a int, w float64) bool {
+	g.iterateAdj(v, func(_ int, a int, w float64) bool {
 		if !marked[a] {
 			pq.Insert(int(w), &Edge{
 				from:   v,
@@ -90,7 +90,7 @@ func (g WGraph) Prim() *MSTForest {
 func prim(g WGraph, v int, marked []bool, edgeTo []*Edge) *queue.LinkedQueue {
 	pq := pqueue.NewBinHeap(g.NumVertical() - 1)
 	marked[v] = true
-	g.IterateAdj(v, func(_ int, a int, w float64) bool {
+	g.iterateAdj(v, func(_ int, a int, w float64) bool {
 		pq.Insert(int(w), a)
 		edgeTo[a] = &Edge{
 			from:   v,
@@ -111,7 +111,7 @@ func prim(g WGraph, v int, marked []bool, edgeTo []*Edge) *queue.LinkedQueue {
 
 func primVisit(g WGraph, v int, marked []bool, pq *pqueue.BinHeap, edgeTo []*Edge) {
 	marked[v] = true
-	g.IterateAdj(v, func(_ int, a int, wt float64) bool {
+	g.iterateAdj(v, func(_ int, a int, wt float64) bool {
 		if marked[a] {
 			return true
 		}

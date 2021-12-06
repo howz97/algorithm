@@ -1,6 +1,7 @@
-package graphs
+package graph_symbol
 
 import (
+	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/util"
 	"strings"
 )
@@ -8,10 +9,10 @@ import (
 type SymbolGraph struct {
 	str2int map[string]int
 	int2str []string
-	Graph   IGraph
+	Graph   graphs.IGraph
 }
 
-func NewSymbolGraph(filename string, scanFn func(string) ([][]string, error), newFn func(int) IGraph) (*SymbolGraph, error) {
+func NewSymbolGraph(filename string, scanFn func(string) ([][]string, error), newFn func(int) graphs.IGraph) (*SymbolGraph, error) {
 	input, err := scanFn(filename)
 	if err != nil {
 		return nil, err
@@ -41,11 +42,11 @@ func NewSymbolGraph(filename string, scanFn func(string) ([][]string, error), ne
 func (sg *SymbolGraph) AddEdge(src, dst string) error {
 	iSrc, ok := sg.str2int[src]
 	if !ok {
-		return ErrVerticalNotExist
+		return graphs.ErrVerticalNotExist
 	}
 	iDst, ok := sg.str2int[dst]
 	if !ok {
-		return ErrVerticalNotExist
+		return graphs.ErrVerticalNotExist
 	}
 	return sg.Graph.AddEdge(iSrc, iDst)
 }
@@ -101,17 +102,17 @@ func ScanInput(filename string) (input [][]string, err error) {
 		}
 		split := strings.Split(line, ":")
 		if len(split) != 2 {
-			err = ErrInputFormat
+			err = graphs.ErrInputFormat
 			return false
 		}
 		src := strings.TrimSpace(split[0])
 		if src == "" {
-			err = ErrInputFormat
+			err = graphs.ErrInputFormat
 			return false
 		}
 		dsts := strings.Split(split[1], ",")
 		if len(dsts) == 0 {
-			err = ErrInputFormat
+			err = graphs.ErrInputFormat
 			return false
 		}
 		row := []string{src}

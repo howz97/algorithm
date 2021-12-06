@@ -49,10 +49,10 @@ func (dg Digraph) NumEdge() uint {
 }
 
 func (dg Digraph) AddEdge(src, dst int) error {
-	return dg.AddWEdge(src, dst, 1)
+	return dg.addWeightedEdge(src, dst, 1)
 }
 
-func (dg Digraph) AddWEdge(src, dst int, w float64) error {
+func (dg Digraph) addWeightedEdge(src, dst int, w float64) error {
 	if !dg.HasVertical(src) || !dg.HasVertical(dst) {
 		return ErrVerticalNotExist
 	}
@@ -123,7 +123,7 @@ func (dg Digraph) FindNegativeEdge() (src, dst int) {
 	return
 }
 
-func (dg Digraph) IterateAdj(v int, fn func(int, int, float64) bool) { // todo: unexported
+func (dg Digraph) iterateAdj(v int, fn func(int, int, float64) bool) {
 	dg[v].Range(func(key hash_map.Key, val search.T) bool {
 		return fn(v, int(key.(util.Integer)), val.(float64))
 	})

@@ -20,10 +20,10 @@ func (g *Graph) NumEdge() uint {
 
 // AddEdge add edge v1-v2
 func (g *Graph) AddEdge(src, dst int) error {
-	return g.AddWEdge(src, dst, 1)
+	return g.addWeightedEdge(src, dst, 1)
 }
 
-func (g *Graph) AddWEdge(src, dst int, w float64) error {
+func (g *Graph) addWeightedEdge(src, dst int, w float64) error {
 	if !g.HasVertical(src) || !g.HasVertical(dst) {
 		return ErrVerticalNotExist
 	}
