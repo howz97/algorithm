@@ -3,20 +3,21 @@ package digraph
 import (
 	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/queue"
-	"github.com/howz97/algorithm/set"
+	"github.com/howz97/algorithm/search"
+	"github.com/howz97/algorithm/search/hash_map"
 	"github.com/howz97/algorithm/stack"
 	"github.com/howz97/algorithm/util"
 	"strconv"
 )
 
-type Digraph []set.IntSet
+type Digraph []*hash_map.Chaining
 
 func New(size int) Digraph {
-	g := make(Digraph, size)
-	for i := range g {
-		g[i] = make(set.IntSet)
+	dg := make([]*hash_map.Chaining, size)
+	for i := range dg {
+		dg[i] = hash_map.New()
 	}
-	return g
+	return dg
 }
 
 func NewBy2DSli(sli [][]int) (Digraph, error) {
@@ -33,30 +34,55 @@ func NewBy2DSli(sli [][]int) (Digraph, error) {
 	return dg, nil
 }
 
+func (dg Digraph) FindNegativeEdge() (src, dst int) {
+	src, dst = -1, -1
+	for v0, hm := range dg {
+		hm.Range(func(key hash_map.Key, val search.T) bool {
+			if val.(float64) < 0 {
+				src = v0
+				dst = int(key.(util.Integer))
+				return false
+			}
+			return true
+		})
+	}
+	return
+}
+
+func (dg Digraph) IterateAdj(v int, fn func(int, int, float64) bool) {
+	dg[v].Range(func(key hash_map.Key, val search.T) bool {
+		return fn(v, int(key.(util.Integer)), val.(float64))
+	})
+}
+
 func (dg Digraph) NumVertical() int {
 	return len(dg)
 }
 
 func (dg Digraph) HasVertical(v int) bool {
-	return v >= 0 && v < dg.NumVertical()
+	return v >= 0 && v < len(dg)
 }
 
-func (dg Digraph) NumEdge() int {
-	n := 0
+func (dg Digraph) NumEdge() uint {
+	n := uint(0)
 	for i := range dg {
-		n += dg[i].Len()
+		n += dg[i].Size()
 	}
 	return n
 }
 
 func (dg Digraph) AddEdge(src, dst int) error {
+	return dg.AddWEdge(src, dst, 1)
+}
+
+func (dg Digraph) AddWEdge(src, dst int, w float64) error {
 	if !dg.HasVertical(src) || !dg.HasVertical(dst) {
 		return graphs.ErrVerticalNotExist
 	}
 	if src == dst {
 		return graphs.ErrSelfLoop
 	}
-	dg[src].Add(dst)
+	dg[src].Put(util.Integer(dst), w)
 	return nil
 }
 
@@ -64,21 +90,25 @@ func (dg Digraph) HasEdge(v1, v2 int) bool {
 	if !dg.HasVertical(v1) || !dg.HasVertical(v2) {
 		return false
 	}
-	return dg[v1].Contains(v2)
-}
-
-func (dg Digraph) Adjacent(v int) []int {
-	if !dg.HasVertical(v) {
-		return nil
-	}
-	return dg[v].Traverse()
+	return dg[v1].Get(util.Integer(v2)) != nil
 }
 
 func (dg Digraph) RangeAdj(v int, fn func(int) bool) {
 	if !dg.HasVertical(v) {
 		return
 	}
-	dg[v].Iterate(fn)
+	dg[v].Range(func(key hash_map.Key, _ search.T) bool {
+		return fn(int(key.(util.Integer)))
+	})
+}
+
+func (dg Digraph) RangeWAdj(v int, fn func(int, float64) bool) {
+	if !dg.HasVertical(v) {
+		return
+	}
+	dg[v].Range(func(key hash_map.Key, val search.T) bool {
+		return fn(int(key.(util.Integer)), val.(float64))
+	})
 }
 
 func (dg Digraph) String() string {
@@ -182,11 +212,11 @@ func (dg Digraph) Topological() *stack.IntStack {
 	return order
 }
 
-func (dg Digraph) IterateEdge(fn func(int, int) bool) {
-	for src, adj := range dg {
+func (dg Digraph) IterateWEdge(fn func(int, int, float64) bool) {
+	for src, hm := range dg {
 		goon := true
-		adj.Iterate(func(dst int) bool {
-			goon = fn(src, dst)
+		hm.Range(func(dst hash_map.Key, v search.T) bool {
+			goon = fn(src, int(dst.(util.Integer)), v.(float64))
 			return goon
 		})
 		if !goon {
@@ -195,14 +225,26 @@ func (dg Digraph) IterateEdge(fn func(int, int) bool) {
 	}
 }
 
-func (dg Digraph) IterateEdgeFrom(v int, fn func(int, int) bool) {
+func (dg Digraph) IterateEdge(fn func(int, int) bool) {
+	dg.IterateWEdge(func(src int, dst int, _ float64) bool {
+		return fn(src, dst)
+	})
+}
+
+func (dg Digraph) IterateWEdgeFrom(v int, fn func(int, int, float64) bool) {
 	dg.IterateVetDFS(v, func(v int) bool {
 		goon := true
-		dg.RangeAdj(v, func(a int) bool {
-			goon = fn(v, a)
+		dg.RangeWAdj(v, func(a int, w float64) bool {
+			goon = fn(v, a, w)
 			return goon
 		})
 		return goon
+	})
+}
+
+func (dg Digraph) IterateEdgeFrom(v int, fn func(int, int) bool) {
+	dg.IterateWEdgeFrom(v, func(src int, dst int, _ float64) bool {
+		return fn(src, dst)
 	})
 }
 

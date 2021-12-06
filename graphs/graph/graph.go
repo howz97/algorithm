@@ -3,6 +3,7 @@ package graph
 import (
 	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/graphs/digraph"
+	"github.com/howz97/algorithm/util"
 )
 
 type Graph struct {
@@ -15,20 +16,24 @@ func New(size int) *Graph {
 	}
 }
 
-func (g *Graph) NumEdge() int {
+func (g *Graph) NumEdge() uint {
 	return g.Digraph.NumEdge() / 2
 }
 
 // AddEdge add edge v1-v2
-func (g *Graph) AddEdge(v1, v2 int) error {
-	if !g.HasVertical(v1) || !g.HasVertical(v2) {
+func (g *Graph) AddEdge(src, dst int) error {
+	return g.AddWEdge(src, dst, 1)
+}
+
+func (g *Graph) AddWEdge(src, dst int, w float64) error {
+	if !g.HasVertical(src) || !g.HasVertical(dst) {
 		return graphs.ErrVerticalNotExist
 	}
-	if v1 == v2 {
+	if src == dst {
 		return graphs.ErrSelfLoop
 	}
-	g.Digraph[v1].Add(v2)
-	g.Digraph[v2].Add(v1)
+	g.Digraph[src].Put(util.Integer(dst), w)
+	g.Digraph[dst].Put(util.Integer(src), w)
 	return nil
 }
 

@@ -192,63 +192,6 @@ func (spt *ShortestPathTree) InitBellmanFord(g *WDigraph) error {
 
 func (spt *ShortestPathTree) findNegativeCycle(g *WDigraph) *stack.IntStack {
 	return g.AnyNegativeCycle() // todo: optimize ?
-	//marked := make([]bool, g.NumVertical())
-	//s := stack.New(g.NumVertical())
-	//onS := make([]bool, g.NumVertical())
-	//for i := 0; i < g.NumVertical(); i++ {
-	//	if !marked[i] {
-	//		if c := findNC(g, i, marked, s, onS, spt.edgeTo); c != nil {
-	//			return c
-	//		}
-	//	}
-	//}
-	//return nil
-}
-
-func findNC(g *WDigraph, v int, marked []bool, s *stack.Stack, onS []bool, edgeTo []int) *stack.Stack {
-	if onS[v] {
-		fmt.Println("cycle found! stack is:", s.String(), v)
-
-		start := 0
-		s.Iterate(func(x stack.T) bool {
-			start++
-			if x.(int) == v {
-				return false
-			}
-			return true
-		})
-		s.Push(v)
-		src := v
-		var weight float64
-		s.IterateRange(start, s.Size(), func(x stack.T) bool {
-			dst := x.(int)
-			weight += g.GetWeight(src, dst)
-			src = dst
-			return true
-		})
-		if weight < 0 {
-			return s
-		}
-		return nil
-	}
-	onS[v] = true
-	s.Push(edgeTo[v])
-	var nc *stack.Stack
-	g.RangeAdj(v, func(a int) bool {
-		if marked[a] {
-			return true
-		}
-		//fmt.Printf("detect NC by path %d->%d \n", v, a)
-		nc = findNC(g, a, marked, s, onS, edgeTo)
-		return nc == nil
-	})
-	if nc != nil {
-		return nc
-	}
-	onS[v] = false
-	s.Pop()
-	marked[v] = true
-	return nil
 }
 
 func bellmanFordRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, needRelax *queue.IntQ, onQ []bool) {

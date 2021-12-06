@@ -1,39 +1,25 @@
 package wgraph
 
 import (
-	"errors"
 	"fmt"
-	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/graphs/graph"
 	pqueue "github.com/howz97/algorithm/pqueue/binaryheap"
 	"github.com/howz97/algorithm/queue"
 	unionfind "github.com/howz97/algorithm/union-find"
 )
 
-var (
-	ErrVerticalNotExist   = errors.New("vertical not exist")
-	ErrNotSupportSelfLoop = errors.New("not support self loop")
-)
-
 type WGraph struct {
 	graph.Graph
-	graphs.Weight
 }
 
 func NewWGraph(size int) *WGraph {
 	return &WGraph{
 		Graph: *graph.New(size),
-		Weight: graphs.NewWeight(size),
 	}
 }
 
 func (g WGraph) AddEdge(src, dst int, w float64) error {
-	if err := g.Graph.AddEdge(src, dst); err != nil {
-		return err
-	}
-	g.SetWeight(src, dst, w)
-	g.SetWeight(dst, src, w)
-	return nil
+	return g.Graph.AddWEdge(src, dst, w)
 }
 
 func (g WGraph) LazyPrim() *MSTForest {
@@ -151,7 +137,7 @@ func (g WGraph) Kruskal() *queue.Queen {
 	mst := queue.NewQueen(g.NumVertical() - 1)
 	uf := unionfind.NewUF(g.NumVertical())
 	pq := pqueue.NewBinHeap(g.NumEdge())
-	g.Iterate(func(src int, dst int, w float64) bool {
+	g.IterateWEdge(func(src int, dst int, w float64) bool {
 		pq.Insert(int(w), &Edge{ // fixme pq Cmp Key
 			from:   src,
 			to:     dst,
