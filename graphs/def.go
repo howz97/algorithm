@@ -13,8 +13,8 @@ var (
 
 type ITraverse interface {
 	HasVertical(v int) bool
-	NumVertical() int
-	RangeAdj(v int, fn func(a int) bool)
+	NumVertical() uint
+	IterateAdj(v int, fn func(a int) bool)
 }
 
 type IGraph interface {
@@ -27,14 +27,14 @@ type IWGraph interface {
 	ITraverse
 	AddEdge(v1, v2 int, w float64) error
 	HasEdge(v1, v2 int) bool
-	RangeWAdj(v int, fn func(a int, w float64) bool)
+	IterateWAdj(v int, fn func(a int, w float64) bool)
 }
 
 func MarshalWGraph(g IWGraph) ([]byte, error) {
 	m := make(map[int]map[int]float64)
-	for v := 0; v < g.NumVertical(); v++ {
+	for v := 0; v < int(g.NumVertical()); v++ {
 		edges := make(map[int]float64)
-		g.RangeWAdj(v, func(a int, w float64) bool {
+		g.IterateWAdj(v, func(a int, w float64) bool {
 			edges[a] = w
 			return true
 		})

@@ -117,7 +117,7 @@ func (spt *ShortestPathTree) initDijkstra(g *WDigraph) {
 }
 
 func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *pqueue.BinHeap) {
-	g.RangeWAdj(v, func(adj int, w float64) bool {
+	g.IterateWAdj(v, func(adj int, w float64) bool {
 		if distTo[v]+w < distTo[adj] {
 			inPQ := distTo[adj] != math.Inf(1)
 			edgeTo[adj] = v
@@ -135,7 +135,7 @@ func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *pqueu
 // ============================ Topological ============================
 
 func (spt *ShortestPathTree) initTopological(g *WDigraph) {
-	order := stack.NewInt(g.NumVertical())
+	order := stack.NewInt(int(g.NumVertical()))
 	g.IterateRDFSFromVet(spt.src, func(v int) bool {
 		order.Push(v)
 		return true
@@ -150,7 +150,7 @@ func (spt *ShortestPathTree) initTopological(g *WDigraph) {
 }
 
 func topologicalRelax(g *WDigraph, v int, edgeTo []int, distTo []float64) {
-	g.RangeWAdj(v, func(a int, w float64) bool {
+	g.IterateWAdj(v, func(a int, w float64) bool {
 		if distTo[v]+w < distTo[a] {
 			edgeTo[a] = v
 			distTo[a] = distTo[v] + w
@@ -174,7 +174,7 @@ func (spt *ShortestPathTree) InitBellmanFord(g *WDigraph) error {
 	onQ := make([]bool, spt.NumVertical())
 	needRelax.PushBack(spt.src)
 	onQ[spt.src] = true
-	relaxTimes := 0
+	relaxTimes := uint(0)
 	for !needRelax.IsEmpty() {
 		v := needRelax.Front()
 		onQ[spt.src] = false
@@ -194,7 +194,7 @@ func (spt *ShortestPathTree) findNegativeCycle(g *WDigraph) *stack.IntStack {
 }
 
 func bellmanFordRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, needRelax *queue.IntQ, onQ []bool) {
-	g.RangeWAdj(v, func(adj int, w float64) bool {
+	g.IterateWAdj(v, func(adj int, w float64) bool {
 		if distTo[v]+w < distTo[adj] {
 			edgeTo[adj] = v
 			distTo[adj] = distTo[v] + w

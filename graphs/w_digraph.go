@@ -11,7 +11,7 @@ type WDigraph struct {
 	Digraph
 }
 
-func NewWDigraph(size int) *WDigraph {
+func NewWDigraph(size uint) *WDigraph {
 	return &WDigraph{
 		Digraph: NewDigraph(size),
 	}
@@ -27,7 +27,7 @@ func LoadWDigraph(filename string) (*WDigraph, error) {
 	if err != nil {
 		return nil, err
 	}
-	g := NewWDigraph(len(m))
+	g := NewWDigraph(uint(len(m)))
 	for src, adj := range m {
 		for dst, w := range adj {
 			err = g.AddEdge(src, dst, w)

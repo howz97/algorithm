@@ -25,7 +25,7 @@ func (dg Digraph) NewBFS(src int) *BFS {
 	q.PushBack(src)
 	for !q.IsEmpty() {
 		edge := q.Front()
-		dg.RangeAdj(edge, func(adj int) bool {
+		dg.IterateAdj(edge, func(adj int) bool {
 			if !bfs.marked[adj] {
 				bfs.edgeTo[adj] = edge
 				bfs.marked[adj] = true

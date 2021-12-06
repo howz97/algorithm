@@ -8,7 +8,7 @@ type Graph struct {
 	Digraph
 }
 
-func NewGraph(size int) *Graph {
+func NewGraph(size uint) *Graph {
 	return &Graph{
 		Digraph: NewDigraph(size),
 	}
@@ -51,7 +51,7 @@ func (g *Graph) HasCycle() bool {
 func (g *Graph) detectCycleDFS(last, cur int, marked []bool) bool {
 	marked[cur] = true
 	found := false
-	g.RangeAdj(cur, func(adj int) bool {
+	g.IterateAdj(cur, func(adj int) bool {
 		if adj == last { // here is different from digraph
 			return true
 		}

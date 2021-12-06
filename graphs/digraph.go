@@ -70,13 +70,13 @@ func (dg Digraph) HasEdge(v1, v2 int) bool {
 	return dg[v1].Get(util.Integer(v2)) != nil
 }
 
-func (dg Digraph) RangeAdj(v int, fn func(int) bool) {
-	dg.RangeWAdj(v, func(a int, _ float64) bool {
+func (dg Digraph) IterateAdj(v int, fn func(int) bool) {
+	dg.IterateWAdj(v, func(a int, _ float64) bool {
 		return fn(a)
 	})
 }
 
-func (dg Digraph) RangeWAdj(v int, fn func(int, float64) bool) {
+func (dg Digraph) IterateWAdj(v int, fn func(int, float64) bool) {
 	if !dg.HasVertical(v) {
 		return
 	}
@@ -89,7 +89,7 @@ func (dg Digraph) String() string {
 	out := ""
 	for i := range dg {
 		out += strconv.Itoa(i) + " :"
-		dg.RangeAdj(i, func(j int) bool {
+		dg.IterateAdj(i, func(j int) bool {
 			out += " " + strconv.Itoa(j)
 			return true
 		})
@@ -102,7 +102,7 @@ func (dg Digraph) String() string {
 func (dg Digraph) Reverse() Digraph {
 	rg := NewDigraph(dg.NumVertical())
 	for v := 0; v < int(dg.NumVertical()); v++ {
-		dg.RangeAdj(v, func(w int) bool {
+		dg.IterateAdj(v, func(w int) bool {
 			rg.AddEdge(w, v)
 			return true
 		})
@@ -173,7 +173,7 @@ func ParseCycleInStack(stk *stack.IntStack) []int {
 func (dg Digraph) DetectCycleDFS(v int, marked []bool, path *stack.IntStack) bool {
 	path.Push(v)
 	found := false
-	dg.RangeAdj(v, func(w int) bool {
+	dg.IterateAdj(v, func(w int) bool {
 		if marked[w] {
 			return true
 		}
@@ -227,7 +227,7 @@ func (dg Digraph) IterateEdge(fn func(int, int) bool) {
 func (dg Digraph) IterateWEdgeFrom(v int, fn func(int, int, float64) bool) {
 	dg.IterateVetDFS(v, func(v int) bool {
 		goon := true
-		dg.RangeWAdj(v, func(a int, w float64) bool {
+		dg.IterateWAdj(v, func(a int, w float64) bool {
 			goon = fn(v, a, w)
 			return goon
 		})
@@ -261,7 +261,7 @@ func (dg Digraph) iterateUnMarkVetDFS(v int, marked []bool, fn func(int) bool) b
 		return false
 	}
 	goon := true // continue DFS or abort
-	dg.RangeAdj(v, func(adj int) bool {
+	dg.IterateAdj(v, func(adj int) bool {
 		if !marked[adj] {
 			if !dg.iterateUnMarkVetDFS(adj, marked, fn) {
 				goon = false
@@ -323,7 +323,7 @@ func (dg Digraph) RDFSOrderVertical(src int) *stack.IntStack {
 func (dg Digraph) rDFS(v int, marked []bool, fn func(int) bool) bool {
 	marked[v] = true
 	goon := true // continue DFS or abort
-	dg.RangeAdj(v, func(a int) bool {
+	dg.IterateAdj(v, func(a int) bool {
 		if !marked[a] {
 			if !dg.rDFS(a, marked, fn) {
 				goon = false
@@ -356,7 +356,7 @@ func (dg Digraph) isBipartiteDFS(cur int, color bool, colors []bool, marked []bo
 	if !marked[cur] {
 		marked[cur] = true
 		colors[cur] = color
-		dg.RangeAdj(cur, func(adj int) bool {
+		dg.IterateAdj(cur, func(adj int) bool {
 			if !dg.isBipartiteDFS(adj, !color, colors, marked) {
 				isBip = false
 				return false
