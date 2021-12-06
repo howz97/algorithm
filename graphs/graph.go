@@ -1,18 +1,16 @@
-package graph
+package graphs
 
 import (
-	"github.com/howz97/algorithm/graphs"
-	"github.com/howz97/algorithm/graphs/digraph"
 	"github.com/howz97/algorithm/util"
 )
 
 type Graph struct {
-	digraph.Digraph
+	Digraph
 }
 
-func New(size int) *Graph {
+func NewGraph(size int) *Graph {
 	return &Graph{
-		Digraph: digraph.NewDigraph(size),
+		Digraph: NewDigraph(size),
 	}
 }
 
@@ -27,10 +25,10 @@ func (g *Graph) AddEdge(src, dst int) error {
 
 func (g *Graph) AddWEdge(src, dst int, w float64) error {
 	if !g.HasVertical(src) || !g.HasVertical(dst) {
-		return graphs.ErrVerticalNotExist
+		return ErrVerticalNotExist
 	}
 	if src == dst {
-		return graphs.ErrSelfLoop
+		return ErrSelfLoop
 	}
 	g.Digraph[src].Put(util.Integer(dst), w)
 	g.Digraph[dst].Put(util.Integer(src), w)

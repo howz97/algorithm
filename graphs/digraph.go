@@ -1,7 +1,6 @@
-package digraph
+package graphs
 
 import (
-	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/search/hash_map"
 	"github.com/howz97/algorithm/stack"
@@ -55,10 +54,10 @@ func (dg Digraph) AddEdge(src, dst int) error {
 
 func (dg Digraph) AddWEdge(src, dst int, w float64) error {
 	if !dg.HasVertical(src) || !dg.HasVertical(dst) {
-		return graphs.ErrVerticalNotExist
+		return ErrVerticalNotExist
 	}
 	if src == dst {
-		return graphs.ErrSelfLoop
+		return ErrSelfLoop
 	}
 	dg[src].Put(util.Integer(dst), w)
 	return nil

@@ -1,4 +1,4 @@
-package wdigraph
+package graphs
 
 import (
 	"fmt"

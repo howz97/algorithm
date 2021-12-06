@@ -1,8 +1,7 @@
 package integer
 
 import (
-	"github.com/howz97/algorithm/graphs/digraph"
-	"github.com/howz97/algorithm/graphs/graph"
+	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/sort"
 	"github.com/howz97/algorithm/util"
 	stdsort "sort"
@@ -10,7 +9,7 @@ import (
 )
 
 func TestDFS_Graph(t *testing.T) {
-	g := graph.New(9)
+	g := graphs.NewGraph(9)
 	var err error
 	err = g.AddEdge(0, 1)
 	if err != nil {
@@ -68,7 +67,7 @@ var digraph1 = [][]int{
 }
 
 func TestDFS_Digraph(t *testing.T) {
-	dg, err := digraph.NewDigraphBy2DSli(digraph1)
+	dg, err := graphs.NewDigraphBy2DSli(digraph1)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,7 +85,7 @@ func TestDFS_Digraph(t *testing.T) {
 	checkDFSResults(t, dg, dfsResults)
 }
 
-func checkDFSResults(t *testing.T, g digraph.Digraph, dfsResults [][]int) {
+func checkDFSResults(t *testing.T, g graphs.Digraph, dfsResults [][]int) {
 	for src := range dfsResults {
 		reach := g.ReachableSlice(src)
 		sort.QuickSort(stdsort.IntSlice(reach))
@@ -97,7 +96,7 @@ func checkDFSResults(t *testing.T, g digraph.Digraph, dfsResults [][]int) {
 }
 
 func TestRevDFS(t *testing.T) {
-	g, err := digraph.NewDigraphBy2DSli(digraph1)
+	g, err := graphs.NewDigraphBy2DSli(digraph1)
 	if err != nil {
 		t.Fatal(err)
 	}

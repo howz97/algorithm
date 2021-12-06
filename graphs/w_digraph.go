@@ -1,8 +1,6 @@
-package wdigraph
+package graphs
 
 import (
-	"github.com/howz97/algorithm/graphs"
-	"github.com/howz97/algorithm/graphs/digraph"
 	"github.com/howz97/algorithm/stack"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -10,12 +8,12 @@ import (
 
 // WDigraph is edge weighted digraph without self loop
 type WDigraph struct {
-	digraph.Digraph
+	Digraph
 }
 
-func New(size int) *WDigraph {
+func NewWDigraph(size int) *WDigraph {
 	return &WDigraph{
-		Digraph: digraph.NewDigraph(size),
+		Digraph: NewDigraph(size),
 	}
 }
 
@@ -29,7 +27,7 @@ func LoadWDigraph(filename string) (*WDigraph, error) {
 	if err != nil {
 		return nil, err
 	}
-	g := New(len(m))
+	g := NewWDigraph(len(m))
 	for src, adj := range m {
 		for dst, w := range adj {
 			err = g.AddEdge(src, dst, w)
@@ -46,7 +44,7 @@ func (g *WDigraph) AddEdge(src, dst int, w float64) error {
 }
 
 func (g *WDigraph) String() string {
-	bytes, err := graphs.MarshalWGraph(g)
+	bytes, err := MarshalWGraph(g)
 	if err != nil {
 		return err.Error()
 	}

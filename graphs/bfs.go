@@ -1,4 +1,4 @@
-package digraph
+package graphs
 
 import (
 	"github.com/howz97/algorithm/queue"

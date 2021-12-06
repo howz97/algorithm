@@ -1,4 +1,4 @@
-package digraph
+package graphs
 
 // SCC is strong connected components of digraph
 // vertices in the same component can access each other

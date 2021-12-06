@@ -3,7 +3,7 @@ package regexp
 import (
 	"errors"
 	"fmt"
-	"github.com/howz97/algorithm/graphs/digraph"
+	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/queue"
 	"github.com/howz97/algorithm/set"
 	"github.com/howz97/algorithm/stack"
@@ -14,14 +14,14 @@ import (
 
 type Regexp struct {
 	table []symbol
-	nfa   digraph.Digraph
-	tc    digraph.TransitiveClosure
+	nfa   graphs.Digraph
+	tc    graphs.Reachable
 }
 
 func (re *Regexp) Match(str string) bool {
 	// lazy init
 	if re.tc == nil {
-		re.tc = re.nfa.TransitiveClosure()
+		re.tc = re.nfa.Reachable()
 	}
 
 	curStatus := re.startStatus()
@@ -230,9 +230,9 @@ func indexRune(runes []rune, r rune) int {
 	return -1
 }
 
-func makeNFA(table []symbol) digraph.Digraph {
+func makeNFA(table []symbol) graphs.Digraph {
 	size := len(table)
-	nfa := digraph.NewDigraph(size + 1)
+	nfa := graphs.NewDigraph(size + 1)
 	stk := stack.NewInt(size)
 	for i, syb := range table {
 		left := i

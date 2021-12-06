@@ -1,9 +1,8 @@
-package wdigraph
+package graphs
 
 import (
 	"errors"
 	"fmt"
-	"github.com/howz97/algorithm/graphs"
 	pqueue "github.com/howz97/algorithm/pqueue/binaryheap"
 	"github.com/howz97/algorithm/queue"
 	"github.com/howz97/algorithm/stack"
@@ -40,7 +39,7 @@ func newShortestPathTree(g *WDigraph, src int) *ShortestPathTree {
 
 func (g *WDigraph) NewShortestPathTree(src int, alg int) (*ShortestPathTree, error) {
 	if !g.HasVertical(src) {
-		return nil, graphs.ErrVerticalNotExist
+		return nil, ErrVerticalNotExist
 	}
 	var err error
 	spt := newShortestPathTree(g, src)

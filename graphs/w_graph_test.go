@@ -1,4 +1,4 @@
-package wgraph
+package graphs
 
 import (
 	"fmt"

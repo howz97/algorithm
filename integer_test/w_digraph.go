@@ -1,9 +1,11 @@
 package main
 
-import "github.com/howz97/algorithm/graphs/wdigraph"
+import (
+	"github.com/howz97/algorithm/graphs"
+)
 
 func main() {
-	g, err := wdigraph.LoadWDigraph("../graphs/wdigraph/w_digraph.yml")
+	g, err := graphs.LoadWDigraph("../graphs/wdigraph/w_digraph.yml")
 	if err != nil {
 		panic(err)
 	}

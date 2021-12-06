@@ -1,12 +1,12 @@
-package graph
+package graphs
 
-type TransitiveClosure struct {
+type SubGraphs struct {
 	locate    []int   // vertical -> subGraphID
 	subGraphs [][]int // subGraphID -> all vertices
 }
 
-func (g *Graph) TransitiveClosure() *TransitiveClosure {
-	tc := &TransitiveClosure{
+func (g *Graph) SubGraphs() *SubGraphs {
+	tc := &SubGraphs{
 		locate: make([]int, g.NumVertical()),
 	}
 	for i := range tc.locate {
@@ -27,14 +27,14 @@ func (g *Graph) TransitiveClosure() *TransitiveClosure {
 	return tc
 }
 
-func (tc *TransitiveClosure) CanReach(src, dst int) bool {
+func (tc *SubGraphs) CanReach(src, dst int) bool {
 	if !tc.hasVertical(src) || !tc.hasVertical(dst) {
 		return false
 	}
 	return tc.locate[src] == tc.locate[dst]
 }
 
-func (tc *TransitiveClosure) Range(v int, fn func(v int) bool) {
+func (tc *SubGraphs) Range(v int, fn func(v int) bool) {
 	if !tc.hasVertical(v) {
 		return
 	}
@@ -45,15 +45,15 @@ func (tc *TransitiveClosure) Range(v int, fn func(v int) bool) {
 	}
 }
 
-func (tc *TransitiveClosure) hasVertical(v int) bool {
+func (tc *SubGraphs) hasVertical(v int) bool {
 	return v >= 0 || v < len(tc.locate)
 }
 
-func (tc *TransitiveClosure) NumSubGraph() int {
+func (tc *SubGraphs) NumSubGraph() int {
 	return len(tc.subGraphs)
 }
 
-func (tc *TransitiveClosure) Locate(v int) int {
+func (tc *SubGraphs) Locate(v int) int {
 	if !tc.hasVertical(v) {
 		return -1
 	}

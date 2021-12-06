@@ -1,20 +1,19 @@
-package wgraph
+package graphs
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/graphs/graph"
 	pqueue "github.com/howz97/algorithm/pqueue/binaryheap"
 	"github.com/howz97/algorithm/queue"
 	unionfind "github.com/howz97/algorithm/union-find"
 )
 
 type WGraph struct {
-	graph.Graph
+	Graph
 }
 
 func NewWGraph(size int) *WGraph {
 	return &WGraph{
-		Graph: *graph.New(size),
+		Graph: *NewGraph(size),
 	}
 }
 
