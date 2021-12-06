@@ -88,7 +88,7 @@ func (g WGraph) Prim() *MSTForest {
 }
 
 func prim(g WGraph, v int, marked []bool, edgeTo []*Edge) *queue.LinkedQueue {
-	pq := pqueue.NewBinHeap(g.NumVertical() - 1)
+	pq := pqueue.NewBinHeap(g.NumVertical())
 	marked[v] = true
 	g.iterateAdj(v, func(_ int, a int, w float64) bool {
 		pq.Insert(int(w), a)
@@ -133,8 +133,8 @@ func primVisit(g WGraph, v int, marked []bool, pq *pqueue.BinHeap, edgeTo []*Edg
 
 // Kruskal 该实现仅支持连通图
 func (g WGraph) Kruskal() *queue.Queen {
-	mst := queue.NewQueen(g.NumVertical() - 1)
-	uf := unionfind.NewUF(g.NumVertical())
+	mst := queue.NewQueen(int(g.NumVertical()))
+	uf := unionfind.NewUF(int(g.NumVertical()))
 	pq := pqueue.NewBinHeap(g.NumEdge())
 	g.IterateWEdge(func(src int, dst int, w float64) bool {
 		pq.Insert(int(w), &Edge{ // fixme pq Cmp Key

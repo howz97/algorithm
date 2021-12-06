@@ -12,7 +12,7 @@ type BinHeap struct {
 }
 
 // NewBinHeap -
-func NewBinHeap(cap int) *BinHeap {
+func NewBinHeap(cap uint) *BinHeap {
 	if cap < 1 {
 		panic("capacity less than 1")
 	}

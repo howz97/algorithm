@@ -10,7 +10,7 @@ import (
 
 type Digraph []*hash_map.Chaining
 
-func NewDigraph(size int) Digraph {
+func NewDigraph(size uint) Digraph {
 	dg := make([]*hash_map.Chaining, size)
 	for i := range dg {
 		dg[i] = hash_map.New()
@@ -19,7 +19,7 @@ func NewDigraph(size int) Digraph {
 }
 
 func NewDigraphBy2DSli(sli [][]int) (Digraph, error) {
-	dg := NewDigraph(len(sli))
+	dg := NewDigraph(uint(len(sli)))
 	var err error
 	for src, s := range sli {
 		for _, dst := range s {
@@ -32,8 +32,8 @@ func NewDigraphBy2DSli(sli [][]int) (Digraph, error) {
 	return dg, nil
 }
 
-func (dg Digraph) NumVertical() int {
-	return len(dg)
+func (dg Digraph) NumVertical() uint {
+	return uint(len(dg))
 }
 
 func (dg Digraph) HasVertical(v int) bool {
@@ -101,7 +101,7 @@ func (dg Digraph) String() string {
 
 func (dg Digraph) Reverse() Digraph {
 	rg := NewDigraph(dg.NumVertical())
-	for v := 0; v < dg.NumVertical(); v++ {
+	for v := 0; v < int(dg.NumVertical()); v++ {
 		dg.RangeAdj(v, func(w int) bool {
 			rg.AddEdge(w, v)
 			return true
@@ -197,7 +197,7 @@ func (dg Digraph) Topological() *stack.IntStack {
 	if dg.HasCycle() {
 		return nil
 	}
-	order := stack.NewInt(dg.NumVertical())
+	order := stack.NewInt(int(dg.NumVertical()))
 	dg.IterateVetRDFS(func(v int) bool {
 		order.Push(v)
 		return true
@@ -312,7 +312,7 @@ func (dg Digraph) IterateRDFSFromVet(src int, fn func(int) bool) {
 }
 
 func (dg Digraph) RDFSOrderVertical(src int) *stack.IntStack {
-	order := stack.NewInt(dg.NumVertical())
+	order := stack.NewInt(int(dg.NumVertical()))
 	dg.IterateRDFSFromVet(src, func(v int) bool {
 		order.Push(v)
 		return true
