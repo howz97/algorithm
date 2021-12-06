@@ -1,4 +1,4 @@
-package graph_symbol
+package symbol_graph
 
 import (
 	"github.com/howz97/algorithm/graphs"
@@ -82,7 +82,7 @@ func (sg *SymbolGraph) RangeAdj(src string, fn func(string) bool) {
 	if !ok {
 		return
 	}
-	sg.Graph.RangeAdj(iSrc, func(adj int) bool {
+	sg.Graph.IterateAdj(iSrc, func(adj int) bool {
 		return fn(sg.int2str[adj])
 	})
 }
