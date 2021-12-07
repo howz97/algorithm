@@ -6,6 +6,7 @@ import (
 	pqueue "github.com/howz97/algorithm/pq/heap"
 	"github.com/howz97/algorithm/queue"
 	"github.com/howz97/algorithm/stack"
+	"github.com/howz97/algorithm/util"
 	"math"
 )
 
@@ -123,9 +124,9 @@ func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *pqueu
 			edgeTo[adj] = v
 			distTo[adj] = distTo[v] + w
 			if inPQ {
-				pq.Fix(int(distTo[adj]), adj)
+				pq.Fix(util.Float(distTo[adj]), adj)
 			} else {
-				pq.Push(int(distTo[adj]), adj)
+				pq.Push(util.Float(distTo[adj]), adj)
 			}
 		}
 		return true

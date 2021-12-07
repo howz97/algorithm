@@ -5,6 +5,7 @@ import (
 	pqueue "github.com/howz97/algorithm/pq/heap"
 	"github.com/howz97/algorithm/queue"
 	unionfind "github.com/howz97/algorithm/union-find"
+	"github.com/howz97/algorithm/util"
 )
 
 type WGraph struct {
@@ -37,10 +38,10 @@ func lazyPrim(g WGraph, v int, marked []bool) *queue.LinkedQueue {
 	marked[v] = true
 	mst := queue.NewLinkedQueue()
 	g.iterateAdj(v, func(src int, dst int, w float64) bool {
-		pq.Push(int(w), &Edge{ // fixme pq Cmp
+		pq.Push(util.Float(w), &Edge{ // fixme pq Cmp
 			from:   src,
 			to:     dst,
-			weight: int(w),
+			weight: w,
 		})
 		return true
 	})
@@ -65,10 +66,10 @@ func lazyPrimVisit(g WGraph, v int, marked []bool, pq *pqueue.Heap) {
 	marked[v] = true
 	g.iterateAdj(v, func(_ int, a int, w float64) bool {
 		if !marked[a] {
-			pq.Push(int(w), &Edge{
+			pq.Push(util.Float(w), &Edge{
 				from:   v,
 				to:     a,
-				weight: int(w),
+				weight: w,
 			})
 		}
 		return true
@@ -91,11 +92,11 @@ func prim(g WGraph, v int, marked []bool, edgeTo []*Edge) *queue.LinkedQueue {
 	pq := pqueue.New(g.NumVertical())
 	marked[v] = true
 	g.iterateAdj(v, func(_ int, a int, w float64) bool {
-		pq.Push(int(w), a)
+		pq.Push(util.Float(w), a)
 		edgeTo[a] = &Edge{
 			from:   v,
 			to:     a,
-			weight: int(w),
+			weight: w,
 		}
 		return true
 	})
@@ -118,13 +119,13 @@ func primVisit(g WGraph, v int, marked []bool, pq *pqueue.Heap, edgeTo []*Edge) 
 		e := &Edge{
 			from:   v,
 			to:     a,
-			weight: int(wt),
+			weight: wt,
 		}
 		if edgeTo[a] == nil {
-			pq.Push(int(wt), a)
+			pq.Push(util.Float(wt), a)
 			edgeTo[a] = e
 		} else if e.weight < edgeTo[a].weight {
-			pq.Fix(e.weight, a)
+			pq.Fix(util.Float(e.weight), a)
 			edgeTo[a] = e
 		}
 		return true
@@ -137,10 +138,10 @@ func (g WGraph) Kruskal() *queue.Queen {
 	uf := unionfind.NewUF(int(g.NumVertical()))
 	pq := pqueue.New(g.NumEdge())
 	g.IterateWEdge(func(src int, dst int, w float64) bool {
-		pq.Push(int(w), &Edge{ // fixme pq Cmp Key
+		pq.Push(util.Float(w), &Edge{ // fixme pq Cmp Key
 			from:   src,
 			to:     dst,
-			weight: int(w),
+			weight: w,
 		})
 		return true
 	})
@@ -181,5 +182,5 @@ func (f *MSTForest) NumConnectedComponent() int {
 
 type Edge struct {
 	from, to int
-	weight   int
+	weight   float64
 }
