@@ -108,24 +108,24 @@ func (spt *ShortestPathTree) HasVertical(v int) bool {
 // ============================ Dijkstra ============================
 
 func (spt *ShortestPathTree) initDijkstra(g *WDigraph) {
-	pq := pqueue.NewBinHeap(g.NumVertical())
+	pq := pqueue.New(g.NumVertical())
 	dijkstraRelax(g, spt.src, spt.edgeTo, spt.distTo, pq)
 	for !pq.IsEmpty() {
-		m := pq.DelMin().(int)
+		m := pq.Pop().(int)
 		dijkstraRelax(g, m, spt.edgeTo, spt.distTo, pq)
 	}
 }
 
-func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *pqueue.BinHeap) {
+func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *pqueue.Heap) {
 	g.IterateWAdj(v, func(adj int, w float64) bool {
 		if distTo[v]+w < distTo[adj] {
 			inPQ := distTo[adj] != math.Inf(1)
 			edgeTo[adj] = v
 			distTo[adj] = distTo[v] + w
 			if inPQ {
-				pq.Update(int(distTo[adj]), adj)
+				pq.Fix(int(distTo[adj]), adj)
 			} else {
-				pq.Insert(int(distTo[adj]), adj)
+				pq.Push(int(distTo[adj]), adj)
 			}
 		}
 		return true
