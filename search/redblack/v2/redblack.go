@@ -1,6 +1,8 @@
 package v2
 
-import . "github.com/howz97/algorithm/search"
+import (
+	"github.com/howz97/algorithm/util"
+)
 
 const (
 	red   = true
@@ -19,14 +21,14 @@ func New() *RedBlack {
 
 // Insert insert a k-v pair into this dictionary
 // if value is nil, is is a vitual deletion operation
-func (rb *RedBlack) Insert(key Cmp, value T) {
+func (rb *RedBlack) Insert(key util.Cmp, value util.T) {
 	rb.root = rb.root.insert(key, value)
 	if rb.root.isRed() {
 		rb.root.color = black
 	}
 }
 
-func (rb *RedBlack) Find(key Cmp) T {
+func (rb *RedBlack) Find(key util.Cmp) util.T {
 	n := rb.root.find(key)
 	if n == nil {
 		return nil
@@ -34,11 +36,11 @@ func (rb *RedBlack) Find(key Cmp) T {
 	return n.value
 }
 
-func (rb *RedBlack) FindMin() T {
+func (rb *RedBlack) FindMin() util.T {
 	return rb.root.findMin().value
 }
 
-func (rb *RedBlack) FindMax() T {
+func (rb *RedBlack) FindMax() util.T {
 	return rb.root.findMax().value
 }
 
@@ -70,15 +72,15 @@ func (rb *RedBlack) Size() int {
 /*=============================================================================*/
 
 type node struct {
-	key      Cmp
-	value    T
+	key      util.Cmp
+	value    util.T
 	color    bool
 	size     int
 	leftSon  *node
 	rightSon *node
 }
 
-func (n *node) insert(k Cmp, v T) *node {
+func (n *node) insert(k util.Cmp, v util.T) *node {
 	if n == nil {
 		return &node{
 			key:   k,
@@ -88,9 +90,9 @@ func (n *node) insert(k Cmp, v T) *node {
 		}
 	}
 	switch k.Cmp(n.key) {
-	case Less:
+	case util.Less:
 		n.leftSon = n.leftSon.insert(k, v)
-	case More:
+	case util.More:
 		n.rightSon = n.rightSon.insert(k, v)
 	default:
 		n.value = v
@@ -108,14 +110,14 @@ func (n *node) insert(k Cmp, v T) *node {
 	return n
 }
 
-func (n *node) find(key Cmp) *node {
+func (n *node) find(key util.Cmp) *node {
 	if n == nil {
 		return nil
 	}
 	switch key.Cmp(n.key) {
-	case Less:
+	case util.Less:
 		return n.leftSon.find(key)
-	case More:
+	case util.More:
 		return n.rightSon.find(key)
 	default:
 		return n

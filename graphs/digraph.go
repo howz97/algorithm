@@ -1,7 +1,6 @@
 package graphs
 
 import (
-	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/search/hash_map"
 	"github.com/howz97/algorithm/stack"
 	"github.com/howz97/algorithm/util"
@@ -80,7 +79,7 @@ func (dg Digraph) IterateWAdj(v int, fn func(int, float64) bool) {
 	if !dg.HasVertical(v) {
 		return
 	}
-	dg[v].Range(func(key hash_map.Key, val search.T) bool {
+	dg[v].Range(func(key hash_map.Key, val util.T) bool {
 		return fn(int(key.(util.Integer)), val.(float64))
 	})
 }
@@ -124,7 +123,7 @@ func (dg Digraph) FindNegativeEdge() (src, dst int) {
 }
 
 func (dg Digraph) iterateAdj(v int, fn func(int, int, float64) bool) {
-	dg[v].Range(func(key hash_map.Key, val search.T) bool {
+	dg[v].Range(func(key hash_map.Key, val util.T) bool {
 		return fn(v, int(key.(util.Integer)), val.(float64))
 	})
 }
@@ -208,7 +207,7 @@ func (dg Digraph) Topological() *stack.IntStack {
 func (dg Digraph) IterateWEdge(fn func(int, int, float64) bool) {
 	for src, hm := range dg {
 		goon := true
-		hm.Range(func(dst hash_map.Key, v search.T) bool {
+		hm.Range(func(dst hash_map.Key, v util.T) bool {
 			goon = fn(src, int(dst.(util.Integer)), v.(float64))
 			return goon
 		})

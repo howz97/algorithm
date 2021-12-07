@@ -43,27 +43,27 @@ func DifferentKVType(t *testing.T, s search.Searcher) {
 	t.Logf("str-int passed")
 }
 
-func IntStrKV() (search.Cmp, search.T) {
+func IntStrKV() (util.Cmp, util.T) {
 	k := rand.Intn(n)
 	v := strconv.Itoa(k)
 	return util.Integer(k), v
 }
 
-func FloatIntKV() (search.Cmp, search.T) {
+func FloatIntKV() (util.Cmp, util.T) {
 	v := rand.Intn(n)
 	k := float64(v) / n
 	return util.Float(k), v
 }
 
-func StrIntKV() (search.Cmp, search.T) {
+func StrIntKV() (util.Cmp, util.T) {
 	k := alphabet.Ascii.RandString(2) // length of string hugely affect cost of BST
 	v := rand.Intn(n)
 	return util.Str(k), v
 }
 
-func LoopTest(t *testing.T, s search.Searcher, kvfn func() (search.Cmp, search.T)) {
+func LoopTest(t *testing.T, s search.Searcher, kvfn func() (util.Cmp, util.T)) {
 	s.Clean()
-	verify := make(map[search.Cmp]search.T)
+	verify := make(map[util.Cmp]util.T)
 	for i := 0; i < 200; i++ {
 		BulkInsert(verify, s, n, kvfn)
 		VerifyResult(t, verify, s)
@@ -72,7 +72,7 @@ func LoopTest(t *testing.T, s search.Searcher, kvfn func() (search.Cmp, search.T
 	}
 }
 
-func BulkInsert(verify map[search.Cmp]search.T, s search.Searcher, cnt int, kvfn func() (search.Cmp, search.T)) {
+func BulkInsert(verify map[util.Cmp]util.T, s search.Searcher, cnt int, kvfn func() (util.Cmp, util.T)) {
 	for i := 0; i < cnt; i++ {
 		k, v := kvfn()
 		s.Put(k, v)
@@ -80,7 +80,7 @@ func BulkInsert(verify map[search.Cmp]search.T, s search.Searcher, cnt int, kvfn
 	}
 }
 
-func BulkDelete(verify map[search.Cmp]search.T, s search.Searcher, cnt int, gen func() (search.Cmp, search.T)) {
+func BulkDelete(verify map[util.Cmp]util.T, s search.Searcher, cnt int, gen func() (util.Cmp, util.T)) {
 	for i := 0; i < cnt; i++ {
 		k, _ := gen()
 		s.Del(k)
@@ -88,7 +88,7 @@ func BulkDelete(verify map[search.Cmp]search.T, s search.Searcher, cnt int, gen 
 	}
 }
 
-func VerifyResult(t *testing.T, verify map[search.Cmp]search.T, s search.Searcher) {
+func VerifyResult(t *testing.T, verify map[util.Cmp]util.T, s search.Searcher) {
 	for k, v := range verify {
 		vGot := s.Get(k)
 		if vGot != v {

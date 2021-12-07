@@ -1,6 +1,8 @@
 package redblack
 
-import . "github.com/howz97/algorithm/search"
+import (
+	"github.com/howz97/algorithm/util"
+)
 
 const (
 	red   = true
@@ -15,14 +17,14 @@ func New() *RedBlack {
 	return new(RedBlack)
 }
 
-func (rb *RedBlack) Put(key Cmp, val T) {
+func (rb *RedBlack) Put(key util.Cmp, val util.T) {
 	rb.root = rb.root.insert(key, val)
 	if rb.root.isRed() {
 		rb.root.color = black
 	}
 }
 
-func (rb *RedBlack) Get(key Cmp) T {
+func (rb *RedBlack) Get(key util.Cmp) util.T {
 	n := rb.root.find(key)
 	if n == nil {
 		return nil
@@ -34,11 +36,11 @@ func (rb *RedBlack) Get(key Cmp) T {
 	return n.value
 }
 
-func (rb *RedBlack) GetMin() T {
+func (rb *RedBlack) GetMin() util.T {
 	return rb.root.findMin().value
 }
 
-func (rb *RedBlack) GetMax() T {
+func (rb *RedBlack) GetMax() util.T {
 	return rb.root.findMax().value
 }
 
@@ -68,7 +70,7 @@ func (rb *RedBlack) DelMax() {
 	}
 }
 
-func (rb *RedBlack) Del(key Cmp) {
+func (rb *RedBlack) Del(key util.Cmp) {
 	if rb.root == nil {
 		return
 	}
@@ -99,15 +101,15 @@ func (rb *RedBlack) Clean() {
 /*=============================================================================*/
 
 type node struct {
-	key      Cmp
-	value    T
+	key      util.Cmp
+	value    util.T
 	color    bool
 	size     uint
 	leftSon  *node
 	rightSon *node
 }
 
-func (n *node) insert(k Cmp, v T) *node {
+func (n *node) insert(k util.Cmp, v util.T) *node {
 	if n == nil {
 		return &node{
 			key:   k,
@@ -117,9 +119,9 @@ func (n *node) insert(k Cmp, v T) *node {
 		}
 	}
 	switch k.Cmp(n.key) {
-	case Less:
+	case util.Less:
 		n.leftSon = n.leftSon.insert(k, v)
-	case More:
+	case util.More:
 		n.rightSon = n.rightSon.insert(k, v)
 	default:
 		n.value = v
@@ -137,14 +139,14 @@ func (n *node) insert(k Cmp, v T) *node {
 	return n
 }
 
-func (n *node) find(key Cmp) *node {
+func (n *node) find(key util.Cmp) *node {
 	if n == nil {
 		return nil
 	}
 	switch key.Cmp(n.key) {
-	case Less:
+	case util.Less:
 		return n.leftSon.find(key)
-	case More:
+	case util.More:
 		return n.rightSon.find(key)
 	default:
 		return n
@@ -236,8 +238,8 @@ func flipColors2(r *node) {
 	r.rightSon.color = red
 }
 
-func (n *node) delete(k Cmp) *node {
-	if k.Cmp(n.key) == Less {
+func (n *node) delete(k util.Cmp) *node {
+	if k.Cmp(n.key) == util.Less {
 		if !n.leftSon.isRed() && !n.leftSon.leftSon.isRed() {
 			n = moveRedLeft(n)
 		}
@@ -246,14 +248,14 @@ func (n *node) delete(k Cmp) *node {
 		if n.leftSon.isRed() {
 			n = rotateRight(n)
 		}
-		if k.Cmp(n.key) == Equal && n.rightSon == nil {
+		if k.Cmp(n.key) == util.Equal && n.rightSon == nil {
 			return nil
 		}
 		// fixme: panic
 		if !n.rightSon.isRed() && !n.rightSon.leftSon.isRed() {
 			n = moveRedRight(n)
 		}
-		if k.Cmp(n.key) == Equal {
+		if k.Cmp(n.key) == util.Equal {
 			min := n.rightSon.findMin()
 			n.value = min.value
 			n.key = min.key

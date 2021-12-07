@@ -16,7 +16,7 @@ func New() *AVL {
 	return new(AVL)
 }
 
-func (avl *AVL) Put(key Cmp, val T) {
+func (avl *AVL) Put(key util.Cmp, val util.T) {
 	exist := false
 	avl.node, exist = avl.put(key, val)
 	if !exist {
@@ -24,7 +24,7 @@ func (avl *AVL) Put(key Cmp, val T) {
 	}
 }
 
-func (avl *AVL) Get(key Cmp) T {
+func (avl *AVL) Get(key util.Cmp) util.T {
 	n := avl.get(key)
 	if n == nil {
 		return nil
@@ -32,15 +32,15 @@ func (avl *AVL) Get(key Cmp) T {
 	return n.value
 }
 
-func (avl *AVL) GetMin() T {
+func (avl *AVL) GetMin() util.T {
 	return avl.getMin().value
 }
 
-func (avl *AVL) GetMax() T {
+func (avl *AVL) GetMax() util.T {
 	return avl.getMax().value
 }
 
-func (avl *AVL) Del(key Cmp) {
+func (avl *AVL) Del(key util.Cmp) {
 	exist := false
 	avl.node, exist = avl.del(key)
 	if exist {
@@ -58,14 +58,14 @@ func (avl *AVL) Clean() {
 }
 
 type node struct {
-	key   Cmp
-	value T
+	key   util.Cmp
+	value util.T
 	h     int8
 	left  *node
 	right *node
 }
 
-func (n *node) put(k Cmp, v T) (*node, bool) {
+func (n *node) put(k util.Cmp, v util.T) (*node, bool) {
 	if n == nil {
 		n = new(node)
 		n.key = k
@@ -74,13 +74,13 @@ func (n *node) put(k Cmp, v T) (*node, bool) {
 	}
 	var exist bool
 	switch k.Cmp(n.key) {
-	case Less:
+	case util.Less:
 		n.left, exist = n.left.put(k, v)
 		if n.diff() > 1 {
 			n = rotation(n)
 		}
 		n.updateHeight()
-	case More:
+	case util.More:
 		n.right, exist = n.right.put(k, v)
 		if n.diff() < -1 {
 			n = rotation(n)
@@ -147,14 +147,14 @@ func (n *node) height() int8 {
 	return n.h
 }
 
-func (n *node) get(k Cmp) *node {
+func (n *node) get(k util.Cmp) *node {
 	if n == nil {
 		return nil
 	}
 	switch k.Cmp(n.key) {
-	case Less:
+	case util.Less:
 		return n.left.get(k)
-	case More:
+	case util.More:
 		return n.right.get(k)
 	default:
 		return n
@@ -181,15 +181,15 @@ func (n *node) getMax() *node {
 	return n
 }
 
-func (n *node) del(k Cmp) (*node, bool) {
+func (n *node) del(k util.Cmp) (*node, bool) {
 	if n == nil {
 		return nil, false
 	}
 	var exist bool
 	switch k.Cmp(n.key) {
-	case Less:
+	case util.Less:
 		n.left, exist = n.left.del(k)
-	case More:
+	case util.More:
 		n.right, exist = n.right.del(k)
 	default:
 		if n.left == nil {
@@ -224,11 +224,11 @@ func (n *node) IsNil() bool {
 	return n == nil
 }
 
-func (n *node) Key() Cmp {
+func (n *node) Key() util.Cmp {
 	return n.key
 }
 
-func (n *node) Val() T {
+func (n *node) Val() util.T {
 	return n.value
 }
 

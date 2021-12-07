@@ -2,6 +2,7 @@ package binarytree
 
 import (
 	"github.com/howz97/algorithm/search"
+	"github.com/howz97/algorithm/util"
 	"time"
 )
 
@@ -15,7 +16,7 @@ func New() *BinaryTree {
 	return new(BinaryTree)
 }
 
-func (st *BinaryTree) Put(key search.Cmp, val search.T) {
+func (st *BinaryTree) Put(key util.Cmp, val util.T) {
 	exist := false
 	st.node, exist = st.put(key, val)
 	if !exist {
@@ -23,7 +24,7 @@ func (st *BinaryTree) Put(key search.Cmp, val search.T) {
 	}
 }
 
-func (st *BinaryTree) Get(key search.Cmp) search.T {
+func (st *BinaryTree) Get(key util.Cmp) util.T {
 	n := st.get(key)
 	if n == nil {
 		return nil
@@ -31,15 +32,15 @@ func (st *BinaryTree) Get(key search.Cmp) search.T {
 	return n.value
 }
 
-func (st *BinaryTree) GetMin() search.T {
+func (st *BinaryTree) GetMin() util.T {
 	return st.getMin().value
 }
 
-func (st *BinaryTree) GetMax() search.T {
+func (st *BinaryTree) GetMax() util.T {
 	return st.getMax().value
 }
 
-func (st *BinaryTree) Del(key search.Cmp) {
+func (st *BinaryTree) Del(key util.Cmp) {
 	exist := false
 	st.node, exist = st.del(key)
 	if exist {
@@ -57,13 +58,13 @@ func (st *BinaryTree) Clean() {
 }
 
 type node struct {
-	value search.T
-	key   search.Cmp
+	value util.T
+	key   util.Cmp
 	left  *node
 	right *node
 }
 
-func (n *node) put(k search.Cmp, v search.T) (*node, bool) {
+func (n *node) put(k util.Cmp, v util.T) (*node, bool) {
 	if n == nil {
 		n = new(node)
 		n.key = k
@@ -72,9 +73,9 @@ func (n *node) put(k search.Cmp, v search.T) (*node, bool) {
 	}
 	var exist bool
 	switch k.Cmp(n.key) {
-	case search.Less:
+	case util.Less:
 		n.left, exist = n.left.put(k, v)
-	case search.More:
+	case util.More:
 		n.right, exist = n.right.put(k, v)
 	default:
 		n.value = v
@@ -83,14 +84,14 @@ func (n *node) put(k search.Cmp, v search.T) (*node, bool) {
 	return n, exist
 }
 
-func (n *node) get(k search.Cmp) *node {
+func (n *node) get(k util.Cmp) *node {
 	if n == nil {
 		return nil
 	}
 	switch k.Cmp(n.key) {
-	case search.Less:
+	case util.Less:
 		n = n.left.get(k)
-	case search.More:
+	case util.More:
 		n = n.right.get(k)
 	}
 	return n
@@ -116,15 +117,15 @@ func (n *node) getMax() *node {
 	return n
 }
 
-func (n *node) del(k search.Cmp) (*node, bool) {
+func (n *node) del(k util.Cmp) (*node, bool) {
 	if n == nil {
 		return nil, false
 	}
 	var exist bool
 	switch k.Cmp(n.key) {
-	case search.Less:
+	case util.Less:
 		n.left, exist = n.left.del(k)
-	case search.More:
+	case util.More:
 		n.right, exist = n.right.del(k)
 	default:
 		if n.left == nil {
@@ -161,10 +162,10 @@ func (n *node) IsNil() bool {
 	return n == nil
 }
 
-func (n *node) Key() search.Cmp {
+func (n *node) Key() util.Cmp {
 	return n.key
 }
 
-func (n *node) Val() search.T {
+func (n *node) Val() util.T {
 	return n.value
 }

@@ -2,7 +2,7 @@ package hash_map
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/search"
+	"github.com/howz97/algorithm/util"
 )
 
 const (
@@ -14,7 +14,7 @@ const (
 
 type Key interface {
 	Hash() uint
-	search.Cmp
+	util.Cmp
 }
 
 type Chaining struct {
@@ -38,11 +38,11 @@ func New(args ...uint) *Chaining {
 	}
 }
 
-func (c *Chaining) Get(k Key) search.T {
+func (c *Chaining) Get(k Key) util.T {
 	return c.tbl.get(k)
 }
 
-func (c *Chaining) Put(k Key, v search.T) {
+func (c *Chaining) Put(k Key, v util.T) {
 	exist := c.tbl.put(k, v)
 	if !exist {
 		c.Num++
@@ -95,7 +95,7 @@ func (c *Chaining) shrink() {
 	c.tbl = newTbl
 }
 
-func (c *Chaining) Range(fn func(key Key, val search.T) bool) {
+func (c *Chaining) Range(fn func(key Key, val util.T) bool) {
 	c.tbl.Range(fn)
 }
 
@@ -125,11 +125,11 @@ func tblMove(src table, dst table) {
 
 type table []bucket
 
-func (t table) put(k Key, v search.T) bool {
+func (t table) put(k Key, v util.T) bool {
 	return t[k.Hash()%t.size()].put(k, v)
 }
 
-func (t table) get(k Key) search.T {
+func (t table) get(k Key) util.T {
 	return t[k.Hash()%t.size()].get(k)
 }
 
@@ -141,7 +141,7 @@ func (t table) size() uint {
 	return uint(len(t))
 }
 
-func (t table) Range(fn func(key Key, val search.T) bool) {
+func (t table) Range(fn func(key Key, val util.T) bool) {
 	for _, bkt := range t {
 		nd := bkt.head
 		for nd != nil {
@@ -155,7 +155,7 @@ func (t table) Range(fn func(key Key, val search.T) bool) {
 
 type node struct {
 	k    Key
-	v    search.T
+	v    util.T
 	next *node
 }
 
@@ -163,7 +163,7 @@ type bucket struct {
 	head *node
 }
 
-func (b *bucket) put(k Key, v search.T) bool {
+func (b *bucket) put(k Key, v util.T) bool {
 	if b.head == nil {
 		b.head = &node{
 			k: k,
@@ -171,14 +171,14 @@ func (b *bucket) put(k Key, v search.T) bool {
 		}
 		return false
 	}
-	if b.head.k.Cmp(k) == search.Equal {
+	if b.head.k.Cmp(k) == util.Equal {
 		b.head.v = v
 		return true
 	}
 	pre := b.head
 	n := b.head.next
 	for n != nil {
-		if n.k.Cmp(k) == search.Equal {
+		if n.k.Cmp(k) == util.Equal {
 			n.v = v
 			return true
 		}
@@ -192,10 +192,10 @@ func (b *bucket) put(k Key, v search.T) bool {
 	return false
 }
 
-func (b *bucket) get(k Key) search.T {
+func (b *bucket) get(k Key) util.T {
 	n := b.head
 	for n != nil {
-		if n.k.Cmp(k) == search.Equal {
+		if n.k.Cmp(k) == util.Equal {
 			return n.v
 		}
 		n = n.next
@@ -207,14 +207,14 @@ func (b *bucket) del(k Key) bool {
 	if b.head == nil {
 		return false
 	}
-	if b.head.k.Cmp(k) == search.Equal {
+	if b.head.k.Cmp(k) == util.Equal {
 		b.head = b.head.next
 		return true
 	}
 	pre := b.head
 	n := b.head.next
 	for n != nil {
-		if n.k.Cmp(k) == search.Equal {
+		if n.k.Cmp(k) == util.Equal {
 			pre.next = n.next
 			return true
 		}

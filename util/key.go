@@ -1,9 +1,22 @@
 package util
 
 import (
-	"github.com/howz97/algorithm/search"
 	"unsafe"
 )
+
+type Result int
+
+const (
+	Equal Result = iota
+	Less
+	More
+)
+
+type T interface{}
+
+type Cmp interface {
+	Cmp(other Cmp) Result
+}
 
 type Integer int // todo: rename to Int
 
@@ -11,14 +24,14 @@ func (v Integer) Hash() uint {
 	return uint(v)
 }
 
-func (v Integer) Cmp(other search.Cmp) search.Result {
+func (v Integer) Cmp(other Cmp) Result {
 	o := other.(Integer)
 	if v < o {
-		return search.Less
+		return Less
 	} else if v > o {
-		return search.More
+		return More
 	} else {
-		return search.Equal
+		return Equal
 	}
 }
 
@@ -28,14 +41,14 @@ func (v Float) Hash() uint {
 	return *(*uint)(unsafe.Pointer(&v))
 }
 
-func (v Float) Cmp(other search.Cmp) search.Result {
+func (v Float) Cmp(other Cmp) Result {
 	o := other.(Float)
 	if v < o {
-		return search.Less
+		return Less
 	} else if v > o {
-		return search.More
+		return More
 	} else {
-		return search.Equal
+		return Equal
 	}
 }
 
@@ -51,13 +64,13 @@ func (v Str) Hash() uint {
 	return h
 }
 
-func (v Str) Cmp(other search.Cmp) search.Result {
+func (v Str) Cmp(other Cmp) Result {
 	o := other.(Str)
 	if v < o {
-		return search.Less
+		return Less
 	} else if v > o {
-		return search.More
+		return More
 	} else {
-		return search.Equal
+		return Equal
 	}
 }

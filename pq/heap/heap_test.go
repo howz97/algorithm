@@ -2,22 +2,23 @@ package heap
 
 import (
 	"fmt"
+	"github.com/howz97/algorithm/util"
 	"testing"
 	"time"
 )
 
 func Test_Heap(t *testing.T) {
 	h := New(10)
-	h.Push(1, 1)
-	h.Push(1, 1)
-	h.Push(2, 2)
-	h.Push(3, 3)
-	h.Push(6, 6)
-	h.Push(5, 5)
-	h.Push(4, 4)
-	h.Push(9, 9)
-	h.Push(8, 8)
-	h.Push(7, 7)
+	h.Push(util.Integer(1), 1)
+	h.Push(util.Integer(1), 1)
+	h.Push(util.Integer(2), 2)
+	h.Push(util.Integer(3), 3)
+	h.Push(util.Integer(6), 6)
+	h.Push(util.Integer(5), 5)
+	h.Push(util.Integer(4), 4)
+	h.Push(util.Integer(9), 9)
+	h.Push(util.Integer(8), 8)
+	h.Push(util.Integer(7), 7)
 	fmt.Println(h.find(5))
 	if m := h.Pop(); m != 1 {
 		t.Fatal("Pop failed")
@@ -35,9 +36,9 @@ func TestBinHeap_Delete(t *testing.T) {
 	t2 := time.Now()
 	t3 := time.Now()
 	t4 := time.Now()
-	h.Push(1, &t1)
-	h.Push(2, &t2)
-	h.Push(3, &t3)
-	h.Push(4, &t4)
+	h.Push(util.Integer(1), &t1)
+	h.Push(util.Integer(2), &t2)
+	h.Push(util.Integer(3), &t3)
+	h.Push(util.Integer(4), &t4)
 	fmt.Println(h.find(&t3))
 }
