@@ -3,7 +3,7 @@ package graphs
 import (
 	"errors"
 	"fmt"
-	pqueue "github.com/howz97/algorithm/pqueue/binaryheap"
+	pqueue "github.com/howz97/algorithm/pq/heap"
 	"github.com/howz97/algorithm/queue"
 	"github.com/howz97/algorithm/stack"
 	"math"

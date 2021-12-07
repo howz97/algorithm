@@ -2,7 +2,7 @@ package graphs
 
 import (
 	"fmt"
-	pqueue "github.com/howz97/algorithm/pqueue/binaryheap"
+	pqueue "github.com/howz97/algorithm/pq/heap"
 	"github.com/howz97/algorithm/queue"
 	unionfind "github.com/howz97/algorithm/union-find"
 )

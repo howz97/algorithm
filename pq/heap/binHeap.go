@@ -1,6 +1,4 @@
-package pqueue
-
-import "container/heap"
+package heap
 
 type Elem struct {
 	p int
@@ -49,7 +47,6 @@ func NewBinHeapWitArray(arry []Elem, cap int) *BinHeap {
 
 // Size return the total amount of element in heap
 func (h *BinHeap) Size() int {
-	heap.Init()
 	return h.size
 }
 
