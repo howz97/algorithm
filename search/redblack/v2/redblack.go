@@ -21,14 +21,14 @@ func New() *RedBlack {
 
 // Insert insert a k-v pair into this dictionary
 // if value is nil, is is a vitual deletion operation
-func (rb *RedBlack) Insert(key util.Cmp, value util.T) {
+func (rb *RedBlack) Insert(key util.Comparable, value util.T) {
 	rb.root = rb.root.insert(key, value)
 	if rb.root.isRed() {
 		rb.root.color = black
 	}
 }
 
-func (rb *RedBlack) Find(key util.Cmp) util.T {
+func (rb *RedBlack) Find(key util.Comparable) util.T {
 	n := rb.root.find(key)
 	if n == nil {
 		return nil
@@ -72,7 +72,7 @@ func (rb *RedBlack) Size() int {
 /*=============================================================================*/
 
 type node struct {
-	key      util.Cmp
+	key      util.Comparable
 	value    util.T
 	color    bool
 	size     int
@@ -80,7 +80,7 @@ type node struct {
 	rightSon *node
 }
 
-func (n *node) insert(k util.Cmp, v util.T) *node {
+func (n *node) insert(k util.Comparable, v util.T) *node {
 	if n == nil {
 		return &node{
 			key:   k,
@@ -110,7 +110,7 @@ func (n *node) insert(k util.Cmp, v util.T) *node {
 	return n
 }
 
-func (n *node) find(key util.Cmp) *node {
+func (n *node) find(key util.Comparable) *node {
 	if n == nil {
 		return nil
 	}

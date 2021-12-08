@@ -58,7 +58,7 @@ func (dg Digraph) addWeightedEdge(src, dst int, w float64) error {
 	if src == dst {
 		return ErrSelfLoop
 	}
-	dg[src].Put(util.Integer(dst), w)
+	dg[src].Put(util.Int(dst), w)
 	return nil
 }
 
@@ -66,7 +66,7 @@ func (dg Digraph) HasEdge(v1, v2 int) bool {
 	if !dg.HasVertical(v1) || !dg.HasVertical(v2) {
 		return false
 	}
-	return dg[v1].Get(util.Integer(v2)) != nil
+	return dg[v1].Get(util.Int(v2)) != nil
 }
 
 func (dg Digraph) IterateAdj(v int, fn func(int) bool) {
@@ -80,7 +80,7 @@ func (dg Digraph) IterateWAdj(v int, fn func(int, float64) bool) {
 		return
 	}
 	dg[v].Range(func(key hash_map.Key, val util.T) bool {
-		return fn(int(key.(util.Integer)), val.(float64))
+		return fn(int(key.(util.Int)), val.(float64))
 	})
 }
 
@@ -124,7 +124,7 @@ func (dg Digraph) FindNegativeEdge() (src, dst int) {
 
 func (dg Digraph) iterateAdj(v int, fn func(int, int, float64) bool) {
 	dg[v].Range(func(key hash_map.Key, val util.T) bool {
-		return fn(v, int(key.(util.Integer)), val.(float64))
+		return fn(v, int(key.(util.Int)), val.(float64))
 	})
 }
 
@@ -208,7 +208,7 @@ func (dg Digraph) IterateWEdge(fn func(int, int, float64) bool) {
 	for src, hm := range dg {
 		goon := true
 		hm.Range(func(dst hash_map.Key, v util.T) bool {
-			goon = fn(src, int(dst.(util.Integer)), v.(float64))
+			goon = fn(src, int(dst.(util.Int)), v.(float64))
 			return goon
 		})
 		if !goon {

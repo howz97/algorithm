@@ -38,7 +38,7 @@ func lazyPrim(g WGraph, v int, marked []bool) *queue.LinkedQueue {
 	marked[v] = true
 	mst := queue.NewLinkedQueue()
 	g.iterateAdj(v, func(src int, dst int, w float64) bool {
-		pq.Push(util.Float(w), &Edge{ // fixme pq Cmp
+		pq.Push(util.Float(w), &Edge{ // fixme pq Comparable
 			from:   src,
 			to:     dst,
 			weight: w,
@@ -138,7 +138,7 @@ func (g WGraph) Kruskal() *queue.Queen {
 	uf := unionfind.NewUF(int(g.NumVertical()))
 	pq := pqueue.New(g.NumEdge())
 	g.IterateWEdge(func(src int, dst int, w float64) bool {
-		pq.Push(util.Float(w), &Edge{ // fixme pq Cmp Key
+		pq.Push(util.Float(w), &Edge{ // fixme pq Comparable Key
 			from:   src,
 			to:     dst,
 			weight: w,

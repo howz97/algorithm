@@ -10,15 +10,15 @@ import (
 func main() {
 	avl := avltree.New()
 	for i := 0; i < 20; i++ {
-		avl.Put(util.Integer(i), i)
+		avl.Put(util.Int(i), i)
 	}
-	fmt.Printf("Size=%d Get(5)=%v \n", avl.Size(), avl.Get(util.Integer(5)))
+	fmt.Printf("Size=%d Get(5)=%v \n", avl.Size(), avl.Get(util.Int(5)))
 	search.PrintBinaryTree(avl)
 
 	for i := 0; i < 10; i++ {
-		avl.Del(util.Integer(i))
+		avl.Del(util.Int(i))
 	}
-	fmt.Printf("Size=%d Get(5)=%v \n", avl.Size(), avl.Get(util.Integer(5)))
+	fmt.Printf("Size=%d Get(5)=%v \n", avl.Size(), avl.Get(util.Int(5)))
 	search.PrintBinaryTree(avl)
 
 	fmt.Println("traversal in order:")

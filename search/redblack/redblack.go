@@ -17,14 +17,14 @@ func New() *RedBlack {
 	return new(RedBlack)
 }
 
-func (rb *RedBlack) Put(key util.Cmp, val util.T) {
+func (rb *RedBlack) Put(key util.Comparable, val util.T) {
 	rb.root = rb.root.insert(key, val)
 	if rb.root.isRed() {
 		rb.root.color = black
 	}
 }
 
-func (rb *RedBlack) Get(key util.Cmp) util.T {
+func (rb *RedBlack) Get(key util.Comparable) util.T {
 	n := rb.root.find(key)
 	if n == nil {
 		return nil
@@ -70,7 +70,7 @@ func (rb *RedBlack) DelMax() {
 	}
 }
 
-func (rb *RedBlack) Del(key util.Cmp) {
+func (rb *RedBlack) Del(key util.Comparable) {
 	if rb.root == nil {
 		return
 	}
@@ -101,7 +101,7 @@ func (rb *RedBlack) Clean() {
 /*=============================================================================*/
 
 type node struct {
-	key      util.Cmp
+	key      util.Comparable
 	value    util.T
 	color    bool
 	size     uint
@@ -109,7 +109,7 @@ type node struct {
 	rightSon *node
 }
 
-func (n *node) insert(k util.Cmp, v util.T) *node {
+func (n *node) insert(k util.Comparable, v util.T) *node {
 	if n == nil {
 		return &node{
 			key:   k,
@@ -139,7 +139,7 @@ func (n *node) insert(k util.Cmp, v util.T) *node {
 	return n
 }
 
-func (n *node) find(key util.Cmp) *node {
+func (n *node) find(key util.Comparable) *node {
 	if n == nil {
 		return nil
 	}
@@ -238,7 +238,7 @@ func flipColors2(r *node) {
 	r.rightSon.color = red
 }
 
-func (n *node) delete(k util.Cmp) *node {
+func (n *node) delete(k util.Comparable) *node {
 	if k.Cmp(n.key) == util.Less {
 		if !n.leftSon.isRed() && !n.leftSon.leftSon.isRed() {
 			n = moveRedLeft(n)

@@ -14,7 +14,7 @@ const (
 
 type Key interface {
 	Hash() uint
-	util.Cmp
+	util.Comparable
 }
 
 type Chaining struct {

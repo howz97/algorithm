@@ -14,18 +14,18 @@ const (
 
 type T interface{}
 
-type Cmp interface {
-	Cmp(other Cmp) Result
+type Comparable interface {
+	Cmp(other Comparable) Result
 }
 
-type Integer int // todo: rename to Int
+type Int int
 
-func (v Integer) Hash() uint {
+func (v Int) Hash() uint {
 	return uint(v)
 }
 
-func (v Integer) Cmp(other Cmp) Result {
-	o := other.(Integer)
+func (v Int) Cmp(other Comparable) Result {
+	o := other.(Int)
 	if v < o {
 		return Less
 	} else if v > o {
@@ -41,7 +41,7 @@ func (v Float) Hash() uint {
 	return *(*uint)(unsafe.Pointer(&v))
 }
 
-func (v Float) Cmp(other Cmp) Result {
+func (v Float) Cmp(other Comparable) Result {
 	o := other.(Float)
 	if v < o {
 		return Less
@@ -64,7 +64,7 @@ func (v Str) Hash() uint {
 	return h
 }
 
-func (v Str) Cmp(other Cmp) Result {
+func (v Str) Cmp(other Comparable) Result {
 	o := other.(Str)
 	if v < o {
 		return Less

@@ -12,7 +12,7 @@ func TestTraversal(t *testing.T) {
 	data := []string{"26", "-", "5", "*", "3", "+", "2"}
 	avl := avltree.New()
 	for i, v := range data {
-		avl.Put(util.Integer(i), v)
+		avl.Put(util.Int(i), v)
 	}
 	search.PrintBinaryTree(avl)
 

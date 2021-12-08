@@ -16,7 +16,7 @@ func New() *BinaryTree {
 	return new(BinaryTree)
 }
 
-func (st *BinaryTree) Put(key util.Cmp, val util.T) {
+func (st *BinaryTree) Put(key util.Comparable, val util.T) {
 	exist := false
 	st.node, exist = st.put(key, val)
 	if !exist {
@@ -24,7 +24,7 @@ func (st *BinaryTree) Put(key util.Cmp, val util.T) {
 	}
 }
 
-func (st *BinaryTree) Get(key util.Cmp) util.T {
+func (st *BinaryTree) Get(key util.Comparable) util.T {
 	n := st.get(key)
 	if n == nil {
 		return nil
@@ -40,7 +40,7 @@ func (st *BinaryTree) GetMax() util.T {
 	return st.getMax().value
 }
 
-func (st *BinaryTree) Del(key util.Cmp) {
+func (st *BinaryTree) Del(key util.Comparable) {
 	exist := false
 	st.node, exist = st.del(key)
 	if exist {
@@ -59,12 +59,12 @@ func (st *BinaryTree) Clean() {
 
 type node struct {
 	value util.T
-	key   util.Cmp
+	key   util.Comparable
 	left  *node
 	right *node
 }
 
-func (n *node) put(k util.Cmp, v util.T) (*node, bool) {
+func (n *node) put(k util.Comparable, v util.T) (*node, bool) {
 	if n == nil {
 		n = new(node)
 		n.key = k
@@ -84,7 +84,7 @@ func (n *node) put(k util.Cmp, v util.T) (*node, bool) {
 	return n, exist
 }
 
-func (n *node) get(k util.Cmp) *node {
+func (n *node) get(k util.Comparable) *node {
 	if n == nil {
 		return nil
 	}
@@ -117,7 +117,7 @@ func (n *node) getMax() *node {
 	return n
 }
 
-func (n *node) del(k util.Cmp) (*node, bool) {
+func (n *node) del(k util.Comparable) (*node, bool) {
 	if n == nil {
 		return nil, false
 	}
@@ -162,7 +162,7 @@ func (n *node) IsNil() bool {
 	return n == nil
 }
 
-func (n *node) Key() util.Cmp {
+func (n *node) Key() util.Comparable {
 	return n.key
 }
 

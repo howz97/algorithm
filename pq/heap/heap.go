@@ -1,14 +1,12 @@
 package heap
 
 import (
-	"github.com/howz97/algorithm/util"
+	. "github.com/howz97/algorithm/util"
 )
 
-type T interface{}
-
 type Elem struct {
-	p util.Cmp
-	v T
+	p   Comparable // priority
+	val T
 }
 
 type Heap struct {
@@ -31,22 +29,22 @@ func (h *Heap) Cap() int {
 	return len(h.elems) - 1
 }
 
-func (h *Heap) Push(p util.Cmp, v T) {
+func (h *Heap) Push(p Comparable, v T) {
 	// insert into the bottom of heap
 	h.len++
 	if h.len < len(h.elems) {
 		e := &h.elems[h.len]
 		e.p = p
-		e.v = v
+		e.val = v
 	} else {
-		h.elems = append(h.elems, Elem{p: p, v: v})
+		h.elems = append(h.elems, Elem{p: p, val: v})
 	}
 	// percolate up from bottom
 	h.percolateUp(h.len)
 }
 
 func (h *Heap) Pop() T {
-	v := h.elems[1].v
+	v := h.elems[1].val
 	// move bottom element to the top position
 	h.elems[1] = h.elems[h.len]
 	h.len--
@@ -71,7 +69,7 @@ func (h *Heap) Del(v T) {
 
 func (h *Heap) find(v T) int {
 	for i := 1; i <= h.len; i++ {
-		if h.elems[i].v == v {
+		if h.elems[i].val == v {
 			return i
 		}
 	}
@@ -79,16 +77,16 @@ func (h *Heap) find(v T) int {
 }
 
 // Fix priority
-func (h *Heap) Fix(p util.Cmp, v T) {
+func (h *Heap) Fix(p Comparable, v T) {
 	i := h.find(v)
 	if i <= 0 {
 		return
 	}
 	switch p.Cmp(h.elems[i].p) {
-	case util.Less:
+	case Less:
 		h.elems[i].p = p
 		h.percolateUp(i)
-	case util.More:
+	case More:
 		h.elems[i].p = p
 		h.percolateDown(i)
 	}
@@ -103,10 +101,10 @@ func (h *Heap) percolateDown(vac int) {
 	sub := vac * 2
 	for sub <= h.len {
 		// choose the smaller sub-node
-		if sub < h.len && h.elems[sub+1].p.Cmp(h.elems[sub].p) == util.Less {
+		if sub < h.len && h.elems[sub+1].p.Cmp(h.elems[sub].p) == Less {
 			sub++
 		}
-		if h.elems[sub].p.Cmp(elem.p) != util.Less {
+		if h.elems[sub].p.Cmp(elem.p) != Less {
 			break
 		}
 		h.elems[vac] = h.elems[sub]
@@ -119,7 +117,7 @@ func (h *Heap) percolateDown(vac int) {
 func (h *Heap) percolateUp(vac int) {
 	elem := h.elems[vac] // copy-out the element and left a vacancy
 	parent := vac / 2
-	for parent > 0 && h.elems[parent].p.Cmp(elem.p) == util.More {
+	for parent > 0 && h.elems[parent].p.Cmp(elem.p) == More {
 		h.elems[vac] = h.elems[parent]
 		vac = parent
 		parent = vac / 2

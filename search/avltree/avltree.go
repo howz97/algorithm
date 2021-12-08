@@ -16,7 +16,7 @@ func New() *AVL {
 	return new(AVL)
 }
 
-func (avl *AVL) Put(key util.Cmp, val util.T) {
+func (avl *AVL) Put(key util.Comparable, val util.T) {
 	exist := false
 	avl.node, exist = avl.put(key, val)
 	if !exist {
@@ -24,7 +24,7 @@ func (avl *AVL) Put(key util.Cmp, val util.T) {
 	}
 }
 
-func (avl *AVL) Get(key util.Cmp) util.T {
+func (avl *AVL) Get(key util.Comparable) util.T {
 	n := avl.get(key)
 	if n == nil {
 		return nil
@@ -40,7 +40,7 @@ func (avl *AVL) GetMax() util.T {
 	return avl.getMax().value
 }
 
-func (avl *AVL) Del(key util.Cmp) {
+func (avl *AVL) Del(key util.Comparable) {
 	exist := false
 	avl.node, exist = avl.del(key)
 	if exist {
@@ -58,14 +58,14 @@ func (avl *AVL) Clean() {
 }
 
 type node struct {
-	key   util.Cmp
+	key   util.Comparable
 	value util.T
 	h     int8
 	left  *node
 	right *node
 }
 
-func (n *node) put(k util.Cmp, v util.T) (*node, bool) {
+func (n *node) put(k util.Comparable, v util.T) (*node, bool) {
 	if n == nil {
 		n = new(node)
 		n.key = k
@@ -147,7 +147,7 @@ func (n *node) height() int8 {
 	return n.h
 }
 
-func (n *node) get(k util.Cmp) *node {
+func (n *node) get(k util.Comparable) *node {
 	if n == nil {
 		return nil
 	}
@@ -181,7 +181,7 @@ func (n *node) getMax() *node {
 	return n
 }
 
-func (n *node) del(k util.Cmp) (*node, bool) {
+func (n *node) del(k util.Comparable) (*node, bool) {
 	if n == nil {
 		return nil, false
 	}
@@ -224,7 +224,7 @@ func (n *node) IsNil() bool {
 	return n == nil
 }
 
-func (n *node) Key() util.Cmp {
+func (n *node) Key() util.Comparable {
 	return n.key
 }
 
