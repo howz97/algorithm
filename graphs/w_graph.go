@@ -2,7 +2,7 @@ package graphs
 
 import (
 	"fmt"
-	pqueue "github.com/howz97/algorithm/pq/heap"
+	"github.com/howz97/algorithm/pq/heap"
 	"github.com/howz97/algorithm/queue"
 	unionfind "github.com/howz97/algorithm/union-find"
 	"github.com/howz97/algorithm/util"
@@ -34,7 +34,7 @@ func (g WGraph) LazyPrim() *MSTForest {
 }
 
 func lazyPrim(g WGraph, v int, marked []bool) *queue.LinkedQueue {
-	pq := pqueue.New(g.NumEdge())
+	pq := heap.New(g.NumEdge())
 	marked[v] = true
 	mst := queue.NewLinkedQueue()
 	g.iterateAdj(v, func(src int, dst int, w float64) bool {
@@ -62,7 +62,7 @@ func lazyPrim(g WGraph, v int, marked []bool) *queue.LinkedQueue {
 	return mst
 }
 
-func lazyPrimVisit(g WGraph, v int, marked []bool, pq *pqueue.Heap) {
+func lazyPrimVisit(g WGraph, v int, marked []bool, pq *heap.Heap) {
 	marked[v] = true
 	g.iterateAdj(v, func(_ int, a int, w float64) bool {
 		if !marked[a] {
@@ -89,7 +89,7 @@ func (g WGraph) Prim() *MSTForest {
 }
 
 func prim(g WGraph, v int, marked []bool, edgeTo []*Edge) *queue.LinkedQueue {
-	pq := pqueue.New(g.NumVertical())
+	pq := heap.New(g.NumVertical())
 	marked[v] = true
 	g.iterateAdj(v, func(_ int, a int, w float64) bool {
 		pq.Push(util.Float(w), a)
@@ -102,15 +102,14 @@ func prim(g WGraph, v int, marked []bool, edgeTo []*Edge) *queue.LinkedQueue {
 	})
 	mst := queue.NewLinkedQueue()
 	for !pq.IsEmpty() {
-		m := pq.Pop()
-		w := m.(int)
+		w := pq.Pop().(int)
 		mst.PushBack(edgeTo[w])
 		primVisit(g, w, marked, pq, edgeTo)
 	}
 	return mst
 }
 
-func primVisit(g WGraph, v int, marked []bool, pq *pqueue.Heap, edgeTo []*Edge) {
+func primVisit(g WGraph, v int, marked []bool, pq *heap.Heap, edgeTo []*Edge) {
 	marked[v] = true
 	g.iterateAdj(v, func(_ int, a int, wt float64) bool {
 		if marked[a] {
@@ -136,7 +135,7 @@ func primVisit(g WGraph, v int, marked []bool, pq *pqueue.Heap, edgeTo []*Edge) 
 func (g WGraph) Kruskal() *queue.Queen {
 	mst := queue.NewQueen(int(g.NumVertical()))
 	uf := unionfind.NewUF(int(g.NumVertical()))
-	pq := pqueue.New(g.NumEdge())
+	pq := heap.New(g.NumEdge())
 	g.IterateWEdge(func(src int, dst int, w float64) bool {
 		pq.Push(util.Float(w), &Edge{
 			from:   src,
