@@ -2,7 +2,7 @@
 * [排序](https://github.com/howz97/algorithm/tree/master/sort)
 * [字符串排序](https://github.com/howz97/algorithm/tree/master/string_sort)
 * [Trie树](https://github.com/howz97/algorithm/tree/master/trie_tree)
-* [子字符串查找](https://github.com/howz97/algorithm/tree/master/string_search)
+* [子字符串查找](https://github.com/howz97/algorithm/tree/master/str_search)
   * KMP
   * BoyerMoore
   * RabinKarp
