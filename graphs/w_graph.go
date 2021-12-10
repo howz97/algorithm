@@ -1,7 +1,6 @@
 package graphs
 
 import (
-	"fmt"
 	"github.com/howz97/algorithm/pq/heap"
 	"github.com/howz97/algorithm/queue"
 	unionfind "github.com/howz97/algorithm/union-find"
@@ -18,26 +17,16 @@ func NewWGraph(size uint) *WGraph {
 	}
 }
 
-func (g WGraph) AddEdge(src, dst int, w float64) error {
+func (g *WGraph) AddEdge(src, dst int, w float64) error {
 	return g.Graph.addWeightedEdge(src, dst, w)
 }
 
-func (g WGraph) LazyPrim() *MSTForest {
+func (g *WGraph) LazyPrim() (mst *WGraph) {
+	pq := heap.New(g.NumVertical())
+	mst = NewWGraph(g.NumVertical())
 	marked := make([]bool, g.NumVertical())
-	f := newMSTForest()
-	for i, b := range marked {
-		if !b {
-			f.addMST(lazyPrim(g, i, marked))
-		}
-	}
-	return f
-}
-
-func lazyPrim(g WGraph, v int, marked []bool) *queue.LinkedQueue {
-	pq := heap.New(g.NumEdge())
-	marked[v] = true
-	mst := queue.NewLinkedQueue()
-	g.iterateAdj(v, func(src int, dst int, w float64) bool {
+	marked[0] = true
+	g.iterateAdj(0, func(src int, dst int, w float64) bool {
 		pq.Push(util.Float(w), &Edge{
 			from:   src,
 			to:     dst,
@@ -46,23 +35,17 @@ func lazyPrim(g WGraph, v int, marked []bool) *queue.LinkedQueue {
 		return true
 	})
 	for !pq.IsEmpty() {
-		m := pq.Pop()
-		e := m.(*Edge)
-		if marked[e.from] && marked[e.to] {
+		e := pq.Pop().(*Edge)
+		if marked[e.to] {
 			continue
 		}
-		mst.PushBack(e)
-		if !marked[e.from] {
-			lazyPrimVisit(g, e.from, marked, pq)
-		}
-		if !marked[e.to] {
-			lazyPrimVisit(g, e.to, marked, pq)
-		}
+		mst.AddEdge(e.from, e.to, e.weight)
+		lazyPrimVisit(g, e.to, marked, pq)
 	}
 	return mst
 }
 
-func lazyPrimVisit(g WGraph, v int, marked []bool, pq *heap.Heap) {
+func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *heap.Heap) {
 	marked[v] = true
 	g.iterateAdj(v, func(_ int, a int, w float64) bool {
 		if !marked[a] {
@@ -76,17 +59,17 @@ func lazyPrimVisit(g WGraph, v int, marked []bool, pq *heap.Heap) {
 	})
 }
 
-func (g WGraph) Prim() *MSTForest {
-	marked := make([]bool, g.NumVertical())
-	edgeTo := make([]*Edge, g.NumVertical())
-	f := newMSTForest()
-	for i, b := range marked {
-		if !b {
-			f.addMST(prim(g, i, marked, edgeTo))
-		}
-	}
-	return f
-}
+//func (g *WGraph) Prim() *MSTForest {
+//	marked := make([]bool, g.NumVertical())
+//	edgeTo := make([]*Edge, g.NumVertical())
+//	f := newMSTForest()
+//	for i, b := range marked {
+//		if !b {
+//			f.addMST(prim(g, i, marked, edgeTo))
+//		}
+//	}
+//	return f
+//}
 
 func prim(g WGraph, v int, marked []bool, edgeTo []*Edge) *queue.LinkedQueue {
 	pq := heap.New(g.NumVertical())
@@ -132,7 +115,7 @@ func primVisit(g WGraph, v int, marked []bool, pq *heap.Heap, edgeTo []*Edge) {
 }
 
 // Kruskal 该实现仅支持连通图
-func (g WGraph) Kruskal() *queue.Queen {
+func (g *WGraph) Kruskal() *queue.Queen {
 	mst := queue.NewQueen(int(g.NumVertical()))
 	uf := unionfind.NewUF(int(g.NumVertical()))
 	pq := heap.New(g.NumEdge())
@@ -154,29 +137,6 @@ func (g WGraph) Kruskal() *queue.Queen {
 		mst.PushBack(minE)
 	}
 	return mst
-}
-
-type MSTForest []*queue.LinkedQueue
-
-func newMSTForest() *MSTForest {
-	f := make(MSTForest, 0, 1)
-	return &f
-}
-
-// 根据连通分量的id获取它的最小生成树
-func (f *MSTForest) MST(cc int) *queue.LinkedQueue {
-	if cc < 0 || cc >= len(*f) {
-		panic(fmt.Sprintf("subgraph %v does not exist", cc))
-	}
-	return (*f)[cc]
-}
-
-func (f *MSTForest) addMST(mst *queue.LinkedQueue) {
-	*f = append(*f, mst)
-}
-
-func (f *MSTForest) NumConnectedComponent() int {
-	return len(*f)
 }
 
 type Edge struct {

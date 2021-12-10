@@ -14,6 +14,7 @@ type Heap struct {
 	elems []Elem
 }
 
+// New make an empty heap. Specify a proper cap to reduce times of re-allocate elems slice
 func New(cap uint) *Heap {
 	h := &Heap{
 		elems: make([]Elem, cap+1), // ignore element at index 0
@@ -26,7 +27,7 @@ func (h *Heap) Size() int {
 }
 
 func (h *Heap) Cap() int {
-	return len(h.elems) - 1
+	return cap(h.elems) - 1
 }
 
 func (h *Heap) Push(p Comparable, v T) {

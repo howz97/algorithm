@@ -53,14 +53,7 @@ func TestEdgeWeightedGraph_LazyPrim(t *testing.T) {
 	g.AddEdge(4, 7, 37)
 	g.AddEdge(5, 7, 28)
 
-	mstf := g.LazyPrim()
-	fmt.Println("MST:")
-	mst := mstf.MST(0)
-	for !mst.IsEmpty() {
-		v := mst.Front()
-		e := v.(*Edge)
-		fmt.Printf("%v--%v, %v\n", e.from, e.to, e.weight)
-	}
+	t.Logf("MST:\n %s \n", g.LazyPrim().String())
 }
 
 func TestEdgeWeightedGraph_Prim(t *testing.T) {
@@ -81,13 +74,4 @@ func TestEdgeWeightedGraph_Prim(t *testing.T) {
 	g.AddEdge(4, 6, 3)
 	g.AddEdge(4, 7, 7)
 	g.AddEdge(5, 7, 8)
-
-	mstf := g.Prim()
-	fmt.Println("MST:")
-	mst := mstf.MST(0)
-	for !mst.IsEmpty() {
-		v := mst.Front()
-		e := v.(*Edge)
-		fmt.Printf("%v--%v, %v\n", e.from, e.to, e.weight)
-	}
 }
