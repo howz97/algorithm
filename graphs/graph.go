@@ -35,6 +35,45 @@ func (g *Graph) addWeightedEdge(src, dst int, w float64) error {
 	return nil
 }
 
+func (g *Graph) DelEdge(src, dst int) {
+	g.Digraph.DelEdge(src, dst)
+	g.Digraph.DelEdge(dst, src)
+}
+
+func (g *Graph) IterateWEdge(fn func(int, int, float64) bool) {
+	visited := make(map[uint64]struct{})
+	g.Digraph.IterateWEdge(func(from int, to int, w float64) bool {
+		if _, v := visited[uint64(to)<<32+uint64(from)]; v {
+			return true
+		}
+		visited[uint64(from)<<32+uint64(to)] = struct{}{}
+		return fn(from, to, w)
+	})
+}
+
+func (g *Graph) IterateEdge(fn func(int, int) bool) {
+	g.IterateWEdge(func(src int, dst int, _ float64) bool {
+		return fn(src, dst)
+	})
+}
+
+func (g *Graph) IterateWEdgeFrom(v int, fn func(int, int, float64) bool) {
+	visited := make(map[uint64]struct{})
+	g.Digraph.IterateWEdgeFrom(v, func(from int, to int, w float64) bool {
+		if _, v := visited[uint64(to)<<32+uint64(from)]; v {
+			return true
+		}
+		visited[uint64(from)<<32+uint64(to)] = struct{}{}
+		return fn(from, to, w)
+	})
+}
+
+func (g *Graph) IterateEdgeFrom(v int, fn func(int, int) bool) {
+	g.IterateWEdgeFrom(v, func(src int, dst int, _ float64) bool {
+		return fn(src, dst)
+	})
+}
+
 func (g *Graph) HasCycle() bool {
 	marked := make([]bool, g.NumVertical())
 	for i, m := range marked {
@@ -66,4 +105,8 @@ func (g *Graph) detectCycleDFS(last, cur int, marked []bool) bool {
 		return true
 	})
 	return found
+}
+
+func (g *Graph) TotalWeight() float64 {
+	return g.Digraph.TotalWeight() / 2
 }

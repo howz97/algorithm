@@ -34,7 +34,7 @@ func TestEdgeWeightedGraph_Kruskal(t *testing.T) {
 	}
 }
 
-func TestEdgeWeightedGraph_LazyPrim(t *testing.T) {
+func TestMST_Prim(t *testing.T) {
 	g := NewWGraph(8) // 算法4th P399 图4.3.10, 不同的是这里权重使用int
 	g.AddEdge(0, 2, 26)
 	g.AddEdge(0, 4, 38)
@@ -52,26 +52,10 @@ func TestEdgeWeightedGraph_LazyPrim(t *testing.T) {
 	g.AddEdge(4, 6, 93)
 	g.AddEdge(4, 7, 37)
 	g.AddEdge(5, 7, 28)
-
-	t.Logf("MST:\n %s \n", g.LazyPrim().String())
-}
-
-func TestEdgeWeightedGraph_Prim(t *testing.T) {
-	g := NewWGraph(8) // 算法4th P399 图4.3.10, 不同的是这里权重使用int
-	g.AddEdge(0, 2, 26)
-	g.AddEdge(0, 4, 8)
-	g.AddEdge(0, 6, 8)
-	g.AddEdge(0, 7, 7)
-	g.AddEdge(1, 2, 6)
-	g.AddEdge(1, 3, 9)
-	g.AddEdge(1, 5, 2)
-	g.AddEdge(1, 7, 9)
-	g.AddEdge(2, 3, 7)
-	g.AddEdge(2, 6, 0)
-	g.AddEdge(2, 7, 4)
-	g.AddEdge(3, 6, 2)
-	g.AddEdge(4, 5, 5)
-	g.AddEdge(4, 6, 3)
-	g.AddEdge(4, 7, 7)
-	g.AddEdge(5, 7, 8)
+	w0 := g.LazyPrim().TotalWeight()
+	w1 := g.Prim().TotalWeight()
+	if w0 != w1 {
+		t.Fatalf("weight %v not equal %v", w0, w1)
+	}
+	t.Logf("MST %v:\n%s \n", w0, g.LazyPrim().String())
 }

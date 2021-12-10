@@ -62,6 +62,13 @@ func (dg Digraph) addWeightedEdge(src, dst int, w float64) error {
 	return nil
 }
 
+func (dg Digraph) DelEdge(src, dst int) {
+	if !dg.HasVertical(src) {
+		return
+	}
+	dg[src].Del(util.Int(dst))
+}
+
 func (dg Digraph) HasEdge(v1, v2 int) bool {
 	if !dg.HasVertical(v1) || !dg.HasVertical(v2) {
 		return false
@@ -90,6 +97,21 @@ func (dg Digraph) Adjacent(v int) (adj []int) {
 		return true
 	})
 	return adj
+}
+
+func (dg Digraph) GetWeightMust(from, to int) float64 {
+	return dg[from].Get(util.Int(to)).(float64)
+}
+
+func (dg Digraph) GetWeight(from, to int) (float64, bool) {
+	if !dg.HasVertical(from) {
+		return 0, false
+	}
+	w := dg[from].Get(util.Int(to))
+	if w == nil {
+		return 0, false
+	}
+	return w.(float64), true
 }
 
 func (dg Digraph) String() string {
@@ -374,4 +396,32 @@ func (dg Digraph) isBipartiteDFS(cur int, color bool, colors []bool, marked []bo
 		isBip = colors[cur] == color
 	}
 	return isBip
+}
+
+func (dg Digraph) SameWith(other Digraph) bool {
+	if dg.NumVertical() != other.NumVertical() {
+		return false
+	}
+	if dg.NumEdge() != other.NumEdge() {
+		return false
+	}
+	isSame := true
+	dg.IterateWEdge(func(from int, to int, w float64) bool {
+		w2, ok := other.GetWeight(from, to)
+		if !ok || w != w2 {
+			isSame = false
+			return false
+		}
+		return true
+	})
+	return isSame
+}
+
+func (dg Digraph) TotalWeight() float64 {
+	var total float64
+	dg.IterateWEdge(func(_ int, _ int, w float64) bool {
+		total += w
+		return true
+	})
+	return total
 }

@@ -61,44 +61,37 @@ func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *heap.Heap) {
 
 func (g *WGraph) Prim() (mst *WGraph) {
 	marked := make([]bool, g.NumVertical())
-	edgeTo := make([]*Edge, g.NumVertical())
 	pq := heap.New(g.NumVertical())
 	mst = NewWGraph(g.NumVertical())
 	marked[0] = true
 	g.iterateAdj(0, func(_ int, a int, w float64) bool {
 		pq.Push(util.Float(w), a)
-		edgeTo[a] = &Edge{
-			from:   0,
-			to:     a,
-			weight: w,
-		}
+		mst.AddEdge(0, a, w)
 		return true
 	})
 	for !pq.IsEmpty() {
-		w := pq.Pop().(int)
-		e := edgeTo[w]
-		mst.AddEdge(e.from, e.to, e.weight)
-		primVisit(g, w, marked, pq, edgeTo, mst)
+		v := pq.Pop().(int)
+		from := mst.Adjacent(v)[0]
+		mst.AddEdge(from, v, g.GetWeightMust(from, v))
+		primVisit(g, mst, v, marked, pq)
 	}
 	return mst
 }
 
-func primVisit(g *WGraph, v int, marked []bool, pq *heap.Heap, mst *WGraph) {
+func primVisit(g, mst *WGraph, v int, marked []bool, pq *heap.Heap) {
 	marked[v] = true
-	g.iterateAdj(v, func(_ int, a int, wt float64) bool {
+	g.iterateAdj(v, func(_ int, a int, w float64) bool {
 		if marked[a] {
 			return true
 		}
-		adj := mst.Adjacent(a)
-		if len(adj) == 0 {
-			pq.Push(util.Float(wt), a)
-			mst.AddEdge(v, a, wt)
-		} else {
-			w2 := mst.GetWeight(adj, a)
-			if wt < w2 {
-				pq.Fix(util.Float(wt), a)
-				edgeTo[a] = e // repalce edge
-			}
+		orig := mst.Adjacent(a)
+		if len(orig) == 0 {
+			pq.Push(util.Float(w), a)
+			mst.AddEdge(v, a, w)
+		} else if w < mst.GetWeightMust(orig[0], a) {
+			pq.Fix(util.Float(w), a)
+			mst.DelEdge(orig[0], a)
+			mst.AddEdge(v, a, w)
 		}
 		return true
 	})
