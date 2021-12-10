@@ -1,20 +1,33 @@
 # algorithm
 主要内容包括：
-* 常见排序算法 
-https://github.com/howz97/algorithm/tree/master/sort
+* 常见排序算法
+  https://github.com/howz97/algorithm/tree/master/sort
 * 字符串排序
-https://github.com/howz97/algorithm/tree/master/string_sort
+  https://github.com/howz97/algorithm/tree/master/string_sort
 * Trie树
-https://github.com/howz97/algorithm/tree/master/trie_tree
-* 子字符串查找 (KMP/BoyerMoore/RabinKarp)
-https://github.com/howz97/algorithm/tree/master/string_search
+  https://github.com/howz97/algorithm/tree/master/trie_tree
+* 子字符串查找
+  https://github.com/howz97/algorithm/tree/master/string_search
+  * KMP
+  * BoyerMoore
+  * RabinKarp
 * 平衡二叉树
-https://github.com/howz97/algorithm/tree/master/search/avltree
+  https://github.com/howz97/algorithm/tree/master/search/avltree
 * 链式哈希表
-https://github.com/howz97/algorithm/tree/master/search/hash_map
-* 带权重有向图的最短路径算法 (Dijkstra/Topological/BellmanFord)
-https://github.com/howz97/algorithm/tree/master/graphs/weighted_digraph
+  https://github.com/howz97/algorithm/tree/master/search/hash_map
+* 优先队列
+  * 堆
+  * 左式堆
+  * 二项队列
+* 图
+  https://github.com/howz97/algorithm/tree/master/graphs
+  * 最小生成树
+    * Lazy-Prim
+    * Prim
+    * Kruskal
+  * 最短路径
+    * Dijkstra
+    * Topological
+    * Bellman-Ford
 * 正则表达式
-https://github.com/howz97/algorithm/tree/master/regexp
-* 优先队列 (二叉堆/左式堆/二项队列)
-https://github.com/howz97/algorithm/tree/master/pqueue
+  https://github.com/howz97/algorithm/tree/master/regexp
