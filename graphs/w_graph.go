@@ -59,56 +59,46 @@ func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *heap.Heap) {
 	})
 }
 
-//func (g *WGraph) Prim() *MSTForest {
-//	marked := make([]bool, g.NumVertical())
-//	edgeTo := make([]*Edge, g.NumVertical())
-//	f := newMSTForest()
-//	for i, b := range marked {
-//		if !b {
-//			f.addMST(prim(g, i, marked, edgeTo))
-//		}
-//	}
-//	return f
-//}
-
-func prim(g WGraph, v int, marked []bool, edgeTo []*Edge) *queue.LinkedQueue {
+func (g *WGraph) Prim() (mst *WGraph) {
+	marked := make([]bool, g.NumVertical())
+	edgeTo := make([]*Edge, g.NumVertical())
 	pq := heap.New(g.NumVertical())
-	marked[v] = true
-	g.iterateAdj(v, func(_ int, a int, w float64) bool {
+	mst = NewWGraph(g.NumVertical())
+	marked[0] = true
+	g.iterateAdj(0, func(_ int, a int, w float64) bool {
 		pq.Push(util.Float(w), a)
 		edgeTo[a] = &Edge{
-			from:   v,
+			from:   0,
 			to:     a,
 			weight: w,
 		}
 		return true
 	})
-	mst := queue.NewLinkedQueue()
 	for !pq.IsEmpty() {
 		w := pq.Pop().(int)
-		mst.PushBack(edgeTo[w])
-		primVisit(g, w, marked, pq, edgeTo)
+		e := edgeTo[w]
+		mst.AddEdge(e.from, e.to, e.weight)
+		primVisit(g, w, marked, pq, edgeTo, mst)
 	}
 	return mst
 }
 
-func primVisit(g WGraph, v int, marked []bool, pq *heap.Heap, edgeTo []*Edge) {
+func primVisit(g *WGraph, v int, marked []bool, pq *heap.Heap, mst *WGraph) {
 	marked[v] = true
 	g.iterateAdj(v, func(_ int, a int, wt float64) bool {
 		if marked[a] {
 			return true
 		}
-		e := &Edge{
-			from:   v,
-			to:     a,
-			weight: wt,
-		}
-		if edgeTo[a] == nil {
+		adj := mst.Adjacent(a)
+		if len(adj) == 0 {
 			pq.Push(util.Float(wt), a)
-			edgeTo[a] = e
-		} else if e.weight < edgeTo[a].weight {
-			pq.Fix(util.Float(e.weight), a)
-			edgeTo[a] = e
+			mst.AddEdge(v, a, wt)
+		} else {
+			w2 := mst.GetWeight(adj, a)
+			if wt < w2 {
+				pq.Fix(util.Float(wt), a)
+				edgeTo[a] = e // repalce edge
+			}
 		}
 		return true
 	})

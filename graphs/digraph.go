@@ -84,6 +84,14 @@ func (dg Digraph) IterateWAdj(v int, fn func(int, float64) bool) {
 	})
 }
 
+func (dg Digraph) Adjacent(v int) (adj []int) {
+	dg.IterateAdj(v, func(a int) bool {
+		adj = append(adj, a)
+		return true
+	})
+	return adj
+}
+
 func (dg Digraph) String() string {
 	out := ""
 	for i := range dg {
