@@ -1,4 +1,4 @@
-package string_search
+package str_search
 
 type BoyerMoore struct {
 	pattern string
