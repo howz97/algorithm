@@ -20,6 +20,7 @@ func (g *WGraph) AddEdge(src, dst int, w float64) error {
 	return g.Graph.addWeightedEdge(src, dst, w)
 }
 
+// LazyPrim gets the minimum spanning tree by Lazy-Prim algorithm. g MUST be a connected graph
 func (g *WGraph) LazyPrim() (mst *WGraph) {
 	pq := heap.New(g.NumVertical())
 	mst = NewWGraph(g.NumVertical())
@@ -58,6 +59,7 @@ func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *heap.Heap) {
 	})
 }
 
+// Prim gets the minimum spanning tree by Prim algorithm. g MUST be a connected graph
 func (g *WGraph) Prim() (mst *WGraph) {
 	marked := make([]bool, g.NumVertical())
 	pq := heap.New(g.NumVertical())
@@ -96,6 +98,7 @@ func primVisit(g, mst *WGraph, v int, marked []bool, pq *heap.Heap) {
 	})
 }
 
+// Kruskal gets the minimum spanning tree by Kruskal algorithm. g MUST be a connected graph
 func (g *WGraph) Kruskal() (mst *WGraph) {
 	mst = NewWGraph(g.NumVertical())
 	uf := unionfind.NewUF(int(g.NumVertical()))
