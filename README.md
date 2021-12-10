@@ -1,4 +1,4 @@
-# algorithm
+# 目录
 * [排序](https://github.com/howz97/algorithm/tree/master/sort)
 * [字符串排序](https://github.com/howz97/algorithm/tree/master/string_sort)
 * [Trie树](https://github.com/howz97/algorithm/tree/master/trie_tree)
