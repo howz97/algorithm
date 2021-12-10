@@ -2,7 +2,6 @@ package graphs
 
 import (
 	"github.com/howz97/algorithm/pq/heap"
-	"github.com/howz97/algorithm/queue"
 	unionfind "github.com/howz97/algorithm/union-find"
 	"github.com/howz97/algorithm/util"
 )
@@ -42,7 +41,7 @@ func (g *WGraph) LazyPrim() (mst *WGraph) {
 		mst.AddEdge(e.from, e.to, e.weight)
 		lazyPrimVisit(g, e.to, marked, pq)
 	}
-	return mst
+	return
 }
 
 func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *heap.Heap) {
@@ -75,7 +74,7 @@ func (g *WGraph) Prim() (mst *WGraph) {
 		mst.AddEdge(from, v, g.GetWeightMust(from, v))
 		primVisit(g, mst, v, marked, pq)
 	}
-	return mst
+	return
 }
 
 func primVisit(g, mst *WGraph, v int, marked []bool, pq *heap.Heap) {
@@ -97,11 +96,10 @@ func primVisit(g, mst *WGraph, v int, marked []bool, pq *heap.Heap) {
 	})
 }
 
-// Kruskal 该实现仅支持连通图
-func (g *WGraph) Kruskal() *queue.Queen {
-	mst := queue.NewQueen(int(g.NumVertical()))
+func (g *WGraph) Kruskal() (mst *WGraph) {
+	mst = NewWGraph(g.NumVertical())
 	uf := unionfind.NewUF(int(g.NumVertical()))
-	pq := heap.New(g.NumEdge())
+	pq := heap.New(g.NumVertical())
 	g.IterateWEdge(func(src int, dst int, w float64) bool {
 		pq.Push(util.Float(w), &Edge{
 			from:   src,
@@ -110,16 +108,15 @@ func (g *WGraph) Kruskal() *queue.Queen {
 		})
 		return true
 	})
-	for !mst.IsFull() {
-		min := pq.Pop()
-		minE := min.(*Edge)
+	for mst.NumEdge() < mst.NumVertical()-1 {
+		minE := pq.Pop().(*Edge)
 		if uf.IsConnected(minE.from, minE.to) {
 			continue
 		}
 		uf.Union(minE.from, minE.to)
-		mst.PushBack(minE)
+		mst.AddEdge(minE.from, minE.to, minE.weight)
 	}
-	return mst
+	return
 }
 
 type Edge struct {
