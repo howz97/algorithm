@@ -18,3 +18,11 @@ func (sg *Symbol) scanVertical(v string) {
 		sg.int2str = append(sg.int2str, v)
 	}
 }
+
+func (sg *Symbol) SymbolOf(v int) string {
+	return sg.int2str[v]
+}
+
+func (sg *Symbol) VetOf(s string) int {
+	return sg.str2int[s]
+}

@@ -28,11 +28,11 @@ func readYaml(filename string, isSymbol bool) (*Digraph, error) {
 		}
 		g = &Digraph{Symbol: NewSymbolGraph()}
 		for v := range m {
-			g.Symbol.scanVertical(v)
+			g.scanVertical(v)
 		}
 		for from, adj := range m {
 			for to, w := range adj {
-				err = g.addWeightedEdge(g.Symbol.str2int[from], g.Symbol.str2int[to], w)
+				err = g.addWeightedEdge(g.str2int[from], g.str2int[to], w)
 				if err != nil {
 					return nil, err
 				}
