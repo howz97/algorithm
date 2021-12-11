@@ -1,4 +1,5 @@
 # 目录
+* [栈](https://github.com/howz97/algorithm/tree/master/stack)
 * [排序](https://github.com/howz97/algorithm/tree/master/sort)
 * [字符串排序](https://github.com/howz97/algorithm/tree/master/string_sort)
 * [Trie树](https://github.com/howz97/algorithm/tree/master/trie_tree)
@@ -13,6 +14,7 @@
   * 左式堆
   * 二项队列
 * [图](https://github.com/howz97/algorithm/tree/master/graphs)
+  * [符号图](https://github.com/howz97/algorithm/tree/master/symbol_graph)
   * 最小生成树
     * Lazy-Prim
     * Prim
@@ -22,3 +24,4 @@
     * Topological
     * Bellman-Ford
 * [正则表达式](https://github.com/howz97/algorithm/tree/master/regexp)
+* [压缩](https://github.com/howz97/algorithm/tree/master/huffman)
