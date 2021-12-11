@@ -14,12 +14,14 @@
   * 左式堆
   * 二项队列
 * [图](https://github.com/howz97/algorithm/tree/master/graphs)
+  * 有向图
+  * 无向图
   * [符号图](https://github.com/howz97/algorithm/tree/master/symbol_graph)
-  * 最小生成树
+  * 加权无向图-最小生成树
     * Lazy-Prim
     * Prim
     * Kruskal
-  * 最短路径
+  * 加权有向图-最短路径
     * Dijkstra
     * Topological
     * Bellman-Ford
