@@ -14,15 +14,7 @@ var (
 	ErrInputFormat      = errors.New("input format error")
 )
 
-type IGraph interface {
-	HasVertical(v int) bool
-	NumVertical() uint
-	IterateAdj(v int, fn func(a int) bool)
-	AddEdge(v1, v2 int) error
-	HasEdge(v1, v2 int) bool
-}
-
-func ReadYaml(filename string) (Digraph, error) {
+func readYaml(filename string) (Digraph, error) {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -46,7 +38,7 @@ func ReadYaml(filename string) (Digraph, error) {
 }
 
 func LoadDigraph(filename string) (Digraph, error) {
-	dg, err := ReadYaml(filename)
+	dg, err := readYaml(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +47,7 @@ func LoadDigraph(filename string) (Digraph, error) {
 }
 
 func LoadGraph(filename string) (*Graph, error) {
-	dg, err := ReadYaml(filename)
+	dg, err := readYaml(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +85,7 @@ func checkNoDirection(dg Digraph) error {
 }
 
 func LoadWDigraph(filename string) (*WDigraph, error) {
-	dg, err := ReadYaml(filename)
+	dg, err := readYaml(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +93,7 @@ func LoadWDigraph(filename string) (*WDigraph, error) {
 }
 
 func LoadWGraph(filename string) (*WGraph, error) {
-	dg, err := ReadYaml(filename)
+	dg, err := readYaml(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -110,4 +102,31 @@ func LoadWGraph(filename string) (*WGraph, error) {
 		return nil, err
 	}
 	return &WGraph{Graph{Digraph: dg}}, nil
+}
+
+func LoadSymbol(filename string) (*SymbolGraph, error) {
+	file, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	var m map[string]map[string]float64
+	err = yaml.Unmarshal(file, &m)
+	if err != nil {
+		return nil, err
+	}
+
+	sg := NewSymbolGraph()
+	for v := range m {
+		sg.scanVertical(v)
+	}
+	sg.IGraph = NewGraph(uint(len(m)))
+	for from, adj := range m {
+		for to := range adj {
+			err = sg.AddEdge(from, to)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return sg, nil
 }

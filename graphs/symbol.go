@@ -2,40 +2,29 @@ package graphs
 
 import (
 	"github.com/howz97/algorithm/util"
+	"gopkg.in/yaml.v2"
 	"strings"
 )
+
+type IGraph interface {
+	NumVertical() uint
+	IterateAdj(v int, fn func(a int) bool)
+	IterateWAdj(v int, fn func(int, float64) bool)
+	AddEdge(v1, v2 int) error
+	HasEdge(v1, v2 int) bool
+}
 
 type SymbolGraph struct {
 	str2int map[string]int
 	int2str []string
-	Graph   IGraph
+	IGraph
 }
 
-func NewSymbolGraph(filename string, scanFn func(string) ([][]string, error), newFn func(int) IGraph) (*SymbolGraph, error) {
-	input, err := scanFn(filename)
-	if err != nil {
-		return nil, err
-	}
-	sg := &SymbolGraph{
+func NewSymbolGraph() *SymbolGraph {
+	return &SymbolGraph{
 		str2int: make(map[string]int),
-		int2str: make([]string, 0),
+		int2str: nil,
 	}
-	for _, row := range input {
-		for _, v := range row {
-			sg.scanVertical(v)
-		}
-	}
-	sg.Graph = newFn(len(sg.int2str))
-	for _, row := range input {
-		if len(row) == 0 {
-			continue
-		}
-		src := row[0]
-		for _, dst := range row[1:] {
-			sg.AddEdge(src, dst)
-		}
-	}
-	return sg, nil
 }
 
 func (sg *SymbolGraph) AddEdge(src, dst string) error {
@@ -47,7 +36,7 @@ func (sg *SymbolGraph) AddEdge(src, dst string) error {
 	if !ok {
 		return ErrVerticalNotExist
 	}
-	return sg.Graph.AddEdge(iSrc, iDst)
+	return sg.IGraph.AddEdge(iSrc, iDst)
 }
 
 func (sg *SymbolGraph) HasEdge(src, dst string) bool {
@@ -59,7 +48,7 @@ func (sg *SymbolGraph) HasEdge(src, dst string) bool {
 	if !ok {
 		return false
 	}
-	return sg.Graph.HasEdge(iSrc, iDst)
+	return sg.IGraph.HasEdge(iSrc, iDst)
 }
 
 func (sg *SymbolGraph) HasVertical(v string) bool {
@@ -81,7 +70,7 @@ func (sg *SymbolGraph) RangeAdj(src string, fn func(string) bool) {
 	if !ok {
 		return
 	}
-	sg.Graph.IterateAdj(iSrc, func(adj int) bool {
+	sg.IGraph.IterateAdj(iSrc, func(adj int) bool {
 		return fn(sg.int2str[adj])
 	})
 }
@@ -91,6 +80,46 @@ func (sg *SymbolGraph) scanVertical(v string) {
 		sg.str2int[v] = len(sg.int2str)
 		sg.int2str = append(sg.int2str, v)
 	}
+}
+
+func (sg *SymbolGraph) Marshal() ([]byte, error) {
+	m := make(map[string]map[string]float64)
+	for v := 0; v < int(sg.NumVertical()); v++ {
+		edges := make(map[string]float64)
+		sg.IterateWAdj(v, func(a int, w float64) bool {
+			edges[sg.int2str[a]] = w
+			return true
+		})
+		m[sg.int2str[v]] = edges
+	}
+	return yaml.Marshal(m)
+}
+
+func LoadSymbolGraphFromTxt(filename string) (*SymbolGraph, error) {
+	input, err := ScanInput(filename)
+	if err != nil {
+		return nil, err
+	}
+	sg := &SymbolGraph{
+		str2int: make(map[string]int),
+		int2str: make([]string, 0),
+	}
+	for _, row := range input {
+		for _, v := range row {
+			sg.scanVertical(v)
+		}
+	}
+	sg.IGraph = NewGraph(uint(len(sg.int2str)))
+	for _, row := range input {
+		if len(row) == 0 {
+			continue
+		}
+		src := row[0]
+		for _, dst := range row[1:] {
+			sg.AddEdge(src, dst)
+		}
+	}
+	return sg, nil
 }
 
 func ScanInput(filename string) (input [][]string, err error) {

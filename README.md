@@ -24,6 +24,5 @@
     * Dijkstra
     * Topological
     * Bellman-Ford
-  * [符号图](https://github.com/howz97/algorithm/tree/master/symbol_graph)
 * [正则表达式](https://github.com/howz97/algorithm/tree/master/regexp)
 * [压缩](https://github.com/howz97/algorithm/tree/master/huffman)
