@@ -104,7 +104,7 @@ func LoadWGraph(filename string) (*WGraph, error) {
 	return &WGraph{Graph{Digraph: dg}}, nil
 }
 
-func LoadSymbol(filename string) (*SymbolGraph, error) {
+func LoadSymbol(filename string) (*Symbol, error) {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
