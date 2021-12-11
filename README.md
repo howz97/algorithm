@@ -16,7 +16,6 @@
 * [图](https://github.com/howz97/algorithm/tree/master/graphs)
   * 有向图
   * 无向图
-  * [符号图](https://github.com/howz97/algorithm/tree/master/symbol_graph)
   * 加权无向图-最小生成树
     * Lazy-Prim
     * Prim
@@ -25,5 +24,6 @@
     * Dijkstra
     * Topological
     * Bellman-Ford
+  * [符号图](https://github.com/howz97/algorithm/tree/master/symbol_graph)
 * [正则表达式](https://github.com/howz97/algorithm/tree/master/regexp)
 * [压缩](https://github.com/howz97/algorithm/tree/master/huffman)
