@@ -2,7 +2,10 @@ package graphs
 
 import (
 	"errors"
+	"fmt"
+	"github.com/howz97/algorithm/util"
 	"gopkg.in/yaml.v2"
+	"io/ioutil"
 )
 
 var (
@@ -11,34 +14,100 @@ var (
 	ErrInputFormat      = errors.New("input format error")
 )
 
-type ITraverse interface {
+type IGraph interface {
 	HasVertical(v int) bool
 	NumVertical() uint
 	IterateAdj(v int, fn func(a int) bool)
-}
-
-type IGraph interface {
-	ITraverse
 	AddEdge(v1, v2 int) error
 	HasEdge(v1, v2 int) bool
 }
 
-type IWGraph interface {
-	ITraverse
-	AddEdge(v1, v2 int, w float64) error
-	HasEdge(v1, v2 int) bool
-	IterateWAdj(v int, fn func(a int, w float64) bool)
+func ReadYaml(filename string) (Digraph, error) {
+	file, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	var m map[int]map[int]float64
+	err = yaml.Unmarshal(file, &m)
+	if err != nil {
+		return nil, err
+	}
+
+	g := NewDigraph(uint(len(m)))
+	for from, adj := range m {
+		for to, w := range adj {
+			err = g.addWeightedEdge(from, to, w)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return g, nil
 }
 
-func MarshalWGraph(g IWGraph) ([]byte, error) {
-	m := make(map[int]map[int]float64)
-	for v := 0; v < int(g.NumVertical()); v++ {
-		edges := make(map[int]float64)
-		g.IterateWAdj(v, func(a int, w float64) bool {
-			edges[a] = w
-			return true
-		})
-		m[v] = edges
+func LoadDigraph(filename string) (Digraph, error) {
+	dg, err := ReadYaml(filename)
+	if err != nil {
+		return nil, err
 	}
-	return yaml.Marshal(m)
+	dropWeight(dg)
+	return dg, nil
+}
+
+func LoadGraph(filename string) (*Graph, error) {
+	dg, err := ReadYaml(filename)
+	if err != nil {
+		return nil, err
+	}
+	err = checkNoDirection(dg)
+	if err != nil {
+		return nil, err
+	}
+	dropWeight(dg)
+	return &Graph{Digraph: dg}, nil
+}
+
+func dropWeight(dg Digraph) {
+	dg.IterateEdge(func(from int, to int) bool {
+		dg[from].Put(util.Int(to), 1)
+		return true
+	})
+}
+
+func checkNoDirection(dg Digraph) error {
+	var err error
+	dg.IterateWEdge(func(from, to int, w float64) bool {
+		wr, ok := dg.GetWeight(to, from)
+		if !ok {
+			err = errors.New(fmt.Sprintf("edge %d->%d has direction", from, to))
+			return false
+		}
+		if wr != w {
+			err = errors.New(fmt.Sprintf("edge %d->%d has weight %v, but %d->%d has weight %v",
+				from, to, w, to, from, wr))
+			return false
+		}
+		return true
+	})
+	return err
+}
+
+func LoadWDigraph(filename string) (*WDigraph, error) {
+	dg, err := ReadYaml(filename)
+	if err != nil {
+		return nil, err
+	}
+	return &WDigraph{Digraph: dg}, nil
+}
+
+func LoadWGraph(filename string) (*WGraph, error) {
+	dg, err := ReadYaml(filename)
+	if err != nil {
+		return nil, err
+	}
+	err = checkNoDirection(dg)
+	if err != nil {
+		return nil, err
+	}
+	return &WGraph{Graph{Digraph: dg}}, nil
 }

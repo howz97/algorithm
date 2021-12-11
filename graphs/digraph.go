@@ -4,6 +4,7 @@ import (
 	"github.com/howz97/algorithm/search/hash_map"
 	"github.com/howz97/algorithm/stack"
 	"github.com/howz97/algorithm/util"
+	"gopkg.in/yaml.v2"
 	"strconv"
 )
 
@@ -17,7 +18,7 @@ func NewDigraph(size uint) Digraph {
 	return dg
 }
 
-func NewDigraphBy2DSli(sli [][]int) (Digraph, error) {
+func NewDigraphBy2DSli(sli [][]int) (Digraph, error) { // todo deprecated
 	dg := NewDigraph(uint(len(sli)))
 	var err error
 	for src, s := range sli {
@@ -424,4 +425,17 @@ func (dg Digraph) TotalWeight() float64 {
 		return true
 	})
 	return total
+}
+
+func (dg Digraph) Marshal() ([]byte, error) {
+	m := make(map[int]map[int]float64)
+	for v := 0; v < int(dg.NumVertical()); v++ {
+		edges := make(map[int]float64)
+		dg.IterateWAdj(v, func(a int, w float64) bool {
+			edges[a] = w
+			return true
+		})
+		m[v] = edges
+	}
+	return yaml.Marshal(m)
 }

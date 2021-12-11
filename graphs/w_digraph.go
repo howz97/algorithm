@@ -2,8 +2,6 @@ package graphs
 
 import (
 	"github.com/howz97/algorithm/stack"
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
 )
 
 // WDigraph is edge weighted digraph without self loop
@@ -17,34 +15,12 @@ func NewWDigraph(size uint) *WDigraph {
 	}
 }
 
-func LoadWDigraph(filename string) (*WDigraph, error) {
-	file, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	var m map[int]map[int]float64
-	err = yaml.Unmarshal(file, &m)
-	if err != nil {
-		return nil, err
-	}
-	g := NewWDigraph(uint(len(m)))
-	for src, adj := range m {
-		for dst, w := range adj {
-			err = g.AddEdge(src, dst, w)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-	return g, nil
-}
-
 func (g *WDigraph) AddEdge(src, dst int, w float64) error {
 	return g.addWeightedEdge(src, dst, w)
 }
 
 func (g *WDigraph) String() string {
-	bytes, err := MarshalWGraph(g)
+	bytes, err := g.Marshal()
 	if err != nil {
 		return err.Error()
 	}
