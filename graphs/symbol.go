@@ -1,28 +1,28 @@
 package graphs
 
 type Symbol struct {
-	str2int map[string]int
-	int2str []string
+	syb2vet map[string]int
+	vet2syb []string
 }
 
 func NewSymbolGraph() *Symbol {
 	return &Symbol{
-		str2int: make(map[string]int),
-		int2str: nil,
+		syb2vet: make(map[string]int),
+		vet2syb: nil,
 	}
 }
 
 func (sg *Symbol) scanVertical(v string) {
-	if _, ok := sg.str2int[v]; !ok {
-		sg.str2int[v] = len(sg.int2str)
-		sg.int2str = append(sg.int2str, v)
+	if _, ok := sg.syb2vet[v]; !ok {
+		sg.syb2vet[v] = len(sg.vet2syb)
+		sg.vet2syb = append(sg.vet2syb, v)
 	}
 }
 
 func (sg *Symbol) SymbolOf(v int) string {
-	return sg.int2str[v]
+	return sg.vet2syb[v]
 }
 
 func (sg *Symbol) VetOf(s string) int {
-	return sg.str2int[s]
+	return sg.syb2vet[s]
 }

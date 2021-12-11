@@ -9,7 +9,7 @@ import (
 )
 
 type Digraph struct {
-	Edges  []*hash_map.Chaining
+	Edges []*hash_map.Chaining
 	*Symbol
 }
 
@@ -438,14 +438,14 @@ func (dg *Digraph) Marshal() ([]byte, error) {
 			if dg.Symbol == nil {
 				edges[strconv.Itoa(a)] = w
 			} else {
-				edges[dg.int2str[a]] = w
+				edges[dg.vet2syb[a]] = w
 			}
 			return true
 		})
 		if dg.Symbol == nil {
 			m[strconv.Itoa(v)] = edges
 		} else {
-			m[dg.int2str[v]] = edges
+			m[dg.vet2syb[v]] = edges
 		}
 	}
 	return yaml.Marshal(m)

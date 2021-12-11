@@ -32,7 +32,7 @@ func readYaml(filename string, isSymbol bool) (*Digraph, error) {
 		}
 		for from, adj := range m {
 			for to, w := range adj {
-				err = g.addWeightedEdge(g.str2int[from], g.str2int[to], w)
+				err = g.addWeightedEdge(g.syb2vet[from], g.syb2vet[to], w)
 				if err != nil {
 					return nil, err
 				}
