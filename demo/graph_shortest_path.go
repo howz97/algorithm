@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	g, err := graphs.LoadWDigraph("../graphs/test_data/w_digraph.yml", false)
+	g, err := graphs.LoadWDigraph("../graphs/test_data/w_digraph.yml")
 	if err != nil {
 		panic(err)
 	}
