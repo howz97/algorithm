@@ -559,7 +559,7 @@ type BFS struct {
 	edgeTo []int
 }
 
-func (dg Digraph) NewBFS(src int) *BFS {
+func (dg Digraph) BFS(src int) *BFS {
 	if !dg.HasVertical(src) {
 		return nil
 	}
@@ -592,21 +592,23 @@ func (bfs *BFS) CanReach(dst int) bool {
 	return bfs.marked[dst]
 }
 
-func (bfs *BFS) ShortestPathTo(dst int) []int {
+func (bfs *BFS) ShortestPathTo(dst int) *Path {
 	if !bfs.CanReach(dst) {
 		return nil
 	}
 	if dst == bfs.src {
-		return []int{dst}
+		return nil
 	}
-	path := make([]int, 0, 2)
-	path = append(path, dst)
-	for bfs.edgeTo[dst] != bfs.src {
+	path := &Path{
+		stk:      stack.NewInt(2),
+		distance: 0,
+	}
+	for dst != bfs.src {
+		path.stk.Push(dst)
+		path.distance++
 		dst = bfs.edgeTo[dst]
-		path = append(path, dst)
 	}
-	path = append(path, bfs.src)
-	util.ReverseInts(path)
+	path.stk.Push(bfs.src)
 	return path
 }
 

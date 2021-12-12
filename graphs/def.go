@@ -93,7 +93,7 @@ func LoadGraph(filename string) (*Graph, error) {
 
 func dropWeight(dg *Digraph) {
 	dg.IterateEdge(func(from int, to int) bool {
-		dg.Edges[from].Put(util.Int(to), 1)
+		dg.Edges[from].Put(util.Int(to), float64(1))
 		return true
 	})
 }

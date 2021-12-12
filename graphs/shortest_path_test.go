@@ -33,13 +33,13 @@ func TestEWD_Integer(t *testing.T) {
 		for dst := 0; dst < num; dst++ {
 			p0 := spsDijkstra.GetPath(src, dst)
 			p1 := spsTop.GetPath(src, dst)
-			if !isPathEqual(p0.stk, p1.stk) {
+			if !isPathEqual(&p0.stk.Stack, &p1.stk.Stack) {
 				t.Errorf("path(%d->%d) not equal: \np0=%s, \np1=%s \n", src, dst, p0, p1)
 			}
 
 			p0 = spsDijkstra.GetPath(src, dst)
 			p1 = spsBF.GetPath(src, dst)
-			if !isPathEqual(p0.stk, p1.stk) {
+			if !isPathEqual(&p0.stk.Stack, &p1.stk.Stack) {
 				t.Errorf("path(%d->%d) not equal: \np0=%s, \np1=%s \n", src, dst, p0, p1)
 			}
 		}

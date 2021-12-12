@@ -16,7 +16,7 @@ const (
 )
 
 type Path struct {
-	stk      *stack.Stack
+	stk      *stack.IntStack
 	distance float64
 }
 
@@ -28,6 +28,18 @@ func (p *Path) String() string {
 	str += fmt.Sprint(p.stk.Pop())
 	for p.stk.Size() > 0 {
 		str += fmt.Sprint("->", p.stk.Pop())
+	}
+	return str
+}
+
+func (p *Path) Symbol(s *Symbol) string {
+	if p == nil {
+		return "path not exist"
+	}
+	str := fmt.Sprintf("(distance=%v): ", p.distance)
+	str += fmt.Sprint(s.SymbolOf(p.stk.Pop()))
+	for p.stk.Size() > 0 {
+		str += fmt.Sprint("->", s.SymbolOf(p.stk.Pop()))
 	}
 	return str
 }
@@ -76,7 +88,7 @@ func (spt *PathTree) PathTo(dst int) *Path {
 	if src < 0 {
 		return nil
 	}
-	path := stack.New(spt.NumVertical())
+	path := stack.NewInt(spt.NumVertical())
 	for {
 		path.Push(dst)
 		dst = src

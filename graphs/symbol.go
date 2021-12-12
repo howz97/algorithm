@@ -24,5 +24,9 @@ func (sg *Symbol) SymbolOf(v int) string {
 }
 
 func (sg *Symbol) VetOf(s string) int {
-	return sg.syb2vet[s]
+	v, ok := sg.syb2vet[s]
+	if !ok {
+		return -1
+	}
+	return v
 }
