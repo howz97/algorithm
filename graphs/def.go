@@ -1,6 +1,7 @@
 package graphs
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/howz97/algorithm/util"
@@ -11,26 +12,30 @@ import (
 var (
 	ErrVerticalNotExist = errors.New("vertical not exist")
 	ErrSelfLoop         = errors.New("not support self loop")
-	ErrInputFormat      = errors.New("input format error")
 	ErrInvalidYaml      = errors.New("input yaml file is invalid")
 )
 
-func readYaml(filename string, isSymbol bool) (*Digraph, error) {
-	file, err := ioutil.ReadFile(filename)
+func readYaml(filename string) (*Digraph, error) {
+	content, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
+	}
+	isSymbol := false
+	if bytes.IndexByte(content, '"') >= 0 {
+		isSymbol = true
 	}
 	var g *Digraph
 	if isSymbol {
 		var m map[string]map[string]float64
-		yaml.Unmarshal(file, &m)
+		err = yaml.Unmarshal(content, &m)
 		if err != nil {
 			return nil, err
 		}
 		if len(m) == 0 {
 			return nil, ErrInvalidYaml
 		}
-		g = &Digraph{Symbol: NewSymbolGraph()}
+		g = NewDigraph(uint(len(m)))
+		g.Symbol = NewSymbolGraph()
 		for v := range m {
 			g.scanVertical(v)
 		}
@@ -44,7 +49,7 @@ func readYaml(filename string, isSymbol bool) (*Digraph, error) {
 		}
 	} else {
 		var m map[int]map[int]float64
-		err = yaml.Unmarshal(file, &m)
+		err = yaml.Unmarshal(content, &m)
 		if err != nil {
 			return nil, err
 		}
@@ -64,8 +69,8 @@ func readYaml(filename string, isSymbol bool) (*Digraph, error) {
 	return g, nil
 }
 
-func LoadDigraph(filename string, isSymbol bool) (*Digraph, error) {
-	dg, err := readYaml(filename, isSymbol)
+func LoadDigraph(filename string) (*Digraph, error) {
+	dg, err := readYaml(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -73,8 +78,8 @@ func LoadDigraph(filename string, isSymbol bool) (*Digraph, error) {
 	return dg, nil
 }
 
-func LoadGraph(filename string, isSymbol bool) (*Graph, error) {
-	dg, err := readYaml(filename, isSymbol)
+func LoadGraph(filename string) (*Graph, error) {
+	dg, err := readYaml(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -111,16 +116,16 @@ func checkNoDirection(dg *Digraph) error {
 	return err
 }
 
-func LoadWDigraph(filename string, isSymbol bool) (*WDigraph, error) {
-	dg, err := readYaml(filename, isSymbol)
+func LoadWDigraph(filename string) (*WDigraph, error) {
+	dg, err := readYaml(filename)
 	if err != nil {
 		return nil, err
 	}
 	return &WDigraph{Digraph: *dg}, nil
 }
 
-func LoadWGraph(filename string, isSymbol bool) (*WGraph, error) {
-	dg, err := readYaml(filename, isSymbol)
+func LoadWGraph(filename string) (*WGraph, error) {
+	dg, err := readYaml(filename)
 	if err != nil {
 		return nil, err
 	}

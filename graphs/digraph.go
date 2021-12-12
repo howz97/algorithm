@@ -120,11 +120,17 @@ func (dg *Digraph) GetWeight(from, to int) (float64, bool) {
 }
 
 func (dg *Digraph) String() string {
+	var i2a func(int) string
+	if dg.Symbol != nil {
+		i2a = dg.SymbolOf
+	} else {
+		i2a = strconv.Itoa
+	}
 	out := ""
 	for i := range dg.Edges {
-		out += strconv.Itoa(i) + " :"
+		out += i2a(i) + " :"
 		dg.IterateAdj(i, func(j int) bool {
-			out += " " + strconv.Itoa(j)
+			out += " " + i2a(j)
 			return true
 		})
 		out += "\n"
