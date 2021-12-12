@@ -20,7 +20,7 @@ func Test_LeftistHeap(t *testing.T) {
 	}
 
 	for i := 0; i < 20; i++ {
-		k, ok := lh1.Front()
+		k, ok := lh1.Peek()
 		if !ok {
 			t.Fatal()
 		}
@@ -28,6 +28,6 @@ func Test_LeftistHeap(t *testing.T) {
 			println(i, k)
 			t.Fatal()
 		}
-		lh1.DelMin()
+		lh1.Pop()
 	}
 }

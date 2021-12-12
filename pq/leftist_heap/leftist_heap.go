@@ -1,55 +1,52 @@
 package leftist
 
-func New() *Heap {
-	return new(Heap)
+import . "github.com/howz97/algorithm/util"
+
+func New() *LeftHeap {
+	return new(LeftHeap)
 }
 
-type Heap struct {
+type LeftHeap struct {
 	h    *node
 	size int
 }
 
-func (lh *Heap) Push(k int) {
+func (lh *LeftHeap) Push(p Comparable, v T) {
 	n := new(node)
-	n.k = k
+	n.priority = p
+	n.val = v
 	lh.h = lh.h.insert(n)
 	lh.size++
 }
 
-func (lh *Heap) Front() (k int, ok bool) {
-	if lh.h == nil {
-		return 0, false
-	}
-	return lh.h.k, true
+func (lh *LeftHeap) Peek() T {
+	return lh.h.val
 }
 
-func (lh *Heap) DelMin() {
+func (lh *LeftHeap) Pop() {
 	lh.h = lh.h.delMin()
 	lh.size--
 }
 
-func (lh *Heap) Merge(lh1 *Heap) {
-	lh.h = merge(lh.h, lh1.h)
-	lh.size += lh1.size
+func (lh *LeftHeap) Merge(other *LeftHeap) {
+	lh.h = merge(lh.h, other.h)
+	lh.size += other.size
 }
 
-func (lh *Heap) Size() int {
+func (lh *LeftHeap) Size() int {
 	return lh.size
 }
 
 type node struct {
-	k     int // priority key
-	left  *node
-	right *node
-	npl   int
+	priority Comparable
+	val      T
+	npl      int // null path length
+	left     *node
+	right    *node
 }
 
-func (h *node) insert(h1 *node) *node {
-	return merge(h, h1)
-}
-
-func (h *node) front() int {
-	return h.k
+func (h *node) insert(other *node) *node {
+	return merge(h, other)
 }
 
 func (h *node) delMin() *node {
@@ -66,7 +63,7 @@ func merge(h1, h2 *node) *node {
 	if h2 == nil {
 		return h1
 	}
-	if h1.k < h2.k {
+	if h1.priority.Cmp(h2.priority) == Less {
 		h1.merge1(h2)
 		return h1
 	}
@@ -80,7 +77,7 @@ func (h *node) merge1(h1 *node) {
 		return
 	}
 	h.right = merge(h.right, h1)
-	if h.left.k < h.right.k {
+	if h.left.priority.Cmp(h.right.priority) == Less {
 		h.left, h.right = h.right, h.left
 	}
 	h.npl = h.right.npl + 1
