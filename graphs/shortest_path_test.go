@@ -7,7 +7,7 @@ import (
 )
 
 func TestEWD_Integer(t *testing.T) {
-	g, err := LoadWDigraph("no_cycle.yml", false)
+	g, err := LoadWDigraph("no_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,7 +64,7 @@ func isPathEqual(s0, s1 *stack.Stack) bool {
 }
 
 func TestNewSPS_Dijkstra(t *testing.T) {
-	g, err := LoadWDigraph("w_digraph.yml", false)
+	g, err := LoadWDigraph("w_digraph.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,7 +80,7 @@ func TestNewSPS_Dijkstra(t *testing.T) {
 }
 
 func TestNewSPS_Topological(t *testing.T) {
-	g, err := LoadWDigraph("no_cycle.yml", false)
+	g, err := LoadWDigraph("no_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,7 +94,7 @@ func TestNewSPS_Topological(t *testing.T) {
 }
 
 func TestPathTree_Top(t *testing.T) {
-	g, err := LoadWDigraph("no_cycle.yml", false)
+	g, err := LoadWDigraph("no_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,7 +117,7 @@ func TestPathTree_Top(t *testing.T) {
 }
 
 func TestNewSPS_BellmanFord(t *testing.T) {
-	g, err := LoadWDigraph("negative_cycle.yml", false)
+	g, err := LoadWDigraph("negative_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
