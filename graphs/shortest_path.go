@@ -16,6 +16,27 @@ const (
 	BellmanFord
 )
 
+type Path struct {
+	stk      *stack.Stack
+	distance float64
+}
+
+func (p *Path) String() string {
+	if p == nil {
+		return "path not exist"
+	}
+	str := fmt.Sprintf("(distance=%v):", p.distance)
+	str += fmt.Sprint(p.stk.Pop())
+	for {
+		v, ok := p.stk.Pop()
+		if !ok {
+			break
+		}
+		str += fmt.Sprint("->", v)
+	}
+	return str
+}
+
 type ShortestPathTree struct {
 	src    int
 	distTo []float64
@@ -77,7 +98,7 @@ func (spt *ShortestPathTree) DistanceTo(dst int) float64 {
 	return spt.distTo[dst]
 }
 
-func (spt *ShortestPathTree) PathTo(dst int) *stack.Stack {
+func (spt *ShortestPathTree) PathTo(dst int) *Path {
 	if !spt.HasVertical(dst) {
 		return nil
 	}
@@ -95,7 +116,10 @@ func (spt *ShortestPathTree) PathTo(dst int) *stack.Stack {
 		}
 	}
 	path.Push(spt.src)
-	return path
+	return &Path{
+		stk:      path,
+		distance: spt.distTo[dst],
+	}
 }
 
 func (spt *ShortestPathTree) NumVertical() int {
@@ -206,4 +230,76 @@ func bellmanFordRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, needRe
 		}
 		return true
 	})
+}
+
+type PathSearcher struct {
+	spt []*ShortestPathTree
+}
+
+func (g *WDigraph) SearcherDijkstra() (*PathSearcher, error) {
+	if src, dst := g.FindNegativeEdge(); src >= 0 {
+		return nil, errors.New(fmt.Sprintf("negative edge %d->%d", src, dst))
+	}
+	sps := &PathSearcher{
+		spt: make([]*ShortestPathTree, g.NumVertical()),
+	}
+	for v := range sps.spt {
+		tree := newShortestPathTree(g, v)
+		tree.initDijkstra(g)
+		sps.spt[v] = tree
+	}
+	return sps, nil
+}
+
+func (g *WDigraph) SearcherTopological() (*PathSearcher, error) {
+	if cycle := g.FindCycle(); cycle != nil {
+		return nil, ErrCycle{Stack: cycle}
+	}
+	sps := &PathSearcher{
+		spt: make([]*ShortestPathTree, g.NumVertical()),
+	}
+	for v := range sps.spt {
+		tree := newShortestPathTree(g, v)
+		tree.initTopological(g)
+		sps.spt[v] = tree
+	}
+	return sps, nil
+}
+
+func (g *WDigraph) SearcherBellmanFord() (*PathSearcher, error) {
+	sps := &PathSearcher{
+		spt: make([]*ShortestPathTree, g.NumVertical()),
+	}
+	var err error
+	for v := range sps.spt {
+		tree := newShortestPathTree(g, v)
+		err = tree.InitBellmanFord(g)
+		if err != nil {
+			return nil, err
+		}
+		sps.spt[v] = tree
+	}
+	return sps, nil
+}
+
+func (s *PathSearcher) Distance(src, dst int) float64 {
+	if !s.HasVertical(src) {
+		return math.Inf(1)
+	}
+	return s.spt[src].DistanceTo(dst)
+}
+
+func (s *PathSearcher) Path(src, dst int) *Path {
+	if !s.HasVertical(src) {
+		return nil
+	}
+	return s.spt[src].PathTo(dst)
+}
+
+func (s *PathSearcher) PrintPath(src, dst int) {
+
+}
+
+func (s *PathSearcher) HasVertical(v int) bool {
+	return v >= 0 && v < len(s.spt)
 }

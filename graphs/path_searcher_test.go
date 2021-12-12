@@ -7,7 +7,7 @@ import (
 )
 
 func TestEWD_Integer(t *testing.T) {
-	g, err := LoadWDigraph("no_cycle.yml")
+	g, err := LoadWDigraph("no_cycle.yml", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -33,14 +33,14 @@ func TestEWD_Integer(t *testing.T) {
 		for dst := 0; dst < num; dst++ {
 			p0 := spsDijkstra.Path(src, dst)
 			p1 := spsTop.Path(src, dst)
-			if !isPathEqual(p0, p1) {
-				t.Errorf("path(%d->%d) not equal: \np0=%s, \np1=%s \n", src, dst, p0.String(), p1.String())
+			if !isPathEqual(p0.stk, p1.stk) {
+				t.Errorf("path(%d->%d) not equal: \np0=%s, \np1=%s \n", src, dst, p0, p1)
 			}
 
 			p0 = spsDijkstra.Path(src, dst)
 			p1 = spsBF.Path(src, dst)
-			if !isPathEqual(p0, p1) {
-				t.Errorf("path(%d->%d) not equal: \np0=%s, \np1=%s \n", src, dst, p0.String(), p1.String())
+			if !isPathEqual(p0.stk, p1.stk) {
+				t.Errorf("path(%d->%d) not equal: \np0=%s, \np1=%s \n", src, dst, p0, p1)
 			}
 		}
 	}
@@ -67,7 +67,7 @@ func isPathEqual(s0, s1 *stack.Stack) bool {
 }
 
 func TestNewSPS_Dijkstra(t *testing.T) {
-	g, err := LoadWDigraph("w_digraph.yml")
+	g, err := LoadWDigraph("w_digraph.yml", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,13 +77,13 @@ func TestNewSPS_Dijkstra(t *testing.T) {
 	num := int(g.NumVertical())
 	for src := 0; src < num; src++ {
 		for dst := 0; dst < num; dst++ {
-			sps.PrintPath(src, dst)
+			fmt.Println(sps.Path(src, dst).String())
 		}
 	}
 }
 
 func TestNewSPS_Topological(t *testing.T) {
-	g, err := LoadWDigraph("no_cycle.yml")
+	g, err := LoadWDigraph("no_cycle.yml", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,13 +91,13 @@ func TestNewSPS_Topological(t *testing.T) {
 	num := int(g.NumVertical())
 	for src := 0; src < num; src++ {
 		for dst := 0; dst < num; dst++ {
-			sps.PrintPath(src, dst)
+			fmt.Println(sps.Path(src, dst).String())
 		}
 	}
 }
 
 func TestPathTree_Top(t *testing.T) {
-	g, err := LoadWDigraph("no_cycle.yml")
+	g, err := LoadWDigraph("no_cycle.yml", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -120,7 +120,7 @@ func TestPathTree_Top(t *testing.T) {
 }
 
 func TestNewSPS_BellmanFord(t *testing.T) {
-	g, err := LoadWDigraph("negative_cycle.yml")
+	g, err := LoadWDigraph("negative_cycle.yml", false)
 	if err != nil {
 		t.Fatal(err)
 	}
