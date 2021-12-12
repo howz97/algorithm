@@ -33,14 +33,14 @@ func (p *Path) String() string {
 	return str
 }
 
-type ShortestPathTree struct {
+type PathTree struct {
 	src    int
 	distTo []float64
 	edgeTo []int
 }
 
-func newShortestPathTree(g *WDigraph, src int) *ShortestPathTree {
-	spt := &ShortestPathTree{
+func newShortestPathTree(g *WDigraph, src int) *PathTree {
+	spt := &PathTree{
 		src:    src,
 		distTo: make([]float64, g.NumVertical()),
 		edgeTo: make([]int, g.NumVertical()),
@@ -55,7 +55,7 @@ func newShortestPathTree(g *WDigraph, src int) *ShortestPathTree {
 	return spt
 }
 
-func (g *WDigraph) NewShortestPathTree(src int, alg int) (*ShortestPathTree, error) {
+func (g *WDigraph) NewShortestPathTree(src int, alg int) (*PathTree, error) {
 	if !g.HasVertical(src) {
 		return nil, ErrVerticalNotExist
 	}
@@ -80,21 +80,21 @@ func (g *WDigraph) NewShortestPathTree(src int, alg int) (*ShortestPathTree, err
 	return spt, err
 }
 
-func (spt *ShortestPathTree) CanReach(dst int) bool {
+func (spt *PathTree) CanReach(dst int) bool {
 	if !spt.HasVertical(dst) {
 		return false
 	}
 	return spt.distTo[dst] != math.Inf(1)
 }
 
-func (spt *ShortestPathTree) DistanceTo(dst int) float64 {
+func (spt *PathTree) DistanceTo(dst int) float64 {
 	if !spt.HasVertical(dst) {
 		return math.Inf(1)
 	}
 	return spt.distTo[dst]
 }
 
-func (spt *ShortestPathTree) PathTo(dst int) *Path {
+func (spt *PathTree) PathTo(dst int) *Path {
 	if !spt.HasVertical(dst) {
 		return nil
 	}
@@ -118,17 +118,17 @@ func (spt *ShortestPathTree) PathTo(dst int) *Path {
 	}
 }
 
-func (spt *ShortestPathTree) NumVertical() int {
+func (spt *PathTree) NumVertical() int {
 	return len(spt.distTo)
 }
 
-func (spt *ShortestPathTree) HasVertical(v int) bool {
+func (spt *PathTree) HasVertical(v int) bool {
 	return v >= 0 && v < len(spt.distTo)
 }
 
 // ============================ Dijkstra ============================
 
-func (spt *ShortestPathTree) initDijkstra(g *WDigraph) {
+func (spt *PathTree) initDijkstra(g *WDigraph) {
 	pq := heap.New(g.NumVertical())
 	dijkstraRelax(g, spt.src, spt.edgeTo, spt.distTo, pq)
 	for !pq.IsEmpty() {
@@ -155,7 +155,7 @@ func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *heap.
 
 // ============================ Topological ============================
 
-func (spt *ShortestPathTree) initTopological(g *WDigraph) {
+func (spt *PathTree) initTopological(g *WDigraph) {
 	order := stack.NewInt(int(g.NumVertical()))
 	g.IterateRDFSFromVet(spt.src, func(v int) bool {
 		order.Push(v)
@@ -187,7 +187,7 @@ func (nc ErrCycle) Error() string {
 	return "weight negative cycle: " + nc.Stack.String()
 }
 
-func (spt *ShortestPathTree) InitBellmanFord(g *WDigraph) error {
+func (spt *PathTree) InitBellmanFord(g *WDigraph) error {
 	needRelax := queue.NewIntQ()
 	onQ := make([]bool, spt.NumVertical())
 	needRelax.PushBack(spt.src)
@@ -207,7 +207,7 @@ func (spt *ShortestPathTree) InitBellmanFord(g *WDigraph) error {
 	return nil
 }
 
-func (spt *ShortestPathTree) findNegativeCycle(g *WDigraph) *stack.IntStack {
+func (spt *PathTree) findNegativeCycle(g *WDigraph) *stack.IntStack {
 	return g.AnyNegativeCycle() // todo: optimize ?
 }
 
@@ -225,16 +225,16 @@ func bellmanFordRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, needRe
 	})
 }
 
-type PathSearcher struct {
-	spt []*ShortestPathTree
+type Searcher struct {
+	spt []*PathTree
 }
 
-func (g *WDigraph) SearcherDijkstra() (*PathSearcher, error) {
+func (g *WDigraph) SearcherDijkstra() (*Searcher, error) {
 	if src, dst := g.FindNegativeEdge(); src >= 0 {
 		return nil, errors.New(fmt.Sprintf("negative edge %d->%d", src, dst))
 	}
-	sps := &PathSearcher{
-		spt: make([]*ShortestPathTree, g.NumVertical()),
+	sps := &Searcher{
+		spt: make([]*PathTree, g.NumVertical()),
 	}
 	for v := range sps.spt {
 		tree := newShortestPathTree(g, v)
@@ -244,12 +244,12 @@ func (g *WDigraph) SearcherDijkstra() (*PathSearcher, error) {
 	return sps, nil
 }
 
-func (g *WDigraph) SearcherTopological() (*PathSearcher, error) {
+func (g *WDigraph) SearcherTopological() (*Searcher, error) {
 	if cycle := g.FindCycle(); cycle != nil {
 		return nil, ErrCycle{Stack: cycle}
 	}
-	sps := &PathSearcher{
-		spt: make([]*ShortestPathTree, g.NumVertical()),
+	sps := &Searcher{
+		spt: make([]*PathTree, g.NumVertical()),
 	}
 	for v := range sps.spt {
 		tree := newShortestPathTree(g, v)
@@ -259,9 +259,9 @@ func (g *WDigraph) SearcherTopological() (*PathSearcher, error) {
 	return sps, nil
 }
 
-func (g *WDigraph) SearcherBellmanFord() (*PathSearcher, error) {
-	sps := &PathSearcher{
-		spt: make([]*ShortestPathTree, g.NumVertical()),
+func (g *WDigraph) SearcherBellmanFord() (*Searcher, error) {
+	sps := &Searcher{
+		spt: make([]*PathTree, g.NumVertical()),
 	}
 	var err error
 	for v := range sps.spt {
@@ -275,20 +275,20 @@ func (g *WDigraph) SearcherBellmanFord() (*PathSearcher, error) {
 	return sps, nil
 }
 
-func (s *PathSearcher) Distance(src, dst int) float64 {
+func (s *Searcher) GetDistance(src, dst int) float64 {
 	if !s.HasVertical(src) {
 		return math.Inf(1)
 	}
 	return s.spt[src].DistanceTo(dst)
 }
 
-func (s *PathSearcher) GetPath(src, dst int) *Path {
+func (s *Searcher) GetPath(src, dst int) *Path {
 	if !s.HasVertical(src) {
 		return nil
 	}
 	return s.spt[src].PathTo(dst)
 }
 
-func (s *PathSearcher) HasVertical(v int) bool {
+func (s *Searcher) HasVertical(v int) bool {
 	return v >= 0 && v < len(s.spt)
 }

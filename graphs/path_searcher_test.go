@@ -12,9 +12,9 @@ func TestEWD_Integer(t *testing.T) {
 		t.Fatal(err)
 	}
 	var (
-		spsDijkstra *PathSearcher
-		spsTop      *PathSearcher
-		spsBF       *PathSearcher
+		spsDijkstra *Searcher
+		spsTop      *Searcher
+		spsBF       *Searcher
 	)
 	spsDijkstra, err = g.SearcherDijkstra()
 	if err != nil {
