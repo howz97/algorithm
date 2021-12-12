@@ -3,7 +3,7 @@ package graphs
 import (
 	"errors"
 	"fmt"
-	pqueue "github.com/howz97/algorithm/pq/heap"
+	"github.com/howz97/algorithm/pq/heap"
 	"github.com/howz97/algorithm/queue"
 	"github.com/howz97/algorithm/stack"
 	"github.com/howz97/algorithm/util"
@@ -129,7 +129,7 @@ func (spt *ShortestPathTree) HasVertical(v int) bool {
 // ============================ Dijkstra ============================
 
 func (spt *ShortestPathTree) initDijkstra(g *WDigraph) {
-	pq := pqueue.New(g.NumVertical())
+	pq := heap.New(g.NumVertical())
 	dijkstraRelax(g, spt.src, spt.edgeTo, spt.distTo, pq)
 	for !pq.IsEmpty() {
 		m := pq.Pop().(int)
@@ -137,7 +137,7 @@ func (spt *ShortestPathTree) initDijkstra(g *WDigraph) {
 	}
 }
 
-func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *pqueue.Heap) {
+func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *heap.Heap) {
 	g.IterateWAdj(v, func(adj int, w float64) bool {
 		if distTo[v]+w < distTo[adj] {
 			inPQ := distTo[adj] != math.Inf(1)
