@@ -2,24 +2,27 @@
 ```go
 package main
 
-import wDigraph "github.com/howz97/algorithm/graphs/wdigraph"
+import (
+	"fmt"
+	"github.com/howz97/algorithm/graphs"
+)
 
 func main() {
-	g, err := wDigraph.ImportEWD("../graphs/wdigraph/tinyEWD.txt")
+	g, err := graphs.LoadWDigraph("../graphs/test_data/w_digraph.yml")
 	if err != nil {
 		panic(err)
 	}
-	pathSearcher, err := g.GenSearcherDijkstra()
-	//pathSearcher, err := g.GenSearcherTopological()
-	//pathSearcher, err := g.GenSearcherBellmanFord()
+	searcher, err := g.SearcherDijkstra()
+	//searcher, err := g.SearcherTopological()
+	//searcher, err := g.SearcherBellmanFord()
 	if err != nil {
 		panic(err)
 	}
-	pathSearcher.PrintPath(0, 7)
+	fmt.Println(searcher.GetPath(1, 2).String())
+
+	/*
+		(distance=0): 1->3->6->2
+	*/
 }
 
-/*
-output：
-PATH: 0->2->7 (distance 0.6000000000000001)
-*/
 ```
