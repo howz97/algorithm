@@ -25,14 +25,10 @@ func (p *Path) String() string {
 	if p == nil {
 		return "path not exist"
 	}
-	str := fmt.Sprintf("(distance=%v):", p.distance)
+	str := fmt.Sprintf("(distance=%v): ", p.distance)
 	str += fmt.Sprint(p.stk.Pop())
-	for {
-		v, ok := p.stk.Pop()
-		if !ok {
-			break
-		}
-		str += fmt.Sprint("->", v)
+	for p.stk.Size() > 0 {
+		str += fmt.Sprint("->", p.stk.Pop())
 	}
 	return str
 }
@@ -165,11 +161,8 @@ func (spt *ShortestPathTree) initTopological(g *WDigraph) {
 		order.Push(v)
 		return true
 	})
-	for {
-		v, ok := order.Pop()
-		if !ok {
-			break
-		}
+	for order.Size() > 0 {
+		v := order.Pop()
 		topologicalRelax(g, v, spt.edgeTo, spt.distTo)
 	}
 }
@@ -294,10 +287,6 @@ func (s *PathSearcher) Path(src, dst int) *Path {
 		return nil
 	}
 	return s.spt[src].PathTo(dst)
-}
-
-func (s *PathSearcher) PrintPath(src, dst int) {
-
 }
 
 func (s *PathSearcher) HasVertical(v int) bool {

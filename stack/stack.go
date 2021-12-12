@@ -31,12 +31,9 @@ func (s *Stack) Cap() int {
 	return len(s.elems)
 }
 
-func (s *Stack) Pop() (T, bool) {
-	if s.Size() <= 0 {
-		return nil, false
-	}
+func (s *Stack) Pop() T {
 	s.top--
-	return s.elems[s.top], true
+	return s.elems[s.top]
 }
 
 func (s *Stack) Push(e T) {

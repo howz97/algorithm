@@ -131,11 +131,10 @@ func compile(pattern []rune) ([]rune, error) {
 			lpStack.Push(len(compiled))
 			compiled = append(compiled, '(')
 		case ')':
-			var ok bool
-			left, ok = lpStack.Pop()
-			if !ok {
+			if lpStack.Size() <= 0 {
 				return nil, errors.New("'(' missing")
 			}
+			left = lpStack.Pop()
 			compiled = append(compiled, ')')
 		case '+':
 			// "(regexp)+" -> "(regexp)(regexp)*"
@@ -245,10 +244,7 @@ func makeNFA(table []symbol) graphs.Digraph {
 				nfa.AddEdge(i, i+1)
 				allOr := queue.NewIntQ()
 				for {
-					out, ok := stk.Pop()
-					if !ok {
-						panic("symbol '(' missing, this should be detected at compile stage")
-					}
+					out := stk.Pop()
 					if table[out].r == '|' {
 						allOr.PushBack(out)
 					} else {

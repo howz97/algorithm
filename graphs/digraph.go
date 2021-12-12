@@ -190,10 +190,10 @@ func (dg *Digraph) FindCycleFrom(v int) *stack.IntStack {
 
 func ParseCycleInStack(stk *stack.IntStack) []int {
 	path := make([]int, 0, stk.Size())
-	w, _ := stk.Pop()
+	w := stk.Pop()
 	path = append(path, w)
 	for {
-		v, _ := stk.Pop()
+		v := stk.Pop()
 		path = append(path, v)
 		if v == w {
 			break

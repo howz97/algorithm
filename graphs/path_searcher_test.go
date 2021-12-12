@@ -53,12 +53,9 @@ func isPathEqual(s0, s1 *stack.Stack) bool {
 	if s0 == nil {
 		return true
 	}
-	for {
-		e0, ok := s0.Pop()
-		if !ok {
-			break
-		}
-		e1, _ := s1.Pop()
+	for s0.Size() > 0 {
+		e0 := s0.Pop()
+		e1 := s1.Pop()
 		if e0 != e1 {
 			return false
 		}

@@ -10,21 +10,14 @@ func NewInt(c int) *IntStack {
 	}
 }
 
-func (s *IntStack) Pop() (int, bool) {
-	e, ok := s.Stack.Pop()
-	if !ok {
-		return 0, false
-	}
-	return e.(int), true
+func (s *IntStack) Pop() int {
+	return s.Stack.Pop().(int)
 }
 
 func (s *IntStack) ToSlice() []int {
 	var sli []int
-	for {
-		v, ok := s.Pop()
-		if !ok {
-			break
-		}
+	for s.Size() > 0 {
+		v := s.Pop()
 		sli = append(sli, v)
 	}
 	return sli

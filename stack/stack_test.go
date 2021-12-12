@@ -12,7 +12,7 @@ func TestNewStack(t *testing.T) {
 		s.Push(i)
 	}
 	for i := 0; i < testTimes; i++ {
-		e, _ := s.Pop()
+		e := s.Pop()
 		fmt.Print(e, " ")
 	}
 }
