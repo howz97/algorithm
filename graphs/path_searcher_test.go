@@ -31,14 +31,14 @@ func TestEWD_Integer(t *testing.T) {
 	num := int(g.NumVertical())
 	for src := 0; src < num; src++ {
 		for dst := 0; dst < num; dst++ {
-			p0 := spsDijkstra.Path(src, dst)
-			p1 := spsTop.Path(src, dst)
+			p0 := spsDijkstra.GetPath(src, dst)
+			p1 := spsTop.GetPath(src, dst)
 			if !isPathEqual(p0.stk, p1.stk) {
 				t.Errorf("path(%d->%d) not equal: \np0=%s, \np1=%s \n", src, dst, p0, p1)
 			}
 
-			p0 = spsDijkstra.Path(src, dst)
-			p1 = spsBF.Path(src, dst)
+			p0 = spsDijkstra.GetPath(src, dst)
+			p1 = spsBF.GetPath(src, dst)
 			if !isPathEqual(p0.stk, p1.stk) {
 				t.Errorf("path(%d->%d) not equal: \np0=%s, \np1=%s \n", src, dst, p0, p1)
 			}
@@ -74,7 +74,7 @@ func TestNewSPS_Dijkstra(t *testing.T) {
 	num := int(g.NumVertical())
 	for src := 0; src < num; src++ {
 		for dst := 0; dst < num; dst++ {
-			fmt.Println(sps.Path(src, dst).String())
+			fmt.Println(sps.GetPath(src, dst).String())
 		}
 	}
 }
@@ -88,7 +88,7 @@ func TestNewSPS_Topological(t *testing.T) {
 	num := int(g.NumVertical())
 	for src := 0; src < num; src++ {
 		for dst := 0; dst < num; dst++ {
-			fmt.Println(sps.Path(src, dst).String())
+			fmt.Println(sps.GetPath(src, dst).String())
 		}
 	}
 }

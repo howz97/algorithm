@@ -282,7 +282,7 @@ func (s *PathSearcher) Distance(src, dst int) float64 {
 	return s.spt[src].DistanceTo(dst)
 }
 
-func (s *PathSearcher) Path(src, dst int) *Path {
+func (s *PathSearcher) GetPath(src, dst int) *Path {
 	if !s.HasVertical(src) {
 		return nil
 	}
