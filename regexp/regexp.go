@@ -14,7 +14,7 @@ import (
 
 type Regexp struct {
 	table []symbol
-	nfa   graphs.Digraph
+	nfa   *graphs.Digraph
 	tc    graphs.Reachable
 }
 
@@ -229,9 +229,9 @@ func indexRune(runes []rune, r rune) int {
 	return -1
 }
 
-func makeNFA(table []symbol) graphs.Digraph {
+func makeNFA(table []symbol) *graphs.Digraph {
 	size := len(table)
-	nfa := graphs.NewDigraph(size + 1)
+	nfa := graphs.NewDigraph(uint(size + 1))
 	stk := stack.NewInt(size)
 	for i, syb := range table {
 		left := i
