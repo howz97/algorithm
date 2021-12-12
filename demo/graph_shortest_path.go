@@ -17,4 +17,8 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(searcher.GetPath(1, 2).String())
+
+	/*
+		(distance=0): 1->3->6->2
+	*/
 }

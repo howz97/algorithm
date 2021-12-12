@@ -12,6 +12,7 @@ var (
 	ErrVerticalNotExist = errors.New("vertical not exist")
 	ErrSelfLoop         = errors.New("not support self loop")
 	ErrInputFormat      = errors.New("input format error")
+	ErrInvalidYaml      = errors.New("input yaml file is invalid")
 )
 
 func readYaml(filename string, isSymbol bool) (*Digraph, error) {
@@ -25,6 +26,9 @@ func readYaml(filename string, isSymbol bool) (*Digraph, error) {
 		yaml.Unmarshal(file, &m)
 		if err != nil {
 			return nil, err
+		}
+		if len(m) == 0 {
+			return nil, ErrInvalidYaml
 		}
 		g = &Digraph{Symbol: NewSymbolGraph()}
 		for v := range m {
@@ -43,6 +47,9 @@ func readYaml(filename string, isSymbol bool) (*Digraph, error) {
 		err = yaml.Unmarshal(file, &m)
 		if err != nil {
 			return nil, err
+		}
+		if len(m) == 0 {
+			return nil, ErrInvalidYaml
 		}
 		g = NewDigraph(uint(len(m)))
 		for from, adj := range m {
