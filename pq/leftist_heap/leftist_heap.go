@@ -1,46 +1,39 @@
-package pqueue
+package leftist
 
-// LeftistH -
-type LeftistH struct {
+func New() *Heap {
+	return new(Heap)
+}
+
+type Heap struct {
 	h    *node
 	size int
 }
 
-// NewLeftistH -
-func NewLeftistH() *LeftistH {
-	return new(LeftistH)
-}
-
-// Insert -
-func (lh *LeftistH) Insert(k int) {
+func (lh *Heap) Push(k int) {
 	n := new(node)
 	n.k = k
 	lh.h = lh.h.insert(n)
 	lh.size++
 }
 
-// Front -
-func (lh *LeftistH) Front() (k int, ok bool) {
+func (lh *Heap) Front() (k int, ok bool) {
 	if lh.h == nil {
 		return 0, false
 	}
 	return lh.h.k, true
 }
 
-// DelMin -
-func (lh *LeftistH) DelMin() {
+func (lh *Heap) DelMin() {
 	lh.h = lh.h.delMin()
 	lh.size--
 }
 
-// Merge -
-func (lh *LeftistH) Merge(lh1 *LeftistH) {
+func (lh *Heap) Merge(lh1 *Heap) {
 	lh.h = merge(lh.h, lh1.h)
 	lh.size += lh1.size
 }
 
-// Size -
-func (lh *LeftistH) Size() int {
+func (lh *Heap) Size() int {
 	return lh.size
 }
 

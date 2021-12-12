@@ -1,18 +1,18 @@
-package pqueue
+package leftist
 
 import (
 	"testing"
 )
 
 func Test_LeftistHeap(t *testing.T) {
-	lh1 := NewLeftistH()
+	lh1 := New()
 	for i := 0; i < 10; i++ {
-		lh1.Insert(i)
+		lh1.Push(i)
 	}
 
-	lh2 := NewLeftistH()
+	lh2 := New()
 	for i := 10; i < 20; i++ {
-		lh2.Insert(i)
+		lh2.Push(i)
 	}
 	lh1.Merge(lh2)
 	if lh1.Size() != 20 {
