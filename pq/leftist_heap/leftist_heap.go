@@ -7,29 +7,34 @@ func New() *LeftHeap {
 }
 
 type LeftHeap struct {
-	h    *node
+	root *node
 	size int
 }
 
 func (lh *LeftHeap) Push(p Comparable, v T) {
-	n := new(node)
-	n.priority = p
-	n.val = v
-	lh.h = lh.h.insert(n)
+	lh.root = merge(lh.root, &node{
+		Comparable: p,
+		val:        v,
+	})
 	lh.size++
 }
 
 func (lh *LeftHeap) Peek() T {
-	return lh.h.val
+	if lh.root == nil {
+		return nil
+	}
+	return lh.root.val
 }
 
-func (lh *LeftHeap) Pop() {
-	lh.h = lh.h.delMin()
+func (lh *LeftHeap) Pop() T {
+	v := lh.root.val
+	lh.root = merge(lh.root.left, lh.root.right)
 	lh.size--
+	return v
 }
 
 func (lh *LeftHeap) Merge(other *LeftHeap) {
-	lh.h = merge(lh.h, other.h)
+	lh.root = merge(lh.root, other.root)
 	lh.size += other.size
 }
 
@@ -38,22 +43,18 @@ func (lh *LeftHeap) Size() int {
 }
 
 type node struct {
-	priority Comparable
-	val      T
-	npl      int // null path length
-	left     *node
-	right    *node
+	Comparable // priority
+	val        T
+	npl        int // null path length
+	left       *node
+	right      *node
 }
 
-func (h *node) insert(other *node) *node {
-	return merge(h, other)
-}
-
-func (h *node) delMin() *node {
+func (h *node) getNPL() int {
 	if h == nil {
-		return nil
+		return -1
 	}
-	return merge(h.left, h.right)
+	return h.npl
 }
 
 func merge(h1, h2 *node) *node {
@@ -63,22 +64,13 @@ func merge(h1, h2 *node) *node {
 	if h2 == nil {
 		return h1
 	}
-	if h1.priority.Cmp(h2.priority) == Less {
-		h1.merge1(h2)
-		return h1
+	if h1.Cmp(h2) == More {
+		h1, h2 = h2, h1
 	}
-	h2.merge1(h1)
-	return h2
-}
-
-func (h *node) merge1(h1 *node) {
-	if h.left == nil {
-		h.left = h1
-		return
+	h1.right = merge(h1.right, h2)
+	if h1.left.getNPL() < h1.right.getNPL() {
+		h1.left, h1.right = h1.right, h1.left
 	}
-	h.right = merge(h.right, h1)
-	if h.left.priority.Cmp(h.right.priority) == Less {
-		h.left, h.right = h.right, h.left
-	}
-	h.npl = h.right.npl + 1
+	h1.npl = h1.right.getNPL() + 1
+	return h1
 }
