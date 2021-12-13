@@ -98,7 +98,7 @@ func TestPathTree_Top(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	tree, err := g.NewShortestPathTree(1, Topological)
+	tree, err := g.ShortestPathTree(1, Topological)
 	if err != nil {
 		t.Fatal(err)
 	}

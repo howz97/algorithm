@@ -160,13 +160,29 @@ func (dg *Digraph) Reverse() *Digraph {
 	return rg
 }
 
-// FindNegativeEdge find a negative edge. If here is no negative edge, (-1, -1) will be returned
+// FindNegativeEdge find a negative edge.
+// If here is no negative edge, (-1, -1) will be returned
 func (dg *Digraph) FindNegativeEdge() (src, dst int) {
 	src, dst = -1, -1
 	dg.IterateWEdge(func(v int, v2 int, w float64) bool {
 		if w < 0 {
 			src = v
 			dst = v2
+			return false
+		}
+		return true
+	})
+	return
+}
+
+// FindNegativeEdgeFrom find a reachable negative edge from the specified start vertical
+// If here is no negative edge, (-1, -1) will be returned
+func (dg *Digraph) FindNegativeEdgeFrom(start int) (src int, dst int) {
+	src, dst = -1, -1
+	dg.IterateWEdgeFrom(start, func(v0 int, v1 int, w float64) bool {
+		if w < 0 {
+			src = v0
+			dst = v1
 			return false
 		}
 		return true

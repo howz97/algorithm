@@ -11,35 +11,17 @@ func NewWDigraph(size uint) *WDigraph {
 	}
 }
 
-// WDigraph is edge weighted digraph without self loop
+// WDigraph is edge weighted digraph
 type WDigraph struct {
 	Digraph
 }
 
+// AddEdge add a weighted and directed edge
 func (g *WDigraph) AddEdge(src, dst int, w float64) error {
 	return g.addWeightedEdge(src, dst, w)
 }
 
-func (g *WDigraph) String() string {
-	bytes, err := g.Marshal()
-	if err != nil {
-		return err.Error()
-	}
-	return string(bytes)
-}
-
-func (g *WDigraph) FindNegativeEdgeFrom(from int) (src int, dst int) {
-	g.IterateWEdgeFrom(from, func(v0 int, v1 int, w float64) bool {
-		if w < 0 {
-			src = v0
-			dst = v1
-			return false
-		}
-		return true
-	})
-	return -1, -1
-}
-
+// AnyNegativeCycle find a negative weighted cycle
 func (g *WDigraph) AnyNegativeCycle() *Path {
 	marked := make([]bool, g.NumVert())
 	path := NewPath()
@@ -59,7 +41,8 @@ func (g *WDigraph) AnyNegativeCycle() *Path {
 	return path
 }
 
-func (g *WDigraph) NewShortestPathTree(src int, alg int) (*PathTree, error) {
+// ShortestPathTree get the shortest path tree from src by the specified algorithm
+func (g *WDigraph) ShortestPathTree(src int, alg int) (*PathTree, error) {
 	if !g.HasVert(src) {
 		return nil, ErrVerticalNotExist
 	}
