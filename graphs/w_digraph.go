@@ -53,6 +53,9 @@ func (g *WDigraph) AnyNegativeCycle() *Path {
 		}
 		return true
 	})
+	if path.stk.Size() <= 0 {
+		return nil
+	}
 	return path
 }
 

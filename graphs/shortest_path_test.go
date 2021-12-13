@@ -102,7 +102,7 @@ func TestPathTree_Top(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	g.IterateVetDFS(1, func(dst int) bool {
+	g.IterateVertDFS(1, func(dst int) bool {
 		if dst == 1 {
 			return true
 		}

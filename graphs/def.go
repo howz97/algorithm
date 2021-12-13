@@ -101,8 +101,8 @@ func dropWeight(dg *Digraph) {
 func checkNoDirection(dg *Digraph) error {
 	var err error
 	dg.IterateWEdge(func(from, to int, w float64) bool {
-		wr, ok := dg.GetWeight(to, from)
-		if !ok {
+		wr := dg.GetWeight(to, from)
+		if wr == 0 {
 			err = errors.New(fmt.Sprintf("edge %d->%d has direction", from, to))
 			return false
 		}

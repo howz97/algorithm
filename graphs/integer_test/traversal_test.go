@@ -3,6 +3,7 @@ package integer
 import (
 	"github.com/howz97/algorithm/graphs"
 	"github.com/howz97/algorithm/sort"
+	"github.com/howz97/algorithm/stack"
 	"github.com/howz97/algorithm/util"
 	stdsort "sort"
 	"testing"
@@ -88,9 +89,13 @@ func TestRevDFS(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	order := g.RDFSOrderVertical(0).ToSlice()
+	order := stack.NewInt(0)
+	g.IterateRDFSFrom(0, func(v int) bool {
+		order.Push(v)
+		return true
+	})
 	correct := []int{0, 3, 6, 7}
-	if !util.SliceEqual(order, correct) {
+	if !util.SliceEqual(order.ToSlice(), correct) {
 		t.Errorf("rev dfs order %v not equal %v", order, correct)
 	}
 }

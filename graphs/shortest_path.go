@@ -186,15 +186,15 @@ func (spt *PathTree) InitBellmanFord(g *WDigraph) error {
 		bellmanFordRelax(g, v, spt.edgeTo, spt.distTo, needRelax, onQ)
 		relaxTimes++
 		if relaxTimes%g.NumVert() == 0 {
-			if c := spt.findNegativeCycle(g); c.Size() > 0 {
-				return ErrCycle{Stack: c}
+			if c := spt.findNegativeCycle(g); c != nil {
+				return ErrCycle{Stack: c.stk}
 			}
 		}
 	}
 	return nil
 }
 
-func (spt *PathTree) findNegativeCycle(g *WDigraph) *stack.IntStack {
+func (spt *PathTree) findNegativeCycle(g *WDigraph) *Path {
 	return g.AnyNegativeCycle() // todo: optimize ?
 }
 

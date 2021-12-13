@@ -22,18 +22,22 @@ type Digraph struct {
 	*Symbol
 }
 
+// NumVert get the number of vertices
 func (dg *Digraph) NumVert() uint {
 	return uint(len(dg.Edges))
 }
 
+// HasVert indicate whether dg contains vertical v
 func (dg *Digraph) HasVert(v int) bool {
 	return v >= 0 && v < len(dg.Edges)
 }
 
-func (dg *Digraph) AddEdge(src, dst int) error {
-	return dg.addWeightedEdge(src, dst, 1)
+// AddEdge add a new edge
+func (dg *Digraph) AddEdge(from, to int) error {
+	return dg.addWeightedEdge(from, to, 1)
 }
 
+// NumEdge get the number of edges
 func (dg *Digraph) NumEdge() uint {
 	n := uint(0)
 	for i := range dg.Edges {
@@ -42,21 +46,22 @@ func (dg *Digraph) NumEdge() uint {
 	return n
 }
 
-func (dg *Digraph) HasEdge(v1, v2 int) bool {
-	if !dg.HasVert(v1) || !dg.HasVert(v2) {
+// HasEdge indicate whether dg contains the edge specified by params
+func (dg *Digraph) HasEdge(from, to int) bool {
+	if !dg.HasVert(from) || !dg.HasVert(to) {
 		return false
 	}
-	return dg.Edges[v1].Get(util.Int(v2)) != nil
+	return dg.Edges[from].Get(util.Int(to)) != nil
 }
 
-func (dg *Digraph) addWeightedEdge(src, dst int, w float64) error {
-	if !dg.HasVert(src) || !dg.HasVert(dst) {
+func (dg *Digraph) addWeightedEdge(from, to int, w float64) error {
+	if !dg.HasVert(from) || !dg.HasVert(to) {
 		return ErrVerticalNotExist
 	}
-	if src == dst {
+	if from == to {
 		return ErrSelfLoop
 	}
-	dg.Edges[src].Put(util.Int(dst), w)
+	dg.Edges[from].Put(util.Int(to), w)
 	return nil
 }
 
@@ -64,17 +69,20 @@ func (dg *Digraph) getWeightMust(from, to int) float64 {
 	return dg.Edges[from].Get(util.Int(to)).(float64)
 }
 
-func (dg *Digraph) GetWeight(from, to int) (float64, bool) {
+// GetWeight get the weight of edge
+// Zero will be returned if edge not exist
+func (dg *Digraph) GetWeight(from, to int) float64 {
 	if !dg.HasVert(from) {
-		return 0, false
+		return 0
 	}
 	w := dg.Edges[from].Get(util.Int(to))
 	if w == nil {
-		return 0, false
+		return 0
 	}
-	return w.(float64), true
+	return w.(float64)
 }
 
+// DelEdge delete an edge
 func (dg *Digraph) DelEdge(src, dst int) {
 	if !dg.HasVert(src) {
 		return
@@ -103,6 +111,7 @@ func (dg *Digraph) iterateWAdj(v int, fn func(int, float64) bool) {
 	})
 }
 
+// Adjacent return a slice contains all adjacent vertices of v
 func (dg *Digraph) Adjacent(v int) (adj []int) {
 	dg.IterateAdj(v, func(a int) bool {
 		adj = append(adj, a)
@@ -169,7 +178,8 @@ func (dg *Digraph) FindCycle() *Path {
 	return nil
 }
 
-// FindCycleFrom find any directed cycle from vertical v in dg. Not include cycle that can not be accessed from v
+// FindCycleFrom find any directed cycle from vertical v in dg
+// But not include cycle that can not be accessed from v
 func (dg *Digraph) FindCycleFrom(v int) *Path {
 	marks := make([]bool, dg.NumVert())
 	path := NewPath()
@@ -177,21 +187,6 @@ func (dg *Digraph) FindCycleFrom(v int) *Path {
 		return path
 	}
 	return nil
-}
-
-func ParseCycleInStack(stk *stack.IntStack) []int {
-	path := make([]int, 0, stk.Size())
-	w := stk.Pop()
-	path = append(path, w)
-	for {
-		v := stk.Pop()
-		path = append(path, v)
-		if v == w {
-			break
-		}
-	}
-	util.ReverseInts(path)
-	return path
 }
 
 func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path) bool {
@@ -229,6 +224,7 @@ func (dg *Digraph) Topological() (order *stack.IntStack) {
 	return
 }
 
+// IterateWEdge iterate all edges and their weight in dg
 func (dg *Digraph) IterateWEdge(fn func(int, int, float64) bool) {
 	for src, hm := range dg.Edges {
 		goon := true
@@ -242,14 +238,16 @@ func (dg *Digraph) IterateWEdge(fn func(int, int, float64) bool) {
 	}
 }
 
+// IterateEdge iterate all edges in dg
 func (dg *Digraph) IterateEdge(fn func(int, int) bool) {
 	dg.IterateWEdge(func(src int, dst int, _ float64) bool {
 		return fn(src, dst)
 	})
 }
 
-func (dg *Digraph) IterateWEdgeFrom(v int, fn func(int, int, float64) bool) {
-	dg.IterateVetDFS(v, func(v int) bool {
+// IterateWEdgeFrom iterate all reachable edges and their weight from vertical src
+func (dg *Digraph) IterateWEdgeFrom(src int, fn func(int, int, float64) bool) {
+	dg.IterateVertDFS(src, func(v int) bool {
 		goon := true
 		dg.iterateWAdj(v, func(a int, w float64) bool {
 			goon = fn(v, a, w)
@@ -259,13 +257,15 @@ func (dg *Digraph) IterateWEdgeFrom(v int, fn func(int, int, float64) bool) {
 	})
 }
 
-func (dg *Digraph) IterateEdgeFrom(v int, fn func(int, int) bool) {
-	dg.IterateWEdgeFrom(v, func(src int, dst int, _ float64) bool {
+// IterateEdgeFrom iterate all reachable edges from vertical src
+func (dg *Digraph) IterateEdgeFrom(src int, fn func(int, int) bool) {
+	dg.IterateWEdgeFrom(src, func(src int, dst int, _ float64) bool {
 		return fn(src, dst)
 	})
 }
 
-func (dg *Digraph) IterateVetDFS(src int, fn func(int) bool) {
+// IterateVertDFS iterate all reachable vertices from vertical src in DFS order
+func (dg *Digraph) IterateVertDFS(src int, fn func(int) bool) {
 	dg.iterateUnMarkVetFrom(src, nil, fn)
 }
 
@@ -296,18 +296,20 @@ func (dg *Digraph) iterateUnMarkVetDFS(v int, marked []bool, fn func(int) bool) 
 	return goon
 }
 
+// ReachableSlice get a slice contains all reachable vertices from src
 func (dg *Digraph) ReachableSlice(src int) []int {
 	if !dg.HasVert(src) {
 		return nil
 	}
 	var arrived []int
-	dg.IterateVetDFS(src, func(v int) bool {
+	dg.IterateVertDFS(src, func(v int) bool {
 		arrived = append(arrived, v)
 		return true
 	})
 	return arrived
 }
 
+// ReachableBits get a bit-map contains all reachable vertices from src
 func (dg *Digraph) ReachableBits(src int) []bool {
 	if !dg.HasVert(src) {
 		return nil
@@ -317,6 +319,7 @@ func (dg *Digraph) ReachableBits(src int) []bool {
 	return marked
 }
 
+// IterateVetRDFS iterate all vertices in RDFS order
 func (dg *Digraph) IterateVetRDFS(fn func(int) bool) {
 	marked := make([]bool, dg.NumVert())
 	for v := range marked {
@@ -327,21 +330,13 @@ func (dg *Digraph) IterateVetRDFS(fn func(int) bool) {
 	}
 }
 
+// IterateRDFSFrom iterate all reachable vertices from vertical src in RDFS order
 func (dg *Digraph) IterateRDFSFrom(src int, fn func(int) bool) {
 	if !dg.HasVert(src) {
 		return
 	}
 	marked := make([]bool, dg.NumVert())
 	dg.rDFS(src, marked, fn)
-}
-
-func (dg *Digraph) RDFSOrderVertical(src int) (order *stack.IntStack) {
-	order = stack.NewInt(int(dg.NumVert()))
-	dg.IterateRDFSFrom(src, func(v int) bool {
-		order.Push(v)
-		return true
-	})
-	return order
 }
 
 func (dg *Digraph) rDFS(v int, marked []bool, fn func(int) bool) bool {
@@ -361,7 +356,7 @@ func (dg *Digraph) rDFS(v int, marked []bool, fn func(int) bool) bool {
 	return fn(v)
 }
 
-func (dg *Digraph) IsBipartiteGraph() bool {
+func (dg *Digraph) IsBipartite() bool {
 	marks := make([]bool, dg.NumVert())
 	colors := make([]bool, dg.NumVert())
 	for i, m := range marks {
@@ -393,7 +388,7 @@ func (dg *Digraph) isBipartiteDFS(cur int, color bool, colors []bool, marked []b
 	return isBip
 }
 
-func (dg *Digraph) SameWith(other Digraph) bool {
+func (dg *Digraph) IsSameWith(other Digraph) bool {
 	if dg.NumVert() != other.NumVert() {
 		return false
 	}
@@ -402,8 +397,7 @@ func (dg *Digraph) SameWith(other Digraph) bool {
 	}
 	isSame := true
 	dg.IterateWEdge(func(from int, to int, w float64) bool {
-		w2, ok := other.GetWeight(from, to)
-		if !ok || w != w2 {
+		if w != other.GetWeight(from, to) {
 			isSame = false
 			return false
 		}
