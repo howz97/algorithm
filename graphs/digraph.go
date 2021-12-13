@@ -65,6 +65,14 @@ func (dg *Digraph) addWeightedEdge(from, to int, w float64) error {
 	return nil
 }
 
+// DelEdge delete an edge
+func (dg *Digraph) DelEdge(src, dst int) {
+	if !dg.HasVert(src) {
+		return
+	}
+	dg.Edges[src].Del(util.Int(dst))
+}
+
 func (dg *Digraph) getWeightMust(from, to int) float64 {
 	return dg.Edges[from].Get(util.Int(to)).(float64)
 }
@@ -82,12 +90,14 @@ func (dg *Digraph) GetWeight(from, to int) float64 {
 	return w.(float64)
 }
 
-// DelEdge delete an edge
-func (dg *Digraph) DelEdge(src, dst int) {
-	if !dg.HasVert(src) {
-		return
-	}
-	dg.Edges[src].Del(util.Int(dst))
+// TotalWeight calculate the total weight of dg
+func (dg *Digraph) TotalWeight() float64 {
+	var total float64
+	dg.IterateWEdge(func(_ int, _ int, w float64) bool {
+		total += w
+		return true
+	})
+	return total
 }
 
 // IterateAdj iterate all adjacent vertices of v
@@ -356,6 +366,7 @@ func (dg *Digraph) rDFS(v int, marked []bool, fn func(int) bool) bool {
 	return fn(v)
 }
 
+// IsBipartite check whether dg is a bipartite graph
 func (dg *Digraph) IsBipartite() bool {
 	marks := make([]bool, dg.NumVert())
 	colors := make([]bool, dg.NumVert())
@@ -388,6 +399,7 @@ func (dg *Digraph) isBipartiteDFS(cur int, color bool, colors []bool, marked []b
 	return isBip
 }
 
+// IsSameWith check whether dg is the same with other
 func (dg *Digraph) IsSameWith(other Digraph) bool {
 	if dg.NumVert() != other.NumVert() {
 		return false
@@ -406,15 +418,7 @@ func (dg *Digraph) IsSameWith(other Digraph) bool {
 	return isSame
 }
 
-func (dg *Digraph) TotalWeight() float64 {
-	var total float64
-	dg.IterateWEdge(func(_ int, _ int, w float64) bool {
-		total += w
-		return true
-	})
-	return total
-}
-
+// Marshal dg into yaml format
 func (dg *Digraph) Marshal() ([]byte, error) {
 	m := make(map[string]map[string]float64)
 	for v := 0; v < int(dg.NumVert()); v++ {
@@ -464,6 +468,7 @@ func (dg Digraph) SCC() *SCC {
 	return scc
 }
 
+// IsStronglyConn check whether src is strongly connected to dst
 func (scc *SCC) IsStronglyConn(src, dst int) bool {
 	if !scc.hasVertical(src) || !scc.hasVertical(dst) {
 		return false
@@ -471,6 +476,7 @@ func (scc *SCC) IsStronglyConn(src, dst int) bool {
 	return scc.locate[src] == scc.locate[dst]
 }
 
+// GetCompID get the strongly connected component ID of vertical v
 func (scc *SCC) GetCompID(v int) int {
 	if !scc.hasVertical(v) {
 		return -1
@@ -478,7 +484,8 @@ func (scc *SCC) GetCompID(v int) int {
 	return scc.locate[v]
 }
 
-func (scc *SCC) RangeComponent(v int, fn func(int) bool) {
+// IterateComponent iterate all vertices strongly connected to vertical v (include v)
+func (scc *SCC) IterateComponent(v int, fn func(int) bool) {
 	if !scc.hasVertical(v) {
 		return
 	}
@@ -489,6 +496,7 @@ func (scc *SCC) RangeComponent(v int, fn func(int) bool) {
 	}
 }
 
+// NumComponents get the number of components
 func (scc *SCC) NumComponents() int {
 	return len(scc.components)
 }
@@ -499,6 +507,7 @@ func (scc *SCC) hasVertical(v int) bool {
 
 type Reachable [][]bool
 
+// Reachable save all reachable information of dg
 func (dg Digraph) Reachable() Reachable {
 	tc := make(Reachable, dg.NumVert())
 	for v := range tc {
@@ -507,6 +516,7 @@ func (dg Digraph) Reachable() Reachable {
 	return tc
 }
 
+// CanReach check whether src can reach dst
 func (tc Reachable) CanReach(src, dst int) bool {
 	if !tc.hasVertical(src) || !tc.hasVertical(dst) {
 		return false
@@ -514,11 +524,12 @@ func (tc Reachable) CanReach(src, dst int) bool {
 	return tc[src][dst]
 }
 
-func (tc Reachable) Range(v int, fn func(v int) bool) {
-	if !tc.hasVertical(v) {
+// Iterate all reachable vertices from src
+func (tc Reachable) Iterate(src int, fn func(v int) bool) {
+	if !tc.hasVertical(src) {
 		return
 	}
-	for w, marked := range tc[v] {
+	for w, marked := range tc[src] {
 		if marked {
 			if !fn(w) {
 				break
@@ -537,6 +548,7 @@ type BFS struct {
 	edgeTo []int
 }
 
+// BFS save all BFS information from src
 func (dg Digraph) BFS(src int) *BFS {
 	if !dg.HasVert(src) {
 		return nil
@@ -563,6 +575,7 @@ func (dg Digraph) BFS(src int) *BFS {
 	return bfs
 }
 
+// CanReach check whether src can reach dst
 func (bfs *BFS) CanReach(dst int) bool {
 	if !bfs.checkVertical(dst) {
 		return false
@@ -570,6 +583,7 @@ func (bfs *BFS) CanReach(dst int) bool {
 	return bfs.marked[dst]
 }
 
+// ShortestPathTo get the shortest path to dst (ignore weight)
 func (bfs *BFS) ShortestPathTo(dst int) *Path {
 	if !bfs.CanReach(dst) {
 		return nil

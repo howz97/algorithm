@@ -37,7 +37,7 @@ func (re *Regexp) Match(str string) bool {
 
 func (re *Regexp) startStatus() set.Set {
 	start := set.New()
-	re.tc.Range(0, func(v int) bool {
+	re.tc.Iterate(0, func(v int) bool {
 		start.Add(v)
 		return true
 	})
@@ -67,7 +67,7 @@ func (re *Regexp) updateCurStatus(src set.Set) set.Set {
 			break
 		}
 		vSrc := e.(int)
-		re.tc.Range(vSrc, func(v int) bool {
+		re.tc.Iterate(vSrc, func(v int) bool {
 			reachable.Add(v)
 			return true
 		})
