@@ -41,7 +41,7 @@ func (h *Heap) Push(p Comparable, v T) {
 		h.elems = append(h.elems, Elem{p: p, val: v})
 	}
 	// percolate up from bottom
-	h.percolateUp(h.len)
+	h.swim(h.len)
 }
 
 func (h *Heap) Pop() T {
@@ -50,7 +50,7 @@ func (h *Heap) Pop() T {
 	h.elems[1] = h.elems[h.len]
 	h.len--
 	// percolate down the top element
-	h.percolateDown(1)
+	h.sink(1)
 	return v
 }
 
@@ -65,7 +65,7 @@ func (h *Heap) Del(v T) {
 	}
 	h.elems[i] = h.elems[h.len]
 	h.len--
-	h.percolateDown(i)
+	h.sink(i)
 }
 
 func (h *Heap) find(v T) int {
@@ -86,10 +86,10 @@ func (h *Heap) Fix(p Comparable, v T) {
 	switch p.Cmp(h.elems[i].p) {
 	case Less:
 		h.elems[i].p = p
-		h.percolateUp(i)
+		h.swim(i)
 	case More:
 		h.elems[i].p = p
-		h.percolateDown(i)
+		h.sink(i)
 	}
 }
 
@@ -97,7 +97,7 @@ func (h *Heap) IsEmpty() bool {
 	return h.len == 0
 }
 
-func (h *Heap) percolateDown(vac int) {
+func (h *Heap) sink(vac int) {
 	elem := h.elems[vac] // copy-out the element and left a vacancy
 	sub := vac * 2
 	for sub <= h.len {
@@ -115,7 +115,7 @@ func (h *Heap) percolateDown(vac int) {
 	h.elems[vac] = elem
 }
 
-func (h *Heap) percolateUp(vac int) {
+func (h *Heap) swim(vac int) {
 	elem := h.elems[vac] // copy-out the element and left a vacancy
 	parent := vac / 2
 	for parent > 0 && h.elems[parent].p.Cmp(elem.p) == More {
