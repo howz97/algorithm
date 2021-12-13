@@ -6,15 +6,15 @@ import (
 	"github.com/howz97/algorithm/stack"
 )
 
-// WDigraph is edge weighted digraph without self loop
-type WDigraph struct {
-	Digraph
-}
-
 func NewWDigraph(size uint) *WDigraph {
 	return &WDigraph{
 		Digraph: *NewDigraph(size),
 	}
+}
+
+// WDigraph is edge weighted digraph without self loop
+type WDigraph struct {
+	Digraph
 }
 
 func (g *WDigraph) AddEdge(src, dst int, w float64) error {

@@ -6,14 +6,14 @@ import (
 	"github.com/howz97/algorithm/util"
 )
 
-type WGraph struct {
-	Graph
-}
-
 func NewWGraph(size uint) *WGraph {
 	return &WGraph{
 		Graph: *NewGraph(size),
 	}
+}
+
+type WGraph struct {
+	Graph
 }
 
 func (g *WGraph) AddEdge(src, dst int, w float64) error {

@@ -4,14 +4,14 @@ import (
 	"github.com/howz97/algorithm/util"
 )
 
-type Graph struct {
-	*Digraph
-}
-
 func NewGraph(size uint) *Graph {
 	return &Graph{
 		Digraph: NewDigraph(size),
 	}
+}
+
+type Graph struct {
+	*Digraph
 }
 
 func (g *Graph) NumEdge() uint {

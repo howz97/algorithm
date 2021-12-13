@@ -9,17 +9,17 @@ import (
 	"strconv"
 )
 
-type Digraph struct {
-	Edges []*hash_map.Chaining
-	*Symbol
-}
-
 func NewDigraph(size uint) *Digraph {
 	edges := make([]*hash_map.Chaining, size)
 	for i := range edges {
 		edges[i] = hash_map.New()
 	}
 	return &Digraph{Edges: edges}
+}
+
+type Digraph struct {
+	Edges []*hash_map.Chaining
+	*Symbol
 }
 
 func (dg *Digraph) NumVertical() uint {
