@@ -216,17 +216,17 @@ func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path) bool {
 	return found
 }
 
-// Topological return a stack that pop vertices in topological order
-func (dg *Digraph) Topological() *stack.IntStack {
+// Topological return a stack that will pop vertices in topological order
+func (dg *Digraph) Topological() (order *stack.IntStack) {
 	if dg.FindCycle() != nil {
-		return nil
+		return
 	}
-	order := stack.NewInt(int(dg.NumVert()))
+	order = stack.NewInt(int(dg.NumVert()))
 	dg.IterateVetRDFS(func(v int) bool {
 		order.Push(v)
 		return true
 	})
-	return order
+	return
 }
 
 func (dg *Digraph) IterateWEdge(fn func(int, int, float64) bool) {
@@ -335,8 +335,8 @@ func (dg *Digraph) IterateRDFSFrom(src int, fn func(int) bool) {
 	dg.rDFS(src, marked, fn)
 }
 
-func (dg *Digraph) RDFSOrderVertical(src int) *stack.IntStack {
-	order := stack.NewInt(int(dg.NumVert()))
+func (dg *Digraph) RDFSOrderVertical(src int) (order *stack.IntStack) {
+	order = stack.NewInt(int(dg.NumVert()))
 	dg.IterateRDFSFrom(src, func(v int) bool {
 		order.Push(v)
 		return true
