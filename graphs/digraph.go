@@ -156,12 +156,12 @@ func (dg *Digraph) FindNegativeEdge() (src, dst int) {
 }
 
 // FindCycle find any directed cycle in dg
-func (dg *Digraph) FindCycle() *stack.IntStack {
+func (dg *Digraph) FindCycle() *Path {
 	marks := make([]bool, dg.NumVert())
-	path := stack.NewInt(4)
+	path := NewPath()
 	for v, m := range marks {
 		if !m {
-			if dg.DetectCycleDFS(v, marks, path) {
+			if dg.detectCycleDFS(v, marks, path) {
 				return path
 			}
 		}
@@ -170,10 +170,10 @@ func (dg *Digraph) FindCycle() *stack.IntStack {
 }
 
 // FindCycleFrom find any directed cycle from vertical v in dg. Not include cycle that can not be accessed from v
-func (dg *Digraph) FindCycleFrom(v int) *stack.IntStack {
+func (dg *Digraph) FindCycleFrom(v int) *Path {
 	marks := make([]bool, dg.NumVert())
-	path := stack.NewInt(4)
-	if dg.DetectCycleDFS(v, marks, path) {
+	path := NewPath()
+	if dg.detectCycleDFS(v, marks, path) {
 		return path
 	}
 	return nil
@@ -194,24 +194,24 @@ func ParseCycleInStack(stk *stack.IntStack) []int {
 	return path
 }
 
-func (dg *Digraph) DetectCycleDFS(v int, marked []bool, path *stack.IntStack) bool {
-	path.Push(v)
+func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path) bool {
+	path.stk.Push(v)
 	found := false
-	dg.IterateAdj(v, func(w int) bool {
-		if marked[w] {
+	dg.iterateWAdj(v, func(a int, _ float64) bool {
+		if marked[a] {
 			return true
 		}
-		if path.Contains(w) {
-			path.Push(w)
+		if path.stk.Contains(a) {
+			path.stk.Push(a)
 			found = true
 			return false
 		}
-		found = dg.DetectCycleDFS(w, marked, path)
+		found = dg.detectCycleDFS(a, marked, path)
 		return !found
 	})
 	marked[v] = true
 	if !found {
-		path.Pop()
+		path.stk.Pop()
 	}
 	return found
 }

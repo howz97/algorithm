@@ -15,6 +15,13 @@ const (
 	BellmanFord
 )
 
+func NewPath() *Path {
+	return &Path{
+		stk:      stack.NewInt(2),
+		distance: 0,
+	}
+}
+
 type Path struct {
 	stk      *stack.IntStack
 	distance float64

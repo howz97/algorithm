@@ -3,7 +3,6 @@ package graphs
 import (
 	"errors"
 	"fmt"
-	"github.com/howz97/algorithm/stack"
 )
 
 func NewWDigraph(size uint) *WDigraph {
@@ -41,13 +40,13 @@ func (g *WDigraph) FindNegativeEdgeFrom(from int) (src int, dst int) {
 	return -1, -1
 }
 
-func (g *WDigraph) AnyNegativeCycle() *stack.IntStack {
+func (g *WDigraph) AnyNegativeCycle() *Path {
 	marked := make([]bool, g.NumVert())
-	path := stack.NewInt(4)
+	path := NewPath()
 	g.IterateWEdge(func(src int, dst int, w float64) bool {
 		if w < 0 {
 			if !marked[src] {
-				if g.DetectCycleDFS(src, marked, path) {
+				if g.detectCycleDFS(src, marked, path) {
 					return false
 				}
 			}
@@ -71,7 +70,7 @@ func (g *WDigraph) NewShortestPathTree(src int, alg int) (*PathTree, error) {
 		spt.initDijkstra(g)
 	case Topological:
 		if cycle := g.FindCycleFrom(src); cycle != nil {
-			err = ErrCycle{Stack: cycle}
+			err = ErrCycle{Stack: cycle.stk}
 		}
 		spt.initTopological(g)
 	case BellmanFord:
@@ -99,7 +98,7 @@ func (g *WDigraph) SearcherDijkstra() (*Searcher, error) {
 
 func (g *WDigraph) SearcherTopological() (*Searcher, error) {
 	if cycle := g.FindCycle(); cycle != nil {
-		return nil, ErrCycle{Stack: cycle}
+		return nil, ErrCycle{Stack: cycle.stk}
 	}
 	sps := &Searcher{
 		spt: make([]*PathTree, g.NumVert()),
