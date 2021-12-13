@@ -90,7 +90,7 @@ func (dg *Digraph) GetWeight(from, to int) float64 {
 	return w.(float64)
 }
 
-// TotalWeight calculate the total weight of dg
+// TotalWeight sum the weight of all edges
 func (dg *Digraph) TotalWeight() float64 {
 	var total float64
 	dg.IterateWEdge(func(_ int, _ int, w float64) bool {
