@@ -27,7 +27,7 @@ func (g *WGraph) LazyPrim() (mst *WGraph) {
 	marked := make([]bool, g.NumVert())
 	marked[0] = true
 	g.iterateWAdj(0, func(dst int, w float64) bool {
-		pq.Push(util.Float(w), &Edge{
+		pq.Push(util.Float(w), &edge{
 			from:   0,
 			to:     dst,
 			weight: w,
@@ -35,7 +35,7 @@ func (g *WGraph) LazyPrim() (mst *WGraph) {
 		return true
 	})
 	for !pq.IsEmpty() {
-		e := pq.Pop().(*Edge)
+		e := pq.Pop().(*edge)
 		if marked[e.to] {
 			continue
 		}
@@ -49,7 +49,7 @@ func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *heap.Heap) {
 	marked[v] = true
 	g.iterateWAdj(v, func(a int, w float64) bool {
 		if !marked[a] {
-			pq.Push(util.Float(w), &Edge{
+			pq.Push(util.Float(w), &edge{
 				from:   v,
 				to:     a,
 				weight: w,
@@ -104,7 +104,7 @@ func (g *WGraph) Kruskal() (mst *WGraph) {
 	uf := unionfind.NewUF(int(g.NumVert()))
 	pq := heap.New(g.NumVert())
 	g.IterateWEdge(func(src int, dst int, w float64) bool {
-		pq.Push(util.Float(w), &Edge{
+		pq.Push(util.Float(w), &edge{
 			from:   src,
 			to:     dst,
 			weight: w,
@@ -112,7 +112,7 @@ func (g *WGraph) Kruskal() (mst *WGraph) {
 		return true
 	})
 	for mst.NumEdge() < mst.NumVert()-1 {
-		minE := pq.Pop().(*Edge)
+		minE := pq.Pop().(*edge)
 		if uf.IsConnected(minE.from, minE.to) {
 			continue
 		}
@@ -122,7 +122,7 @@ func (g *WGraph) Kruskal() (mst *WGraph) {
 	return
 }
 
-type Edge struct {
+type edge struct {
 	from, to int
 	weight   float64
 }
