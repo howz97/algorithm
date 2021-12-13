@@ -42,7 +42,7 @@ func (g *WDigraph) FindNegativeEdgeFrom(from int) (src int, dst int) {
 }
 
 func (g *WDigraph) AnyNegativeCycle() *stack.IntStack {
-	marked := make([]bool, g.NumVertical())
+	marked := make([]bool, g.NumVert())
 	path := stack.NewInt(4)
 	g.IterateWEdge(func(src int, dst int, w float64) bool {
 		if w < 0 {
@@ -58,7 +58,7 @@ func (g *WDigraph) AnyNegativeCycle() *stack.IntStack {
 }
 
 func (g *WDigraph) NewShortestPathTree(src int, alg int) (*PathTree, error) {
-	if !g.HasVertical(src) {
+	if !g.HasVert(src) {
 		return nil, ErrVerticalNotExist
 	}
 	var err error
@@ -87,7 +87,7 @@ func (g *WDigraph) SearcherDijkstra() (*Searcher, error) {
 		return nil, errors.New(fmt.Sprintf("negative edge %d->%d", src, dst))
 	}
 	sps := &Searcher{
-		spt: make([]*PathTree, g.NumVertical()),
+		spt: make([]*PathTree, g.NumVert()),
 	}
 	for v := range sps.spt {
 		tree := newShortestPathTree(g, v)
@@ -102,7 +102,7 @@ func (g *WDigraph) SearcherTopological() (*Searcher, error) {
 		return nil, ErrCycle{Stack: cycle}
 	}
 	sps := &Searcher{
-		spt: make([]*PathTree, g.NumVertical()),
+		spt: make([]*PathTree, g.NumVert()),
 	}
 	for v := range sps.spt {
 		tree := newShortestPathTree(g, v)
@@ -114,7 +114,7 @@ func (g *WDigraph) SearcherTopological() (*Searcher, error) {
 
 func (g *WDigraph) SearcherBellmanFord() (*Searcher, error) {
 	sps := &Searcher{
-		spt: make([]*PathTree, g.NumVertical()),
+		spt: make([]*PathTree, g.NumVert()),
 	}
 	var err error
 	for v := range sps.spt {

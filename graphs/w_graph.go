@@ -22,13 +22,13 @@ func (g *WGraph) AddEdge(src, dst int, w float64) error {
 
 // LazyPrim gets the minimum spanning tree by Lazy-Prim algorithm. g MUST be a connected graph
 func (g *WGraph) LazyPrim() (mst *WGraph) {
-	pq := heap.New(g.NumVertical())
-	mst = NewWGraph(g.NumVertical())
-	marked := make([]bool, g.NumVertical())
+	pq := heap.New(g.NumVert())
+	mst = NewWGraph(g.NumVert())
+	marked := make([]bool, g.NumVert())
 	marked[0] = true
-	g.iterateAdj(0, func(src int, dst int, w float64) bool {
+	g.iterateWAdj(0, func(dst int, w float64) bool {
 		pq.Push(util.Float(w), &Edge{
-			from:   src,
+			from:   0,
 			to:     dst,
 			weight: w,
 		})
@@ -47,7 +47,7 @@ func (g *WGraph) LazyPrim() (mst *WGraph) {
 
 func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *heap.Heap) {
 	marked[v] = true
-	g.iterateAdj(v, func(_ int, a int, w float64) bool {
+	g.iterateWAdj(v, func(a int, w float64) bool {
 		if !marked[a] {
 			pq.Push(util.Float(w), &Edge{
 				from:   v,
@@ -61,11 +61,11 @@ func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *heap.Heap) {
 
 // Prim gets the minimum spanning tree by Prim algorithm. g MUST be a connected graph
 func (g *WGraph) Prim() (mst *WGraph) {
-	marked := make([]bool, g.NumVertical())
-	pq := heap.New(g.NumVertical())
-	mst = NewWGraph(g.NumVertical())
+	marked := make([]bool, g.NumVert())
+	pq := heap.New(g.NumVert())
+	mst = NewWGraph(g.NumVert())
 	marked[0] = true
-	g.iterateAdj(0, func(_ int, a int, w float64) bool {
+	g.iterateWAdj(0, func(a int, w float64) bool {
 		pq.Push(util.Float(w), a)
 		mst.AddEdge(0, a, w)
 		return true
@@ -81,7 +81,7 @@ func (g *WGraph) Prim() (mst *WGraph) {
 
 func primVisit(g, mst *WGraph, v int, marked []bool, pq *heap.Heap) {
 	marked[v] = true
-	g.iterateAdj(v, func(_ int, a int, w float64) bool {
+	g.iterateWAdj(v, func(a int, w float64) bool {
 		if marked[a] {
 			return true
 		}
@@ -100,9 +100,9 @@ func primVisit(g, mst *WGraph, v int, marked []bool, pq *heap.Heap) {
 
 // Kruskal gets the minimum spanning tree by Kruskal algorithm. g MUST be a connected graph
 func (g *WGraph) Kruskal() (mst *WGraph) {
-	mst = NewWGraph(g.NumVertical())
-	uf := unionfind.NewUF(int(g.NumVertical()))
-	pq := heap.New(g.NumVertical())
+	mst = NewWGraph(g.NumVert())
+	uf := unionfind.NewUF(int(g.NumVert()))
+	pq := heap.New(g.NumVert())
 	g.IterateWEdge(func(src int, dst int, w float64) bool {
 		pq.Push(util.Float(w), &Edge{
 			from:   src,
@@ -111,7 +111,7 @@ func (g *WGraph) Kruskal() (mst *WGraph) {
 		})
 		return true
 	})
-	for mst.NumEdge() < mst.NumVertical()-1 {
+	for mst.NumEdge() < mst.NumVert()-1 {
 		minE := pq.Pop().(*Edge)
 		if uf.IsConnected(minE.from, minE.to) {
 			continue

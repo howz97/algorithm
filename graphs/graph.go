@@ -24,7 +24,7 @@ func (g *Graph) AddEdge(src, dst int) error {
 }
 
 func (g *Graph) addWeightedEdge(src, dst int, w float64) error {
-	if !g.HasVertical(src) || !g.HasVertical(dst) {
+	if !g.HasVert(src) || !g.HasVert(dst) {
 		return ErrVerticalNotExist
 	}
 	if src == dst {
@@ -75,7 +75,7 @@ func (g *Graph) IterateEdgeFrom(v int, fn func(int, int) bool) {
 }
 
 func (g *Graph) HasCycle() bool {
-	marked := make([]bool, g.NumVertical())
+	marked := make([]bool, g.NumVert())
 	for i, m := range marked {
 		if m {
 			continue
@@ -118,7 +118,7 @@ type SubGraphs struct {
 
 func (g *Graph) SubGraphs() *SubGraphs {
 	tc := &SubGraphs{
-		locate: make([]int, g.NumVertical()),
+		locate: make([]int, g.NumVert()),
 	}
 	for i := range tc.locate {
 		tc.locate[i] = -1

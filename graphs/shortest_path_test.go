@@ -28,7 +28,7 @@ func TestEWD_Integer(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	num := int(g.NumVertical())
+	num := int(g.NumVert())
 	for src := 0; src < num; src++ {
 		for dst := 0; dst < num; dst++ {
 			p0 := spsDijkstra.GetPath(src, dst)
@@ -71,7 +71,7 @@ func TestNewSPS_Dijkstra(t *testing.T) {
 
 	sps, _ := g.SearcherDijkstra()
 
-	num := int(g.NumVertical())
+	num := int(g.NumVert())
 	for src := 0; src < num; src++ {
 		for dst := 0; dst < num; dst++ {
 			fmt.Println(sps.GetPath(src, dst).String())
@@ -85,7 +85,7 @@ func TestNewSPS_Topological(t *testing.T) {
 		t.Fatal(err)
 	}
 	sps, _ := g.SearcherTopological()
-	num := int(g.NumVertical())
+	num := int(g.NumVert())
 	for src := 0; src < num; src++ {
 		for dst := 0; dst < num; dst++ {
 			fmt.Println(sps.GetPath(src, dst).String())

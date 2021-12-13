@@ -53,8 +53,8 @@ type PathTree struct {
 func newShortestPathTree(g *WDigraph, src int) *PathTree {
 	spt := &PathTree{
 		src:    src,
-		distTo: make([]float64, g.NumVertical()),
-		edgeTo: make([]int, g.NumVertical()),
+		distTo: make([]float64, g.NumVert()),
+		edgeTo: make([]int, g.NumVert()),
 	}
 	for i := range spt.distTo {
 		spt.distTo[i] = math.Inf(1)
@@ -113,7 +113,7 @@ func (spt *PathTree) HasVertical(v int) bool {
 }
 
 func (spt *PathTree) initDijkstra(g *WDigraph) {
-	pq := heap.New(g.NumVertical())
+	pq := heap.New(g.NumVert())
 	dijkstraRelax(g, spt.src, spt.edgeTo, spt.distTo, pq)
 	for !pq.IsEmpty() {
 		m := pq.Pop().(int)
@@ -122,7 +122,7 @@ func (spt *PathTree) initDijkstra(g *WDigraph) {
 }
 
 func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *heap.Heap) {
-	g.IterateWAdj(v, func(adj int, w float64) bool {
+	g.iterateWAdj(v, func(adj int, w float64) bool {
 		if distTo[v]+w < distTo[adj] {
 			inPQ := distTo[adj] != math.Inf(1)
 			edgeTo[adj] = v
@@ -138,7 +138,7 @@ func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *heap.
 }
 
 func (spt *PathTree) initTopological(g *WDigraph) {
-	order := stack.NewInt(int(g.NumVertical()))
+	order := stack.NewInt(int(g.NumVert()))
 	g.IterateRDFSFrom(spt.src, func(v int) bool {
 		order.Push(v)
 		return true
@@ -150,7 +150,7 @@ func (spt *PathTree) initTopological(g *WDigraph) {
 }
 
 func topologicalRelax(g *WDigraph, v int, edgeTo []int, distTo []float64) {
-	g.IterateWAdj(v, func(a int, w float64) bool {
+	g.iterateWAdj(v, func(a int, w float64) bool {
 		if distTo[v]+w < distTo[a] {
 			edgeTo[a] = v
 			distTo[a] = distTo[v] + w
@@ -178,7 +178,7 @@ func (spt *PathTree) InitBellmanFord(g *WDigraph) error {
 		onQ[spt.src] = false
 		bellmanFordRelax(g, v, spt.edgeTo, spt.distTo, needRelax, onQ)
 		relaxTimes++
-		if relaxTimes%g.NumVertical() == 0 {
+		if relaxTimes%g.NumVert() == 0 {
 			if c := spt.findNegativeCycle(g); c.Size() > 0 {
 				return ErrCycle{Stack: c}
 			}
@@ -192,7 +192,7 @@ func (spt *PathTree) findNegativeCycle(g *WDigraph) *stack.IntStack {
 }
 
 func bellmanFordRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, needRelax *queue.IntQ, onQ []bool) {
-	g.IterateWAdj(v, func(adj int, w float64) bool {
+	g.iterateWAdj(v, func(adj int, w float64) bool {
 		if distTo[v]+w < distTo[adj] {
 			edgeTo[adj] = v
 			distTo[adj] = distTo[v] + w

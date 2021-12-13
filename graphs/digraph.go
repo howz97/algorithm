@@ -22,12 +22,16 @@ type Digraph struct {
 	*Symbol
 }
 
-func (dg *Digraph) NumVertical() uint {
+func (dg *Digraph) NumVert() uint {
 	return uint(len(dg.Edges))
 }
 
-func (dg *Digraph) HasVertical(v int) bool {
+func (dg *Digraph) HasVert(v int) bool {
 	return v >= 0 && v < len(dg.Edges)
+}
+
+func (dg *Digraph) AddEdge(src, dst int) error {
+	return dg.addWeightedEdge(src, dst, 1)
 }
 
 func (dg *Digraph) NumEdge() uint {
@@ -38,12 +42,15 @@ func (dg *Digraph) NumEdge() uint {
 	return n
 }
 
-func (dg *Digraph) AddEdge(src, dst int) error {
-	return dg.addWeightedEdge(src, dst, 1)
+func (dg *Digraph) HasEdge(v1, v2 int) bool {
+	if !dg.HasVert(v1) || !dg.HasVert(v2) {
+		return false
+	}
+	return dg.Edges[v1].Get(util.Int(v2)) != nil
 }
 
 func (dg *Digraph) addWeightedEdge(src, dst int, w float64) error {
-	if !dg.HasVertical(src) || !dg.HasVertical(dst) {
+	if !dg.HasVert(src) || !dg.HasVert(dst) {
 		return ErrVerticalNotExist
 	}
 	if src == dst {
@@ -53,30 +60,44 @@ func (dg *Digraph) addWeightedEdge(src, dst int, w float64) error {
 	return nil
 }
 
+func (dg *Digraph) getWeightMust(from, to int) float64 {
+	return dg.Edges[from].Get(util.Int(to)).(float64)
+}
+
+func (dg *Digraph) GetWeight(from, to int) (float64, bool) {
+	if !dg.HasVert(from) {
+		return 0, false
+	}
+	w := dg.Edges[from].Get(util.Int(to))
+	if w == nil {
+		return 0, false
+	}
+	return w.(float64), true
+}
+
 func (dg *Digraph) DelEdge(src, dst int) {
-	if !dg.HasVertical(src) {
+	if !dg.HasVert(src) {
 		return
 	}
 	dg.Edges[src].Del(util.Int(dst))
 }
 
-func (dg *Digraph) HasEdge(v1, v2 int) bool {
-	if !dg.HasVertical(v1) || !dg.HasVertical(v2) {
-		return false
-	}
-	return dg.Edges[v1].Get(util.Int(v2)) != nil
-}
-
+// IterateAdj iterate all adjacent vertices of v
 func (dg *Digraph) IterateAdj(v int, fn func(int) bool) {
 	dg.IterateWAdj(v, func(a int, _ float64) bool {
 		return fn(a)
 	})
 }
 
+// IterateWAdj iterate all adjacent vertices and weight of v
 func (dg *Digraph) IterateWAdj(v int, fn func(int, float64) bool) {
-	if !dg.HasVertical(v) {
+	if !dg.HasVert(v) {
 		return
 	}
+	dg.iterateWAdj(v, fn)
+}
+
+func (dg *Digraph) iterateWAdj(v int, fn func(int, float64) bool) {
 	dg.Edges[v].Range(func(key hash_map.Key, val util.T) bool {
 		return fn(int(key.(util.Int)), val.(float64))
 	})
@@ -88,21 +109,6 @@ func (dg *Digraph) Adjacent(v int) (adj []int) {
 		return true
 	})
 	return adj
-}
-
-func (dg *Digraph) getWeightMust(from, to int) float64 {
-	return dg.Edges[from].Get(util.Int(to)).(float64)
-}
-
-func (dg *Digraph) GetWeight(from, to int) (float64, bool) {
-	if !dg.HasVertical(from) {
-		return 0, false
-	}
-	w := dg.Edges[from].Get(util.Int(to))
-	if w == nil {
-		return 0, false
-	}
-	return w.(float64), true
 }
 
 func (dg *Digraph) String() string {
@@ -125,17 +131,17 @@ func (dg *Digraph) String() string {
 	return out
 }
 
+// Reverse all edges of dg
 func (dg *Digraph) Reverse() *Digraph {
-	rg := NewDigraph(dg.NumVertical())
-	for v := 0; v < int(dg.NumVertical()); v++ {
-		dg.IterateAdj(v, func(w int) bool {
-			rg.AddEdge(w, v)
-			return true
-		})
-	}
+	rg := NewDigraph(dg.NumVert())
+	dg.IterateWEdge(func(from int, to int, w float64) bool {
+		rg.addWeightedEdge(to, from, w)
+		return true
+	})
 	return rg
 }
 
+// FindNegativeEdge find a negative edge. If here is no negative edge, (-1, -1) will be returned
 func (dg *Digraph) FindNegativeEdge() (src, dst int) {
 	src, dst = -1, -1
 	dg.IterateWEdge(func(v int, v2 int, w float64) bool {
@@ -149,18 +155,9 @@ func (dg *Digraph) FindNegativeEdge() (src, dst int) {
 	return
 }
 
-func (dg *Digraph) iterateAdj(v int, fn func(int, int, float64) bool) {
-	dg.Edges[v].Range(func(key hash_map.Key, val util.T) bool {
-		return fn(v, int(key.(util.Int)), val.(float64))
-	})
-}
-
-func (dg *Digraph) HasCycle() bool {
-	return dg.FindCycle() != nil
-}
-
+// FindCycle find any directed cycle in dg
 func (dg *Digraph) FindCycle() *stack.IntStack {
-	marks := make([]bool, dg.NumVertical())
+	marks := make([]bool, dg.NumVert())
 	path := stack.NewInt(4)
 	for v, m := range marks {
 		if !m {
@@ -172,8 +169,9 @@ func (dg *Digraph) FindCycle() *stack.IntStack {
 	return nil
 }
 
+// FindCycleFrom find any directed cycle from vertical v in dg. Not include cycle that can not be accessed from v
 func (dg *Digraph) FindCycleFrom(v int) *stack.IntStack {
-	marks := make([]bool, dg.NumVertical())
+	marks := make([]bool, dg.NumVert())
 	path := stack.NewInt(4)
 	if dg.DetectCycleDFS(v, marks, path) {
 		return path
@@ -220,10 +218,10 @@ func (dg *Digraph) DetectCycleDFS(v int, marked []bool, path *stack.IntStack) bo
 
 // Topological return a stack that pop vertices in topological order
 func (dg *Digraph) Topological() *stack.IntStack {
-	if dg.HasCycle() {
+	if dg.FindCycle() != nil {
 		return nil
 	}
-	order := stack.NewInt(int(dg.NumVertical()))
+	order := stack.NewInt(int(dg.NumVert()))
 	dg.IterateVetRDFS(func(v int) bool {
 		order.Push(v)
 		return true
@@ -253,7 +251,7 @@ func (dg *Digraph) IterateEdge(fn func(int, int) bool) {
 func (dg *Digraph) IterateWEdgeFrom(v int, fn func(int, int, float64) bool) {
 	dg.IterateVetDFS(v, func(v int) bool {
 		goon := true
-		dg.IterateWAdj(v, func(a int, w float64) bool {
+		dg.iterateWAdj(v, func(a int, w float64) bool {
 			goon = fn(v, a, w)
 			return goon
 		})
@@ -272,11 +270,11 @@ func (dg *Digraph) IterateVetDFS(src int, fn func(int) bool) {
 }
 
 func (dg *Digraph) iterateUnMarkVetFrom(src int, marked []bool, fn func(int) bool) {
-	if !dg.HasVertical(src) {
+	if !dg.HasVert(src) {
 		return
 	}
 	if len(marked) == 0 {
-		marked = make([]bool, dg.NumVertical())
+		marked = make([]bool, dg.NumVert())
 	}
 	dg.iterateUnMarkVetDFS(src, marked, fn)
 }
@@ -299,7 +297,7 @@ func (dg *Digraph) iterateUnMarkVetDFS(v int, marked []bool, fn func(int) bool) 
 }
 
 func (dg *Digraph) ReachableSlice(src int) []int {
-	if !dg.HasVertical(src) {
+	if !dg.HasVert(src) {
 		return nil
 	}
 	var arrived []int
@@ -311,16 +309,16 @@ func (dg *Digraph) ReachableSlice(src int) []int {
 }
 
 func (dg *Digraph) ReachableBits(src int) []bool {
-	if !dg.HasVertical(src) {
+	if !dg.HasVert(src) {
 		return nil
 	}
-	marked := make([]bool, dg.NumVertical())
+	marked := make([]bool, dg.NumVert())
 	dg.iterateUnMarkVetDFS(src, marked, func(_ int) bool { return true })
 	return marked
 }
 
 func (dg *Digraph) IterateVetRDFS(fn func(int) bool) {
-	marked := make([]bool, dg.NumVertical())
+	marked := make([]bool, dg.NumVert())
 	for v := range marked {
 		if marked[v] {
 			continue
@@ -330,15 +328,15 @@ func (dg *Digraph) IterateVetRDFS(fn func(int) bool) {
 }
 
 func (dg *Digraph) IterateRDFSFrom(src int, fn func(int) bool) {
-	if !dg.HasVertical(src) {
+	if !dg.HasVert(src) {
 		return
 	}
-	marked := make([]bool, dg.NumVertical())
+	marked := make([]bool, dg.NumVert())
 	dg.rDFS(src, marked, fn)
 }
 
 func (dg *Digraph) RDFSOrderVertical(src int) *stack.IntStack {
-	order := stack.NewInt(int(dg.NumVertical()))
+	order := stack.NewInt(int(dg.NumVert()))
 	dg.IterateRDFSFrom(src, func(v int) bool {
 		order.Push(v)
 		return true
@@ -364,8 +362,8 @@ func (dg *Digraph) rDFS(v int, marked []bool, fn func(int) bool) bool {
 }
 
 func (dg *Digraph) IsBipartiteGraph() bool {
-	marks := make([]bool, dg.NumVertical())
-	colors := make([]bool, dg.NumVertical())
+	marks := make([]bool, dg.NumVert())
+	colors := make([]bool, dg.NumVert())
 	for i, m := range marks {
 		if m {
 			continue
@@ -396,7 +394,7 @@ func (dg *Digraph) isBipartiteDFS(cur int, color bool, colors []bool, marked []b
 }
 
 func (dg *Digraph) SameWith(other Digraph) bool {
-	if dg.NumVertical() != other.NumVertical() {
+	if dg.NumVert() != other.NumVert() {
 		return false
 	}
 	if dg.NumEdge() != other.NumEdge() {
@@ -425,9 +423,9 @@ func (dg *Digraph) TotalWeight() float64 {
 
 func (dg *Digraph) Marshal() ([]byte, error) {
 	m := make(map[string]map[string]float64)
-	for v := 0; v < int(dg.NumVertical()); v++ {
+	for v := 0; v < int(dg.NumVert()); v++ {
 		edges := make(map[string]float64)
-		dg.IterateWAdj(v, func(a int, w float64) bool {
+		dg.iterateWAdj(v, func(a int, w float64) bool {
 			if dg.Symbol == nil {
 				edges[strconv.Itoa(a)] = w
 			} else {
@@ -454,9 +452,9 @@ type SCC struct {
 // SCC calculate strong connected components of digraph with kosaraju algorithm
 func (dg Digraph) SCC() *SCC {
 	scc := &SCC{
-		locate: make([]int, dg.NumVertical()),
+		locate: make([]int, dg.NumVert()),
 	}
-	marked := make([]bool, dg.NumVertical())
+	marked := make([]bool, dg.NumVert())
 	dg.IterateVetRDFS(func(v int) bool {
 		if !marked[v] {
 			c := make([]int, 0, 8)
@@ -508,7 +506,7 @@ func (scc *SCC) hasVertical(v int) bool {
 type Reachable [][]bool
 
 func (dg Digraph) Reachable() Reachable {
-	tc := make(Reachable, dg.NumVertical())
+	tc := make(Reachable, dg.NumVert())
 	for v := range tc {
 		tc[v] = dg.ReachableBits(v)
 	}
@@ -546,13 +544,13 @@ type BFS struct {
 }
 
 func (dg Digraph) BFS(src int) *BFS {
-	if !dg.HasVertical(src) {
+	if !dg.HasVert(src) {
 		return nil
 	}
 	bfs := &BFS{
 		src:    src,
-		marked: make([]bool, dg.NumVertical()),
-		edgeTo: make([]int, dg.NumVertical()),
+		marked: make([]bool, dg.NumVert()),
+		edgeTo: make([]int, dg.NumVert()),
 	}
 	q := queue.NewIntQ()
 	bfs.marked[src] = true
