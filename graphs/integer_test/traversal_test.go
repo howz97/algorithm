@@ -54,20 +54,8 @@ func TestDFS_Graph(t *testing.T) {
 	checkDFSResults(t, g.Digraph, dfsResults)
 }
 
-var digraph1 = [][]int{
-	0: {3},
-	1: {5},
-	2: {1},
-	3: {6, 7},
-	4: {},
-	5: {2, 8},
-	6: {7},
-	7: {},
-	8: {7},
-}
-
 func TestDFS_Digraph(t *testing.T) {
-	dg, err := graphs.NewDigraphBy2DSli(digraph1)
+	dg, err := graphs.LoadDigraph("..\\test_data\\dfs.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -85,7 +73,7 @@ func TestDFS_Digraph(t *testing.T) {
 	checkDFSResults(t, dg, dfsResults)
 }
 
-func checkDFSResults(t *testing.T, g graphs.Digraph, dfsResults [][]int) {
+func checkDFSResults(t *testing.T, g *graphs.Digraph, dfsResults [][]int) {
 	for src := range dfsResults {
 		reach := g.ReachableSlice(src)
 		sort.QuickSort(stdsort.IntSlice(reach))
@@ -96,7 +84,7 @@ func checkDFSResults(t *testing.T, g graphs.Digraph, dfsResults [][]int) {
 }
 
 func TestRevDFS(t *testing.T) {
-	g, err := graphs.NewDigraphBy2DSli(digraph1)
+	g, err := graphs.LoadDigraph("..\\test_data\\dfs.yml")
 	if err != nil {
 		t.Fatal(err)
 	}

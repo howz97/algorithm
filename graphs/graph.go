@@ -5,12 +5,12 @@ import (
 )
 
 type Graph struct {
-	Digraph
+	*Digraph
 }
 
 func NewGraph(size uint) *Graph {
 	return &Graph{
-		Digraph: *NewDigraph(size),
+		Digraph: NewDigraph(size),
 	}
 }
 

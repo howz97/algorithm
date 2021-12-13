@@ -22,20 +22,6 @@ func NewDigraph(size uint) *Digraph {
 	return &Digraph{Edges: edges}
 }
 
-func NewDigraphBy2DSli(sli [][]int) (*Digraph, error) { // todo deprecated
-	dg := NewDigraph(uint(len(sli)))
-	var err error
-	for src, s := range sli {
-		for _, dst := range s {
-			err = dg.AddEdge(src, dst)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-	return dg, nil
-}
-
 func (dg *Digraph) NumVertical() uint {
 	return uint(len(dg.Edges))
 }
@@ -104,7 +90,7 @@ func (dg *Digraph) Adjacent(v int) (adj []int) {
 	return adj
 }
 
-func (dg *Digraph) GetWeightMust(from, to int) float64 {
+func (dg *Digraph) getWeightMust(from, to int) float64 {
 	return dg.Edges[from].Get(util.Int(to)).(float64)
 }
 
@@ -282,10 +268,10 @@ func (dg *Digraph) IterateEdgeFrom(v int, fn func(int, int) bool) {
 }
 
 func (dg *Digraph) IterateVetDFS(src int, fn func(int) bool) {
-	dg.IterateUnMarkVetDFS(src, nil, fn)
+	dg.iterateUnMarkVetFrom(src, nil, fn)
 }
 
-func (dg *Digraph) IterateUnMarkVetDFS(src int, marked []bool, fn func(int) bool) {
+func (dg *Digraph) iterateUnMarkVetFrom(src int, marked []bool, fn func(int) bool) {
 	if !dg.HasVertical(src) {
 		return
 	}
@@ -343,7 +329,7 @@ func (dg *Digraph) IterateVetRDFS(fn func(int) bool) {
 	}
 }
 
-func (dg *Digraph) IterateRDFSFromVet(src int, fn func(int) bool) {
+func (dg *Digraph) IterateRDFSFrom(src int, fn func(int) bool) {
 	if !dg.HasVertical(src) {
 		return
 	}
@@ -353,7 +339,7 @@ func (dg *Digraph) IterateRDFSFromVet(src int, fn func(int) bool) {
 
 func (dg *Digraph) RDFSOrderVertical(src int) *stack.IntStack {
 	order := stack.NewInt(int(dg.NumVertical()))
-	dg.IterateRDFSFromVet(src, func(v int) bool {
+	dg.IterateRDFSFrom(src, func(v int) bool {
 		order.Push(v)
 		return true
 	})
@@ -474,7 +460,7 @@ func (dg Digraph) SCC() *SCC {
 	dg.IterateVetRDFS(func(v int) bool {
 		if !marked[v] {
 			c := make([]int, 0, 8)
-			dg.IterateUnMarkVetDFS(v, marked, func(w int) bool {
+			dg.iterateUnMarkVetFrom(v, marked, func(w int) bool {
 				scc.locate[w] = len(scc.components)
 				c = append(c, w)
 				return true

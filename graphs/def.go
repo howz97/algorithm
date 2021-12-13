@@ -88,7 +88,7 @@ func LoadGraph(filename string) (*Graph, error) {
 		return nil, err
 	}
 	dropWeight(dg)
-	return &Graph{Digraph: *dg}, nil
+	return &Graph{Digraph: dg}, nil
 }
 
 func dropWeight(dg *Digraph) {
@@ -133,5 +133,5 @@ func LoadWGraph(filename string) (*WGraph, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &WGraph{Graph{Digraph: *dg}}, nil
+	return &WGraph{Graph{Digraph: dg}}, nil
 }

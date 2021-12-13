@@ -73,7 +73,7 @@ func (g *WGraph) Prim() (mst *WGraph) {
 	for !pq.IsEmpty() {
 		v := pq.Pop().(int)
 		from := mst.Adjacent(v)[0]
-		mst.AddEdge(from, v, g.GetWeightMust(from, v))
+		mst.AddEdge(from, v, g.getWeightMust(from, v))
 		primVisit(g, mst, v, marked, pq)
 	}
 	return
@@ -89,7 +89,7 @@ func primVisit(g, mst *WGraph, v int, marked []bool, pq *heap.Heap) {
 		if len(orig) == 0 {
 			pq.Push(util.Float(w), a)
 			mst.AddEdge(v, a, w)
-		} else if w < mst.GetWeightMust(orig[0], a) {
+		} else if w < mst.getWeightMust(orig[0], a) {
 			pq.Fix(util.Float(w), a)
 			mst.DelEdge(orig[0], a)
 			mst.AddEdge(v, a, w)
