@@ -1,15 +1,15 @@
 package graphs
 
-type Symbol struct {
-	syb2vet map[string]int
-	vet2syb []string
-}
-
 func NewSymbolGraph() *Symbol {
 	return &Symbol{
 		syb2vet: make(map[string]int),
 		vet2syb: nil,
 	}
+}
+
+type Symbol struct {
+	syb2vet map[string]int
+	vet2syb []string
 }
 
 func (sg *Symbol) scanVertical(v string) {
