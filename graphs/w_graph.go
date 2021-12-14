@@ -121,8 +121,3 @@ func (g *WGraph) Kruskal() (mst *WGraph) {
 	}
 	return
 }
-
-type edge struct {
-	from, to int
-	weight   float64
-}

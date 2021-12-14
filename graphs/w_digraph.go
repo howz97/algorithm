@@ -3,6 +3,18 @@ package graphs
 import (
 	"errors"
 	"fmt"
+	"github.com/howz97/algorithm/pq/heap"
+	"github.com/howz97/algorithm/queue"
+	"github.com/howz97/algorithm/stack"
+	"github.com/howz97/algorithm/util"
+	"math"
+	"strconv"
+)
+
+const (
+	Dijkstra = iota
+	Topological
+	BellmanFord
 )
 
 func NewWDigraph(size uint) *WDigraph {
@@ -60,11 +72,172 @@ func (g *WDigraph) ShortestPathTree(src int, alg int) (*PathTree, error) {
 		}
 		spt.initTopological(g)
 	case BellmanFord:
-		err = spt.InitBellmanFord(g)
+		err = spt.initBellmanFord(g)
 	default:
 		err = errors.New(fmt.Sprintf("algorithm %v not supported", alg))
 	}
 	return spt, err
+}
+
+// PathTree is shortest path tree
+type PathTree struct {
+	src    int
+	distTo []float64
+	edgeTo []int
+}
+
+func newShortestPathTree(g *WDigraph, src int) *PathTree {
+	spt := &PathTree{
+		src:    src,
+		distTo: make([]float64, g.NumVert()),
+		edgeTo: make([]int, g.NumVert()),
+	}
+	for i := range spt.distTo {
+		spt.distTo[i] = math.Inf(1)
+	}
+	spt.distTo[src] = 0
+	for i := range spt.edgeTo {
+		spt.edgeTo[i] = -1
+	}
+	return spt
+}
+
+// CanReach check whether src can reach dst
+func (spt *PathTree) CanReach(dst int) bool {
+	if !spt.hasVert(dst) {
+		return false
+	}
+	return spt.distTo[dst] != math.Inf(1)
+}
+
+// DistanceTo get the distance from src to dst
+func (spt *PathTree) DistanceTo(dst int) float64 {
+	if !spt.hasVert(dst) {
+		return math.Inf(1)
+	}
+	return spt.distTo[dst]
+}
+
+// PathTo get the path from src to dst
+func (spt *PathTree) PathTo(dst int) *Path {
+	if !spt.hasVert(dst) {
+		return nil
+	}
+	src := spt.edgeTo[dst]
+	if src < 0 {
+		return nil
+	}
+	path := stack.NewInt(len(spt.distTo))
+	for {
+		path.Push(dst)
+		dst = src
+		src = spt.edgeTo[dst]
+		if src < 0 {
+			break
+		}
+	}
+	path.Push(spt.src)
+	return &Path{
+		Stack:      path,
+		distance: spt.distTo[dst],
+	}
+}
+
+func (spt *PathTree) hasVert(v int) bool {
+	return v >= 0 && v < len(spt.distTo)
+}
+
+func (spt *PathTree) initDijkstra(g *WDigraph) {
+	pq := heap.New(g.NumVert())
+	dijkstraRelax(g, spt.src, spt.edgeTo, spt.distTo, pq)
+	for !pq.IsEmpty() {
+		m := pq.Pop().(int)
+		dijkstraRelax(g, m, spt.edgeTo, spt.distTo, pq)
+	}
+}
+
+func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *heap.Heap) {
+	g.iterateWAdj(v, func(adj int, w float64) bool {
+		if distTo[v]+w < distTo[adj] {
+			inPQ := distTo[adj] != math.Inf(1)
+			edgeTo[adj] = v
+			distTo[adj] = distTo[v] + w
+			if inPQ {
+				pq.Fix(util.Float(distTo[adj]), adj)
+			} else {
+				pq.Push(util.Float(distTo[adj]), adj)
+			}
+		}
+		return true
+	})
+}
+
+func (spt *PathTree) initTopological(g *WDigraph) {
+	order := stack.NewInt(int(g.NumVert()))
+	g.IterateRDFSFrom(spt.src, func(v int) bool {
+		order.Push(v)
+		return true
+	})
+	for order.Size() > 0 {
+		v := order.Pop()
+		topologicalRelax(g, v, spt.edgeTo, spt.distTo)
+	}
+}
+
+func topologicalRelax(g *WDigraph, v int, edgeTo []int, distTo []float64) {
+	g.iterateWAdj(v, func(a int, w float64) bool {
+		if distTo[v]+w < distTo[a] {
+			edgeTo[a] = v
+			distTo[a] = distTo[v] + w
+		}
+		return true
+	})
+}
+
+type ErrCycle struct {
+	Stack *stack.Stack
+}
+
+func (nc ErrCycle) Error() string {
+	return "weight negative cycle: " + nc.Stack.String()
+}
+
+func (spt *PathTree) initBellmanFord(g *WDigraph) error {
+	needRelax := queue.NewIntQ()
+	onQ := make([]bool, g.NumVert())
+	needRelax.PushBack(spt.src)
+	onQ[spt.src] = true
+	relaxTimes := uint(0)
+	for !needRelax.IsEmpty() {
+		v := needRelax.Front()
+		onQ[spt.src] = false
+		bellmanFordRelax(g, v, spt.edgeTo, spt.distTo, needRelax, onQ)
+		relaxTimes++
+		if relaxTimes%g.NumVert() == 0 {
+			if c := spt.findNegativeCycle(g); c != nil {
+				return ErrCycle{Stack: c.stk}
+			}
+		}
+	}
+	return nil
+}
+
+func (spt *PathTree) findNegativeCycle(g *WDigraph) *Path {
+	return g.AnyNegativeCycle() // todo: optimize ?
+}
+
+func bellmanFordRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, needRelax *queue.IntQ, onQ []bool) {
+	g.iterateWAdj(v, func(adj int, w float64) bool {
+		if distTo[v]+w < distTo[adj] {
+			edgeTo[adj] = v
+			distTo[adj] = distTo[v] + w
+			if !onQ[adj] {
+				needRelax.PushBack(adj)
+				onQ[adj] = true
+			}
+		}
+		return true
+	})
 }
 
 func (g *WDigraph) SearcherDijkstra() (*Searcher, error) {
@@ -84,7 +257,7 @@ func (g *WDigraph) SearcherDijkstra() (*Searcher, error) {
 
 func (g *WDigraph) SearcherTopological() (*Searcher, error) {
 	if cycle := g.FindCycle(); cycle != nil {
-		return nil, ErrCycle{Stack: cycle.stk}
+		return nil, ErrCycle{Stack: cycle.Stack}
 	}
 	sps := &Searcher{
 		spt: make([]*PathTree, g.NumVert()),
@@ -104,11 +277,87 @@ func (g *WDigraph) SearcherBellmanFord() (*Searcher, error) {
 	var err error
 	for v := range sps.spt {
 		tree := newShortestPathTree(g, v)
-		err = tree.InitBellmanFord(g)
+		err = tree.initBellmanFord(g)
 		if err != nil {
 			return nil, err
 		}
 		sps.spt[v] = tree
 	}
 	return sps, nil
+}
+
+type Searcher struct {
+	spt []*PathTree
+}
+
+func (s *Searcher) GetDistance(src, dst int) float64 {
+	if !s.HasVertical(src) {
+		return math.Inf(1)
+	}
+	return s.spt[src].DistanceTo(dst)
+}
+
+func (s *Searcher) GetPath(src, dst int) *Path {
+	if !s.HasVertical(src) {
+		return nil
+	}
+	return s.spt[src].PathTo(dst)
+}
+
+func (s *Searcher) HasVertical(v int) bool {
+	return v >= 0 && v < len(s.spt)
+}
+
+func NewPath() *Path {
+	return &Path{
+		Stack:      stack.New(2),
+		distance: 0,
+	}
+}
+
+type Path struct {
+	*stack.Stack
+	distance float64
+}
+
+func (p *Path) Push(from, to int, w float64) {
+	p.Stack.Push(edge{
+		from:   from,
+		to:     to,
+		weight: w,
+	})
+	p.distance += w
+}
+
+func (p *Path) Pop() edge {
+	e := p.Stack.Pop().(edge)
+	p.distance -= e.weight
+	return e
+}
+
+func (p *Path) Str(s *Symbol) string {
+	if p == nil || p.Size() <= 0 {
+		return "path not exist"
+	}
+	var i2s func(int)string
+	if s == nil {
+		i2s = strconv.Itoa
+	} else {
+		i2s = s.SymbolOf
+	}
+	str := fmt.Sprintf("(distance=%v): ", p.distance)
+	for p.Stack.Size() > 0 {
+		e := p.Pop()
+		str += e.string(i2s) + ", "
+	}
+	return str
+}
+
+type edge struct {
+	from, to int
+	weight   float64
+}
+
+func (e *edge) string(i2s func(int)string) string {
+	return i2s(e.from) + "->" + i2s(e.to)
 }

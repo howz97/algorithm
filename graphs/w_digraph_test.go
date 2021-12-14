@@ -74,7 +74,7 @@ func TestNewSPS_Dijkstra(t *testing.T) {
 	num := int(g.NumVert())
 	for src := 0; src < num; src++ {
 		for dst := 0; dst < num; dst++ {
-			fmt.Println(sps.GetPath(src, dst).String())
+			fmt.Println(sps.GetPath(src, dst).Str(nil))
 		}
 	}
 }
@@ -88,7 +88,7 @@ func TestNewSPS_Topological(t *testing.T) {
 	num := int(g.NumVert())
 	for src := 0; src < num; src++ {
 		for dst := 0; dst < num; dst++ {
-			fmt.Println(sps.GetPath(src, dst).String())
+			fmt.Println(sps.GetPath(src, dst).Str(nil))
 		}
 	}
 }

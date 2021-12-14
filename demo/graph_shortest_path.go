@@ -16,7 +16,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(searcher.GetPath(1, 2).String())
+	fmt.Println(searcher.GetPath(1, 2).Str(nil))
 
 	/*
 		(distance=0): 1->3->6->2
