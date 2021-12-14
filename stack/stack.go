@@ -105,11 +105,17 @@ func (s *Stack) String() string {
 	return str
 }
 
-func (s *Stack) Peek() T {
+func (s *Stack) Peek(i int) T {
 	if s.top <= 0 {
 		return nil
 	}
-	return s.elems[s.top-1]
+	if i < 0 {
+		i = 0
+	}
+	if i >= s.top {
+		i = s.top-1
+	}
+	return s.elems[i]
 }
 
 func SizeOf(s *Stack) int {
