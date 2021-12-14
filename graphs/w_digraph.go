@@ -323,6 +323,24 @@ func (p *Path) Pop() edge {
 	return e
 }
 
+func (p *Path) ContainsVert(v int) bool {
+	if p.Size() <= 0 {
+		return false
+	}
+	found := false
+	p.Iterate(func(e stack.T) bool {
+		if e.(edge).from == v {
+			found = true
+			return false
+		}
+		return true
+	})
+	if !found {
+		found = p.Peek().(edge).to == v
+	}
+	return found
+}
+
 func (p *Path) Str(s *Symbol) string {
 	if p == nil || p.Size() <= 0 {
 		return "path not exist"

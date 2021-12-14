@@ -216,24 +216,24 @@ func (dg *Digraph) FindCycleFrom(v int) *Path {
 }
 
 func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path) bool {
-	path.stk.Push(v)
 	found := false
-	dg.iterateWAdj(v, func(a int, _ float64) bool {
+	dg.iterateWAdj(v, func(a int, w float64) bool {
 		if marked[a] {
 			return true
 		}
-		if path.stk.Contains(a) {
-			path.stk.Push(a)
+		if path.ContainsVert(a) {
+			path.Push(v, a, w)
 			found = true
 			return false
 		}
+		path.Push(v, a, w)
 		found = dg.detectCycleDFS(a, marked, path)
+		if !found {
+			path.Pop()
+		}
 		return !found
 	})
 	marked[v] = true
-	if !found {
-		path.stk.Pop()
-	}
 	return found
 }
 
