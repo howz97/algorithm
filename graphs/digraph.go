@@ -607,16 +607,12 @@ func (bfs *BFS) ShortestPathTo(dst int) *Path {
 	if dst == bfs.src {
 		return nil
 	}
-	path := &Path{
-		stk:      stack.NewInt(2),
-		distance: 0,
-	}
+	path := NewPath()
 	for dst != bfs.src {
-		path.stk.Push(dst)
+		path.Push(bfs.edgeTo[dst], dst, 1)
 		path.distance++
 		dst = bfs.edgeTo[dst]
 	}
-	path.stk.Push(bfs.src)
 	return path
 }
 
