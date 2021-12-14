@@ -374,13 +374,15 @@ func (p *Path) Cycle() *Cycle {
 		path.Push(e.from, e.to, e.weight)
 		return true
 	})
-	return (*Cycle)(path)
+	return &Cycle{path}
 }
 
-type Cycle Path
+type Cycle struct {
+	*Path
+}
 
 func (c *Cycle) Error() string {
-	return c.String()
+	return c.Str(nil)
 }
 
 type edge struct {

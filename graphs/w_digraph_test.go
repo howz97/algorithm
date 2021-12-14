@@ -2,12 +2,11 @@ package graphs
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/stack"
 	"testing"
 )
 
 func TestEWD_Integer(t *testing.T) {
-	g, err := LoadWDigraph("no_cycle.yml")
+	g, err := LoadWDigraph(".\\test_data\\no_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -33,25 +32,25 @@ func TestEWD_Integer(t *testing.T) {
 		for dst := 0; dst < num; dst++ {
 			p0 := spsDijkstra.GetPath(src, dst)
 			p1 := spsTop.GetPath(src, dst)
-			if !isPathEqual(p0.Stack, p1.Stack) {
-				t.Errorf("path(%d->%d) not equal: \np0=%s, \np1=%s \n", src, dst, p0, p1)
+			if !isPathEqual(p0, p1) {
+				t.Errorf("path(%d->%d) not equal: \np0=%s, \np1=%s \n", src, dst, p0.Str(nil), p1.Str(nil))
 			}
 
 			p0 = spsDijkstra.GetPath(src, dst)
 			p1 = spsBF.GetPath(src, dst)
-			if !isPathEqual(p0.Stack, p1.Stack) {
-				t.Errorf("path(%d->%d) not equal: \np0=%s, \np1=%s \n", src, dst, p0, p1)
+			if !isPathEqual(p0, p1) {
+				t.Errorf("path(%d->%d) not equal: \np0=%s, \np1=%s \n", src, dst, p0.Str(nil), p1.Str(nil))
 			}
 		}
 	}
 }
 
-func isPathEqual(s0, s1 *stack.Stack) bool {
-	if stack.SizeOf(s0) != stack.SizeOf(s1) {
-		return false
-	}
-	if s0 == nil {
+func isPathEqual(s0, s1 *Path) bool {
+	if s0 == nil && s1 == nil {
 		return true
+	}
+	if s0 == nil || s1 == nil {
+		return false
 	}
 	for s0.Size() > 0 {
 		e0 := s0.Pop()
@@ -64,7 +63,7 @@ func isPathEqual(s0, s1 *stack.Stack) bool {
 }
 
 func TestNewSPS_Dijkstra(t *testing.T) {
-	g, err := LoadWDigraph("w_digraph.yml")
+	g, err := LoadWDigraph(".\\test_data\\w_digraph.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,7 +79,7 @@ func TestNewSPS_Dijkstra(t *testing.T) {
 }
 
 func TestNewSPS_Topological(t *testing.T) {
-	g, err := LoadWDigraph("no_cycle.yml")
+	g, err := LoadWDigraph(".\\test_data\\no_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,7 +93,7 @@ func TestNewSPS_Topological(t *testing.T) {
 }
 
 func TestPathTree_Top(t *testing.T) {
-	g, err := LoadWDigraph("no_cycle.yml")
+	g, err := LoadWDigraph(".\\test_data\\no_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,7 +116,7 @@ func TestPathTree_Top(t *testing.T) {
 }
 
 func TestNewSPS_BellmanFord(t *testing.T) {
-	g, err := LoadWDigraph("negative_cycle.yml")
+	g, err := LoadWDigraph(".\\test_data\\negative_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
