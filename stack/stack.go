@@ -58,6 +58,22 @@ func (s *Stack) Contains(e T) bool {
 	return false
 }
 
+func (s *Stack) Index(fn func(T) bool) int {
+	i := 0
+	s.Iterate(func(e T) bool {
+		ok := fn(e)
+		if ok {
+			return false
+		}
+		i++
+		return true
+	})
+	if i >= s.top {
+		return -1
+	}
+	return i
+}
+
 func (s *Stack) Iterate(fn func(T) bool) {
 	s.IterateRange(0, s.Size(), fn)
 }
@@ -87,6 +103,13 @@ func (s *Stack) String() string {
 	})
 	str += "(top)"
 	return str
+}
+
+func (s *Stack) Peek() T {
+	if s.top <= 0 {
+		return nil
+	}
+	return s.elems[s.top-1]
 }
 
 func SizeOf(s *Stack) int {

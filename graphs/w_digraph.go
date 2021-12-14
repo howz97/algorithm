@@ -34,7 +34,7 @@ func (g *WDigraph) AddEdge(src, dst int, w float64) error {
 }
 
 // AnyNegativeCycle find a negative weighted cycle
-func (g *WDigraph) AnyNegativeCycle() *Path {
+func (g *WDigraph) AnyNegativeCycle() *Cycle {
 	marked := make([]bool, g.NumVert())
 	path := NewPath()
 	g.IterateWEdge(func(src int, dst int, w float64) bool {
@@ -47,10 +47,7 @@ func (g *WDigraph) AnyNegativeCycle() *Path {
 		}
 		return true
 	})
-	if path.stk.Size() <= 0 {
-		return nil
-	}
-	return path
+	return path.Cycle()
 }
 
 // ShortestPathTree get the shortest path tree from src by the specified algorithm
@@ -64,11 +61,13 @@ func (g *WDigraph) ShortestPathTree(src int, alg int) (*PathTree, error) {
 	case Dijkstra:
 		if src, dst := g.FindNegativeEdgeFrom(src); src >= 0 {
 			err = errors.New(fmt.Sprintf("negative edge %d->%d", src, dst))
+			break
 		}
 		spt.initDijkstra(g)
 	case Topological:
-		if cycle := g.FindCycleFrom(src); cycle != nil {
-			err = ErrCycle{Stack: cycle.stk}
+		if p := g.FindCycleFrom(src); p != nil {
+			err = p.Cycle()
+			break
 		}
 		spt.initTopological(g)
 	case BellmanFord:
@@ -127,20 +126,17 @@ func (spt *PathTree) PathTo(dst int) *Path {
 	if src < 0 {
 		return nil
 	}
-	path := stack.NewInt(len(spt.distTo))
+	path := NewPath()
+	path.distance = spt.distTo[dst]
 	for {
-		path.Push(dst)
+		path.Push(src, dst, 0)
 		dst = src
 		src = spt.edgeTo[dst]
 		if src < 0 {
 			break
 		}
 	}
-	path.Push(spt.src)
-	return &Path{
-		Stack:      path,
-		distance: spt.distTo[dst],
-	}
+	return path
 }
 
 func (spt *PathTree) hasVert(v int) bool {
@@ -194,14 +190,6 @@ func topologicalRelax(g *WDigraph, v int, edgeTo []int, distTo []float64) {
 	})
 }
 
-type ErrCycle struct {
-	Stack *stack.Stack
-}
-
-func (nc ErrCycle) Error() string {
-	return "weight negative cycle: " + nc.Stack.String()
-}
-
 func (spt *PathTree) initBellmanFord(g *WDigraph) error {
 	needRelax := queue.NewIntQ()
 	onQ := make([]bool, g.NumVert())
@@ -215,14 +203,14 @@ func (spt *PathTree) initBellmanFord(g *WDigraph) error {
 		relaxTimes++
 		if relaxTimes%g.NumVert() == 0 {
 			if c := spt.findNegativeCycle(g); c != nil {
-				return ErrCycle{Stack: c.stk}
+				return c
 			}
 		}
 	}
 	return nil
 }
 
-func (spt *PathTree) findNegativeCycle(g *WDigraph) *Path {
+func (spt *PathTree) findNegativeCycle(g *WDigraph) *Cycle {
 	return g.AnyNegativeCycle() // todo: optimize ?
 }
 
@@ -256,8 +244,8 @@ func (g *WDigraph) SearcherDijkstra() (*Searcher, error) {
 }
 
 func (g *WDigraph) SearcherTopological() (*Searcher, error) {
-	if cycle := g.FindCycle(); cycle != nil {
-		return nil, ErrCycle{Stack: cycle.Stack}
+	if c := g.FindCycle(); c != nil {
+		return nil, c
 	}
 	sps := &Searcher{
 		spt: make([]*PathTree, g.NumVert()),
@@ -310,7 +298,7 @@ func (s *Searcher) HasVertical(v int) bool {
 
 func NewPath() *Path {
 	return &Path{
-		Stack:      stack.New(2),
+		Stack:    stack.New(2),
 		distance: 0,
 	}
 }
@@ -339,7 +327,7 @@ func (p *Path) Str(s *Symbol) string {
 	if p == nil || p.Size() <= 0 {
 		return "path not exist"
 	}
-	var i2s func(int)string
+	var i2s func(int) string
 	if s == nil {
 		i2s = strconv.Itoa
 	} else {
@@ -353,11 +341,35 @@ func (p *Path) Str(s *Symbol) string {
 	return str
 }
 
+func (p *Path) Cycle() *Cycle {
+	e := p.Peek()
+	if e == nil {
+		return nil
+	}
+	x := e.(edge).to
+	i := p.Index(func(v stack.T) bool {
+		return v.(edge).from == x
+	})
+	path := NewPath()
+	p.IterateRange(i, p.Size(), func(v stack.T) bool {
+		e := v.(edge)
+		path.Push(e.from, e.to, e.weight)
+		return true
+	})
+	return (*Cycle)(path)
+}
+
+type Cycle Path
+
+func (c *Cycle) Error() string {
+	return c.String()
+}
+
 type edge struct {
 	from, to int
 	weight   float64
 }
 
-func (e *edge) string(i2s func(int)string) string {
+func (e *edge) string(i2s func(int) string) string {
 	return i2s(e.from) + "->" + i2s(e.to)
 }

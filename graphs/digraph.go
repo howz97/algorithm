@@ -191,13 +191,13 @@ func (dg *Digraph) FindNegativeEdgeFrom(start int) (src int, dst int) {
 }
 
 // FindCycle find any directed cycle in dg
-func (dg *Digraph) FindCycle() *Path {
+func (dg *Digraph) FindCycle() *Cycle {
 	marks := make([]bool, dg.NumVert())
 	path := NewPath()
 	for v, m := range marks {
 		if !m {
 			if dg.detectCycleDFS(v, marks, path) {
-				return path
+				return path.Cycle()
 			}
 		}
 	}
