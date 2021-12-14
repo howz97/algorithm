@@ -360,8 +360,7 @@ func (p *Path) Str(s *Symbol) string {
 }
 
 func (p *Path) Cycle() *Cycle {
-	fmt.Println("path is", p.Stack.String())
-	e := p.Peek(0)
+	e := p.Peek(p.Size())
 	if e == nil {
 		return nil
 	}
@@ -370,7 +369,7 @@ func (p *Path) Cycle() *Cycle {
 		return v.(edge).from == x
 	})
 	path := NewPath()
-	p.IterateRange(0, i+1, func(v stack.T) bool {
+	p.IterateRange(i, p.Size(), func(v stack.T) bool {
 		e := v.(edge)
 		path.Push(e.from, e.to, e.weight)
 		return true
