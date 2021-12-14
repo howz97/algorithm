@@ -40,7 +40,7 @@ func (g *WDigraph) AnyNegativeCycle() *Cycle {
 	g.IterateWEdge(func(src int, dst int, w float64) bool {
 		if w < 0 {
 			if !marked[src] {
-				if g.detectCycleDFS(src, marked, path) {
+				if g.detectCycleDFS(src, marked, path, true) {
 					return false
 				}
 			}

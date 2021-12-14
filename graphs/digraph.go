@@ -1,6 +1,7 @@
 package graphs
 
 import (
+	"fmt"
 	"github.com/howz97/algorithm/queue"
 	"github.com/howz97/algorithm/search/hash_map"
 	"github.com/howz97/algorithm/stack"
@@ -196,7 +197,7 @@ func (dg *Digraph) FindCycle() *Cycle {
 	path := NewPath()
 	for v, m := range marks {
 		if !m {
-			if dg.detectCycleDFS(v, marks, path) {
+			if dg.detectCycleDFS(v, marks, path, false) {
 				return path.Cycle()
 			}
 		}
@@ -209,25 +210,37 @@ func (dg *Digraph) FindCycle() *Cycle {
 func (dg *Digraph) FindCycleFrom(v int) *Path {
 	marks := make([]bool, dg.NumVert())
 	path := NewPath()
-	if dg.detectCycleDFS(v, marks, path) {
+	if dg.detectCycleDFS(v, marks, path, false) {
 		return path
 	}
 	return nil
 }
 
-func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path) bool {
+func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path, negative bool) bool {
 	found := false
 	dg.iterateWAdj(v, func(a int, w float64) bool {
+		if v == 7 {
+			fmt.Println("edge @@@", v, a)
+		}
 		if marked[a] {
 			return true
 		}
 		if path.ContainsVert(a) {
 			path.Push(v, a, w)
+			if negative {
+				fmt.Println("cycle path found", path.String())
+				c := path.Cycle()
+				if c.distance >= 0 {
+					path.Pop()
+					return true
+				}
+				fmt.Println("negative cycle is ", c.String(), c.distance)
+			}
 			found = true
 			return false
 		}
 		path.Push(v, a, w)
-		found = dg.detectCycleDFS(a, marked, path)
+		found = dg.detectCycleDFS(a, marked, path, negative)
 		if !found {
 			path.Pop()
 		}

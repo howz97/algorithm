@@ -122,7 +122,7 @@ func TestNewSPS_BellmanFord(t *testing.T) {
 	}
 	_, err = g.SearcherBellmanFord()
 	if err == nil {
-		t.Fatal("negative cycle exist, error should be received")
+		t.Fatalf("negative cycle exist, error should be received")
 	}
 	fmt.Println(err)
 }
