@@ -62,6 +62,31 @@ func isPathEqual(s0, s1 *Path) bool {
 	return true
 }
 
+func TestEWD_Integer2(t *testing.T) {
+	g, err := LoadWDigraph(".\\test_data\\w_digraph.yml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	spsDijkstra, err := g.SearcherDijkstra()
+	if err != nil {
+		t.Fatal(err)
+	}
+	spsBF, err := g.SearcherBellmanFord()
+	if err != nil {
+		t.Fatal(err)
+	}
+	num := int(g.NumVert())
+	for src := 0; src < num; src++ {
+		for dst := 0; dst < num; dst++ {
+			p0 := spsDijkstra.GetPath(src, dst)
+			p1 := spsBF.GetPath(src, dst)
+			if !isPathEqual(p0, p1) {
+				t.Errorf("path(%d->%d) not equal: \np0=%s, \np1=%s \n", src, dst, p0.Str(nil), p1.Str(nil))
+			}
+		}
+	}
+}
+
 func TestNewSPS_Dijkstra(t *testing.T) {
 	g, err := LoadWDigraph(".\\test_data\\w_digraph.yml")
 	if err != nil {
