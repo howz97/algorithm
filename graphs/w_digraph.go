@@ -35,19 +35,20 @@ func (g *WDigraph) AddEdge(src, dst int, w float64) error {
 
 // AnyNegativeCycle find a negative weighted cycle
 func (g *WDigraph) AnyNegativeCycle() *Cycle {
-	marked := make([]bool, g.NumVert())
-	path := NewPath()
-	g.IterateWEdge(func(src int, dst int, w float64) bool {
-		if w < 0 {
-			if !marked[src] {
-				if g.detectCycleDFS(src, marked, path, true) {
-					return false
-				}
-			}
-		}
-		return true
-	})
-	return path.Cycle()
+	//marked := make([]bool, g.NumVert())
+	//path := NewPath()
+	//g.IterateWEdge(func(src int, dst int, w float64) bool {
+	//	if w < 0 {
+	//		if !marked[src] {
+	//			if g.detectCycleDFS(src, marked, path, true) {
+	//				return false
+	//			}
+	//		}
+	//	}
+	//	return true
+	//})
+	//return path.Cycle()
+	return nil
 }
 
 // ShortestPathTree get the shortest path tree from src by the specified algorithm
@@ -244,7 +245,7 @@ func (g *WDigraph) SearcherDijkstra() (*Searcher, error) {
 }
 
 func (g *WDigraph) SearcherTopological() (*Searcher, error) {
-	if c := g.FindCycle(); c != nil {
+	if c := g.FindCycle(false); c != nil {
 		return nil, c
 	}
 	sps := &Searcher{
