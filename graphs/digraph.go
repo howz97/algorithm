@@ -1,7 +1,6 @@
 package graphs
 
 import (
-	"fmt"
 	"github.com/howz97/algorithm/queue"
 	"github.com/howz97/algorithm/search/hash_map"
 	"github.com/howz97/algorithm/stack"
@@ -217,24 +216,19 @@ func (dg *Digraph) FindCycleFrom(v int) *Path {
 }
 
 func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path, negative bool) bool {
-	fmt.Printf("visiting %d : adjs=%v \n", v, dg.Adjacent(v))
-
 	found := false
 	dg.iterateWAdj(v, func(a int, w float64) bool {
-		fmt.Printf("edge %d->%d  marked[%d]=%v\n", v, a, a, marked[a])
 		if marked[a] {
 			return true
 		}
 		if path.ContainsVert(a) {
 			path.Push(v, a, w)
-			fmt.Println("cycle path found", path.String())
 			if negative {
 				c := path.Cycle()
 				if c.distance >= 0 {
 					path.Pop()
 					return true
 				}
-				fmt.Println("negative cycle is ", c.String(), c.distance)
 			}
 			found = true
 			return false
@@ -247,7 +241,6 @@ func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path, negative boo
 		return !found
 	})
 	marked[v] = true
-	fmt.Printf("vertical %d visited\n", v)
 	return found
 }
 
