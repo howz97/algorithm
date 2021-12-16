@@ -613,6 +613,7 @@ func (bfs *BFS) ShortestPathTo(dst int) *Path {
 		path.distance++
 		dst = bfs.edgeTo[dst]
 	}
+	path.Reverse()
 	return path
 }
 
