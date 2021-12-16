@@ -151,15 +151,3 @@ func TestNewSPS_BellmanFord(t *testing.T) {
 	}
 	fmt.Println(err)
 }
-
-func TestNegativeCycle(t *testing.T) {
-	g, err := LoadWDigraph(".\\test_data\\negative_cycle.yml")
-	if err != nil {
-		t.Fatal(err)
-	}
-	nc := g.FindCycle(true)
-	if nc == nil {
-		t.Fatalf("negative cycle not found")
-	}
-	t.Logf("negative cycle %s found", nc.Error())
-}

@@ -191,12 +191,12 @@ func (dg *Digraph) FindNegativeEdgeFrom(start int) (src int, dst int) {
 }
 
 // FindCycle find any directed cycle in dg
-func (dg *Digraph) FindCycle(negative bool) *Cycle {
+func (dg *Digraph) FindCycle() *Cycle {
 	marks := make([]bool, dg.NumVert())
 	path := NewPath()
 	for v, m := range marks {
 		if !m {
-			if dg.detectCycleDFS(v, marks, path, negative) {
+			if dg.detectCycleDFS(v, marks, path) {
 				return path.Cycle()
 			}
 		}
@@ -209,13 +209,13 @@ func (dg *Digraph) FindCycle(negative bool) *Cycle {
 func (dg *Digraph) FindCycleFrom(v int) *Path {
 	marks := make([]bool, dg.NumVert())
 	path := NewPath()
-	if dg.detectCycleDFS(v, marks, path, false) {
+	if dg.detectCycleDFS(v, marks, path) {
 		return path
 	}
 	return nil
 }
 
-func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path, negative bool) bool {
+func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path) bool {
 	found := false
 	dg.iterateWAdj(v, func(a int, w float64) bool {
 		if marked[a] {
@@ -223,18 +223,11 @@ func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path, negative boo
 		}
 		if path.ContainsVert(a) {
 			path.Push(v, a, w)
-			if negative {
-				c := path.Cycle()
-				if c.distance >= 0 {
-					path.Pop()
-					return true
-				}
-			}
 			found = true
 			return false
 		}
 		path.Push(v, a, w)
-		found = dg.detectCycleDFS(a, marked, path, negative)
+		found = dg.detectCycleDFS(a, marked, path)
 		if !found {
 			path.Pop()
 		}
@@ -246,7 +239,7 @@ func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path, negative boo
 
 // Topological return a stack that will pop vertices in topological order
 func (dg *Digraph) Topological() (order *stack.IntStack) {
-	if dg.FindCycle(false) != nil {
+	if dg.FindCycle() != nil {
 		return
 	}
 	order = stack.NewInt(int(dg.NumVert()))

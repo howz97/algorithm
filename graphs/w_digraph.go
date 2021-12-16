@@ -33,24 +33,6 @@ func (g *WDigraph) AddEdge(src, dst int, w float64) error {
 	return g.addWeightedEdge(src, dst, w)
 }
 
-// AnyNegativeCycle find a negative weighted cycle
-func (g *WDigraph) AnyNegativeCycle() *Cycle {
-	//marked := make([]bool, g.NumVert())
-	//path := NewPath()
-	//g.IterateWEdge(func(src int, dst int, w float64) bool {
-	//	if w < 0 {
-	//		if !marked[src] {
-	//			if g.detectCycleDFS(src, marked, path, true) {
-	//				return false
-	//			}
-	//		}
-	//	}
-	//	return true
-	//})
-	//return path.Cycle()
-	return nil
-}
-
 // ShortestPathTree get the shortest path tree from src by the specified algorithm
 func (g *WDigraph) ShortestPathTree(src int, alg int) (*PathTree, error) {
 	if !g.HasVert(src) {
@@ -203,16 +185,25 @@ func (spt *PathTree) initBellmanFord(g *WDigraph) error {
 		bellmanFordRelax(g, v, spt.edgeTo, spt.distTo, q, onQ)
 		relaxTimes++
 		if relaxTimes%g.NumVert() == 0 {
-			if c := spt.findNegativeCycle(g); c != nil {
-				return c
-			}
+			sptg := spt.toWDigraph(g)
+			fmt.Println(sptg.String())
+			c := sptg.FindCycle()
+			fmt.Println(c.String())
+			return c.Cycle()
 		}
 	}
 	return nil
 }
 
-func (spt *PathTree) findNegativeCycle(g *WDigraph) *Cycle {
-	return g.AnyNegativeCycle() // fixme: spt.AnyNegativeCycle
+func (spt *PathTree) toWDigraph(g *WDigraph) *WDigraph {
+	sptg := NewWDigraph(g.NumVert())
+    for to, from := range spt.edgeTo {
+		if to == spt.src {
+			continue
+		}
+		sptg.AddEdge(from, to, g.getWeightMust(from, to))
+	}
+	return sptg
 }
 
 func bellmanFordRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, q *queue.IntQ, onQ []bool) {
@@ -245,7 +236,7 @@ func (g *WDigraph) SearcherDijkstra() (*Searcher, error) {
 }
 
 func (g *WDigraph) SearcherTopological() (*Searcher, error) {
-	if c := g.FindCycle(false); c != nil {
+	if c := g.FindCycle(); c != nil {
 		return nil, c
 	}
 	sps := &Searcher{
