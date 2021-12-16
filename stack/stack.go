@@ -1,15 +1,16 @@
 package stack
 
-import "fmt"
+import (
+	"fmt"
+	. "github.com/howz97/algorithm/util"
+)
 
 const (
 	minCap = 2
 )
 
-type T interface{}
-
 type Stack struct {
-	elems []T
+	elems Elems
 	top   int
 }
 
@@ -18,7 +19,7 @@ func New(c int) *Stack {
 		c = minCap
 	}
 	return &Stack{
-		elems: make([]T, c),
+		elems: make(Elems, c),
 		top:   0,
 	}
 }
@@ -116,6 +117,10 @@ func (s *Stack) Peek(i int) T {
 		i = s.top - 1
 	}
 	return s.elems[i]
+}
+
+func (s *Stack) Reverse() {
+	ReverseSlice(s.elems)
 }
 
 func SizeOf(s *Stack) int {

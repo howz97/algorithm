@@ -119,6 +119,7 @@ func (spt *PathTree) PathTo(dst int) *Path {
 			break
 		}
 	}
+	path.Reverse()
 	return path
 }
 
@@ -319,7 +320,7 @@ func (p *Path) ContainsVert(v int) bool {
 		return false
 	}
 	found := false
-	p.Iterate(func(e stack.T) bool {
+	p.Iterate(func(e util.T) bool {
 		if e.(edge).from == v {
 			found = true
 			return false
@@ -343,7 +344,7 @@ func (p *Path) Str(s *Symbol) string {
 		i2s = s.SymbolOf
 	}
 	str := fmt.Sprintf("(distance=%v): ", p.distance)
-	p.Iterate(func(e stack.T) bool {
+	p.Iterate(func(e util.T) bool {
 		eg := e.(edge)
 		str += eg.string(i2s) + ", "
 		return true
@@ -357,11 +358,11 @@ func (p *Path) Cycle() *Cycle {
 		return nil
 	}
 	x := e.(edge).to
-	i := p.Index(func(v stack.T) bool {
+	i := p.Index(func(v util.T) bool {
 		return v.(edge).from == x
 	})
 	path := NewPath()
-	p.IterateRange(i, p.Size(), func(v stack.T) bool {
+	p.IterateRange(i, p.Size(), func(v util.T) bool {
 		e := v.(edge)
 		path.Push(e.from, e.to, e.weight)
 		return true

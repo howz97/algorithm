@@ -98,6 +98,16 @@ func SliceEqual(a, b []int) bool {
 	return true
 }
 
+type Elems []T
+
+func (e Elems) Len() int {
+	return len(e)
+}
+
+func (e Elems) Swap(i, j int) {
+	e[i], e[j] = e[j], e[i]
+}
+
 type Reversible interface {
 	// Len is the number of elements in the collection.
 	Len() int
