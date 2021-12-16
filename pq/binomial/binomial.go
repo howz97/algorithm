@@ -43,24 +43,25 @@ func (bq *BQ) Merge(bq1 *BQ) error {
 	}
 	bq.currentSize += bq1.currentSize
 	var carry *node
-	for i := 0; i <= max(bq.MaxTrees(), bq1.MaxTrees()); i++ {
-		switch bq.hasTree(i) + bq1.hasTree(i)*2 + notNil(carry)*4 {
-		case 2:
+	n := max(bq.MaxTrees(), bq1.MaxTrees())
+	for i := 0; i <= n; i++ {
+		switch notNil(carry)*4 + bq1.hasTree(i)*2 + bq.hasTree(i) {
+		case 2: // 010
 			bq.trees[i] = bq1.trees[i]
-		case 3:
+		case 3: // 011
 			carry = merge(bq.trees[i], bq1.trees[i])
 			bq.trees[i] = nil
-		case 4:
+		case 4: // 100
 			bq.trees[i] = carry
 			carry = nil
-		case 5:
+		case 5: // 101
 			carry = merge(carry, bq.trees[i])
 			bq.trees[i] = nil
-		case 6:
+		case 6: // 110
 			fallthrough
-		case 7:
+		case 7: // 111
 			carry = merge(carry, bq1.trees[i])
-		default: // case 0, case 1
+		default: // 000, 001
 		}
 	}
 	return nil
