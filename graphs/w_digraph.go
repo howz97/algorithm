@@ -343,10 +343,11 @@ func (p *Path) Str(s *Symbol) string {
 		i2s = s.SymbolOf
 	}
 	str := fmt.Sprintf("(distance=%v): ", p.distance)
-	for p.Stack.Size() > 0 {
-		e := p.Pop()
-		str += e.string(i2s) + ", "
-	}
+	p.Iterate(func(e stack.T) bool {
+		eg := e.(edge)
+		str += eg.string(i2s) + ", "
+		return true
+	})
 	return str
 }
 
@@ -374,6 +375,10 @@ type Cycle struct {
 
 func (c *Cycle) Error() string {
 	return c.Str(nil)
+}
+
+func (c *Cycle) Cycle() *Cycle {
+	return c
 }
 
 type edge struct {
