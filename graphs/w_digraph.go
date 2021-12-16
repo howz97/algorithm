@@ -178,18 +178,17 @@ func (spt *PathTree) initBellmanFord(g *WDigraph) error {
 	onQ := make([]bool, g.NumVert())
 	q.PushBack(spt.src)
 	onQ[spt.src] = true
-	relaxTimes := uint(0)
+	cnt := uint(0)
 	for !q.IsEmpty() {
 		v := q.Front()
 		onQ[v] = false
 		bellmanFordRelax(g, v, spt.edgeTo, spt.distTo, q, onQ)
-		relaxTimes++
-		if relaxTimes%g.NumVert() == 0 {
-			sptg := spt.toWDigraph(g)
-			fmt.Println(sptg.String())
-			c := sptg.FindCycle()
-			fmt.Println(c.String())
-			return c.Cycle()
+		cnt++
+		if cnt%g.NumVert() == 0 {
+			c := spt.toWDigraph(g).FindCycle()
+			if c != nil {
+				return c
+			}
 		}
 	}
 	return nil
@@ -197,7 +196,7 @@ func (spt *PathTree) initBellmanFord(g *WDigraph) error {
 
 func (spt *PathTree) toWDigraph(g *WDigraph) *WDigraph {
 	sptg := NewWDigraph(g.NumVert())
-    for to, from := range spt.edgeTo {
+	for to, from := range spt.edgeTo {
 		if to == spt.src {
 			continue
 		}

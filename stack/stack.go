@@ -113,7 +113,7 @@ func (s *Stack) Peek(i int) T {
 		i = 0
 	}
 	if i >= s.top {
-		i = s.top-1
+		i = s.top - 1
 	}
 	return s.elems[i]
 }
