@@ -10,7 +10,7 @@ func Test_BQ(t *testing.T) {
 	bq := New()
 	var err error
 	for i := 0; i <= 50; i++ {
-		err = bq.Insert(i)
+		err = bq.Push(i)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -28,7 +28,7 @@ func Test_BQ(t *testing.T) {
 	}
 	m := 0
 	for i := 0; i < 100; i++ {
-		m, err = bq.DelMin()
+		m, err = bq.Pop()
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -47,14 +47,14 @@ func Test_DelMin(t *testing.T) {
 	bq := New()
 	var err error
 	for i := 100; i < 200; i++ {
-		err = bq.Insert(i)
+		err = bq.Push(i)
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
 	m := 0
 	for i := 100; i < 200; i++ {
-		m, err = bq.DelMin()
+		m, err = bq.Pop()
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -70,7 +70,7 @@ func Test_Insert(t *testing.T) {
 	bq := New()
 	var err error
 	for i := 0; i < 198; i++ {
-		err = bq.Insert(i)
+		err = bq.Push(i)
 		if err != nil {
 			t.Fatal(err)
 		}

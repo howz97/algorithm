@@ -1,8 +1,6 @@
 package binomial
 
 const (
-	defaultMaxTrees = 8
-
 	isNil  = 0
 	notNil = 1
 )
@@ -16,7 +14,7 @@ type Binomial struct {
 // New return a binomial queue with default capacity
 func New() *Binomial {
 	return &Binomial{
-		trees: make([]*node, defaultMaxTrees),
+		trees: make([]*node, 8),
 	}
 }
 
@@ -53,18 +51,14 @@ func (b *Binomial) Merge(other *Binomial) {
 	}
 }
 
-// Insert k into binomial queue. ErrExceedCap returned when Binomial has been full
-func (b *Binomial) Insert(k int) {
-	bq1 := New()
-	bq1.trees[0] = &node{
-		k: k,
-	}
-	bq1.size = 1
-	b.Merge(bq1)
+func (b *Binomial) Push(k int) {
+	b.Merge(&Binomial{
+		size:  1,
+		trees: []*node{{k: k}},
+	})
 }
 
-// DelMin delete and return the min key. ErrEmptyBQ returned when Binomial has been empty
-func (b *Binomial) DelMin() (int, error) {
+func (b *Binomial) Pop() int {
 	min := 1<<63 - 1 // initialed with biggest int64
 	minIdx := -1
 	for i := 0; i < len(b.trees); i++ {
@@ -85,7 +79,14 @@ func (b *Binomial) DelMin() (int, error) {
 		bq1.trees[i].nextSibling = nil
 	}
 	b.Merge(bq1)
-	return min, nil
+	return min
+}
+
+func (b *Binomial) isNil(i int) int {
+	if i >= len(b.trees) {
+		return isNil
+	}
+	return b.trees[i].isNil()
 }
 
 // Size return the current size of the binomial queue
@@ -107,13 +108,6 @@ func merge(r1, r2 *node) *node {
 	r2.nextSibling = r1.leftSon
 	r1.leftSon = r2
 	return r1
-}
-
-func (b *Binomial) isNil(i int) int {
-	if i >= len(b.trees) {
-		return isNil
-	}
-	return b.trees[i].isNil()
 }
 
 func (n *node) isNil() int {
