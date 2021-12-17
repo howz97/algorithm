@@ -58,9 +58,9 @@ func LevelOrder(bt ITraversal, fn func(ITraversal) bool) {
 	if bt.IsNil() {
 		return
 	}
-	q := queue.NewLinkedQueue()
+	q := queue.NewLinked()
 	q.PushBack(bt)
-	for !q.IsEmpty() {
+	for q.Size() > 0 {
 		bt = q.Front().(ITraversal)
 		if !fn(bt) {
 			break
@@ -93,9 +93,9 @@ func ReverseOrder(bt ITraversal, fn func(ITraversal) bool) bool {
 
 func PrintBinaryTree(bt ITraversal) {
 	var sli []string
-	q := queue.NewLinkedQueue()
+	q := queue.NewLinked()
 	q.PushBack(bt)
-	for !q.IsEmpty() {
+	for q.Size() > 0 {
 		bt = q.Front().(ITraversal)
 		if bt.IsNil() {
 			sli = append(sli, "#")

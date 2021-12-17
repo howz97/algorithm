@@ -12,15 +12,15 @@ const (
 
 func TestInterfaceQ(t *testing.T) {
 	qSlice := NewQueen(testTimes)
-	qLinked := NewLinkedQueue()
-	qInt := NewIntQ()
+	qLinked := NewLinked()
+	qInt := NewLinkInt()
 
 	start := time.Now()
 	for i := 0; i < testTimes; i++ {
 		qSlice.PushBack(i)
 	}
 	for i := 0; i < testTimes; i++ {
-		qLinked.Front()
+		qSlice.Front()
 	}
 	elapsed := time.Since(start)
 	fmt.Printf("Queen implemented by array cost [%v]\n", elapsed.String())

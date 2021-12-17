@@ -574,10 +574,10 @@ func (dg Digraph) BFS(src int) *BFS {
 		marked: make([]bool, dg.NumVert()),
 		edgeTo: make([]int, dg.NumVert()),
 	}
-	q := queue.NewIntQ()
+	q := queue.NewLinkInt()
 	bfs.marked[src] = true
 	q.PushBack(src)
-	for !q.IsEmpty() {
+	for q.Size() > 0 {
 		edge := q.Front()
 		dg.IterateAdj(edge, func(adj int) bool {
 			if !bfs.marked[adj] {

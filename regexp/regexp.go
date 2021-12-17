@@ -242,7 +242,7 @@ func makeNFA(table []symbol) *graphs.Digraph {
 				stk.Push(i)
 			case ')':
 				nfa.AddEdge(i, i+1)
-				allOr := queue.NewIntQ()
+				allOr := queue.NewLinkInt()
 				for {
 					out := stk.Pop()
 					if table[out].r == '|' {
@@ -253,7 +253,7 @@ func makeNFA(table []symbol) *graphs.Digraph {
 						break
 					}
 				}
-				for !allOr.IsEmpty() {
+				for allOr.Size() > 0 {
 					or := allOr.Front()
 					nfa.AddEdge(left, or+1)
 					nfa.AddEdge(or, i)
