@@ -4,7 +4,7 @@ type SliStr struct {
 	*Slice
 }
 
-func NewSliceStr(cap int) *SliStr {
+func NewSliStr(cap int) *SliStr {
 	return &SliStr{Slice: NewSlice(cap)}
 }
 

@@ -7,14 +7,11 @@ import (
 )
 
 const (
-	testTimes = 10000000
+	testTimes = 30000000
 )
 
 func TestInterfaceQ(t *testing.T) {
-	qSlice := NewSlice(testTimes)
-	qLinked := NewLinked()
-	qInt := NewLinkInt()
-
+	qSlice := NewSlice(0)
 	start := time.Now()
 	for i := 0; i < testTimes; i++ {
 		qSlice.PushBack(i)
@@ -23,8 +20,20 @@ func TestInterfaceQ(t *testing.T) {
 		qSlice.Front()
 	}
 	elapsed := time.Since(start)
-	fmt.Printf("Queen implemented by array cost [%v]\n", elapsed.String())
+	fmt.Printf("Slice cost [%v]\n", elapsed.String())
 
+	qSliStr := NewSliStr(testTimes)
+	start = time.Now()
+	for i := 0; i < testTimes; i++ {
+		qSliStr.PushBack("x")
+	}
+	for i := 0; i < testTimes; i++ {
+		qSliStr.Front()
+	}
+	elapsed = time.Since(start)
+	fmt.Printf("Slice-Str cost [%v]\n", elapsed.String())
+
+	qLinked := NewLinked()
 	start = time.Now()
 	for i := 0; i < testTimes; i++ {
 		qLinked.PushBack(i)
@@ -33,8 +42,9 @@ func TestInterfaceQ(t *testing.T) {
 		qLinked.Front()
 	}
 	elapsed = time.Since(start)
-	fmt.Printf("Queen implemented by linked-list cost [%v]\n", elapsed.String())
+	fmt.Printf("Linked [%v]\n", elapsed.String())
 
+	qInt := NewLinkInt()
 	start = time.Now()
 	for i := 0; i < testTimes; i++ {
 		qInt.PushBack(i)
@@ -43,5 +53,5 @@ func TestInterfaceQ(t *testing.T) {
 		qInt.Front()
 	}
 	elapsed = time.Since(start)
-	fmt.Printf("Queen implemented by linked-list and direct type cost [%v]\n", elapsed.String())
+	fmt.Printf("Linked-Int [%v]\n", elapsed.String())
 }

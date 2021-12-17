@@ -11,6 +11,7 @@ const (
 type Slice struct {
 	elems      []T
 	head, back int
+	size       int
 }
 
 func NewSlice(cap int) *Slice {
@@ -28,6 +29,7 @@ func (q *Slice) Front() T {
 	if q.head == len(q.elems) {
 		q.head = 0
 	}
+	q.size--
 	return e
 }
 
@@ -47,19 +49,13 @@ func (q *Slice) PushBack(e T) {
 		q.back = 0
 	}
 	q.elems[q.back] = e
+	q.size++
 }
 
 func (q *Slice) isFull() bool {
 	return q.Size() == len(q.elems)
 }
 
-func (q *Slice) Size() (size int) {
-	if q.head < q.back {
-		size = q.back - q.head + 1
-	} else if q.head > q.back {
-		size = len(q.elems) - (q.head - q.back - 1)
-	} else {
-		size = 0
-	}
-	return
+func (q *Slice) Size() int {
+	return q.size
 }

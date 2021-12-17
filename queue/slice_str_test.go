@@ -6,7 +6,7 @@ import (
 )
 
 func Test_StrQueue(t *testing.T) {
-	q := NewSliceStr(0)
+	q := NewSliStr(0)
 	if q.Size() > 0 {
 		t.Fatal()
 	}
