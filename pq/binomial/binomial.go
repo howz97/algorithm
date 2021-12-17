@@ -1,129 +1,96 @@
 package binomial
 
-import (
-	"errors"
-)
-
 const (
-	defaultMaxTrees = 16
+	defaultMaxTrees = 8
+
+	isNil  = 0
+	notNil = 1
 )
 
-var (
-	// ErrExceedCap returned when merge would exceed capacity
-	ErrExceedCap = errors.New("merge would exceed capacity")
-
-	// ErrEmptyBQ means BQ has been empty
-	ErrEmptyBQ = errors.New("delete but BQ has been empty")
-)
-
-// BQ is a binomial queue
-type BQ struct {
-	currentSize int
-	trees       []*node
+// Binomial is a binomial queue
+type Binomial struct {
+	size  int
+	trees []*node
 }
 
 // New return a binomial queue with default capacity
-func New() *BQ {
-	return &BQ{
+func New() *Binomial {
+	return &Binomial{
 		trees: make([]*node, defaultMaxTrees),
 	}
 }
 
-// NewWithMaxTrees return a binomial queue that capacity equal to 2^(maxTrees+1)-1
-func NewWithMaxTrees(maxTrees int) *BQ {
-	return &BQ{
-		trees: make([]*node, maxTrees),
-	}
-}
-
 // Merge bq1 to bq. ErrExceedCap returned when merge would exceed capacity
-func (bq *BQ) Merge(bq1 *BQ) error {
-	if bq.currentSize+bq1.currentSize > bq.Cap() {
-		return ErrExceedCap
+func (b *Binomial) Merge(other *Binomial) {
+	if len(other.trees) > len(b.trees) {
+		*b, *other = *other, *b
 	}
-	bq.currentSize += bq1.currentSize
+	b.size += other.size
+	n := len(b.trees)
 	var carry *node
-	n := max(bq.MaxTrees(), bq1.MaxTrees())
-	for i := 0; i <= n; i++ {
-		switch notNil(carry)*4 + bq1.hasTree(i)*2 + bq.hasTree(i) {
+	for i := 0; i < n; i++ {
+		switch carry.isNil()<<2 + other.isNil(i)<<1 + b.isNil(i) {
 		case 2: // 010
-			bq.trees[i] = bq1.trees[i]
+			b.trees[i] = other.trees[i]
 		case 3: // 011
-			carry = merge(bq.trees[i], bq1.trees[i])
-			bq.trees[i] = nil
+			carry = merge(b.trees[i], other.trees[i])
+			b.trees[i] = nil
 		case 4: // 100
-			bq.trees[i] = carry
+			b.trees[i] = carry
 			carry = nil
 		case 5: // 101
-			carry = merge(carry, bq.trees[i])
-			bq.trees[i] = nil
+			carry = merge(carry, b.trees[i])
+			b.trees[i] = nil
 		case 6: // 110
 			fallthrough
 		case 7: // 111
-			carry = merge(carry, bq1.trees[i])
+			carry = merge(carry, other.trees[i])
 		default: // 000, 001
 		}
 	}
-	return nil
+	if carry != nil {
+		b.trees = append(b.trees, carry)
+	}
 }
 
-// Insert k into binomial queue. ErrExceedCap returned when BQ has been full
-func (bq *BQ) Insert(k int) error {
-	bq1 := NewWithMaxTrees(1)
+// Insert k into binomial queue. ErrExceedCap returned when Binomial has been full
+func (b *Binomial) Insert(k int) {
+	bq1 := New()
 	bq1.trees[0] = &node{
 		k: k,
 	}
-	bq1.currentSize = 1
-	return bq.Merge(bq1)
+	bq1.size = 1
+	b.Merge(bq1)
 }
 
-// DelMin delete and return the min key. ErrEmptyBQ returned when BQ has been empty
-func (bq *BQ) DelMin() (int, error) {
-	if bq.currentSize == 0 {
-		return 0, ErrEmptyBQ
-	}
+// DelMin delete and return the min key. ErrEmptyBQ returned when Binomial has been empty
+func (b *Binomial) DelMin() (int, error) {
 	min := 1<<63 - 1 // initialed with biggest int64
 	minIdx := -1
-	for i := 0; i < bq.MaxTrees(); i++ {
-		if bq.trees[i] != nil && bq.trees[i].k < min {
+	for i := 0; i < len(b.trees); i++ {
+		if b.trees[i] != nil && b.trees[i].k < min {
 			minIdx = i
-			min = bq.trees[i].k
+			min = b.trees[i].k
 		}
 	}
-	minTree := bq.trees[minIdx]
+	minTree := b.trees[minIdx]
 	deletedTree := minTree.leftSon
-	bq.trees[minIdx] = nil
-	bq.currentSize -= 1 << uint(minIdx)
-	bq1 := NewWithMaxTrees(minIdx)
-	bq1.currentSize = 1<<uint(minIdx) - 1
+	b.trees[minIdx] = nil
+	b.size -= 1 << uint(minIdx)
+	bq1 := New()
+	bq1.size = 1<<uint(minIdx) - 1
 	for i := minIdx - 1; i >= 0; i-- {
 		bq1.trees[i] = deletedTree
 		deletedTree = deletedTree.nextSibling
 		bq1.trees[i].nextSibling = nil
 	}
-	bq.Merge(bq1)
+	b.Merge(bq1)
 	return min, nil
 }
 
-// IsEmpty tell us weather BQ is empty
-func (bq *BQ) IsEmpty() bool {
-	return bq.currentSize == 0
-}
-
 // Size return the current size of the binomial queue
-func (bq *BQ) Size() int {
-	return bq.currentSize
-}
-
-// Cap return the capacity of the binomail queue
-func (bq *BQ) Cap() int {
-	maxTrees := uint(len(bq.trees))
-	return (1 << maxTrees) - 1
-}
-
-// MaxTrees is the upper limit of the number of trees
-func (bq *BQ) MaxTrees() int {
-	return len(bq.trees)
+func (b *Binomial) Size() int {
+	return b.size
 }
 
 type node struct {
@@ -142,23 +109,16 @@ func merge(r1, r2 *node) *node {
 	return r1
 }
 
-func (bq *BQ) hasTree(i int) int {
-	if i >= bq.MaxTrees() || bq.trees[i] == nil {
-		return 0
+func (b *Binomial) isNil(i int) int {
+	if i >= len(b.trees) {
+		return isNil
 	}
-	return 1
+	return b.trees[i].isNil()
 }
 
-func notNil(n *node) int {
+func (n *node) isNil() int {
 	if n == nil {
-		return 0
+		return isNil
 	}
-	return 1
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
+	return notNil
 }

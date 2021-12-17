@@ -71,6 +71,13 @@ func MaxInt8(a, b int8) int8 {
 	return b
 }
 
+func Max(a, b Comparable) Comparable {
+	if a.Cmp(b) == More {
+		return a
+	}
+	return b
+}
+
 func ExecCost(fn func()) time.Duration {
 	t := time.Now()
 	fn()

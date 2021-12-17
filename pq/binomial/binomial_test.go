@@ -113,7 +113,7 @@ func Test_Merge(t *testing.T) {
 	}
 }
 
-func newBQSize(size int) *BQ {
+func newBQSize(size int) *Binomial {
 	if size < 0 {
 		panic("size < 0")
 	}
@@ -124,7 +124,7 @@ func newBQSize(size int) *BQ {
 			bq.trees[i] = binomialTree(i)
 		}
 	}
-	bq.currentSize = size
+	bq.size = size
 	return bq
 }
 
