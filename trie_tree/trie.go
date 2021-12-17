@@ -97,19 +97,19 @@ func (t *Trie) KeysWithPrefix(prefix string) []string {
 		return nil
 	}
 	prefix += string(runes)
-	q := queue.NewSliStr()
+	q := queue.NewSliStr(0)
 	node.Collect(t.a, prefix, q)
 	return q.PopAll()
 }
 
 func (t *Trie) Keys() []string {
-	q := queue.NewSliStr()
+	q := queue.NewSliStr(0)
 	t.tree.Keys(t.a, q)
 	return q.PopAll()
 }
 
 func (t *Trie) KeysMatch(p string) []string {
-	q := queue.NewSliStr()
+	q := queue.NewSliStr(0)
 	t.tree.KeysMatch(t.a, []rune(p), "", q)
 	return q.PopAll()
 }
