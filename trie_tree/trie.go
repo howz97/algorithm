@@ -14,9 +14,9 @@ type TrieNode interface {
 	Delete(a alphabet.Interface, k []rune)
 	Locate(a alphabet.Interface, k []rune) (TrieNode, []rune)
 	LongestPrefixOf(a alphabet.Interface, s []rune, d, l int) int
-	Collect(a alphabet.Interface, prefix string, keys *queue.StrQ)
-	KeysMatch(a alphabet.Interface, pattern []rune, prefix string, keys *queue.StrQ)
-	Keys(a alphabet.Interface, keys *queue.StrQ)
+	Collect(a alphabet.Interface, prefix string, keys *queue.SliStr)
+	KeysMatch(a alphabet.Interface, pattern []rune, prefix string, keys *queue.SliStr)
+	Keys(a alphabet.Interface, keys *queue.SliStr)
 	Compress() error
 	IsCompressed() bool
 }
@@ -97,19 +97,19 @@ func (t *Trie) KeysWithPrefix(prefix string) []string {
 		return nil
 	}
 	prefix += string(runes)
-	q := queue.NewStrQ()
+	q := queue.NewSliceStr()
 	node.Collect(t.a, prefix, q)
 	return q.PopAll()
 }
 
 func (t *Trie) Keys() []string {
-	q := queue.NewStrQ()
+	q := queue.NewSliceStr()
 	t.tree.Keys(t.a, q)
 	return q.PopAll()
 }
 
 func (t *Trie) KeysMatch(p string) []string {
-	q := queue.NewStrQ()
+	q := queue.NewSliceStr()
 	t.tree.KeysMatch(t.a, []rune(p), "", q)
 	return q.PopAll()
 }

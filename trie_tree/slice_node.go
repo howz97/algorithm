@@ -79,9 +79,9 @@ func (t *SliceNode) LongestPrefixOf(a alphabet.Interface, s []rune, d int, l int
 	return next.LongestPrefixOf(a, s, d+1, l)
 }
 
-// Collect collects all keys of t and put them into StrQ
+// Collect collects all keys of t and put them into SliStr
 // p is the prefix record
-func (t *SliceNode) Collect(a alphabet.Interface, prefix string, keys *queue.StrQ) {
+func (t *SliceNode) Collect(a alphabet.Interface, prefix string, keys *queue.SliStr) {
 	if t.val != nil {
 		keys.PushBack(prefix)
 	}
@@ -93,7 +93,7 @@ func (t *SliceNode) Collect(a alphabet.Interface, prefix string, keys *queue.Str
 	}
 }
 
-func (t *SliceNode) KeysMatch(a alphabet.Interface, pattern []rune, prefix string, keys *queue.StrQ) {
+func (t *SliceNode) KeysMatch(a alphabet.Interface, pattern []rune, prefix string, keys *queue.SliStr) {
 	if len(pattern) == 0 {
 		if t.val != nil {
 			keys.PushBack(prefix)
@@ -116,7 +116,7 @@ func (t *SliceNode) KeysMatch(a alphabet.Interface, pattern []rune, prefix strin
 	}
 }
 
-func (t *SliceNode) Keys(a alphabet.Interface, keys *queue.StrQ) {
+func (t *SliceNode) Keys(a alphabet.Interface, keys *queue.SliStr) {
 	t.Collect(a, "", keys)
 }
 

@@ -6,8 +6,8 @@ import (
 )
 
 func Test_StrQueue(t *testing.T) {
-	q := NewStrQ()
-	if !q.IsEmpty() {
+	q := NewSliceStr(0)
+	if q.Size() > 0 {
 		t.Fatal()
 	}
 	for i := 0; i <= 10; i++ {

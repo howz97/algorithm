@@ -124,7 +124,7 @@ func (t *TSTNode) LongestPrefixOf(_ alphabet.Interface, s []rune, d, l int) int 
 	return l
 }
 
-func (t *TSTNode) Collect(_ alphabet.Interface, prefix string, keys *queue.StrQ) {
+func (t *TSTNode) Collect(_ alphabet.Interface, prefix string, keys *queue.SliStr) {
 	if t.v != nil {
 		keys.PushBack(prefix)
 	}
@@ -133,7 +133,7 @@ func (t *TSTNode) Collect(_ alphabet.Interface, prefix string, keys *queue.StrQ)
 	}
 }
 
-func (t *TSTNode) collect(_ alphabet.Interface, prefix string, keys *queue.StrQ) {
+func (t *TSTNode) collect(_ alphabet.Interface, prefix string, keys *queue.SliStr) {
 	if t.v != nil {
 		keys.PushBack(prefix + string(t.r))
 	}
@@ -148,7 +148,7 @@ func (t *TSTNode) collect(_ alphabet.Interface, prefix string, keys *queue.StrQ)
 	}
 }
 
-func (t *TSTNode) KeysMatch(_ alphabet.Interface, pattern []rune, prefix string, keys *queue.StrQ) {
+func (t *TSTNode) KeysMatch(_ alphabet.Interface, pattern []rune, prefix string, keys *queue.SliStr) {
 	if len(pattern) == 0 {
 		return
 	}
@@ -169,7 +169,7 @@ func (t *TSTNode) KeysMatch(_ alphabet.Interface, pattern []rune, prefix string,
 	}
 }
 
-func (t *TSTNode) Keys(_ alphabet.Interface, keys *queue.StrQ) {
+func (t *TSTNode) Keys(_ alphabet.Interface, keys *queue.SliStr) {
 	t.collect(nil, "", keys)
 }
 

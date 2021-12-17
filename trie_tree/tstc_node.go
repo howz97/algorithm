@@ -204,7 +204,7 @@ func (t *TSTCNode) LongestPrefixOf(_ alphabet.Interface, s []rune, d, l int) int
 	return l
 }
 
-func (t *TSTCNode) Collect(_ alphabet.Interface, prefix string, keys *queue.StrQ) {
+func (t *TSTCNode) Collect(_ alphabet.Interface, prefix string, keys *queue.SliStr) {
 	if t.v != nil {
 		keys.PushBack(prefix)
 	}
@@ -213,7 +213,7 @@ func (t *TSTCNode) Collect(_ alphabet.Interface, prefix string, keys *queue.StrQ
 	}
 }
 
-func (t *TSTCNode) collect(_ alphabet.Interface, prefix string, keys *queue.StrQ) {
+func (t *TSTCNode) collect(_ alphabet.Interface, prefix string, keys *queue.SliStr) {
 	if t.v != nil {
 		keys.PushBack(prefix + string(t.rs))
 	}
@@ -228,7 +228,7 @@ func (t *TSTCNode) collect(_ alphabet.Interface, prefix string, keys *queue.StrQ
 	}
 }
 
-func (t *TSTCNode) KeysMatch(_ alphabet.Interface, pattern []rune, prefix string, keys *queue.StrQ) {
+func (t *TSTCNode) KeysMatch(_ alphabet.Interface, pattern []rune, prefix string, keys *queue.SliStr) {
 	if len(pattern) < len(t.rs) || !util.IsRunesMatch(pattern[:len(t.rs)-1], t.rs[:len(t.rs)-1]) {
 		return
 	}
@@ -250,7 +250,7 @@ func (t *TSTCNode) KeysMatch(_ alphabet.Interface, pattern []rune, prefix string
 	}
 }
 
-func (t *TSTCNode) Keys(_ alphabet.Interface, keys *queue.StrQ) {
+func (t *TSTCNode) Keys(_ alphabet.Interface, keys *queue.SliStr) {
 	t.collect(nil, "", keys)
 }
 
