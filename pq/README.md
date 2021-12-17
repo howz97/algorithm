@@ -46,7 +46,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/pq/leftist_heap"
+	"github.com/howz97/algorithm/pq/leftist"
 	. "github.com/howz97/algorithm/util"
 )
 
