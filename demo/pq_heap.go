@@ -30,10 +30,9 @@ func main() {
 		fmt.Print(pq.Pop().(string))
 	}
 
-	/*
-		Size: 0, Cap: 3
-		Size: 4, Cap: 7. (auto re-allocate)
-		1799
-		079z
-	*/
+	//Output:
+	//Size: 0, Cap: 3
+	//Size: 4, Cap: 7. (auto re-allocate)
+	//1799
+	//079z
 }

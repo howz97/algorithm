@@ -21,19 +21,19 @@ func New() *Binomial {
 }
 
 // Merge bq1 to bq. ErrExceedCap returned when merge would exceed capacity
-func (b *Binomial) Merge(other *Binomial) {
-	if len(other.trees) > len(b.trees) {
-		*b, *other = *other, *b
+func (b *Binomial) Merge(b2 *Binomial) {
+	if len(b2.trees) > len(b.trees) {
+		*b, *b2 = *b2, *b
 	}
-	b.size += other.size
+	b.size += b2.size
 	n := len(b.trees)
 	var carry *node
 	for i := 0; i < n; i++ {
-		switch carry.isNil()<<2 + other.isNil(i)<<1 + b.isNil(i) {
+		switch carry.isNil()<<2 + b2.isNil(i)<<1 + b.isNil(i) {
 		case 2: // 010
-			b.trees[i] = other.trees[i]
+			b.trees[i] = b2.trees[i]
 		case 3: // 011
-			carry = merge(b.trees[i], other.trees[i])
+			carry = merge(b.trees[i], b2.trees[i])
 			b.trees[i] = nil
 		case 4: // 100
 			b.trees[i] = carry
@@ -44,7 +44,7 @@ func (b *Binomial) Merge(other *Binomial) {
 		case 6: // 110
 			fallthrough
 		case 7: // 111
-			carry = merge(carry, other.trees[i])
+			carry = merge(carry, b2.trees[i])
 		default: // 000, 001
 		}
 	}
