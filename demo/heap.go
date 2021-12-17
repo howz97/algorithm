@@ -14,7 +14,7 @@ func main() {
 	pq.Push(Int(9), "9")
 	pq.Push(Int(7), "7")
 	fmt.Printf("Size: %d, Cap: %d. (auto re-allocate) \n", pq.Size(), pq.Cap())
-	for !pq.IsEmpty() {
+	for pq.Size() > 0 {
 		fmt.Print(pq.Pop().(string))
 	}
 	fmt.Println()
@@ -26,7 +26,7 @@ func main() {
 	pq.Push(Int(999), "z")
 	pq.Del("1")
 	pq.Fix(Int(0), "0")
-	for !pq.IsEmpty() {
+	for pq.Size() > 0 {
 		fmt.Print(pq.Pop().(string))
 	}
 

@@ -34,7 +34,7 @@ func (g *WGraph) LazyPrim() (mst *WGraph) {
 		})
 		return true
 	})
-	for !pq.IsEmpty() {
+	for pq.Size() > 0 {
 		e := pq.Pop().(*edge)
 		if marked[e.to] {
 			continue
@@ -70,7 +70,7 @@ func (g *WGraph) Prim() (mst *WGraph) {
 		mst.AddEdge(0, a, w)
 		return true
 	})
-	for !pq.IsEmpty() {
+	for pq.Size() > 0 {
 		v := pq.Pop().(int)
 		from := mst.Adjacent(v)[0]
 		mst.AddEdge(from, v, g.getWeightMust(from, v))

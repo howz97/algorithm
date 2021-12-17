@@ -9,6 +9,10 @@ type Elem struct {
 	val T
 }
 
+func (e Elem) Cmp(e2 Elem) Result {
+	return e.p.Cmp(e2.p)
+}
+
 type Heap struct {
 	len   int // amount of elems
 	elems []Elem
@@ -93,19 +97,15 @@ func (h *Heap) Fix(p Comparable, v T) {
 	}
 }
 
-func (h *Heap) IsEmpty() bool {
-	return h.len == 0
-}
-
 func (h *Heap) sink(vac int) {
 	elem := h.elems[vac] // copy-out the element and left a vacancy
 	sub := vac * 2
 	for sub <= h.len {
 		// choose the smaller sub-node
-		if sub < h.len && h.elems[sub+1].p.Cmp(h.elems[sub].p) == Less {
+		if sub < h.len && h.elems[sub+1].Cmp(h.elems[sub]) == Less {
 			sub++
 		}
-		if h.elems[sub].p.Cmp(elem.p) != Less {
+		if h.elems[sub].Cmp(elem) != Less {
 			break
 		}
 		h.elems[vac] = h.elems[sub]
@@ -118,7 +118,7 @@ func (h *Heap) sink(vac int) {
 func (h *Heap) swim(vac int) {
 	elem := h.elems[vac] // copy-out the element and left a vacancy
 	parent := vac / 2
-	for parent > 0 && h.elems[parent].p.Cmp(elem.p) == More {
+	for parent > 0 && h.elems[parent].Cmp(elem) == More {
 		h.elems[vac] = h.elems[parent]
 		vac = parent
 		parent = vac / 2

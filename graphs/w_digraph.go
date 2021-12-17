@@ -130,7 +130,7 @@ func (spt *PathTree) hasVert(v int) bool {
 func (spt *PathTree) initDijkstra(g *WDigraph) {
 	pq := heap.New(g.NumVert())
 	dijkstraRelax(g, spt.src, spt.edgeTo, spt.distTo, pq)
-	for !pq.IsEmpty() {
+	for pq.Size() > 0 {
 		m := pq.Pop().(int)
 		dijkstraRelax(g, m, spt.edgeTo, spt.distTo, pq)
 	}
