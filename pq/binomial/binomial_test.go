@@ -8,38 +8,21 @@ import (
 
 func Test_BQ(t *testing.T) {
 	bq := New()
-	var err error
 	for i := 0; i <= 50; i++ {
-		err = bq.Push(i)
-		if err != nil {
-			t.Fatal(err)
-		}
+		bq.Push(i)
 	}
-	bq1 := NewWithMaxTrees(33)
+	bq1 := New()
 	for i := 51; i < 100; i++ {
-		err = bq1.Insert(i)
-		if err != nil {
-			t.Fatal(err)
-		}
+		bq1.Push(i)
 	}
-	err = bq.Merge(bq1)
-	if err != nil {
-		t.Fatal(err)
-	}
+	bq.Merge(bq1)
 	m := 0
 	for i := 0; i < 100; i++ {
-		m, err = bq.Pop()
-		if err != nil {
-			t.Fatal(err)
-		}
+		m = bq.Pop()
 		if m != i {
 			fmt.Printf("minimal element should be %v instead of %v\n", i, m)
 			t.Fatal()
 		}
-		fmt.Printf("%v deleted!!!\n", m)
-	}
-	if !bq.IsEmpty() {
-		t.Fatal()
 	}
 }
 
@@ -47,14 +30,11 @@ func Test_DelMin(t *testing.T) {
 	bq := New()
 	var err error
 	for i := 100; i < 200; i++ {
-		err = bq.Push(i)
-		if err != nil {
-			t.Fatal(err)
-		}
+		bq.Push(i)
 	}
 	m := 0
 	for i := 100; i < 200; i++ {
-		m, err = bq.Pop()
+		m = bq.Pop()
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -62,18 +42,13 @@ func Test_DelMin(t *testing.T) {
 			fmt.Printf("minimal element should be %v instead of %v\n", i, m)
 			t.Fatal()
 		}
-		fmt.Printf("%v deleted!!! left-size:%v\n", m, bq.Size())
 	}
 }
 
 func Test_Insert(t *testing.T) {
 	bq := New()
-	var err error
 	for i := 0; i < 198; i++ {
-		err = bq.Push(i)
-		if err != nil {
-			t.Fatal(err)
-		}
+		bq.Push(i)
 	}
 	if bq.Size() != 198 {
 		t.Fatal()
@@ -93,10 +68,7 @@ func Test_Insert(t *testing.T) {
 func Test_Merge(t *testing.T) {
 	bq := newBQSize(90)
 	bq1 := newBQSize(108)
-	err := bq.Merge(bq1)
-	if err != nil {
-		t.Fatal(err)
-	}
+	bq.Merge(bq1)
 	fmt.Println(bq.Size())
 	if bq.Size() != 90+108 {
 		t.Fatal()
@@ -139,7 +111,7 @@ func binomialTree(height int) *node {
 	}
 	t1 := binomialTree(height - 1)
 	t2 := binomialTree(height - 1)
-	t2.nextSibling = t1.leftSon
-	t1.leftSon = t2
+	t2.sibling = t1.son
+	t1.son = t2
 	return t1
 }

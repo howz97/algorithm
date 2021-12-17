@@ -51,6 +51,13 @@ func (b *Binomial) Merge(other *Binomial) {
 	}
 }
 
+func (b *Binomial) isNil(i int) int {
+	if i >= len(b.trees) {
+		return isNil
+	}
+	return b.trees[i].isNil()
+}
+
 func (b *Binomial) Push(k int) {
 	b.Merge(&Binomial{
 		size:  1,
@@ -59,34 +66,34 @@ func (b *Binomial) Push(k int) {
 }
 
 func (b *Binomial) Pop() int {
-	min := 1<<63 - 1 // initialed with biggest int64
-	minIdx := -1
-	for i := 0; i < len(b.trees); i++ {
-		if b.trees[i] != nil && b.trees[i].k < min {
-			minIdx = i
-			min = b.trees[i].k
+	index := 0 // index of node to pop
+	for ; index < len(b.trees); index++ {
+		if b.trees[index] != nil {
+			break
 		}
 	}
-	minTree := b.trees[minIdx]
-	deletedTree := minTree.leftSon
-	b.trees[minIdx] = nil
-	b.size -= 1 << uint(minIdx)
-	bq1 := New()
-	bq1.size = 1<<uint(minIdx) - 1
-	for i := minIdx - 1; i >= 0; i-- {
-		bq1.trees[i] = deletedTree
-		deletedTree = deletedTree.nextSibling
-		bq1.trees[i].nextSibling = nil
+	for i := index + 1; i < len(b.trees); i++ {
+		if b.trees[i] != nil && b.trees[i].k < b.trees[index].k {
+			index = i
+		}
 	}
-	b.Merge(bq1)
-	return min
-}
-
-func (b *Binomial) isNil(i int) int {
-	if i >= len(b.trees) {
-		return isNil
+	// remove tree at index
+	popNode := b.trees[index]
+	b.trees[index] = nil
+	b.size -= 1 << uint(index)
+	// trees left by popNode become a new binomial
+	trees := popNode.son
+	b2 := New()
+	for i := index - 1; i >= 0; i-- {
+		b2.trees[i] = trees
+		sibling := trees.sibling
+		trees.sibling = nil
+		trees = sibling
 	}
-	return b.trees[i].isNil()
+	b2.size = 1<<uint(index) - 1
+	// merge b2 back
+	b.Merge(b2)
+	return popNode.k
 }
 
 // Size return the current size of the binomial queue
@@ -95,19 +102,9 @@ func (b *Binomial) Size() int {
 }
 
 type node struct {
-	k           int
-	nextSibling *node
-	leftSon     *node
-}
-
-func merge(r1, r2 *node) *node {
-	// both r1 and r2 can not be nil
-	if r1.k > r2.k {
-		return merge(r2, r1)
-	}
-	r2.nextSibling = r1.leftSon
-	r1.leftSon = r2
-	return r1
+	k       int // todo
+	sibling *node
+	son     *node
 }
 
 func (n *node) isNil() int {
@@ -115,4 +112,14 @@ func (n *node) isNil() int {
 		return isNil
 	}
 	return notNil
+}
+
+// both a and b MUST not be nil
+func merge(a, b *node) *node {
+	if a.k > b.k {
+		*a, *b = *b, *a
+	}
+	b.sibling = a.son
+	a.son = b
+	return a
 }
