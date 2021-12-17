@@ -2,23 +2,23 @@ package binomial
 
 import (
 	"fmt"
+	. "github.com/howz97/algorithm/util"
 	"math"
 	"testing"
 )
 
 func Test_BQ(t *testing.T) {
 	bq := New()
-	for i := 0; i <= 50; i++ {
+	for i := Int(0); i <= 50; i++ {
 		bq.Push(i)
 	}
 	bq1 := New()
-	for i := 51; i < 100; i++ {
+	for i := Int(51); i < 100; i++ {
 		bq1.Push(i)
 	}
 	bq.Merge(bq1)
-	m := 0
-	for i := 0; i < 100; i++ {
-		m = bq.Pop()
+	for i := Int(0); i < 100; i++ {
+		m := bq.Pop()
 		if m != i {
 			fmt.Printf("minimal element should be %v instead of %v\n", i, m)
 			t.Fatal()
@@ -29,12 +29,11 @@ func Test_BQ(t *testing.T) {
 func Test_DelMin(t *testing.T) {
 	bq := New()
 	var err error
-	for i := 100; i < 200; i++ {
+	for i := Int(100); i < 200; i++ {
 		bq.Push(i)
 	}
-	m := 0
-	for i := 100; i < 200; i++ {
-		m = bq.Pop()
+	for i := Int(100); i < 200; i++ {
+		m := bq.Pop()
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -47,7 +46,7 @@ func Test_DelMin(t *testing.T) {
 
 func Test_Insert(t *testing.T) {
 	bq := New()
-	for i := 0; i < 198; i++ {
+	for i := Int(0); i < 198; i++ {
 		bq.Push(i)
 	}
 	if bq.Size() != 198 {
@@ -106,7 +105,7 @@ func binomialTree(height int) *node {
 	}
 	if height == 0 {
 		return &node{
-			k: 1,
+			p: Int(1),
 		}
 	}
 	t1 := binomialTree(height - 1)

@@ -1,5 +1,7 @@
 package binomial
 
+import . "github.com/howz97/algorithm/util"
+
 const (
 	isNil  = 0
 	notNil = 1
@@ -58,14 +60,14 @@ func (b *Binomial) isNil(i int) int {
 	return b.trees[i].isNil()
 }
 
-func (b *Binomial) Push(k int) {
+func (b *Binomial) Push(p Comparable) {
 	b.Merge(&Binomial{
 		size:  1,
-		trees: []*node{{k: k}},
+		trees: []*node{{p: p}},
 	})
 }
 
-func (b *Binomial) Pop() int {
+func (b *Binomial) Pop() Comparable {
 	index := 0 // index of node to pop
 	for ; index < len(b.trees); index++ {
 		if b.trees[index] != nil {
@@ -73,7 +75,7 @@ func (b *Binomial) Pop() int {
 		}
 	}
 	for i := index + 1; i < len(b.trees); i++ {
-		if b.trees[i] != nil && b.trees[i].k < b.trees[index].k {
+		if b.trees[i] != nil && b.trees[i].Cmp(b.trees[index]) == Less {
 			index = i
 		}
 	}
@@ -93,16 +95,16 @@ func (b *Binomial) Pop() int {
 	b2.size = 1<<uint(index) - 1
 	// merge b2 back
 	b.Merge(b2)
-	return popNode.k
+	return popNode.p
 }
 
-// Size return the current size of the binomial queue
+// Size get the current size of this binomial queue
 func (b *Binomial) Size() int {
 	return b.size
 }
 
 type node struct {
-	k       int // todo
+	p       Comparable
 	sibling *node
 	son     *node
 }
@@ -114,9 +116,13 @@ func (n *node) isNil() int {
 	return notNil
 }
 
+func (n *node) Cmp(other *node) Result {
+	return n.p.Cmp(other.p)
+}
+
 // both a and b MUST not be nil
 func merge(a, b *node) *node {
-	if a.k > b.k {
+	if a.Cmp(b) == More {
 		*a, *b = *b, *a
 	}
 	b.sibling = a.son
