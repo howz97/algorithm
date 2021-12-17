@@ -12,8 +12,8 @@
 * [链式哈希表](https://github.com/howz97/algorithm/tree/master/search/hash_map)
 * [优先队列](https://github.com/howz97/algorithm/tree/master/pq)
   * [堆](https://github.com/howz97/algorithm/tree/master/pq/heap)
-  * 左式堆
-  * 二项队列
+  * [左式堆](https://github.com/howz97/algorithm/tree/master/pq/leftist)
+  * [二项队列](https://github.com/howz97/algorithm/tree/master/pq/binomial)
 * [图](https://pkg.go.dev/github.com/howz97/algorithm/graphs)
   * 有向图
     * BFS
