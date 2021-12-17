@@ -1,6 +1,9 @@
 [文档](https://pkg.go.dev/github.com/howz97/algorithm)
 
 * [栈](https://github.com/howz97/algorithm/tree/master/stack)
+* [队列](https://github.com/howz97/algorithm/tree/master/queue)
+  * [数组实现](https://github.com/howz97/algorithm/blob/master/queue/slice.go)
+  * [链表实现](https://github.com/howz97/algorithm/blob/master/queue/linked.go)
 * [排序](https://github.com/howz97/algorithm/tree/master/sort)
 * [字符串排序](https://github.com/howz97/algorithm/tree/master/string_sort)
 * [Trie树](https://github.com/howz97/algorithm/tree/master/trie_tree)
