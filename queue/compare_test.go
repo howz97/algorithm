@@ -11,7 +11,7 @@ const (
 )
 
 func TestInterfaceQ(t *testing.T) {
-	qSlice := NewQueen(testTimes)
+	qSlice := NewSlice(testTimes)
 	qLinked := NewLinked()
 	qInt := NewLinkInt()
 
