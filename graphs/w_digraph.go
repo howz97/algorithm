@@ -19,13 +19,13 @@ const (
 
 func NewWDigraph(size uint) *WDigraph {
 	return &WDigraph{
-		Digraph: *NewDigraph(size),
+		Digraph: NewDigraph(size),
 	}
 }
 
 // WDigraph is edge weighted digraph
 type WDigraph struct {
-	Digraph
+	*Digraph
 }
 
 // AddEdge add a weighted and directed edge

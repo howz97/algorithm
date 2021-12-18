@@ -8,12 +8,12 @@ import (
 
 func NewWGraph(size uint) *WGraph {
 	return &WGraph{
-		Graph: *NewGraph(size),
+		Graph: NewGraph(size),
 	}
 }
 
 type WGraph struct {
-	Graph
+	*Graph
 }
 
 func (g *WGraph) AddEdge(src, dst int, w float64) error {
@@ -120,4 +120,10 @@ func (g *WGraph) Kruskal() (mst *WGraph) {
 		mst.AddEdge(minE.from, minE.to, minE.weight)
 	}
 	return
+}
+
+func (g *WGraph) ToWDigraph() *WDigraph {
+	return &WDigraph{
+		Digraph: g.Digraph,
+	}
 }
