@@ -85,7 +85,9 @@ func (b *Binomial) Pop() Comparable {
 	b.size -= 1 << uint(index)
 	// trees left by popNode become a new binomial
 	trees := popNode.son
-	b2 := New()
+	b2 := &Binomial{
+		trees: make([]*node, index),
+	}
 	for i := index - 1; i >= 0; i-- {
 		b2.trees[i] = trees
 		sibling := trees.sibling
