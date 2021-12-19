@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	Dijkstra = iota
+	Any = iota
+	Dijkstra
 	Topological
 	BellmanFord
 )
@@ -56,7 +57,13 @@ func (g *WDigraph) ShortestPathTree(src int, alg int) (*PathTree, error) {
 	case BellmanFord:
 		err = spt.initBellmanFord(g)
 	default:
-		err = errors.New(fmt.Sprintf("algorithm %v not supported", alg))
+		if g.FindCycleFrom(src) == nil {
+			spt.initTopological(g)
+		} else if src, _ := g.FindNegativeEdgeFrom(src); src < 0 {
+			spt.initDijkstra(g)
+		} else {
+			err = spt.initBellmanFord(g)
+		}
 	}
 	return spt, err
 }
