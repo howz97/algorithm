@@ -273,6 +273,18 @@ func (g *WDigraph) SearcherBellmanFord() (*Searcher, error) {
 	return sps, nil
 }
 
+func (g *WDigraph) Searcher() (*Searcher, error) {
+	sps, err := g.SearcherTopological()
+	if err == nil {
+		return sps, nil
+	}
+	sps, err = g.SearcherDijkstra()
+	if err == nil {
+		return sps, nil
+	}
+	return g.SearcherBellmanFord()
+}
+
 type Searcher struct {
 	spt []*PathTree
 }
