@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestNewSPS_Dijkstra(t *testing.T) {
+func TestDijkstra_Simple(t *testing.T) {
 	g, err := LoadWDigraph(".\\test_data\\w_digraph.yml")
 	if err != nil {
 		t.Fatal(err)
@@ -18,7 +18,7 @@ func TestNewSPS_Dijkstra(t *testing.T) {
 	CheckSearcher(t, sps, g)
 }
 
-func TestNewSPS_Topological(t *testing.T) {
+func TestTopological_Simple(t *testing.T) {
 	g, err := LoadWDigraph(".\\test_data\\no_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
@@ -30,7 +30,7 @@ func TestNewSPS_Topological(t *testing.T) {
 	CheckSearcher(t, sps, g)
 }
 
-func TestBellmanFord(t *testing.T) {
+func TestBellmanFord_Simple(t *testing.T) {
 	g, err := LoadWDigraph(".\\test_data\\w_digraph.yml")
 	if err != nil {
 		t.Fatal(err)
@@ -70,10 +70,34 @@ func CheckSPT(t *testing.T, tree *PathTree, dg *WDigraph) {
 	})
 }
 
+const (
+	vertLowerLimit = 100
+	vertRange = 100
+)
+
 func TestTopological(t *testing.T) {
+	LoopTestSearcher(t, 2, 0.5, func(wd *WDigraph) (*Searcher, error) {
+		return wd.SearcherTopological()
+	})
+}
+
+func TestDijkstra(t *testing.T) {
+	LoopTestSearcher(t, vertLowerLimit, 0.0001, func(wd *WDigraph) (*Searcher, error) {
+		return wd.SearcherDijkstra()
+	})
+}
+
+func TestBellmanFord(t *testing.T) {
+	LoopTestSearcher(t, vertLowerLimit, 0.05, func(wd *WDigraph) (*Searcher, error) {
+		return wd.SearcherBellmanFord()
+	})
+}
+
+func LoopTestSearcher(t *testing.T, edgeLimit int, negativeEdge float64,
+	fn func(*WDigraph)(*Searcher, error)) {
 	for i := 0; i < 100; i++ {
-		wd := RandWDigraph()
-		sps, err := wd.Searcher()
+		wd := RandWDigraph(edgeLimit, negativeEdge)
+		sps, err := fn(wd)
 		if err != nil {
 			t.Log(err)
 			continue
@@ -82,14 +106,14 @@ func TestTopological(t *testing.T) {
 	}
 }
 
-func RandWDigraph() (wd *WDigraph) {
-	wd = NewWDigraph(uint(10 + rand.Intn(100)))
+func RandWDigraph(edgeLimit int, negativeEdge float64) (wd *WDigraph) {
+	wd = NewWDigraph(uint(vertLowerLimit + rand.Intn(vertRange)))
 	nv := int(wd.NumVert())
 	for from := 0; from < nv; from++ {
-		ne := rand.Intn(10) // edges limit
+		ne := rand.Intn(edgeLimit)
 		for j := 0; j < ne; j++ {
 			to := rand.Intn(nv)
-			w := (rand.Float64() - 0.1) * 10000
+			w := (rand.Float64() - negativeEdge) * 10000
 			wd.AddEdge(from, to, w)
 		}
 	}
