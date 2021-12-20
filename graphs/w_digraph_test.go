@@ -72,7 +72,7 @@ func CheckSPT(t *testing.T, tree *PathTree, dg *WDigraph) {
 
 const (
 	vertLowerLimit = 100
-	vertRange = 100
+	vertRange      = 900
 )
 
 func TestTopological(t *testing.T) {
@@ -82,20 +82,26 @@ func TestTopological(t *testing.T) {
 }
 
 func TestDijkstra(t *testing.T) {
-	LoopTestSearcher(t, vertLowerLimit, 0.0001, func(wd *WDigraph) (*Searcher, error) {
+	LoopTestSearcher(t, 10, 0.00001, func(wd *WDigraph) (*Searcher, error) {
 		return wd.SearcherDijkstra()
 	})
 }
 
 func TestBellmanFord(t *testing.T) {
-	LoopTestSearcher(t, vertLowerLimit, 0.05, func(wd *WDigraph) (*Searcher, error) {
+	LoopTestSearcher(t, 10, 0.0005, func(wd *WDigraph) (*Searcher, error) {
 		return wd.SearcherBellmanFord()
 	})
 }
 
+func TestSearcher(t *testing.T) {
+	LoopTestSearcher(t, 10, 0.0005, func(wd *WDigraph) (*Searcher, error) {
+		return wd.Searcher()
+	})
+}
+
 func LoopTestSearcher(t *testing.T, edgeLimit int, negativeEdge float64,
-	fn func(*WDigraph)(*Searcher, error)) {
-	for i := 0; i < 100; i++ {
+	fn func(*WDigraph) (*Searcher, error)) {
+	for i := 0; i < 10; i++ {
 		wd := RandWDigraph(edgeLimit, negativeEdge)
 		sps, err := fn(wd)
 		if err != nil {
