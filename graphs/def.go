@@ -121,7 +121,7 @@ func LoadWDigraph(filename string) (*WDigraph, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &WDigraph{Digraph: *dg}, nil
+	return &WDigraph{Digraph: dg}, nil
 }
 
 func LoadWGraph(filename string) (*WGraph, error) {
@@ -133,5 +133,5 @@ func LoadWGraph(filename string) (*WGraph, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &WGraph{Graph{Digraph: dg}}, nil
+	return &WGraph{&Graph{Digraph: dg}}, nil
 }

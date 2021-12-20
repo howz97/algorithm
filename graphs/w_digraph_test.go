@@ -2,6 +2,7 @@ package graphs
 
 import (
 	"fmt"
+	"math/rand"
 	"testing"
 )
 
@@ -67,4 +68,30 @@ func CheckSPT(t *testing.T, tree *PathTree, dg *WDigraph) {
 		}
 		return true
 	})
+}
+
+func TestTopological(t *testing.T) {
+	for i := 0; i < 100; i++ {
+		wd := RandWDigraph()
+		sps, err := wd.Searcher()
+		if err != nil {
+			t.Log(err)
+			continue
+		}
+		CheckSearcher(t, sps, wd)
+	}
+}
+
+func RandWDigraph() (wd *WDigraph) {
+	wd = NewWDigraph(uint(10 + rand.Intn(100)))
+	nv := int(wd.NumVert())
+	for from := 0; from < nv; from++ {
+		ne := rand.Intn(10) // edges limit
+		for j := 0; j < ne; j++ {
+			to := rand.Intn(nv)
+			w := (rand.Float64() - 0.1) * 10000
+			wd.AddEdge(from, to, w)
+		}
+	}
+	return
 }

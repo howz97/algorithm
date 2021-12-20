@@ -205,7 +205,7 @@ func (spt *PathTree) initBellmanFord(g *WDigraph) error {
 func (spt *PathTree) toWDigraph(g *WDigraph) *WDigraph {
 	sptg := NewWDigraph(g.NumVert())
 	for to, from := range spt.edgeTo {
-		if to == spt.src {
+		if from < 0 {
 			continue
 		}
 		sptg.AddEdge(from, to, g.getWeightMust(from, to))
