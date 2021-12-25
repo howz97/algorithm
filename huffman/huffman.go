@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	huffman := NewHuffman("./huffman.txt")
+	huffman := NewHuffman("C:\\Users\\zhanghow\\code\\algorithm\\huffman\\huffman.txt")
 	huffman.printWeights()
 	fmt.Println()
 	huffman.printEncodeMap()

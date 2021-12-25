@@ -52,7 +52,7 @@ func (t *Trie) Find(k string) T {
 	return t.tree.Find(t.a, []rune(k))
 }
 
-// Update or set a value
+// Upsert update or insert a value
 // Insert a new node if the node not exists
 func (t *Trie) Upsert(k string, v T) {
 	t.tree.Upsert(t.a, []rune(k), v)
