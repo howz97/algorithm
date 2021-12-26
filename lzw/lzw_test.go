@@ -1,9 +1,15 @@
 package lzw
 
-import "testing"
+import (
+	"io/ioutil"
+	"testing"
+)
 
 func TestCompress(t *testing.T) {
-	data := []byte("abababaabskabaab")
+	data, err := ioutil.ReadFile("..\\testdata\\tale.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
 	compressed := Compress(data)
 	t.Logf("compress performance %v", float64(len(compressed))/float64(len(data)))
 	decompressed := Decompress(compressed)
@@ -13,9 +19,9 @@ func TestCompress(t *testing.T) {
 	}
 	for i, b := range data {
 		if b != decompressed[i] {
-			t.Log(data)
+			t.Log(data, string(data))
 			t.Log(compressed)
-			t.Log(decompressed)
+			t.Log(decompressed, string(decompressed))
 			t.Errorf("diffence at %d: raw data is %v, decompressed is %v", i, b, decompressed[i])
 			break
 		}

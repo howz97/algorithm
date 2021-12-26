@@ -51,13 +51,14 @@ func Decompress(data []byte) (out []byte) {
 		if len(data) == 0 {
 			break
 		}
-		code1 := peekUint16(data)
-		if e := table.Get(Int(code1)); e != nil {
-			bytes = append(bytes, e.([]byte)[0])
+		bytes1 := make([]byte, len(bytes))
+		copy(bytes1, bytes)
+		if e := table.Get(Int(peekUint16(data))); e != nil {
+			bytes1 = append(bytes1, e.([]byte)[0])
 		} else {
-			bytes = append(bytes, bytes[0])
+			bytes1 = append(bytes1, bytes[0])
 		}
-		table.Put(Int(i), bytes)
+		table.Put(Int(i), bytes1)
 		i++
 	}
 	return
