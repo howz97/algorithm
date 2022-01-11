@@ -9,6 +9,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/howz97/algorithm/pq/heap"
+	. "github.com/howz97/algorithm/search"
+	. "github.com/howz97/algorithm/util"
 	"io/ioutil"
 	"os"
 )
@@ -151,4 +154,80 @@ func generateHuffmantree(weights map[byte]uint) *binaryTree {
 		}
 	}
 	return minBT[0]
+}
+
+type node struct {
+	isLeaf bool
+	b      byte
+	cnt    uint
+	L, R   *node
+}
+
+func (n *node) IsNil() bool {
+	return n == nil
+}
+
+func (n *node) Val() T {
+	return nil
+}
+
+func (n *node) Left() ITraversal {
+	return n.L
+}
+
+func (n *node) Right() ITraversal {
+	return n.R
+}
+
+//func (n *node) Cmp(other Comparable) Result {
+//	n2 := other.(*node)
+//	if n.cnt < n2.cnt {
+//		return Less
+//	} else if n.cnt > n2.cnt {
+//		return More
+//	} else {
+//		return Equal
+//	}
+//}
+
+func Compress(data []byte) []byte {
+	var stat [256]uint
+	for _, b := range data {
+		stat[b]++
+	}
+	pq := heap.New(256)
+	for b, cnt := range stat {
+		if cnt > 0 {
+			pq.Push(Int(cnt), &node{
+				isLeaf: true,
+				b:      byte(b),
+				cnt:    cnt,
+			})
+		}
+	}
+	var huffmantree *node
+	for {
+		n1 := pq.Pop().(*node)
+		n2, ok := pq.Pop().(*node)
+		if !ok {
+			huffmantree = n1
+			break
+		}
+		cnt := n1.cnt + n2.cnt
+		pq.Push(Int(cnt), &node{
+			isLeaf: false,
+			cnt:    cnt,
+			L:      n1,
+			R:      n2,
+		})
+	}
+	PreOrder(huffmantree, func(t ITraversal) bool {
+		n := t.(*node)
+
+		return true
+	})
+}
+
+func Decompress(data []byte) []byte {
+
 }

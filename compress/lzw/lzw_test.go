@@ -6,7 +6,7 @@ import (
 )
 
 func TestCompress(t *testing.T) {
-	data, err := ioutil.ReadFile("..\\testdata\\tale.txt")
+	data, err := ioutil.ReadFile("..\\testdata\\tale_1.txt")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -12,21 +12,7 @@ type Searcher interface {
 
 type ITraversal interface {
 	IsNil() bool
-	Key() util.Comparable
 	Val() util.T
 	Left() ITraversal
 	Right() ITraversal
-}
-
-type KeyVal struct {
-	key   util.Comparable
-	value util.T
-}
-
-func (kv *KeyVal) Key() util.Comparable {
-	return kv.key
-}
-
-func (kv *KeyVal) Val() util.T {
-	return kv.value
 }
