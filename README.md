@@ -43,4 +43,6 @@
     * Topological
     * Bellman-Ford
 * [正则表达式](https://github.com/howz97/algorithm/tree/master/regexp)
-* [压缩](https://github.com/howz97/algorithm/tree/master/huffman)
+* [压缩](https://github.com/howz97/algorithm/tree/master/compress)
+  * [Huffman](https://github.com/howz97/algorithm/tree/master/compress/huffman)
+  * [LZW](https://github.com/howz97/algorithm/tree/master/compress/lzw)
