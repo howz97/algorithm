@@ -89,15 +89,17 @@ func (bw *bitWriter) WriteBits(bits []bool) {
 }
 
 func (bw *bitWriter) WriteByte(b byte) {
-	for i := uint(7); i >= 0; i-- {
+	for i := uint(7); i > 0; i-- {
 		bw.WriteBit((b >> i & 1) == 1)
 	}
+	bw.WriteBit((b & 1) == 1)
 }
 
 func (bw *bitWriter) WriteUint32(n uint32) {
-	for i := uint(31); i >= 0; i-- {
+	for i := uint(31); i > 0; i-- {
 		bw.WriteBit((n >> i & 1) == 1)
 	}
+	bw.WriteBit((n & 1) == 1)
 }
 
 func (bw *bitWriter) Close() {

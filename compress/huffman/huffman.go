@@ -4,12 +4,13 @@ import (
 	"github.com/howz97/algorithm/pq/heap"
 	. "github.com/howz97/algorithm/search"
 	. "github.com/howz97/algorithm/util"
+	"strconv"
 )
 
 type node struct {
 	isLeaf      bool
 	b           byte
-	cnt         uint
+	cnt         int
 	left, right *node
 }
 
@@ -17,8 +18,12 @@ func (n *node) IsNil() bool {
 	return n == nil
 }
 
-func (n *node) Val() T {
-	return nil
+func (n *node) String() string {
+	str := ""
+	if n.isLeaf {
+		str = "(" + string([]byte{n.b}) + ")"
+	}
+	return str + strconv.Itoa(n.cnt)
 }
 
 func (n *node) Left() ITraversal {
@@ -29,7 +34,7 @@ func (n *node) Right() ITraversal {
 	return n.right
 }
 
-func (n *node) makeTable(code []bool, table [256][]bool) {
+func (n *node) makeTable(code []bool, table [][]bool) {
 	if n.isLeaf {
 		table[n.b] = make([]bool, len(code))
 		copy(table[n.b], code)
@@ -65,7 +70,7 @@ func compile(data []byte) (*bitWriter, [256][]bool) {
 	bw := new(bitWriter)
 	huffmanTree := genHuffmanTree(data)
 	var table [256][]bool
-	huffmanTree.makeTable(make([]bool, 0, 256), table)
+	huffmanTree.makeTable(make([]bool, 0, 256), table[:])
 	// Encode huffman tree
 	PreOrder(huffmanTree, func(t ITraversal) bool {
 		n := t.(*node)
@@ -81,7 +86,7 @@ func compile(data []byte) (*bitWriter, [256][]bool) {
 }
 
 func genHuffmanTree(data []byte) (huffmanTree *node) {
-	var stat [256]uint
+	var stat [256]int
 	for _, b := range data {
 		stat[b]++
 	}
@@ -109,7 +114,7 @@ func genHuffmanTree(data []byte) (huffmanTree *node) {
 	return pq.Pop().(*node)
 }
 
-func Decompress(data []byte) []byte {
+func Decompress(data []byte) ([]byte, error) {
 	br := newBitReader(data)
 	huffmanTree := newNode(br)
 	size := br.ReadBits(32)
@@ -123,7 +128,10 @@ func Decompress(data []byte) []byte {
 				nd = nd.left
 			}
 		}
+		if br.Err() != nil {
+			break
+		}
 		output = append(output, nd.b)
 	}
-	return output
+	return output, br.Err()
 }

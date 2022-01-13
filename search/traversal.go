@@ -1,7 +1,6 @@
 package search
 
 import (
-	"fmt"
 	"github.com/howz97/algorithm/queue"
 	"github.com/waiyva/binary-tree/btprinter"
 )
@@ -101,7 +100,7 @@ func PrintBinaryTree(bt ITraversal) {
 			sli = append(sli, "#")
 			continue
 		}
-		sli = append(sli, fmt.Sprint(bt.Val()))
+		sli = append(sli, bt.String())
 		q.PushBack(bt.Left())
 		q.PushBack(bt.Right())
 	}

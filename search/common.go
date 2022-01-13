@@ -1,6 +1,9 @@
 package search
 
-import "github.com/howz97/algorithm/util"
+import (
+	"fmt"
+	"github.com/howz97/algorithm/util"
+)
 
 type Searcher interface {
 	Put(key util.Comparable, val util.T)
@@ -11,8 +14,8 @@ type Searcher interface {
 }
 
 type ITraversal interface {
+	fmt.Stringer
 	IsNil() bool
-	Val() util.T
 	Left() ITraversal
 	Right() ITraversal
 }

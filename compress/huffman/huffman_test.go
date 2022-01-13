@@ -6,13 +6,16 @@ import (
 )
 
 func TestCompress(t *testing.T) {
-	data, err := ioutil.ReadFile("..\\testdata\\tale_1.txt")
+	data, err := ioutil.ReadFile("..\\testdata\\tale.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
 	compressed := Compress(data)
-	t.Logf("compress performance %v", float64(len(compressed))/float64(len(data)))
-	decompressed := Decompress(compressed)
+	t.Logf("compress performance %.4f", float64(len(compressed))/float64(len(data)))
+	decompressed, err := Decompress(compressed)
+	if err != nil {
+		t.Error(err)
+	}
 
 	if len(data) != len(decompressed) {
 		t.Fatalf("raw data length is %v, decompressed length is %v", len(data), len(decompressed))
@@ -30,7 +33,11 @@ func TestCompress(t *testing.T) {
 
 func TestSimple(t *testing.T) {
 	data := "zhang how 1997"
-	result := string(Decompress(Compress([]byte(data))))
+	de, err := Decompress(Compress([]byte(data)))
+	if err != nil {
+		t.Error(err)
+	}
+	result := string(de)
 	if data != result {
 		t.Errorf("%v not equal %v", data, result)
 	}

@@ -23,7 +23,7 @@ func main() {
 
 	fmt.Println("traversal in order:")
 	search.InOrder(avl, func(t search.ITraversal) bool {
-		fmt.Printf("%v,", t.Val())
+		fmt.Printf("%v,", t.String())
 		return true
 	})
 }

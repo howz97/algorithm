@@ -1,6 +1,7 @@
 package binarytree
 
 import (
+	"fmt"
 	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/util"
 	"time"
@@ -166,6 +167,6 @@ func (n *node) Key() util.Comparable {
 	return n.key
 }
 
-func (n *node) Val() util.T {
-	return n.value
+func (n *node) String() string {
+	return fmt.Sprint(n.value)
 }

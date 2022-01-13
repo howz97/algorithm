@@ -228,8 +228,8 @@ func (n *node) Key() util.Comparable {
 	return n.key
 }
 
-func (n *node) Val() util.T {
-	return n.value
+func (n *node) String() string {
+	return fmt.Sprint(n.value)
 }
 
 func (n *node) isBalance() bool {
