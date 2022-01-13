@@ -56,6 +56,7 @@ func newNode(br *bitReader) (n *node) {
 	return
 }
 
+// Compress data using huffman algorithm
 func Compress(data []byte) []byte {
 	bw, table := compile(data)
 	bw.WriteUint32(uint32(len(data)))
@@ -114,6 +115,7 @@ func genHuffmanTree(data []byte) (huffmanTree *node) {
 	return pq.Pop().(*node)
 }
 
+// Decompress data compressed by huffman algorithm
 func Decompress(data []byte) ([]byte, error) {
 	br := newBitReader(data)
 	huffmanTree := newNode(br)

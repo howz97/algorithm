@@ -5,6 +5,7 @@ import (
 	. "github.com/howz97/algorithm/util"
 )
 
+// Compress data using LZW algorithm
 func Compress(data []byte) (out []byte) {
 	table := hash_map.New()
 	unused := uint16(0)
@@ -36,6 +37,7 @@ func Compress(data []byte) (out []byte) {
 	return
 }
 
+// Decompress data compressed by LZW algorithm
 func Decompress(data []byte) (out []byte) {
 	table := hash_map.New()
 	i := uint16(0)
