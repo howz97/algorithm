@@ -1,7 +1,7 @@
 package redblack
 
 import (
-	"github.com/howz97/algorithm/util"
+	. "github.com/howz97/algorithm/util"
 )
 
 const (
@@ -17,14 +17,14 @@ func New() *RedBlack {
 	return new(RedBlack)
 }
 
-func (rb *RedBlack) Put(key util.Comparable, val util.T) {
+func (rb *RedBlack) Put(key Comparable, val T) {
 	rb.root = rb.root.insert(key, val)
 	if rb.root.isRed() {
 		rb.root.color = black
 	}
 }
 
-func (rb *RedBlack) Get(key util.Comparable) util.T {
+func (rb *RedBlack) Get(key Comparable) T {
 	n := rb.root.find(key)
 	if n == nil {
 		return nil
@@ -36,11 +36,11 @@ func (rb *RedBlack) Get(key util.Comparable) util.T {
 	return n.value
 }
 
-func (rb *RedBlack) GetMin() util.T {
+func (rb *RedBlack) GetMin() T {
 	return rb.root.findMin().value
 }
 
-func (rb *RedBlack) GetMax() util.T {
+func (rb *RedBlack) GetMax() T {
 	return rb.root.findMax().value
 }
 
@@ -70,7 +70,7 @@ func (rb *RedBlack) DelMax() {
 	}
 }
 
-func (rb *RedBlack) Del(key util.Comparable) {
+func (rb *RedBlack) Del(key Comparable) {
 	if rb.root == nil {
 		return
 	}
@@ -101,15 +101,15 @@ func (rb *RedBlack) Clean() {
 /*=============================================================================*/
 
 type node struct {
-	key      util.Comparable
-	value    util.T
+	key      Comparable
+	value    T
 	color    bool
 	size     uint
 	leftSon  *node
 	rightSon *node
 }
 
-func (n *node) insert(k util.Comparable, v util.T) *node {
+func (n *node) insert(k Comparable, v T) *node {
 	if n == nil {
 		return &node{
 			key:   k,
@@ -119,9 +119,9 @@ func (n *node) insert(k util.Comparable, v util.T) *node {
 		}
 	}
 	switch k.Cmp(n.key) {
-	case util.Less:
+	case Less:
 		n.leftSon = n.leftSon.insert(k, v)
-	case util.More:
+	case More:
 		n.rightSon = n.rightSon.insert(k, v)
 	default:
 		n.value = v
@@ -139,14 +139,14 @@ func (n *node) insert(k util.Comparable, v util.T) *node {
 	return n
 }
 
-func (n *node) find(key util.Comparable) *node {
+func (n *node) find(key Comparable) *node {
 	if n == nil {
 		return nil
 	}
 	switch key.Cmp(n.key) {
-	case util.Less:
+	case Less:
 		return n.leftSon.find(key)
-	case util.More:
+	case More:
 		return n.rightSon.find(key)
 	default:
 		return n
@@ -238,8 +238,8 @@ func flipColors2(r *node) {
 	r.rightSon.color = red
 }
 
-func (n *node) delete(k util.Comparable) *node {
-	if k.Cmp(n.key) == util.Less {
+func (n *node) delete(k Comparable) *node {
+	if k.Cmp(n.key) == Less {
 		if !n.leftSon.isRed() && !n.leftSon.leftSon.isRed() {
 			n = moveRedLeft(n)
 		}
@@ -248,14 +248,14 @@ func (n *node) delete(k util.Comparable) *node {
 		if n.leftSon.isRed() {
 			n = rotateRight(n)
 		}
-		if k.Cmp(n.key) == util.Equal && n.rightSon == nil {
+		if k.Cmp(n.key) == Equal && n.rightSon == nil {
 			return nil
 		}
 		// fixme: panic
 		if !n.rightSon.isRed() && !n.rightSon.leftSon.isRed() {
 			n = moveRedRight(n)
 		}
-		if k.Cmp(n.key) == util.Equal {
+		if k.Cmp(n.key) == Equal {
 			min := n.rightSon.findMin()
 			n.value = min.value
 			n.key = min.key
