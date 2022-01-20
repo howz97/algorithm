@@ -1,6 +1,8 @@
 package redblack
 
 import (
+	"fmt"
+	. "github.com/howz97/algorithm/search"
 	. "github.com/howz97/algorithm/util"
 )
 
@@ -18,6 +20,31 @@ type node struct {
 
 func (n *node) Cmp(a Comparable) Result {
 	return n.key.Cmp(a.(*node).key)
+}
+
+func (n *node) Left() ITraversal {
+	return n.left
+}
+
+func (n *node) Right() ITraversal {
+	return n.right
+}
+
+func (n *node) IsNil() bool {
+	return n.left == nil && n.right == nil
+}
+
+func (n *node) String() string {
+	if n.IsNil() {
+		return "Nil"
+	}
+	var color string
+	if n.color == red {
+		color = "r"
+	} else {
+		color = "b"
+	}
+	return fmt.Sprintf("%s[%v]", color, n.key)
 }
 
 type Tree struct {
@@ -81,6 +108,10 @@ func (tree *Tree) fixInsert(n *node) {
 			}
 		} else {
 			uncle := n.p.p.left
+			if uncle == nil {
+				fmt.Println("uncle is nil ")
+				PrintBinaryTree(tree.root) // todo
+			}
 			if uncle.color == red {
 				n.p.color, uncle.color = black, black
 				n = n.p.p
@@ -98,6 +129,7 @@ func (tree *Tree) fixInsert(n *node) {
 			}
 		}
 	}
+	tree.root.color = black
 }
 
 func (tree *Tree) rightRotate(n *node) {
@@ -150,36 +182,38 @@ loop:
 }
 
 func (tree *Tree) Del(key Comparable) {
-	z := tree.find(key)
-	if z == nil {
+	del := tree.find(key)
+	if del == tree.null {
 		return
 	}
 	tree.size--
-	y := z
-	yOrig := y.color
-	var x *node
-	if z.left == tree.null {
-		x = z.right
-		tree.transplant(z, x)
-	} else if z.right == tree.null {
-		x = z.left
-		tree.transplant(z, x)
+	del2 := del
+	d2Orig := del2.color
+	var rep *node
+	if del.left == tree.null {
+		rep = del.right
+		tree.transplant(del, rep)
+	} else if del.right == tree.null {
+		rep = del.left
+		tree.transplant(del, rep)
 	} else {
-		y = tree.getMin(z.right)
-		yOrig = y.color
-		x = y.right
-		if y.p != z {
-			tree.transplant(y, x)
-			y.right = z.right
-			y.right.p = y
+		del2 = tree.getMin(del.right)
+		d2Orig = del2.color
+		rep = del2.right
+		if del2.p == del {
+			rep.p = del2 // todo: why ?
+		} else {
+			tree.transplant(del2, rep)
+			del2.right = del.right
+			del2.right.p = del2
 		}
-		tree.transplant(z, y)
-		y.left = z.left
-		y.left.p = y
-		y.color = z.color
+		tree.transplant(del, del2)
+		del2.left = del.left
+		del2.left.p = del2
+		del2.color = del.color
 	}
-	if yOrig == black {
-		tree.fixDelete(x)
+	if d2Orig == black {
+		tree.fixDelete(rep)
 	}
 }
 
@@ -243,6 +277,9 @@ func (tree *Tree) fixDelete(n *node) {
 }
 
 func (tree *Tree) getMin(n *node) (min *node) {
+	if n.IsNil() {
+		return n
+	}
 	min = n
 	for min.left != tree.null {
 		min = min.left
