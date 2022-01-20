@@ -9,6 +9,7 @@ type Searcher interface {
 	Put(key util.Comparable, val util.T)
 	Get(key util.Comparable) util.T
 	Del(key util.Comparable)
+	Clean()
 	Size() uint
 }
 

@@ -9,306 +9,270 @@ const (
 	black = false
 )
 
-type RedBlack struct {
+type node struct {
+	key            Comparable
+	value          T
+	color          bool
+	p, left, right *node
+}
+
+func (n *node) Cmp(a Comparable) Result {
+	return n.key.Cmp(a.(*node).key)
+}
+
+type Tree struct {
 	root *node
+	null *node
+	size uint
 }
 
-func New() *RedBlack {
-	return new(RedBlack)
+func (tree *Tree) Put(key Comparable, val T) {
+	p := tree.null
+	x := tree.root
+	for x != tree.null {
+		p = x
+		switch key.Cmp(x.key) {
+		case Less:
+			x = x.left
+		case More:
+			x = x.right
+		case Equal:
+			x.value = val
+			return
+		}
+	}
+	tree.size++
+	in := &node{
+		key:   key,
+		value: val,
+		color: red,
+		p:     p,
+		left:  tree.null,
+		right: tree.null,
+	}
+	if p == tree.null {
+		tree.root = in
+	} else if in.Cmp(p) == Less {
+		p.left = in
+	} else {
+		p.right = in
+	}
+	tree.fixInsert(in)
 }
 
-func (rb *RedBlack) Put(key Comparable, val T) {
-	rb.root = rb.root.insert(key, val)
-	if rb.root.isRed() {
-		rb.root.color = black
+func (tree *Tree) fixInsert(n *node) {
+	for n.p.color == red {
+		if n.p == n.p.p.left {
+			uncle := n.p.p.right
+			if uncle.color == red {
+				n.p.color, uncle.color = black, black
+				n = n.p.p
+				n.color = red
+				// continue
+			} else {
+				// uncle is black
+				if n == n.p.right {
+					n = n.p
+					tree.leftRotate(n)
+				}
+				n.p.color = black
+				n.p.p.color = red
+				tree.rightRotate(n.p.p)
+			}
+		} else {
+			uncle := n.p.p.left
+			if uncle.color == red {
+				n.p.color, uncle.color = black, black
+				n = n.p.p
+				n.color = red
+				// continue
+			} else {
+				// uncle is black
+				if n == n.p.left {
+					n = n.p
+					tree.rightRotate(n)
+				}
+				n.p.color = black
+				n.p.p.color = red
+				tree.leftRotate(n.p.p)
+			}
+		}
 	}
 }
 
-func (rb *RedBlack) Get(key Comparable) T {
-	n := rb.root.find(key)
-	if n == nil {
-		return nil
+func (tree *Tree) rightRotate(n *node) {
+	top := n.left
+	n.left = top.right
+	if n.left != tree.null {
+		n.left.p = n
 	}
-	if n.value == nil {
-		rb.Del(n.key) // 删除value为nil的节点
+	tree.transplant(n, top)
+	top.right = n
+	n.p = top
+}
+
+func (tree *Tree) leftRotate(n *node) {
+	top := n.right
+	n.right = top.left
+	if n.right != tree.null {
+		n.right.p = n
+	}
+	tree.transplant(n, top)
+	top.left = n
+	n.p = top
+}
+
+func (tree *Tree) transplant(a, b *node) {
+	b.p = a.p
+	if b.p == tree.null {
+		tree.root = b
+	} else if a == a.p.left {
+		b.p.left = b
+	} else {
+		b.p.right = b
+	}
+}
+
+func (tree *Tree) find(key Comparable) *node {
+	cur := tree.root
+loop:
+	for cur != tree.null {
+		switch key.Cmp(cur.key) {
+		case Less:
+			cur = cur.left
+		case More:
+			cur = cur.right
+		case Equal:
+			break loop
+		}
+	}
+	return cur
+}
+
+func (tree *Tree) Del(key Comparable) {
+	z := tree.find(key)
+	if z == nil {
+		return
+	}
+	tree.size--
+	y := z
+	yOrig := y.color
+	var x *node
+	if z.left == tree.null {
+		x = z.right
+		tree.transplant(z, x)
+	} else if z.right == tree.null {
+		x = z.left
+		tree.transplant(z, x)
+	} else {
+		y = tree.getMin(z.right)
+		yOrig = y.color
+		x = y.right
+		if y.p != z {
+			tree.transplant(y, x)
+			y.right = z.right
+			y.right.p = y
+		}
+		tree.transplant(z, y)
+		y.left = z.left
+		y.left.p = y
+		y.color = z.color
+	}
+	if yOrig == black {
+		tree.fixDelete(x)
+	}
+}
+
+func (tree *Tree) fixDelete(n *node) {
+	for n != tree.root && n.color == black {
+		if n == n.p.left {
+			sibling := n.p.right
+			if sibling.color == red {
+				sibling.color = black
+				n.p.color = red
+				tree.leftRotate(n.p)
+				sibling = n.p.right
+			}
+			// sibling is black
+			if sibling.left.color == black && sibling.right.color == black {
+				sibling.color = red
+				n = n.p
+				// continue
+			} else {
+				if sibling.right.color == black {
+					sibling.left.color = black
+					sibling.color = red
+					tree.rightRotate(sibling)
+					sibling = n.p.right
+				}
+				// sibling.right is red
+				n.p.color, sibling.color = sibling.color, n.p.color
+				sibling.right.color = black
+				tree.leftRotate(n.p)
+				n = tree.root
+			}
+		} else {
+			sibling := n.p.left
+			if sibling.color == red {
+				sibling.color = black
+				n.p.color = red
+				tree.rightRotate(n.p)
+				sibling = n.p.left
+			}
+			// sibling is black
+			if sibling.left.color == black && sibling.right.color == black {
+				sibling.color = red
+				n = n.p
+				// continue
+			} else {
+				if sibling.left.color == black {
+					sibling.right.color = black
+					sibling.color = red
+					tree.leftRotate(sibling)
+					sibling = n.p.left
+				}
+				// sibling.right is red
+				n.p.color, sibling.color = sibling.color, n.p.color
+				sibling.left.color = black
+				tree.rightRotate(n.p)
+				n = tree.root
+			}
+		}
+	}
+	n.color = black
+}
+
+func (tree *Tree) getMin(n *node) (min *node) {
+	min = n
+	for min.left != tree.null {
+		min = min.left
+	}
+	return
+}
+
+func (tree *Tree) Get(key Comparable) T {
+	n := tree.find(key)
+	if n == tree.null {
 		return nil
 	}
 	return n.value
 }
 
-func (rb *RedBlack) GetMin() T {
-	return rb.root.findMin().value
+func (tree *Tree) Size() uint {
+	return tree.size
 }
 
-func (rb *RedBlack) GetMax() T {
-	return rb.root.findMax().value
+func (tree *Tree) Clean() {
+	tree.root = tree.null
+	tree.size = 0
 }
 
-func (rb *RedBlack) DelMin() {
-	if rb.root == nil {
-		return
+func New() *Tree {
+	null := new(node)
+	null.color = black
+	null.p = null
+	return &Tree{
+		root: null,
+		null: null,
 	}
-	if !rb.root.leftSon.isRed() && !rb.root.rightSon.isRed() {
-		rb.root.color = red
-	}
-	rb.root = rb.root.delMin()
-	if rb.root != nil {
-		rb.root.color = black
-	}
-}
-
-func (rb *RedBlack) DelMax() {
-	if rb.root == nil {
-		return
-	}
-	if !rb.root.leftSon.isRed() && !rb.root.rightSon.isRed() {
-		rb.root.color = red
-	}
-	rb.root = rb.root.delMax()
-	if rb.root != nil {
-		rb.root.color = black
-	}
-}
-
-func (rb *RedBlack) Del(key Comparable) {
-	if rb.root == nil {
-		return
-	}
-	if !rb.root.leftSon.isRed() && !rb.root.rightSon.isRed() {
-		rb.root.color = red
-	}
-	rb.root = rb.root.delete(key)
-	if rb.root != nil {
-		rb.root.color = black
-	}
-}
-
-func (rb *RedBlack) Empty() bool {
-	return rb.root == nil
-}
-
-func (rb *RedBlack) Size() uint {
-	if rb.root == nil {
-		return 0
-	}
-	return rb.root.size
-}
-
-func (rb *RedBlack) Clean() {
-	rb.root = nil
-}
-
-/*=============================================================================*/
-
-type node struct {
-	key      Comparable
-	value    T
-	color    bool
-	size     uint
-	leftSon  *node
-	rightSon *node
-}
-
-func (n *node) insert(k Comparable, v T) *node {
-	if n == nil {
-		return &node{
-			key:   k,
-			value: v,
-			color: red,
-			size:  1,
-		}
-	}
-	switch k.Cmp(n.key) {
-	case Less:
-		n.leftSon = n.leftSon.insert(k, v)
-	case More:
-		n.rightSon = n.rightSon.insert(k, v)
-	default:
-		n.value = v
-	}
-	n.size = size(n.leftSon) + size(n.rightSon) + 1
-	if !n.leftSon.isRed() && n.rightSon.isRed() {
-		n = rotateLeft(n)
-	}
-	if n.leftSon.isRed() && n.leftSon.leftSon.isRed() {
-		n = rotateRight(n)
-	}
-	if n.leftSon.isRed() && n.rightSon.isRed() {
-		flipColors(n)
-	}
-	return n
-}
-
-func (n *node) find(key Comparable) *node {
-	if n == nil {
-		return nil
-	}
-	switch key.Cmp(n.key) {
-	case Less:
-		return n.leftSon.find(key)
-	case More:
-		return n.rightSon.find(key)
-	default:
-		return n
-	}
-}
-
-func (n *node) findMin() *node {
-	if n == nil {
-		return nil
-	}
-	for n.leftSon != nil {
-		n = n.leftSon
-	}
-	return n
-}
-
-func (n *node) findMax() *node {
-	if n == nil {
-		return nil
-	}
-	for n.rightSon != nil {
-		n = n.rightSon
-	}
-	return n
-}
-
-func (n *node) delMin() *node {
-	if n.leftSon == nil {
-		return nil
-	}
-	if !n.leftSon.isRed() && !n.leftSon.leftSon.isRed() {
-		n = moveRedLeft(n)
-	}
-	n.leftSon = n.leftSon.delMin()
-	return balance(n)
-}
-
-func (n *node) delMax() *node {
-	if n.leftSon.isRed() {
-		n = rotateRight(n)
-	}
-	if n.rightSon == nil {
-		return nil
-	}
-	if !n.rightSon.isRed() && !n.rightSon.rightSon.isRed() {
-		n = moveRedRight(n)
-	}
-	n.rightSon = n.rightSon.delMax()
-	return balance(n)
-}
-
-func moveRedRight(r *node) *node {
-	flipColors2(r)
-	if !r.leftSon.leftSon.isRed() {
-		r = rotateRight(r)
-	}
-	return r
-}
-
-func moveRedLeft(r *node) *node {
-	flipColors2(r)
-	if r.rightSon.leftSon.isRed() {
-		r.rightSon = rotateRight(r.rightSon)
-		r = rotateLeft(r)
-	}
-	return r
-}
-
-func balance(r *node) *node {
-	if r.rightSon.isRed() {
-		r = rotateLeft(r)
-	}
-	r.size = size(r.leftSon) + size(r.rightSon) + 1
-	if !r.leftSon.isRed() && r.rightSon.isRed() {
-		r = rotateLeft(r)
-	}
-	if r.leftSon.isRed() && r.leftSon.leftSon.isRed() {
-		r = rotateRight(r)
-	}
-	if r.leftSon.isRed() && r.rightSon.isRed() {
-		flipColors(r) // ?
-	}
-	return r
-}
-
-func flipColors2(r *node) {
-	r.color = black
-	r.leftSon.color = red
-	r.rightSon.color = red
-}
-
-func (n *node) delete(k Comparable) *node {
-	if k.Cmp(n.key) == Less {
-		if !n.leftSon.isRed() && !n.leftSon.leftSon.isRed() {
-			n = moveRedLeft(n)
-		}
-		n.leftSon = n.leftSon.delete(k)
-	} else {
-		if n.leftSon.isRed() {
-			n = rotateRight(n)
-		}
-		if k.Cmp(n.key) == Equal && n.rightSon == nil {
-			return nil
-		}
-		// fixme: panic
-		if !n.rightSon.isRed() && !n.rightSon.leftSon.isRed() {
-			n = moveRedRight(n)
-		}
-		if k.Cmp(n.key) == Equal {
-			min := n.rightSon.findMin()
-			n.value = min.value
-			n.key = min.key
-			n.rightSon = n.rightSon.delMin()
-		} else {
-			n.rightSon = n.rightSon.delete(k)
-		}
-	}
-	return balance(n)
-}
-
-func (n *node) isRed() bool {
-	if n == nil {
-		return false
-	}
-	return n.color == red
-}
-
-func size(n *node) uint {
-	if n == nil {
-		return 0
-	}
-	return n.size
-}
-
-func rotateLeft(root *node) *node {
-	newRoot := root.rightSon
-	root.rightSon = newRoot.leftSon
-	newRoot.leftSon = root
-	root.size = size(root.leftSon) + size(root.rightSon) + 1
-	newRoot.size = size(newRoot.leftSon) + size(newRoot.rightSon) + 1
-	if root.color == black {
-		newRoot.color = black
-		root.color = red
-	}
-	return newRoot
-}
-
-func rotateRight(root *node) *node {
-	newRoot := root.leftSon
-	root.leftSon = newRoot.rightSon
-	newRoot.rightSon = root
-	root.size = size(root.leftSon) + size(root.rightSon) + 1
-	newRoot.size = size(newRoot.leftSon) + size(newRoot.rightSon) + 1
-	if root.color == black {
-		newRoot.color = black
-		root.color = red
-	}
-	return newRoot
-}
-
-func flipColors(root *node) {
-	root.leftSon.color = black
-	root.rightSon.color = black
-	root.color = red
 }
