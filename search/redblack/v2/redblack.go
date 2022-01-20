@@ -20,13 +20,10 @@ func (n *node) Cmp(a Comparable) Result {
 	return n.key.Cmp(a.(*node).key)
 }
 
-func (n *node) getMin() *node {
-
-}
-
 type Tree struct {
 	root *node
 	null *node
+	size uint
 }
 
 func (tree *Tree) Put(key Comparable, val T) {
@@ -44,6 +41,7 @@ func (tree *Tree) Put(key Comparable, val T) {
 			return
 		}
 	}
+	tree.size++
 	in := &node{
 		key:   key,
 		value: val,
@@ -136,7 +134,19 @@ func (tree *Tree) transplant(a, b *node) {
 }
 
 func (tree *Tree) find(key Comparable) *node {
-
+	cur := tree.root
+loop:
+	for cur != tree.null {
+		switch key.Cmp(cur.key) {
+		case Less:
+			cur = cur.left
+		case More:
+			cur = cur.right
+		case Equal:
+			break loop
+		}
+	}
+	return cur
 }
 
 func (tree *Tree) Del(key Comparable) {
@@ -144,6 +154,7 @@ func (tree *Tree) Del(key Comparable) {
 	if z == nil {
 		return
 	}
+	tree.size--
 	y := z
 	yOrig := y.color
 	var x *node
@@ -154,7 +165,7 @@ func (tree *Tree) Del(key Comparable) {
 		x = z.left
 		tree.transplant(z, x)
 	} else {
-		y = z.right.getMin()
+		y = tree.getMin(z.right)
 		yOrig = y.color
 		x = y.right
 		if y.p != z {
@@ -174,7 +185,79 @@ func (tree *Tree) Del(key Comparable) {
 
 func (tree *Tree) fixDelete(n *node) {
 	for n != tree.root && n.color == black {
-
+		if n == n.p.left {
+			sibling := n.p.right
+			if sibling.color == red {
+				sibling.color = black
+				n.p.color = red
+				tree.leftRotate(n.p)
+				sibling = n.p.right
+			}
+			// sibling is black
+			if sibling.left.color == black && sibling.right.color == black {
+				sibling.color = red
+				n = n.p
+				// continue
+			} else {
+				if sibling.right.color == black {
+					sibling.left.color = black
+					sibling.color = red
+					tree.rightRotate(sibling)
+					sibling = n.p.right
+				}
+				// sibling.right is red
+				n.p.color, sibling.color = sibling.color, n.p.color
+				sibling.right.color = black
+				tree.leftRotate(n.p)
+				n = tree.root
+			}
+		} else {
+			sibling := n.p.left
+			if sibling.color == red {
+				sibling.color = black
+				n.p.color = red
+				tree.rightRotate(n.p)
+				sibling = n.p.left
+			}
+			// sibling is black
+			if sibling.left.color == black && sibling.right.color == black {
+				sibling.color = red
+				n = n.p
+				// continue
+			} else {
+				if sibling.left.color == black {
+					sibling.right.color = black
+					sibling.color = red
+					tree.leftRotate(sibling)
+					sibling = n.p.left
+				}
+				// sibling.right is red
+				n.p.color, sibling.color = sibling.color, n.p.color
+				sibling.left.color = black
+				tree.rightRotate(n.p)
+				n = tree.root
+			}
+		}
 	}
 	n.color = black
+}
+
+func (tree *Tree) getMin(n *node) (min *node) {
+	min = n
+	for min.left != tree.null {
+		min = min.left
+	}
+	return
+}
+
+func (tree *Tree) Get(key Comparable) T {
+	n := tree.find(key)
+	if n == tree.null {
+		return nil
+	}
+	return n.value
+}
+
+func (tree *Tree) Size() uint {
+	return tree.size
 }
