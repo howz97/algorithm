@@ -201,7 +201,8 @@ func (tree *Tree) Del(key Comparable) {
 		d2Orig = del2.color
 		rep = del2.right
 		if del2.p == del {
-			rep.p = del2 // if rep is tree.null, assign del2 to null.p  todo: why ?
+			// If rep is tree.null, assign del2 to null.p to ensure following fixDelete works.
+			rep.p = del2
 		} else {
 			tree.transplant(del2, rep)
 			del2.right = del.right
