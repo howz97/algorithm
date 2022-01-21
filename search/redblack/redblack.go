@@ -102,6 +102,7 @@ func (tree *Tree) fixInsert(n *node) {
 					n = n.p
 					tree.leftRotate(n)
 				}
+				// n is the left son of n.p
 				n.p.color = black
 				n.p.p.color = red
 				tree.rightRotate(n.p.p)
@@ -119,6 +120,7 @@ func (tree *Tree) fixInsert(n *node) {
 					n = n.p
 					tree.rightRotate(n)
 				}
+				// n is the right son of n.p
 				n.p.color = black
 				n.p.p.color = red
 				tree.leftRotate(n.p.p)
