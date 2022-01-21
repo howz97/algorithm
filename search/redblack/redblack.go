@@ -108,10 +108,6 @@ func (tree *Tree) fixInsert(n *node) {
 			}
 		} else {
 			uncle := n.p.p.left
-			if uncle == nil {
-				fmt.Println("uncle is nil ")
-				PrintBinaryTree(tree.root) // todo
-			}
 			if uncle.color == red {
 				n.p.color, uncle.color = black, black
 				n = n.p.p
