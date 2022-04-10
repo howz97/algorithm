@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/string_sort"
+
+	"github.com/howz97/algorithm/strings/string_sort"
 )
 
 func main() {

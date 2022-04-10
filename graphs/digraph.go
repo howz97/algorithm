@@ -1,12 +1,13 @@
 package graphs
 
 import (
-	"github.com/howz97/algorithm/queue"
+	"strconv"
+
+	"github.com/howz97/algorithm/basic/queue"
+	"github.com/howz97/algorithm/basic/stack"
 	"github.com/howz97/algorithm/search/hash_map"
-	"github.com/howz97/algorithm/stack"
 	"github.com/howz97/algorithm/util"
 	"gopkg.in/yaml.v2"
-	"strconv"
 )
 
 func NewDigraph(size uint) *Digraph {
@@ -238,11 +239,11 @@ func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path) bool {
 }
 
 // Topological return a stack that will pop vertices in topological order
-func (dg *Digraph) Topological() (order *stack.IntStack) {
+func (dg *Digraph) Topological() (order *stack.Stack[int]) {
 	if dg.FindCycle() != nil {
 		return
 	}
-	order = stack.NewInt(int(dg.NumVert()))
+	order = stack.New[int](int(dg.NumVert()))
 	dg.IterateVetRDFS(func(v int) bool {
 		order.Push(v)
 		return true
@@ -574,7 +575,7 @@ func (dg Digraph) BFS(src int) *BFS {
 		marked: make([]bool, dg.NumVert()),
 		edgeTo: make([]int, dg.NumVert()),
 	}
-	q := queue.NewLinkInt()
+	q := queue.NewLinkQ[int]()
 	bfs.marked[src] = true
 	q.PushBack(src)
 	for q.Size() > 0 {

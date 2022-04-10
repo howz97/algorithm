@@ -1,29 +1,28 @@
 package queue
 
-import (
-	. "github.com/howz97/algorithm/util"
-)
-
 const (
-	MinCap = 2
+	MinCap = 4
 )
 
-type Slice struct {
+type SliceQ[T any] struct {
 	elems      []T
 	head, back int
 	size       int
 }
 
-func NewSlice(cap int) *Slice {
+func NewSliceQ[T any](cap int) *SliceQ[T] {
 	if cap < MinCap {
 		cap = MinCap
 	}
-	return &Slice{
+	return &SliceQ[T]{
 		elems: make([]T, cap),
 	}
 }
 
-func (q *Slice) Front() T {
+func (q *SliceQ[T]) Front() T {
+	if q.size <= 0 {
+		panic("empty queue")
+	}
 	e := q.elems[q.head]
 	q.head++
 	if q.head == len(q.elems) {
@@ -33,7 +32,14 @@ func (q *Slice) Front() T {
 	return e
 }
 
-func (q *Slice) PushBack(e T) {
+func (q *SliceQ[T]) PushBack(e T) {
+	if q.size <= 0 {
+		q.elems[0] = e
+		q.head = 0
+		q.back = 0
+		q.size = 1
+		return
+	}
 	if q.isFull() {
 		expand := make([]T, 2*len(q.elems))
 		n := q.Size()
@@ -52,10 +58,18 @@ func (q *Slice) PushBack(e T) {
 	q.size++
 }
 
-func (q *Slice) isFull() bool {
+func (q *SliceQ[T]) isFull() bool {
 	return q.Size() == len(q.elems)
 }
 
-func (q *Slice) Size() int {
+func (q *SliceQ[T]) Size() int {
 	return q.size
+}
+
+func (q *SliceQ[T]) Drain() []T {
+	var elems []T
+	for q.Size() > 0 {
+		elems = append(elems, q.Front())
+	}
+	return elems
 }

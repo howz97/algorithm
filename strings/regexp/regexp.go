@@ -3,13 +3,14 @@ package regexp
 import (
 	"errors"
 	"fmt"
-	"github.com/howz97/algorithm/graphs"
-	"github.com/howz97/algorithm/queue"
-	"github.com/howz97/algorithm/set"
-	"github.com/howz97/algorithm/stack"
 	"strconv"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/howz97/algorithm/basic/queue"
+	"github.com/howz97/algorithm/basic/set"
+	"github.com/howz97/algorithm/basic/stack"
+	"github.com/howz97/algorithm/graphs"
 )
 
 type Regexp struct {
@@ -35,8 +36,8 @@ func (re *Regexp) Match(str string) bool {
 	return curStatus.Contains(len(re.table))
 }
 
-func (re *Regexp) startStatus() set.Set {
-	start := set.New()
+func (re *Regexp) startStatus() set.Set[int] {
+	start := set.New[int]()
 	re.tc.Iterate(0, func(v int) bool {
 		start.Add(v)
 		return true
@@ -44,14 +45,13 @@ func (re *Regexp) startStatus() set.Set {
 	return start
 }
 
-func (re *Regexp) forwardStatus(curStatus set.Set, r rune) set.Set {
-	arrived := set.New()
+func (re *Regexp) forwardStatus(curStatus set.Set[int], r rune) set.Set[int] {
+	arrived := set.New[int]()
 	for {
-		v, ok := curStatus.TakeOne()
+		s, ok := curStatus.TakeOne()
 		if !ok {
 			break
 		}
-		s := v.(int)
 		if re.table[s].match(r) {
 			arrived.Add(s + 1)
 		}
@@ -59,14 +59,13 @@ func (re *Regexp) forwardStatus(curStatus set.Set, r rune) set.Set {
 	return arrived
 }
 
-func (re *Regexp) updateCurStatus(src set.Set) set.Set {
-	reachable := set.New()
+func (re *Regexp) updateCurStatus(src set.Set[int]) set.Set[int] {
+	reachable := set.New[int]()
 	for {
-		e, ok := src.TakeOne()
+		vSrc, ok := src.TakeOne()
 		if !ok {
 			break
 		}
-		vSrc := e.(int)
 		re.tc.Iterate(vSrc, func(v int) bool {
 			reachable.Add(v)
 			return true
@@ -117,7 +116,7 @@ func makeSymbolTable(compiled []rune) []symbol {
 func compile(pattern []rune) ([]rune, error) {
 	compiled := make([]rune, 0, len(pattern)<<1)
 	left := 0
-	lpStack := stack.NewInt(0)
+	lpStack := stack.New[int](0)
 	for i := 0; i < len(pattern); i++ {
 		switch pattern[i] {
 		case '\\': // must put \ on top case
@@ -232,7 +231,7 @@ func indexRune(runes []rune, r rune) int {
 func makeNFA(table []symbol) *graphs.Digraph {
 	size := len(table)
 	nfa := graphs.NewDigraph(uint(size + 1))
-	stk := stack.NewInt(size)
+	stk := stack.New[int](size)
 	for i, syb := range table {
 		left := i
 		if syb.isPrime {
@@ -242,7 +241,7 @@ func makeNFA(table []symbol) *graphs.Digraph {
 				stk.Push(i)
 			case ')':
 				nfa.AddEdge(i, i+1)
-				allOr := queue.NewLinkInt()
+				allOr := queue.NewLinkQ[int]()
 				for {
 					out := stk.Pop()
 					if table[out].r == '|' {

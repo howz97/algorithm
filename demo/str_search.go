@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/str_search"
 	"io/ioutil"
+
+	"github.com/howz97/algorithm/strings/str_search"
 )
 
 func main() {

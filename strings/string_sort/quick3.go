@@ -1,7 +1,7 @@
 package string_sort
 
 import (
-	"github.com/howz97/algorithm/alphabet"
+	"github.com/howz97/algorithm/strings/alphabet"
 )
 
 func Quick3WithAlphabet(a alphabet.Interface, data []string) {

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/howz97/algorithm/alphabet"
+	"github.com/howz97/algorithm/strings/alphabet"
 	"github.com/howz97/algorithm/util"
 )
 

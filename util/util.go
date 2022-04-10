@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"io/ioutil"
 	"os"
-	"sort"
 	"strings"
 	"time"
 )
@@ -105,33 +104,12 @@ func SliceEqual(a, b []int) bool {
 	return true
 }
 
-type Elems []T
-
-func (e Elems) Len() int {
-	return len(e)
-}
-
-func (e Elems) Swap(i, j int) {
-	e[i], e[j] = e[j], e[i]
-}
-
-type Reversible interface {
-	// Len is the number of elements in the collection.
-	Len() int
-	// Swap swaps the elements with indexes i and j.
-	Swap(i, j int)
-}
-
-func ReverseSlice(data Reversible) {
-	m := data.Len() / 2
-	j := data.Len() - 1
+func Reverse[T any](data []T) {
+	m := len(data) / 2
+	j := len(data) - 1
 	for i := 0; i < m; {
-		data.Swap(i, j)
+		data[i], data[j] = data[j], data[i]
 		i++
 		j--
 	}
-}
-
-func ReverseInts(data []int) {
-	ReverseSlice(sort.IntSlice(data))
 }

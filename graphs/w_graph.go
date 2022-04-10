@@ -1,8 +1,8 @@
 package graphs
 
 import (
+	unionfind "github.com/howz97/algorithm/basic/union-find"
 	"github.com/howz97/algorithm/pq/heap"
-	unionfind "github.com/howz97/algorithm/union-find"
 	"github.com/howz97/algorithm/util"
 )
 

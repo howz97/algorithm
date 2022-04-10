@@ -1,8 +1,8 @@
 package trietree
 
 import (
-	"github.com/howz97/algorithm/alphabet"
-	"github.com/howz97/algorithm/queue"
+	"github.com/howz97/algorithm/basic/queue"
+	"github.com/howz97/algorithm/strings/alphabet"
 )
 
 type T interface{}
@@ -14,9 +14,9 @@ type TrieNode interface {
 	Delete(a alphabet.Interface, k []rune)
 	Locate(a alphabet.Interface, k []rune) (TrieNode, []rune)
 	LongestPrefixOf(a alphabet.Interface, s []rune, d, l int) int
-	Collect(a alphabet.Interface, prefix string, keys *queue.SliStr)
-	KeysMatch(a alphabet.Interface, pattern []rune, prefix string, keys *queue.SliStr)
-	Keys(a alphabet.Interface, keys *queue.SliStr)
+	Collect(a alphabet.Interface, prefix string, keys *queue.SliceQ[string])
+	KeysMatch(a alphabet.Interface, pattern []rune, prefix string, keys *queue.SliceQ[string])
+	Keys(a alphabet.Interface, keys *queue.SliceQ[string])
 	Compress() error
 	IsCompressed() bool
 }
@@ -97,21 +97,21 @@ func (t *Trie) KeysWithPrefix(prefix string) []string {
 		return nil
 	}
 	prefix += string(runes)
-	q := queue.NewSliStr(0)
+	q := queue.NewSliceQ[string](0)
 	node.Collect(t.a, prefix, q)
-	return q.PopAll()
+	return q.Drain()
 }
 
 func (t *Trie) Keys() []string {
-	q := queue.NewSliStr(0)
+	q := queue.NewSliceQ[string](0)
 	t.tree.Keys(t.a, q)
-	return q.PopAll()
+	return q.Drain()
 }
 
 func (t *Trie) KeysMatch(p string) []string {
-	q := queue.NewSliStr(0)
+	q := queue.NewSliceQ[string](0)
 	t.tree.KeysMatch(t.a, []rune(p), "", q)
-	return q.PopAll()
+	return q.Drain()
 }
 
 func (t *Trie) Size() int {

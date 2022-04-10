@@ -1,7 +1,7 @@
 package search
 
 import (
-	"github.com/howz97/algorithm/queue"
+	"github.com/howz97/algorithm/basic/queue"
 	"github.com/waiyva/binary-tree/btprinter"
 )
 
@@ -57,10 +57,10 @@ func LevelOrder(bt ITraversal, fn func(ITraversal) bool) {
 	if bt.IsNil() {
 		return
 	}
-	q := queue.NewLinked()
+	q := queue.NewLinkQ[ITraversal]()
 	q.PushBack(bt)
 	for q.Size() > 0 {
-		bt = q.Front().(ITraversal)
+		bt = q.Front()
 		if !fn(bt) {
 			break
 		}
@@ -92,10 +92,10 @@ func ReverseOrder(bt ITraversal, fn func(ITraversal) bool) bool {
 
 func PrintBinaryTree(bt ITraversal) {
 	var sli []string
-	q := queue.NewLinked()
+	q := queue.NewLinkQ[ITraversal]()
 	q.PushBack(bt)
 	for q.Size() > 0 {
-		bt = q.Front().(ITraversal)
+		bt = q.Front()
 		if bt.IsNil() {
 			sli = append(sli, "#")
 			continue

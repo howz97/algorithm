@@ -1,16 +1,17 @@
 package integer
 
 import (
-	"github.com/howz97/algorithm/alphabet"
+	"math/rand"
+	"strconv"
+	"testing"
+
 	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/search/avltree"
 	"github.com/howz97/algorithm/search/binarytree"
 	"github.com/howz97/algorithm/search/hash_map"
 	"github.com/howz97/algorithm/search/redblack"
+	"github.com/howz97/algorithm/strings/alphabet"
 	"github.com/howz97/algorithm/util"
-	"math/rand"
-	"strconv"
-	"testing"
 )
 
 const n = 1000

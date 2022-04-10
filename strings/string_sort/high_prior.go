@@ -1,6 +1,6 @@
 package string_sort
 
-import "github.com/howz97/algorithm/alphabet"
+import "github.com/howz97/algorithm/strings/alphabet"
 
 func HighPrior(data []string) {
 	HighPriorWithAlphabet(alphabet.Unicode, data)

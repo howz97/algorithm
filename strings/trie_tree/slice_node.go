@@ -2,8 +2,9 @@ package trietree
 
 import (
 	"errors"
-	"github.com/howz97/algorithm/alphabet"
-	"github.com/howz97/algorithm/queue"
+
+	"github.com/howz97/algorithm/basic/queue"
+	"github.com/howz97/algorithm/strings/alphabet"
 )
 
 // R direction trie tree
@@ -81,7 +82,7 @@ func (t *SliceNode) LongestPrefixOf(a alphabet.Interface, s []rune, d int, l int
 
 // Collect collects all keys of t and put them into SliStr
 // p is the prefix record
-func (t *SliceNode) Collect(a alphabet.Interface, prefix string, keys *queue.SliStr) {
+func (t *SliceNode) Collect(a alphabet.Interface, prefix string, keys *queue.SliceQ[string]) {
 	if t.val != nil {
 		keys.PushBack(prefix)
 	}
@@ -93,7 +94,7 @@ func (t *SliceNode) Collect(a alphabet.Interface, prefix string, keys *queue.Sli
 	}
 }
 
-func (t *SliceNode) KeysMatch(a alphabet.Interface, pattern []rune, prefix string, keys *queue.SliStr) {
+func (t *SliceNode) KeysMatch(a alphabet.Interface, pattern []rune, prefix string, keys *queue.SliceQ[string]) {
 	if len(pattern) == 0 {
 		if t.val != nil {
 			keys.PushBack(prefix)
@@ -116,7 +117,7 @@ func (t *SliceNode) KeysMatch(a alphabet.Interface, pattern []rune, prefix strin
 	}
 }
 
-func (t *SliceNode) Keys(a alphabet.Interface, keys *queue.SliStr) {
+func (t *SliceNode) Keys(a alphabet.Interface, keys *queue.SliceQ[string]) {
 	t.Collect(a, "", keys)
 }
 

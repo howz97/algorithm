@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/compress/lzw"
+
+	"github.com/howz97/algorithm/strings/compress/lzw"
 )
 
 func main() {

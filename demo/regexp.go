@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/regexp"
+
+	"github.com/howz97/algorithm/strings/regexp"
 )
 
 const (

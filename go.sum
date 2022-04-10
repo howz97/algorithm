@@ -1,5 +1,7 @@
 github.com/waiyva/binary-tree v1.0.0 h1:dNpLJ1JX0z8pwkaitGnbL0LW+7TVpSjWUcTOeg28648=
 github.com/waiyva/binary-tree v1.0.0/go.mod h1:ci4TW2seKt3TsLSi8fyVc2JdX6pJ2lDFzvsD+xy9Qmk=
+golang.org/x/exp v0.0.0-20220407100705-7b9b53b0aca4 h1:K3x+yU+fbot38x5bQbU2QqUAVyYLEktdNH2GxZLnM3U=
+golang.org/x/exp v0.0.0-20220407100705-7b9b53b0aca4/go.mod h1:lgLbSvA5ygNOMpwM/9anMpWVlVJ7Z+cHWq/eFuinpGE=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v2 v2.4.0 h1:D8xgwECY7CYvx+Y2n4sBz93Jn9JRvxdiyyo8CTfuKaY=
 gopkg.in/yaml.v2 v2.4.0/go.mod h1:RDklbk79AGWmwhnvt/jBztapEOGDOx6ZbXqjP6csGnQ=

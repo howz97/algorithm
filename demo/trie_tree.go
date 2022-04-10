@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/trie_tree"
+
+	trietree "github.com/howz97/algorithm/strings/trie_tree"
 )
 
 var dict = map[string]string{

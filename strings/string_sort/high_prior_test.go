@@ -1,13 +1,14 @@
 package string_sort
 
 import (
-	"github.com/howz97/algorithm/alphabet"
-	mysort "github.com/howz97/algorithm/sort"
-	"github.com/howz97/algorithm/util"
 	"os"
 	"sort"
 	"testing"
 	"time"
+
+	mysort "github.com/howz97/algorithm/sort"
+	"github.com/howz97/algorithm/strings/alphabet"
+	"github.com/howz97/algorithm/util"
 )
 
 const filename = "./short.txt"

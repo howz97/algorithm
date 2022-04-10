@@ -1,8 +1,8 @@
 package trietree
 
 import (
-	"github.com/howz97/algorithm/alphabet"
-	"github.com/howz97/algorithm/queue"
+	"github.com/howz97/algorithm/basic/queue"
+	"github.com/howz97/algorithm/strings/alphabet"
 	"github.com/howz97/algorithm/util"
 )
 
@@ -204,7 +204,7 @@ func (t *TSTCNode) LongestPrefixOf(_ alphabet.Interface, s []rune, d, l int) int
 	return l
 }
 
-func (t *TSTCNode) Collect(_ alphabet.Interface, prefix string, keys *queue.SliStr) {
+func (t *TSTCNode) Collect(_ alphabet.Interface, prefix string, keys *queue.SliceQ[string]) {
 	if t.v != nil {
 		keys.PushBack(prefix)
 	}
@@ -213,7 +213,7 @@ func (t *TSTCNode) Collect(_ alphabet.Interface, prefix string, keys *queue.SliS
 	}
 }
 
-func (t *TSTCNode) collect(_ alphabet.Interface, prefix string, keys *queue.SliStr) {
+func (t *TSTCNode) collect(_ alphabet.Interface, prefix string, keys *queue.SliceQ[string]) {
 	if t.v != nil {
 		keys.PushBack(prefix + string(t.rs))
 	}
@@ -228,7 +228,7 @@ func (t *TSTCNode) collect(_ alphabet.Interface, prefix string, keys *queue.SliS
 	}
 }
 
-func (t *TSTCNode) KeysMatch(_ alphabet.Interface, pattern []rune, prefix string, keys *queue.SliStr) {
+func (t *TSTCNode) KeysMatch(_ alphabet.Interface, pattern []rune, prefix string, keys *queue.SliceQ[string]) {
 	if len(pattern) < len(t.rs) || !util.IsRunesMatch(pattern[:len(t.rs)-1], t.rs[:len(t.rs)-1]) {
 		return
 	}
@@ -250,7 +250,7 @@ func (t *TSTCNode) KeysMatch(_ alphabet.Interface, pattern []rune, prefix string
 	}
 }
 
-func (t *TSTCNode) Keys(_ alphabet.Interface, keys *queue.SliStr) {
+func (t *TSTCNode) Keys(_ alphabet.Interface, keys *queue.SliceQ[string]) {
 	t.collect(nil, "", keys)
 }
 
