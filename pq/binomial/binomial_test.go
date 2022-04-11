@@ -2,22 +2,21 @@ package binomial
 
 import (
 	"fmt"
-	. "github.com/howz97/algorithm/util"
 	"math"
 	"testing"
 )
 
 func Test_BQ(t *testing.T) {
-	bq := New()
-	for i := Int(0); i <= 50; i++ {
+	bq := New[int]()
+	for i := 0; i <= 50; i++ {
 		bq.Push(i)
 	}
-	bq1 := New()
-	for i := Int(51); i < 100; i++ {
+	bq1 := New[int]()
+	for i := 51; i < 100; i++ {
 		bq1.Push(i)
 	}
 	bq.Merge(bq1)
-	for i := Int(0); i < 100; i++ {
+	for i := 0; i < 100; i++ {
 		m := bq.Pop()
 		if m != i {
 			fmt.Printf("minimal element should be %v instead of %v\n", i, m)
@@ -27,12 +26,12 @@ func Test_BQ(t *testing.T) {
 }
 
 func Test_DelMin(t *testing.T) {
-	bq := New()
+	bq := New[int]()
 	var err error
-	for i := Int(100); i < 200; i++ {
+	for i := 100; i < 200; i++ {
 		bq.Push(i)
 	}
-	for i := Int(100); i < 200; i++ {
+	for i := 100; i < 200; i++ {
 		m := bq.Pop()
 		if err != nil {
 			t.Fatal(err)
@@ -45,8 +44,8 @@ func Test_DelMin(t *testing.T) {
 }
 
 func Test_Insert(t *testing.T) {
-	bq := New()
-	for i := Int(0); i < 198; i++ {
+	bq := New[int]()
+	for i := 0; i < 198; i++ {
 		bq.Push(i)
 	}
 	if bq.Size() != 198 {
@@ -84,12 +83,12 @@ func Test_Merge(t *testing.T) {
 	}
 }
 
-func newBQSize(size int) *Binomial {
+func newBQSize(size int) *Binomial[int] {
 	if size < 0 {
 		panic("size < 0")
 	}
 	maxTrees := int(math.Logb(float64(size))) + 1
-	bq := New()
+	bq := New[int]()
 	for i := 0; i <= maxTrees; i++ {
 		if 1<<uint(i)&size != 0 {
 			bq.trees[i] = binomialTree(i)
@@ -99,13 +98,13 @@ func newBQSize(size int) *Binomial {
 	return bq
 }
 
-func binomialTree(height int) *node {
+func binomialTree(height int) *node[int] {
 	if height < 0 {
 		panic("height < 0")
 	}
 	if height == 0 {
-		return &node{
-			p: Int(1),
+		return &node[int]{
+			p: 1,
 		}
 	}
 	t1 := binomialTree(height - 1)
@@ -120,14 +119,14 @@ func TestExample(t *testing.T) {
 }
 
 func ExampleBinomial() {
-	b := New()
-	b.Push(Int(1))
-	b.Push(Int(9))
-	b.Push(Int(9))
-	b.Push(Int(7))
-	b2 := New()
-	b2.Push(Int(13))
-	b2.Push(Int(11))
+	b := New[int]()
+	b.Push(1)
+	b.Push(9)
+	b.Push(9)
+	b.Push(7)
+	b2 := New[int]()
+	b2.Push(13)
+	b2.Push(11)
 	b.Merge(b2)
 	for b.Size() > 0 {
 		fmt.Print(b.Pop(), ",")

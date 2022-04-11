@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"golang.org/x/exp/constraints"
 )
 
 func ReadAllLines(filename string) []string {
@@ -70,8 +72,8 @@ func MaxInt8(a, b int8) int8 {
 	return b
 }
 
-func Max(a, b Comparable) Comparable {
-	if a.Cmp(b) == More {
+func Max[Ord constraints.Ordered](a, b Ord) Ord {
+	if a > b {
 		return a
 	}
 	return b

@@ -2,13 +2,12 @@ package search
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/util"
 )
 
-type Searcher interface {
-	Put(key util.Comparable, val util.T)
-	Get(key util.Comparable) util.T
-	Del(key util.Comparable)
+type Searcher[Cmp comparable, T any] interface {
+	Put(key Cmp, val T)
+	Get(key Cmp) T
+	Del(key Cmp)
 	Clean()
 	Size() uint
 }

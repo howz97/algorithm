@@ -4,33 +4,33 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-type Elem[P constraints.Ordered, V any] struct {
-	p   P // priority
-	val V
+type Elem[O constraints.Ordered, T any] struct {
+	p   O // priority
+	val T
 }
 
-type Heap[P constraints.Ordered, V any] struct {
+type Heap[O constraints.Ordered, T any] struct {
 	len   int // amount of elems
-	elems []Elem[P, V]
+	elems []Elem[O, T]
 }
 
 // New make an empty heap. Specify a proper cap to reduce times of re-allocate elems slice
-func New[P constraints.Ordered, V any](cap uint) *Heap[P, V] {
-	h := &Heap[P, V]{
-		elems: make([]Elem[P, V], cap+1), // ignore element at index 0
+func New[O constraints.Ordered, T any](cap uint) *Heap[O, T] {
+	h := &Heap[O, T]{
+		elems: make([]Elem[O, T], cap+1), // ignore element at index 0
 	}
 	return h
 }
 
-func (h *Heap[P, V]) Size() int {
+func (h *Heap[O, T]) Size() int {
 	return h.len
 }
 
-func (h *Heap[P, V]) Cap() int {
+func (h *Heap[O, T]) Cap() int {
 	return cap(h.elems) - 1
 }
 
-func (h *Heap[P, V]) Push(p P, v V) {
+func (h *Heap[O, T]) Push(p O, v T) {
 	// insert into the bottom of heap
 	h.len++
 	if h.len < len(h.elems) {
@@ -38,13 +38,13 @@ func (h *Heap[P, V]) Push(p P, v V) {
 		e.p = p
 		e.val = v
 	} else {
-		h.elems = append(h.elems, Elem[P, V]{p: p, val: v})
+		h.elems = append(h.elems, Elem[O, T]{p: p, val: v})
 	}
 	// percolate up from bottom
 	h.swim(h.len)
 }
 
-func (h *Heap[P, V]) Pop() V {
+func (h *Heap[O, T]) Pop() T {
 	v := h.elems[1].val
 	// move bottom element to the top position
 	h.elems[1] = h.elems[h.len]
@@ -54,7 +54,7 @@ func (h *Heap[P, V]) Pop() V {
 	return v
 }
 
-func (h *Heap[P, V]) sink(vac int) {
+func (h *Heap[O, T]) sink(vac int) {
 	elem := h.elems[vac] // copy-out the element and left a vacancy
 	sub := vac * 2
 	for sub <= h.len {
@@ -72,7 +72,7 @@ func (h *Heap[P, V]) sink(vac int) {
 	h.elems[vac] = elem
 }
 
-func (h *Heap[P, V]) swim(vac int) {
+func (h *Heap[O, T]) swim(vac int) {
 	elem := h.elems[vac] // copy-out the element and left a vacancy
 	parent := vac / 2
 	for parent > 0 && h.elems[parent].p > elem.p {

@@ -2,19 +2,19 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/howz97/algorithm/pq/binomial"
-	. "github.com/howz97/algorithm/util"
 )
 
 func main() {
-	b := binomial.New()
-	b.Push(Int(1))
-	b.Push(Int(9))
-	b.Push(Int(9))
-	b.Push(Int(7))
-	b2 := binomial.New()
-	b2.Push(Int(13))
-	b2.Push(Int(11))
+	b := binomial.New[int]()
+	b.Push(1)
+	b.Push(9)
+	b.Push(9)
+	b.Push(7)
+	b2 := binomial.New[int]()
+	b2.Push(13)
+	b2.Push(11)
 	b.Merge(b2)
 	for b.Size() > 0 {
 		fmt.Print(b.Pop(), ",")

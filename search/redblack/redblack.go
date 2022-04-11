@@ -2,8 +2,9 @@ package redblack
 
 import (
 	"fmt"
+
 	. "github.com/howz97/algorithm/search"
-	. "github.com/howz97/algorithm/util"
+	"golang.org/x/exp/constraints"
 )
 
 const (
@@ -11,30 +12,26 @@ const (
 	black = false
 )
 
-type node struct {
-	key            Comparable
+type node[Ord constraints.Ordered, T any] struct {
+	key            Ord
 	value          T
 	color          bool
-	p, left, right *node
+	p, left, right *node[Ord, T]
 }
 
-func (n *node) Cmp(a Comparable) Result {
-	return n.key.Cmp(a.(*node).key)
-}
-
-func (n *node) Left() ITraversal {
+func (n *node[Ord, T]) Left() ITraversal {
 	return n.left
 }
 
-func (n *node) Right() ITraversal {
+func (n *node[Ord, T]) Right() ITraversal {
 	return n.right
 }
 
-func (n *node) IsNil() bool {
+func (n *node[Ord, T]) IsNil() bool {
 	return n.left == nil && n.right == nil
 }
 
-func (n *node) String() string {
+func (n *node[Ord, T]) String() string {
 	if n.IsNil() {
 		return "Nil"
 	}
@@ -47,29 +44,28 @@ func (n *node) String() string {
 	return fmt.Sprintf("%s[%v]", color, n.key)
 }
 
-type Tree struct {
-	root *node
-	null *node
+type Tree[Ord constraints.Ordered, T any] struct {
+	root *node[Ord, T]
+	null *node[Ord, T]
 	size uint
 }
 
-func (tree *Tree) Put(key Comparable, val T) {
+func (tree *Tree[Ord, T]) Put(key Ord, val T) {
 	p := tree.null
 	x := tree.root
 	for x != tree.null {
 		p = x
-		switch key.Cmp(x.key) {
-		case Less:
+		if key < x.key {
 			x = x.left
-		case More:
+		} else if key > x.key {
 			x = x.right
-		case Equal:
+		} else {
 			x.value = val
 			return
 		}
 	}
 	tree.size++
-	in := &node{
+	in := &node[Ord, T]{
 		key:   key,
 		value: val,
 		color: red,
@@ -79,7 +75,7 @@ func (tree *Tree) Put(key Comparable, val T) {
 	}
 	if p == tree.null {
 		tree.root = in
-	} else if in.Cmp(p) == Less {
+	} else if in.key < p.key {
 		p.left = in
 	} else {
 		p.right = in
@@ -87,7 +83,7 @@ func (tree *Tree) Put(key Comparable, val T) {
 	tree.fixInsert(in)
 }
 
-func (tree *Tree) fixInsert(n *node) {
+func (tree *Tree[Ord, T]) fixInsert(n *node[Ord, T]) {
 	for n.p.color == red {
 		if n.p == n.p.p.left {
 			uncle := n.p.p.right
@@ -130,7 +126,7 @@ func (tree *Tree) fixInsert(n *node) {
 	tree.root.color = black
 }
 
-func (tree *Tree) rightRotate(n *node) {
+func (tree *Tree[Ord, T]) rightRotate(n *node[Ord, T]) {
 	top := n.left
 	n.left = top.right
 	if n.left != tree.null {
@@ -141,7 +137,7 @@ func (tree *Tree) rightRotate(n *node) {
 	n.p = top
 }
 
-func (tree *Tree) leftRotate(n *node) {
+func (tree *Tree[Ord, T]) leftRotate(n *node[Ord, T]) {
 	top := n.right
 	n.right = top.left
 	if n.right != tree.null {
@@ -152,7 +148,7 @@ func (tree *Tree) leftRotate(n *node) {
 	n.p = top
 }
 
-func (tree *Tree) transplant(a, b *node) {
+func (tree *Tree[Ord, T]) transplant(a, b *node[Ord, T]) {
 	b.p = a.p
 	if b.p == tree.null {
 		tree.root = b
@@ -163,23 +159,22 @@ func (tree *Tree) transplant(a, b *node) {
 	}
 }
 
-func (tree *Tree) find(key Comparable) *node {
+func (tree *Tree[Ord, T]) find(key Ord) *node[Ord, T] {
 	cur := tree.root
 loop:
 	for cur != tree.null {
-		switch key.Cmp(cur.key) {
-		case Less:
+		if key < cur.key {
 			cur = cur.left
-		case More:
+		} else if key > cur.key {
 			cur = cur.right
-		case Equal:
+		} else {
 			break loop
 		}
 	}
 	return cur
 }
 
-func (tree *Tree) Del(key Comparable) {
+func (tree *Tree[Ord, T]) Del(key Ord) {
 	del := tree.find(key)
 	if del == tree.null {
 		return
@@ -187,7 +182,7 @@ func (tree *Tree) Del(key Comparable) {
 	tree.size--
 	del2 := del
 	d2Orig := del2.color
-	var rep *node
+	var rep *node[Ord, T]
 	if del.left == tree.null {
 		rep = del.right
 		tree.transplant(del, rep)
@@ -216,7 +211,7 @@ func (tree *Tree) Del(key Comparable) {
 	}
 }
 
-func (tree *Tree) fixDelete(n *node) {
+func (tree *Tree[Ord, T]) fixDelete(n *node[Ord, T]) {
 	for n != tree.root && n.color == black {
 		if n == n.p.left {
 			sibling := n.p.right
@@ -275,7 +270,7 @@ func (tree *Tree) fixDelete(n *node) {
 	n.color = black
 }
 
-func (tree *Tree) getMin(n *node) (min *node) {
+func (tree *Tree[Ord, T]) getMin(n *node[Ord, T]) (min *node[Ord, T]) {
 	if n.IsNil() {
 		return n
 	}
@@ -286,28 +281,29 @@ func (tree *Tree) getMin(n *node) (min *node) {
 	return
 }
 
-func (tree *Tree) Get(key Comparable) T {
+func (tree *Tree[Ord, T]) Get(key Ord) (T, bool) {
 	n := tree.find(key)
 	if n == tree.null {
-		return nil
+		var v T
+		return v, false
 	}
-	return n.value
+	return n.value, true
 }
 
-func (tree *Tree) Size() uint {
+func (tree *Tree[Ord, T]) Size() uint {
 	return tree.size
 }
 
-func (tree *Tree) Clean() {
+func (tree *Tree[Ord, T]) Clean() {
 	tree.root = tree.null
 	tree.size = 0
 }
 
-func New() *Tree {
-	null := new(node)
+func New[Ord constraints.Ordered, T any]() *Tree[Ord, T] {
+	null := new(node[Ord, T])
 	null.color = black
 	null.p = null
-	return &Tree{
+	return &Tree[Ord, T]{
 		root: null,
 		null: null,
 	}

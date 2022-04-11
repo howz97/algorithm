@@ -1,72 +1,65 @@
 package leftist
 
-import . "github.com/howz97/algorithm/util"
+import "golang.org/x/exp/constraints"
 
-func New() *LeftHeap {
-	return new(LeftHeap)
+func New[O constraints.Ordered]() *Heap[O] {
+	return new(Heap[O])
 }
 
-type LeftHeap struct {
-	root *node
+type Heap[O constraints.Ordered] struct {
+	root *node[O]
 	size int
 }
 
-func (lh *LeftHeap) Push(p Comparable) {
-	lh.root = merge(lh.root, &node{
-		p: p,
+func (lh *Heap[O]) Push(o O) {
+	lh.root = merge(lh.root, &node[O]{
+		p: o,
 	})
 	lh.size++
 }
 
-func (lh *LeftHeap) Peek() T {
-	if lh.root == nil {
-		return nil
-	}
+func (lh *Heap[O]) Peek() O {
 	return lh.root.p
 }
 
-func (lh *LeftHeap) Pop() Comparable {
+func (lh *Heap[O]) Pop() O {
 	p := lh.root.p
 	lh.root = merge(lh.root.left, lh.root.right)
 	lh.size--
 	return p
 }
 
-func (lh *LeftHeap) Merge(other *LeftHeap) {
+func (lh *Heap[O]) Merge(other *Heap[O]) {
 	lh.root = merge(lh.root, other.root)
 	lh.size += other.size
 }
 
-func (lh *LeftHeap) Size() int {
+func (lh *Heap[O]) Size() int {
 	return lh.size
 }
 
-type node struct {
-	p     Comparable // priority
-	npl   int        // null path length
-	left  *node
-	right *node
+type node[O constraints.Ordered] struct {
+	p     O   // priority
+	npl   int // null path length
+	left  *node[O]
+	right *node[O]
 }
 
-func (n *node) getNPL() int {
+func (n *node[O]) getNPL() int {
 	if n == nil {
 		return -1
 	}
 	return n.npl
 }
 
-func (n *node) Cmp(n2 *node) Result {
-	return n.p.Cmp(n2.p)
-}
-
-func merge(n1, n2 *node) *node {
+func merge[O constraints.Ordered](n1, n2 *node[O]) *node[O] {
 	if n1 == nil {
 		return n2
 	}
 	if n2 == nil {
 		return n1
 	}
-	if n1.Cmp(n2) == More {
+	if n1.p > n2.p {
 		n1, n2 = n2, n1
 	}
 	n1.right = merge(n1.right, n2)

@@ -1,6 +1,8 @@
 package binomial
 
-import . "github.com/howz97/algorithm/util"
+import (
+	"golang.org/x/exp/constraints"
+)
 
 const (
 	isNil  = 0
@@ -8,26 +10,26 @@ const (
 )
 
 // Binomial is a binomial queue
-type Binomial struct {
+type Binomial[O constraints.Ordered] struct {
 	size  int
-	trees []*node
+	trees []*node[O]
 }
 
 // New return a binomial queue with default capacity
-func New() *Binomial {
-	return &Binomial{
-		trees: make([]*node, 8),
+func New[O constraints.Ordered]() *Binomial[O] {
+	return &Binomial[O]{
+		trees: make([]*node[O], 8),
 	}
 }
 
 // Merge bq1 to bq. ErrExceedCap returned when merge would exceed capacity
-func (b *Binomial) Merge(b2 *Binomial) {
+func (b *Binomial[O]) Merge(b2 *Binomial[O]) {
 	if len(b2.trees) > len(b.trees) {
 		*b, *b2 = *b2, *b
 	}
 	b.size += b2.size
 	n := len(b.trees)
-	var carry *node
+	var carry *node[O]
 	for i := 0; i < n; i++ {
 		switch carry.isNil()<<2 + b2.isNil(i)<<1 + b.isNil(i) {
 		case 2: // 010
@@ -53,21 +55,21 @@ func (b *Binomial) Merge(b2 *Binomial) {
 	}
 }
 
-func (b *Binomial) isNil(i int) int {
+func (b *Binomial[O]) isNil(i int) int {
 	if i >= len(b.trees) {
 		return isNil
 	}
 	return b.trees[i].isNil()
 }
 
-func (b *Binomial) Push(p Comparable) {
-	b.Merge(&Binomial{
+func (b *Binomial[O]) Push(p O) {
+	b.Merge(&Binomial[O]{
 		size:  1,
-		trees: []*node{{p: p}},
+		trees: []*node[O]{{p: p}},
 	})
 }
 
-func (b *Binomial) Pop() Comparable {
+func (b *Binomial[O]) Pop() O {
 	index := 0 // index of node to pop
 	for ; index < len(b.trees); index++ {
 		if b.trees[index] != nil {
@@ -75,7 +77,7 @@ func (b *Binomial) Pop() Comparable {
 		}
 	}
 	for i := index + 1; i < len(b.trees); i++ {
-		if b.trees[i] != nil && b.trees[i].Cmp(b.trees[index]) == Less {
+		if b.trees[i] != nil && b.trees[i].p < b.trees[index].p {
 			index = i
 		}
 	}
@@ -85,8 +87,8 @@ func (b *Binomial) Pop() Comparable {
 	b.size -= 1 << uint(index)
 	// trees left by popNode become a new binomial
 	trees := popNode.son
-	b2 := &Binomial{
-		trees: make([]*node, index),
+	b2 := &Binomial[O]{
+		trees: make([]*node[O], index),
 	}
 	for i := index - 1; i >= 0; i-- {
 		b2.trees[i] = trees
@@ -101,30 +103,26 @@ func (b *Binomial) Pop() Comparable {
 }
 
 // Size get the current size of this binomial queue
-func (b *Binomial) Size() int {
+func (b *Binomial[O]) Size() int {
 	return b.size
 }
 
-type node struct {
-	p       Comparable
-	sibling *node
-	son     *node
+type node[O constraints.Ordered] struct {
+	p       O
+	sibling *node[O]
+	son     *node[O]
 }
 
-func (n *node) isNil() int {
+func (n *node[O]) isNil() int {
 	if n == nil {
 		return isNil
 	}
 	return notNil
 }
 
-func (n *node) Cmp(other *node) Result {
-	return n.p.Cmp(other.p)
-}
-
 // both a and b MUST not be nil
-func merge(a, b *node) *node {
-	if a.Cmp(b) == More {
+func merge[O constraints.Ordered](a, b *node[O]) *node[O] {
+	if a.p > b.p {
 		*a, *b = *b, *a
 	}
 	b.sibling = a.son

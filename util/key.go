@@ -12,65 +12,26 @@ const (
 	More
 )
 
-type T interface{}
-
-type Comparable interface {
-	Cmp(other Comparable) Result
-}
-
 type Int int
 
-func (v Int) Hash() uint {
-	return uint(v)
-}
-
-func (v Int) Cmp(other Comparable) Result {
-	o := other.(Int)
-	if v < o {
-		return Less
-	} else if v > o {
-		return More
-	} else {
-		return Equal
-	}
+func (v Int) Hash() uintptr {
+	return uintptr(v)
 }
 
 type Float float64
 
-func (v Float) Hash() uint {
-	return *(*uint)(unsafe.Pointer(&v))
-}
-
-func (v Float) Cmp(other Comparable) Result {
-	o := other.(Float)
-	if v < o {
-		return Less
-	} else if v > o {
-		return More
-	} else {
-		return Equal
-	}
+func (v Float) Hash() uintptr {
+	return *(*uintptr)(unsafe.Pointer(&v))
 }
 
 const littlePrime = 31
 
 type Str string
 
-func (v Str) Hash() uint {
-	h := uint(0)
+func (v Str) Hash() uintptr {
+	h := uintptr(0)
 	for i := 0; i < len(v); i++ {
-		h = h*littlePrime + uint(v[i])
+		h = h*littlePrime + uintptr(v[i])
 	}
 	return h
-}
-
-func (v Str) Cmp(other Comparable) Result {
-	o := other.(Str)
-	if v < o {
-		return Less
-	} else if v > o {
-		return More
-	} else {
-		return Equal
-	}
 }

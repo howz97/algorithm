@@ -2,22 +2,23 @@ package binarytree
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/search"
-	"github.com/howz97/algorithm/util"
 	"time"
+
+	"github.com/howz97/algorithm/search"
+	"golang.org/x/exp/constraints"
 )
 
 // BinaryTree is a simple binary search tree that does not guarantee balance
-type BinaryTree struct {
-	*node
+type BinaryTree[Ord constraints.Ordered, T any] struct {
+	*node[Ord, T]
 	size uint
 }
 
-func New() *BinaryTree {
-	return new(BinaryTree)
+func New[Ord constraints.Ordered, T any]() *BinaryTree[Ord, T] {
+	return new(BinaryTree[Ord, T])
 }
 
-func (st *BinaryTree) Put(key util.Comparable, val util.T) {
+func (st *BinaryTree[Ord, T]) Put(key Ord, val T) {
 	exist := false
 	st.node, exist = st.put(key, val)
 	if !exist {
@@ -25,23 +26,24 @@ func (st *BinaryTree) Put(key util.Comparable, val util.T) {
 	}
 }
 
-func (st *BinaryTree) Get(key util.Comparable) util.T {
+func (st *BinaryTree[Ord, T]) Get(key Ord) (T, bool) {
 	n := st.get(key)
 	if n == nil {
-		return nil
+		var v T
+		return v, false
 	}
-	return n.value
+	return n.value, true
 }
 
-func (st *BinaryTree) GetMin() util.T {
+func (st *BinaryTree[Ord, T]) GetMin() T {
 	return st.getMin().value
 }
 
-func (st *BinaryTree) GetMax() util.T {
+func (st *BinaryTree[Ord, T]) GetMax() T {
 	return st.getMax().value
 }
 
-func (st *BinaryTree) Del(key util.Comparable) {
+func (st *BinaryTree[Ord, T]) Del(key Ord) {
 	exist := false
 	st.node, exist = st.del(key)
 	if exist {
@@ -49,56 +51,54 @@ func (st *BinaryTree) Del(key util.Comparable) {
 	}
 }
 
-func (st *BinaryTree) Size() uint {
+func (st *BinaryTree[Ord, T]) Size() uint {
 	return st.size
 }
 
-func (st *BinaryTree) Clean() {
+func (st *BinaryTree[Ord, T]) Clean() {
 	st.node = nil
 	st.size = 0
 }
 
-type node struct {
-	value util.T
-	key   util.Comparable
-	left  *node
-	right *node
+type node[Ord constraints.Ordered, T any] struct {
+	value T
+	key   Ord
+	left  *node[Ord, T]
+	right *node[Ord, T]
 }
 
-func (n *node) put(k util.Comparable, v util.T) (*node, bool) {
+func (n *node[Ord, T]) put(k Ord, v T) (*node[Ord, T], bool) {
 	if n == nil {
-		n = new(node)
+		n = new(node[Ord, T])
 		n.key = k
 		n.value = v
 		return n, false
 	}
 	var exist bool
-	switch k.Cmp(n.key) {
-	case util.Less:
+	if k < n.key {
 		n.left, exist = n.left.put(k, v)
-	case util.More:
+	} else if k > n.key {
 		n.right, exist = n.right.put(k, v)
-	default:
+	} else {
 		n.value = v
 		exist = true
 	}
 	return n, exist
 }
 
-func (n *node) get(k util.Comparable) *node {
+func (n *node[Ord, T]) get(k Ord) *node[Ord, T] {
 	if n == nil {
 		return nil
 	}
-	switch k.Cmp(n.key) {
-	case util.Less:
+	if k < n.key {
 		n = n.left.get(k)
-	case util.More:
+	} else if k > n.key {
 		n = n.right.get(k)
 	}
 	return n
 }
 
-func (n *node) getMin() *node {
+func (n *node[Ord, T]) getMin() *node[Ord, T] {
 	if n == nil {
 		return nil
 	}
@@ -108,7 +108,7 @@ func (n *node) getMin() *node {
 	return n
 }
 
-func (n *node) getMax() *node {
+func (n *node[Ord, T]) getMax() *node[Ord, T] {
 	if n == nil {
 		return nil
 	}
@@ -118,17 +118,16 @@ func (n *node) getMax() *node {
 	return n
 }
 
-func (n *node) del(k util.Comparable) (*node, bool) {
+func (n *node[Ord, T]) del(k Ord) (*node[Ord, T], bool) {
 	if n == nil {
 		return nil, false
 	}
 	var exist bool
-	switch k.Cmp(n.key) {
-	case util.Less:
+	if k < n.key {
 		n.left, exist = n.left.del(k)
-	case util.More:
+	} else if k > n.key {
 		n.right, exist = n.right.del(k)
-	default:
+	} else {
 		if n.left == nil {
 			return n.right, true
 		}
@@ -136,7 +135,7 @@ func (n *node) del(k util.Comparable) (*node, bool) {
 			return n.left, true
 		}
 		exist = true
-		var replacer *node
+		var replacer *node[Ord, T]
 		if time.Now().UnixNano()&1 == 1 { // to make it randomly
 			replacer = n.left.getMax()
 			n.left, _ = n.left.del(replacer.key)
@@ -151,22 +150,22 @@ func (n *node) del(k util.Comparable) (*node, bool) {
 	return n, exist
 }
 
-func (n *node) Left() search.ITraversal {
+func (n *node[Ord, T]) Left() search.ITraversal {
 	return n.left
 }
 
-func (n *node) Right() search.ITraversal {
+func (n *node[Ord, T]) Right() search.ITraversal {
 	return n.right
 }
 
-func (n *node) IsNil() bool {
+func (n *node[Ord, T]) IsNil() bool {
 	return n == nil
 }
 
-func (n *node) Key() util.Comparable {
+func (n *node[Ord, T]) Key() Ord {
 	return n.key
 }
 
-func (n *node) String() string {
+func (n *node[Ord, T]) String() string {
 	return fmt.Sprint(n.value)
 }

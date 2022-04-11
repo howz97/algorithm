@@ -5,7 +5,6 @@ import (
 
 	"github.com/howz97/algorithm/pq/heap"
 	. "github.com/howz97/algorithm/search"
-	. "github.com/howz97/algorithm/util"
 )
 
 type node struct {

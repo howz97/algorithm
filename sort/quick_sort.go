@@ -1,20 +1,18 @@
 package sort
 
-import (
-	stdsort "sort"
-)
+import "golang.org/x/exp/constraints"
 
-func QuickSort(data stdsort.Interface) {
-	quickSort(data, 0, data.Len()-1)
+func QuickSort[Ord constraints.Ordered](data []Ord) {
+	quickSort(data, 0, len(data)-1)
 }
 
-func quickSort(data stdsort.Interface, lo, hi int) {
+func quickSort[Ord constraints.Ordered](data []Ord, lo, hi int) {
 	if hi <= lo {
 		return
 	}
 	if hi-lo == 1 {
-		if data.Less(hi, lo) {
-			data.Swap(hi, lo)
+		if data[hi] < data[lo] {
+			data[hi], data[lo] = data[lo], data[hi]
 		}
 		return
 	}
@@ -25,44 +23,44 @@ func quickSort(data stdsort.Interface, lo, hi int) {
 }
 
 // 把 data[0] data[len(data)/2] data[len(data)-1] 中的中位数（枢纽元）交换到data[len(data)-1]
-func median2end(data stdsort.Interface, lo, hi int) {
+func median2end[Ord constraints.Ordered](data []Ord, lo, hi int) {
 	m := int(uint(lo+hi) >> 1)
-	if data.Less(m, lo) {
-		data.Swap(m, lo)
+	if data[m] < data[lo] {
+		data[m], data[lo] = data[lo], data[m]
 	}
-	if data.Less(hi, m) {
-		data.Swap(hi, m)
-		if data.Less(m, lo) {
-			data.Swap(m, lo)
+	if data[hi] < data[m] {
+		data[hi], data[m] = data[m], data[hi]
+		if data[m] < data[lo] {
+			data[m], data[lo] = data[lo], data[m]
 		}
 	}
-	data.Swap(m, hi)
+	data[hi], data[m] = data[m], data[hi]
 }
 
 // 此时枢纽元在 data[len(data)-1] , 开始分割data[:len(data)-1], 并将枢纽元交换到i最终位置
-func cutOff(data stdsort.Interface, lo, hi int) int {
+func cutOff[Ord constraints.Ordered](data []Ord, lo, hi int) int {
 	i, j := lo, hi-1
 	for i <= j {
-		for i <= hi && data.Less(i, hi) {
+		for i <= hi && data[i] < data[hi] {
 			i++
 		}
-		for j >= lo && data.Less(hi, j) {
+		for j >= lo && data[hi] < data[j] {
 			j--
 		}
 		if i == hi {
 			return hi
 		}
 		if j < lo {
-			data.Swap(lo, hi)
+			data[hi], data[lo] = data[lo], data[hi]
 			return lo
 		}
 		if i <= j {
-			data.Swap(i, j)
+			data[i], data[j] = data[j], data[i]
 			i++
 			j--
 		}
 	}
-	data.Swap(i, hi)
+	data[i], data[hi] = data[hi], data[i]
 	return i
 }
 

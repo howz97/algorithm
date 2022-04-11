@@ -1,7 +1,8 @@
 package sort
 
-// HeapSort -
-func HeapSort(data []int) {
+import "golang.org/x/exp/constraints"
+
+func HeapSort[Ord constraints.Ordered](data []Ord) {
 	adjust(data)
 	for i := len(data) - 1; i > 0; i-- {
 		data[0], data[i] = data[i], data[0]
@@ -9,13 +10,13 @@ func HeapSort(data []int) {
 	}
 }
 
-func adjust(h []int) {
+func adjust[Ord constraints.Ordered](h []Ord) {
 	for i := (len(h) - 2) / 2; i >= 0; i-- {
 		percolateDown(h, i)
 	}
 }
 
-func percolateDown(h []int, i int) {
+func percolateDown[Ord constraints.Ordered](h []Ord, i int) {
 	k := h[i]
 	cavIdx := i
 	for {

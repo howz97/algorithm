@@ -79,7 +79,7 @@ func TestStdSort(t *testing.T) {
 
 func TestQuickSort(t *testing.T) {
 	LoopTest(t, func(data []string) {
-		mysort.QuickSort(sort.StringSlice(data))
+		mysort.QuickSort(data)
 	}, "MyQuickSort")
 }
 

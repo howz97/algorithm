@@ -25,12 +25,12 @@ func TestCompareMerge(t *testing.T) {
 }
 
 func LeftistMerge() {
-	left := leftist.New()
+	left := leftist.New[int]()
 	for i := 0; i < mergeCnt; i++ {
-		l2 := leftist.New()
+		l2 := leftist.New[int]()
 		n := rand.Intn(mergeCnt)
 		for j := 0; j < n; j++ {
-			l2.Push(Int(rand.Int()))
+			l2.Push(rand.Int())
 		}
 		left.Merge(l2)
 	}
@@ -38,12 +38,12 @@ func LeftistMerge() {
 }
 
 func BinomialMerge() {
-	b := binomial.New()
+	b := binomial.New[int]()
 	for i := 0; i < mergeCnt; i++ {
-		l2 := binomial.New()
+		l2 := binomial.New[int]()
 		n := rand.Intn(mergeCnt)
 		for j := 0; j < n; j++ {
-			l2.Push(Int(rand.Int()))
+			l2.Push(rand.Int())
 		}
 		b.Merge(l2)
 	}
@@ -71,16 +71,16 @@ func HeapPush() {
 }
 
 func LeftistPush() {
-	left := leftist.New()
+	left := leftist.New[int]()
 	for i := 0; i < pushCnt; i++ {
-		left.Push(Int(rand.Int()))
+		left.Push(rand.Int())
 	}
 }
 
 func BinomialPush() {
-	left := binomial.New()
+	left := binomial.New[int]()
 	for i := 0; i < pushCnt; i++ {
-		left.Push(Int(rand.Int()))
+		left.Push(rand.Int())
 	}
 }
 
@@ -99,9 +99,9 @@ func TestComparePop(t *testing.T) {
 	}))
 
 	rand.Seed(1)
-	left := leftist.New()
+	left := leftist.New[int]()
 	for i := 0; i < pushCnt; i++ {
-		left.Push(Int(rand.Int()))
+		left.Push(rand.Int())
 	}
 	t.Logf("LeftistPop cost %v", ExecCost(func() {
 		for left.Size() > 0 {
@@ -110,9 +110,9 @@ func TestComparePop(t *testing.T) {
 	}))
 
 	rand.Seed(1)
-	b := binomial.New()
+	b := binomial.New[int]()
 	for i := 0; i < pushCnt; i++ {
-		b.Push(Int(rand.Int()))
+		b.Push(rand.Int())
 	}
 	t.Logf("BinomialPop cost %v", ExecCost(func() {
 		for b.Size() > 0 {
@@ -136,15 +136,15 @@ func TestCompareInteger(t *testing.T) {
 }
 
 func LeftistInteger() {
-	left := leftist.New()
+	left := leftist.New[int]()
 	for cnt := 0; cnt < integerLoop; cnt++ {
 		for i := 0; i < integerPush; i++ {
-			left.Push(Int(rand.Int()))
+			left.Push(rand.Int())
 		}
 		n := rand.Intn(left.Size() * 2)
-		l2 := leftist.New()
+		l2 := leftist.New[int]()
 		for i := 0; i < n; i++ {
-			l2.Push(Int(rand.Int()))
+			l2.Push(rand.Int())
 		}
 		left.Merge(l2)
 		n = rand.Intn(left.Size())
@@ -156,15 +156,15 @@ func LeftistInteger() {
 }
 
 func BinomialInteger() {
-	b := binomial.New()
+	b := binomial.New[int]()
 	for cnt := 0; cnt < integerLoop; cnt++ {
 		for i := 0; i < integerPush; i++ {
-			b.Push(Int(rand.Int()))
+			b.Push(rand.Int())
 		}
 		n := rand.Intn(b.Size() * 2)
-		b2 := binomial.New()
+		b2 := binomial.New[int]()
 		for i := 0; i < n; i++ {
-			b2.Push(Int(rand.Int()))
+			b2.Push(rand.Int())
 		}
 		b.Merge(b2)
 		n = rand.Intn(b.Size())
