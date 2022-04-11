@@ -9,7 +9,6 @@ import (
 	"github.com/howz97/algorithm/basic/queue"
 	"github.com/howz97/algorithm/basic/stack"
 	"github.com/howz97/algorithm/pq/heap"
-	"github.com/howz97/algorithm/util"
 )
 
 const (
@@ -136,24 +135,24 @@ func (spt *PathTree) hasVert(v int) bool {
 }
 
 func (spt *PathTree) initDijkstra(g *WDigraph) {
-	pq := heap.New(g.NumVert())
+	pq := heap.New2[float64, int](g.NumVert())
 	dijkstraRelax(g, spt.src, spt.edgeTo, spt.distTo, pq)
 	for pq.Size() > 0 {
-		m := pq.Pop().(int)
+		m := pq.Pop()
 		dijkstraRelax(g, m, spt.edgeTo, spt.distTo, pq)
 	}
 }
 
-func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *heap.Heap) {
+func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *heap.Heap2[float64, int]) {
 	g.iterateWAdj(v, func(adj int, w float64) bool {
 		if distTo[v]+w < distTo[adj] {
 			inPQ := distTo[adj] != math.Inf(1)
 			edgeTo[adj] = v
 			distTo[adj] = distTo[v] + w
 			if inPQ {
-				pq.Fix(util.Float(distTo[adj]), adj)
+				pq.Fix(distTo[adj], adj)
 			} else {
-				pq.Push(util.Float(distTo[adj]), adj)
+				pq.Push(distTo[adj], adj)
 			}
 		}
 		return true

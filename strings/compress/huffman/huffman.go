@@ -1,10 +1,11 @@
 package huffman
 
 import (
+	"strconv"
+
 	"github.com/howz97/algorithm/pq/heap"
 	. "github.com/howz97/algorithm/search"
 	. "github.com/howz97/algorithm/util"
-	"strconv"
 )
 
 type node struct {
@@ -91,10 +92,10 @@ func genHuffmanTree(data []byte) (huffmanTree *node) {
 	for _, b := range data {
 		stat[b]++
 	}
-	pq := heap.New(256)
+	pq := heap.New[int, *node](256)
 	for b, cnt := range stat {
 		if cnt > 0 {
-			pq.Push(Int(cnt), &node{
+			pq.Push(cnt, &node{
 				isLeaf: true,
 				b:      byte(b),
 				cnt:    cnt,
@@ -102,17 +103,17 @@ func genHuffmanTree(data []byte) (huffmanTree *node) {
 		}
 	}
 	for pq.Size() > 1 {
-		n1 := pq.Pop().(*node)
-		n2 := pq.Pop().(*node)
+		n1 := pq.Pop()
+		n2 := pq.Pop()
 		cnt := n1.cnt + n2.cnt
-		pq.Push(Int(cnt), &node{
+		pq.Push(cnt, &node{
 			isLeaf: false,
 			cnt:    cnt,
 			left:   n1,
 			right:  n2,
 		})
 	}
-	return pq.Pop().(*node)
+	return pq.Pop()
 }
 
 // Decompress data compressed by huffman algorithm

@@ -2,12 +2,13 @@ package pq
 
 import (
 	"fmt"
+	"math/rand"
+	"testing"
+
 	"github.com/howz97/algorithm/pq/binomial"
 	"github.com/howz97/algorithm/pq/heap"
 	"github.com/howz97/algorithm/pq/leftist"
 	. "github.com/howz97/algorithm/util"
-	"math/rand"
-	"testing"
 )
 
 const (
@@ -63,9 +64,9 @@ func TestComparePush(t *testing.T) {
 }
 
 func HeapPush() {
-	left := heap.New(pushCnt)
+	left := heap.New[int, int](pushCnt)
 	for i := 0; i < pushCnt; i++ {
-		left.Push(Int(rand.Int()), i)
+		left.Push(rand.Int(), i)
 	}
 }
 
@@ -87,9 +88,9 @@ func TestComparePop(t *testing.T) {
 	t.Log("Start to compare Pop...")
 
 	rand.Seed(1)
-	h := heap.New(0)
+	h := heap.New[int, int](0)
 	for i := 0; i < pushCnt; i++ {
-		h.Push(Int(rand.Int()), nil)
+		h.Push(rand.Int(), i)
 	}
 	t.Logf("HeapPop cost %v", ExecCost(func() {
 		for h.Size() > 0 {

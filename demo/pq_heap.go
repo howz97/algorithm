@@ -2,32 +2,32 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/howz97/algorithm/pq/heap"
-	. "github.com/howz97/algorithm/util"
 )
 
 func main() {
-	pq := heap.New(3)
+	pq := heap.New2[int, string](3)
 	fmt.Printf("Size: %d, Cap: %d \n", pq.Size(), pq.Cap())
-	pq.Push(Int(1), "1")
-	pq.Push(Int(9), "9")
-	pq.Push(Int(9), "9")
-	pq.Push(Int(7), "7")
+	pq.Push(1, "1")
+	pq.Push(9, "9")
+	pq.Push(9, "9")
+	pq.Push(7, "7")
 	fmt.Printf("Size: %d, Cap: %d. (auto re-allocate) \n", pq.Size(), pq.Cap())
 	for pq.Size() > 0 {
-		fmt.Print(pq.Pop().(string))
+		fmt.Print(pq.Pop())
 	}
 	fmt.Println()
 
-	pq.Push(Int(1), "1")
-	pq.Push(Int(9), "9")
-	pq.Push(Int(7), "7")
-	pq.Push(Int(99), "0")
-	pq.Push(Int(999), "z")
+	pq.Push(1, "1")
+	pq.Push(9, "9")
+	pq.Push(7, "7")
+	pq.Push(99, "0")
+	pq.Push(999, "z")
 	pq.Del("1")
-	pq.Fix(Int(0), "0")
+	pq.Fix(0, "0")
 	for pq.Size() > 0 {
-		fmt.Print(pq.Pop().(string))
+		fmt.Print(pq.Pop())
 	}
 
 	//Output:

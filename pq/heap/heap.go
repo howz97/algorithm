@@ -1,40 +1,36 @@
 package heap
 
 import (
-	. "github.com/howz97/algorithm/util"
+	"golang.org/x/exp/constraints"
 )
 
-type Elem struct {
-	p   Comparable // priority
-	val T
+type Elem[P constraints.Ordered, V any] struct {
+	p   P // priority
+	val V
 }
 
-func (e Elem) Cmp(e2 Elem) Result {
-	return e.p.Cmp(e2.p)
-}
-
-type Heap struct {
+type Heap[P constraints.Ordered, V any] struct {
 	len   int // amount of elems
-	elems []Elem
+	elems []Elem[P, V]
 }
 
 // New make an empty heap. Specify a proper cap to reduce times of re-allocate elems slice
-func New(cap uint) *Heap {
-	h := &Heap{
-		elems: make([]Elem, cap+1), // ignore element at index 0
+func New[P constraints.Ordered, V any](cap uint) *Heap[P, V] {
+	h := &Heap[P, V]{
+		elems: make([]Elem[P, V], cap+1), // ignore element at index 0
 	}
 	return h
 }
 
-func (h *Heap) Size() int {
+func (h *Heap[P, V]) Size() int {
 	return h.len
 }
 
-func (h *Heap) Cap() int {
+func (h *Heap[P, V]) Cap() int {
 	return cap(h.elems) - 1
 }
 
-func (h *Heap) Push(p Comparable, v T) {
+func (h *Heap[P, V]) Push(p P, v V) {
 	// insert into the bottom of heap
 	h.len++
 	if h.len < len(h.elems) {
@@ -42,13 +38,13 @@ func (h *Heap) Push(p Comparable, v T) {
 		e.p = p
 		e.val = v
 	} else {
-		h.elems = append(h.elems, Elem{p: p, val: v})
+		h.elems = append(h.elems, Elem[P, V]{p: p, val: v})
 	}
 	// percolate up from bottom
 	h.swim(h.len)
 }
 
-func (h *Heap) Pop() T {
+func (h *Heap[P, V]) Pop() V {
 	v := h.elems[1].val
 	// move bottom element to the top position
 	h.elems[1] = h.elems[h.len]
@@ -58,54 +54,15 @@ func (h *Heap) Pop() T {
 	return v
 }
 
-func (h *Heap) Del(v T) {
-	i := h.find(v)
-	if i <= 0 {
-		return
-	}
-	if i == h.len {
-		h.len--
-		return
-	}
-	h.elems[i] = h.elems[h.len]
-	h.len--
-	h.sink(i)
-}
-
-func (h *Heap) find(v T) int {
-	for i := 1; i <= h.len; i++ {
-		if h.elems[i].val == v {
-			return i
-		}
-	}
-	return -1
-}
-
-// Fix priority
-func (h *Heap) Fix(p Comparable, v T) {
-	i := h.find(v)
-	if i <= 0 {
-		return
-	}
-	switch p.Cmp(h.elems[i].p) {
-	case Less:
-		h.elems[i].p = p
-		h.swim(i)
-	case More:
-		h.elems[i].p = p
-		h.sink(i)
-	}
-}
-
-func (h *Heap) sink(vac int) {
+func (h *Heap[P, V]) sink(vac int) {
 	elem := h.elems[vac] // copy-out the element and left a vacancy
 	sub := vac * 2
 	for sub <= h.len {
 		// choose the smaller sub-node
-		if sub < h.len && h.elems[sub+1].Cmp(h.elems[sub]) == Less {
+		if sub < h.len && h.elems[sub+1].p < h.elems[sub].p {
 			sub++
 		}
-		if h.elems[sub].Cmp(elem) != Less {
+		if h.elems[sub].p >= elem.p {
 			break
 		}
 		h.elems[vac] = h.elems[sub]
@@ -115,10 +72,10 @@ func (h *Heap) sink(vac int) {
 	h.elems[vac] = elem
 }
 
-func (h *Heap) swim(vac int) {
+func (h *Heap[P, V]) swim(vac int) {
 	elem := h.elems[vac] // copy-out the element and left a vacancy
 	parent := vac / 2
-	for parent > 0 && h.elems[parent].Cmp(elem) == More {
+	for parent > 0 && h.elems[parent].p > elem.p {
 		h.elems[vac] = h.elems[parent]
 		vac = parent
 		parent = vac / 2
