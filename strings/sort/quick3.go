@@ -4,7 +4,7 @@ import (
 	"github.com/howz97/algorithm/strings/alphabet"
 )
 
-func Quick3WithAlphabet(a alphabet.Interface, data []string) {
+func Quick3Alp(a alphabet.Interface, data []string) {
 	runes := make([][]rune, len(data))
 	for i := range runes {
 		runes[i] = []rune(data[i])

@@ -66,10 +66,10 @@ func Test_Quick3(t *testing.T) {
 	LoopTest(t, Quick3, "Quick3")
 }
 
-func Test_Quick3WithAlphabet(t *testing.T) {
+func Test_Quick3Alp(t *testing.T) {
 	LoopTest(t, func(data []string) {
-		Quick3WithAlphabet(alpha, data)
-	}, "Quick3WithAlphabet")
+		Quick3Alp(alpha, data)
+	}, "Quick3Alp")
 }
 
 func TestStdSort(t *testing.T) {
@@ -85,7 +85,7 @@ func TestQuickSort(t *testing.T) {
 func TestCompare(t *testing.T) {
 	Test_HighPrior(t)
 	Test_HighPriorAlp(t)
-	Test_Quick3WithAlphabet(t)
+	Test_Quick3Alp(t)
 	Test_Quick3(t)
 	TestQuickSort(t)
 	TestStdSort(t)
