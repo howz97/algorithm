@@ -1,5 +1,5 @@
 .vscode
 .idea
 alg_rust/target
-string_sort/*.txt
+strings/sort/*.txt
 tmp.txt

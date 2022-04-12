@@ -1,4 +1,4 @@
-package string_sort
+package sort
 
 import (
 	"github.com/howz97/algorithm/strings/alphabet"

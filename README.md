@@ -5,7 +5,7 @@
   * [数组实现](https://github.com/howz97/algorithm/blob/master/queue/slice.go)
   * [链表实现](https://github.com/howz97/algorithm/blob/master/queue/linked.go)
 * [排序](https://github.com/howz97/algorithm/tree/master/sort)
-* [字符串排序](https://github.com/howz97/algorithm/tree/master/string_sort)
+* [字符串排序](https://github.com/howz97/algorithm/tree/master/sort)
   * 高位优先排序
   * 快速三向排序
 * [Trie树](https://github.com/howz97/algorithm/tree/master/trie_tree)

@@ -11,18 +11,14 @@ const (
 	DNA         = `ACTG`
 	OCTAL       = `01234567`
 	DECIMAL     = `0123456789`
-	HEXADECIMAL = `0123456789ABCDEF`
+	HEXADECIMAL = DECIMAL + `ABCDEF`
 	LOWERCASE   = `abcdefghijklmnopqrstuvwxyz`
 	UPPERCASE   = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`
-	BASE64      = `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/`
+	BASE64      = UPPERCASE + LOWERCASE + DECIMAL + `+/`
 	ASCII       = ` !"#$%&'()*+,-./` + DECIMAL + `:;<=>?@` + UPPERCASE + `[\]^_` + "`" + LOWERCASE + `{|}~`
 )
 
-var (
-	LowerCase = NewAlphabetImpl(LOWERCASE)
-	Ascii     = NewAlphabetImpl(ASCII)
-	Unicode   = new(unicodeImpl)
-)
+var Unicode = new(unicodeImpl)
 
 // map unicode to other alphabet
 type Interface interface {

@@ -1,4 +1,4 @@
-package string_sort
+package sort
 
 import (
 	"os"
@@ -11,9 +11,9 @@ import (
 	"github.com/howz97/algorithm/util"
 )
 
-const filename = "./short.txt"
+const filename = "./dna.txt"
 const testTimes = 1
-const inputSize = 1000
+const inputSize = 3000
 
 var alpha = alphabet.NewAlphabetImpl(alphabet.UPPERCASE)
 
@@ -26,13 +26,10 @@ func TestCreateInput(t *testing.T) {
 	//	return RandString(5)
 	//})
 
-	prefix := ""
-	for i := 0; i < 300000; i++ {
-		prefix += "A"
-	}
-	CreateInputStrings(t, "./long.txt", func() string {
-		return prefix + alpha.RandString(10)
-	})
+	// alpha = alphabet.NewAlphabetImpl(alphabet.DNA)
+	// CreateInputStrings(t, "./dna.txt", func() string {
+	// 	return alpha.RandString(1000)
+	// })
 
 	//CreateInputStrings(t, "./length_rand.txt", func() string {
 	//	return RandString(rand.Intn(100))
@@ -53,14 +50,16 @@ func CreateInputStrings(t *testing.T, filename string, fn func() string) {
 	}
 }
 
-func Test_HighPrior(t *testing.T) {
-	LoopTest(t, HighPrior, "HighPrior")
+func Test_HighPriorAlp(t *testing.T) {
+	LoopTest(t, func(data []string) {
+		HighPriorAlp(alpha, data)
+	}, "HighPriorAlp")
 }
 
-func Test_HighPriorWithAlphabet(t *testing.T) {
+func Test_HighPrior(t *testing.T) {
 	LoopTest(t, func(data []string) {
-		HighPriorWithAlphabet(alpha, data)
-	}, "HighPriorWithAlphabet")
+		HighPrior(data)
+	}, "HighPrior")
 }
 
 func Test_Quick3(t *testing.T) {
@@ -79,13 +78,13 @@ func TestStdSort(t *testing.T) {
 
 func TestQuickSort(t *testing.T) {
 	LoopTest(t, func(data []string) {
-		mysort.QuickSort(data)
+		mysort.Quick(data)
 	}, "MyQuickSort")
 }
 
 func TestCompare(t *testing.T) {
-	//Test_HighPrior(t)
-	Test_HighPriorWithAlphabet(t)
+	Test_HighPrior(t)
+	Test_HighPriorAlp(t)
 	Test_Quick3WithAlphabet(t)
 	Test_Quick3(t)
 	TestQuickSort(t)
@@ -115,9 +114,9 @@ func TestStringCompare(t *testing.T) {
 	str2 := str1
 	b := true
 
-	t0 := time.Now()
 	runes1 := []rune(str1)
 	runes2 := []rune(str2)
+	t0 := time.Now()
 	for i := range runes1 {
 		if runes1[i] < runes2[i] {
 			b = false
@@ -126,9 +125,9 @@ func TestStringCompare(t *testing.T) {
 	}
 	t.Logf("compare runes %v %v", time.Since(t0), b)
 
-	t0 = time.Now()
 	bytes1 := []byte(str1)
 	bytes2 := []byte(str2)
+	t0 = time.Now()
 	for i := range bytes1 {
 		if bytes1[i] < bytes2[i] {
 			b = false

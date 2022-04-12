@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/howz97/algorithm/strings/string_sort"
+	"github.com/howz97/algorithm/strings/sort"
 )
 
 func main() {
@@ -20,6 +20,6 @@ func main() {
 		"王麻子",
 		"李二狗",
 	}
-	string_sort.Quick3(data)
+	sort.Quick3(data)
 	fmt.Println(data)
 }

@@ -9,7 +9,7 @@ import (
 )
 
 func TestSliceNode(t *testing.T) {
-	trie := NewTrie(alphabet.Ascii)
+	trie := NewTrie(alphabet.NewAlphabetImpl(alphabet.ASCII))
 	TrieTreeTest(t, trie, DataASCII)
 }
 
