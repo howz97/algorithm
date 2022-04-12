@@ -2,7 +2,7 @@ package sort
 
 import "golang.org/x/exp/constraints"
 
-func QuickSort[Ord constraints.Ordered](data []Ord) {
+func Quick[Ord constraints.Ordered](data []Ord) {
 	quickSort(data, 0, len(data)-1)
 }
 

@@ -9,13 +9,13 @@ import (
 )
 
 func TestContrast(t *testing.T) {
-	testPerformance(PopSort[int], "PopSort")
-	testPerformance(SelectSort[int], "SelectSort")
-	testPerformance(InsertSort[int], "InsertSort")
-	testPerformance(ShellSort[int], "ShellSort")
-	testPerformance(MergeSort[int], "MergeSort")
-	testPerformance(HeapSort[int], "HeapSort")
-	testPerformance(QuickSort[int], "QuickSort")
+	testPerformance(Bubble[int], "PopSort")
+	testPerformance(Select[int], "SelectSort")
+	testPerformance(Insert[int], "InsertSort")
+	testPerformance(Shell[int], "ShellSort")
+	testPerformance(Merge[int], "MergeSort")
+	testPerformance(Heap[int], "HeapSort")
+	testPerformance(Quick[int], "QuickSort")
 
 	testPerformance(func(p []int) { stdsort.Sort(stdsort.IntSlice(p)) }, "Go library sort.Ints")
 }

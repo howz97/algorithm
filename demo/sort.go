@@ -8,6 +8,6 @@ import (
 
 func main() {
 	sli := []int{46, 4, 1, 26, 4, 25}
-	sort.QuickSort(sli)
+	sort.Quick(sli)
 	fmt.Println(sli)
 }

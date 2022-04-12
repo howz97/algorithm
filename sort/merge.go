@@ -2,7 +2,7 @@ package sort
 
 import "golang.org/x/exp/constraints"
 
-func MergeSort[Ord constraints.Ordered](data []Ord) {
+func Merge[Ord constraints.Ordered](data []Ord) {
 	aux := make([]Ord, len(data))
 	mergeSort(data, aux)
 }

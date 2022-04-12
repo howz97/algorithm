@@ -2,8 +2,7 @@ package sort
 
 import "golang.org/x/exp/constraints"
 
-// InsertSort -
-func InsertSort[Ord constraints.Ordered](data []Ord) {
+func Insert[Ord constraints.Ordered](data []Ord) {
 	for i := 1; i < len(data); i++ {
 		insrtNum := data[i]
 		j := i - 1

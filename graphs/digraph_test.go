@@ -124,7 +124,7 @@ func TestDFS_Digraph(t *testing.T) {
 func checkDFSResults(t *testing.T, g *Digraph, dfsResults [][]int) {
 	for src := range dfsResults {
 		reach := g.ReachableSlice(src)
-		sort.QuickSort(stdsort.IntSlice(reach))
+		sort.Quick(stdsort.IntSlice(reach))
 		if !util.SliceEqual(reach, dfsResults[src]) {
 			t.Errorf("v %d reach %v not equal %v", src, reach, dfsResults[src])
 		}

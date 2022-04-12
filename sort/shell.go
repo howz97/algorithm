@@ -2,7 +2,7 @@ package sort
 
 import "golang.org/x/exp/constraints"
 
-func ShellSort[Ord constraints.Ordered](data []Ord) {
+func Shell[Ord constraints.Ordered](data []Ord) {
 	// 使用希尔增量
 	for incre := len(data) >> 1; incre > 1; incre >>= 1 {
 		for i := incre; i < len(data); i++ {
@@ -14,7 +14,7 @@ func ShellSort[Ord constraints.Ordered](data []Ord) {
 			data[j+incre] = insrtNum
 		}
 	}
-	InsertSort(data)
+	Insert(data)
 }
 
 //func ShellSort(data []int) {
