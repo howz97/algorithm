@@ -1,20 +1,13 @@
 package search
 
 import (
-	"fmt"
+	"golang.org/x/exp/constraints"
 )
 
-type Searcher[Cmp comparable, T any] interface {
-	Put(key Cmp, val T)
-	Get(key Cmp) T
-	Del(key Cmp)
+type Searcher[Ord constraints.Ordered, T any] interface {
+	Put(key Ord, val T)
+	Get(key Ord) (T, bool)
+	Del(key Ord)
 	Clean()
 	Size() uint
-}
-
-type ITraversal interface {
-	fmt.Stringer
-	IsNil() bool
-	Left() ITraversal
-	Right() ITraversal
 }

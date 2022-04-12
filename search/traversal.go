@@ -1,9 +1,18 @@
 package search
 
 import (
+	"fmt"
+
 	"github.com/howz97/algorithm/basic/queue"
 	"github.com/waiyva/binary-tree/btprinter"
 )
+
+type ITraversal interface {
+	fmt.Stringer
+	IsNil() bool
+	Left() ITraversal
+	Right() ITraversal
+}
 
 func PreOrder(bt ITraversal, fn func(ITraversal) bool) bool {
 	if !fn(bt) {

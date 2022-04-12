@@ -2,7 +2,6 @@ package integer
 
 import (
 	"math/rand"
-	"strconv"
 	"testing"
 
 	"github.com/howz97/algorithm/search"
@@ -10,88 +9,59 @@ import (
 	"github.com/howz97/algorithm/search/binarytree"
 	"github.com/howz97/algorithm/search/hash_map"
 	"github.com/howz97/algorithm/search/redblack"
-	"github.com/howz97/algorithm/strings/alphabet"
 	"github.com/howz97/algorithm/util"
 )
 
-const n = 1000
-
 func TestAVL(t *testing.T) {
-	DifferentKVType(t, avltree.New())
+	LoopTest(t, avltree.New[util.Int, int]())
 }
 
 func TestBinaryTree(t *testing.T) {
-	DifferentKVType(t, binarytree.New())
+	LoopTest(t, binarytree.New[util.Int, int]())
 }
 
 func TestRedBlack(t *testing.T) {
-	DifferentKVType(t, redblack.New())
+	LoopTest(t, redblack.New[util.Int, int]())
 }
 
 func TestHashMap(t *testing.T) {
-	DifferentKVType(t, NewHashMap())
+	LoopTest(t, hash_map.New[util.Int, int]())
 }
 
-func DifferentKVType(t *testing.T, s search.Searcher) {
-	t.Logf("start test different types of k-v ...")
-	LoopTest(t, s, IntStrKV)
-	t.Logf("int-str passed")
-
-	LoopTest(t, s, FloatIntKV)
-	t.Logf("float-int passed")
-
-	LoopTest(t, s, StrIntKV)
-	t.Logf("str-int passed")
-}
-
-func IntStrKV() (util.Comparable, util.T) {
-	k := rand.Intn(n)
-	v := strconv.Itoa(k)
-	return util.Int(k), v
-}
-
-func FloatIntKV() (util.Comparable, util.T) {
-	v := rand.Intn(n)
-	k := float64(v) / n
-	return util.Float(k), v
-}
-
-func StrIntKV() (util.Comparable, util.T) {
-	k := alphabet.Ascii.RandString(2) // length of string hugely affect cost of BST
-	v := rand.Intn(n)
-	return util.Str(k), v
-}
-
-func LoopTest(t *testing.T, s search.Searcher, kvfn func() (util.Comparable, util.T)) {
-	s.Clean()
-	verify := make(map[util.Comparable]util.T)
-	for i := 0; i < 200; i++ {
-		BulkInsert(verify, s, n, kvfn)
+func LoopTest(t *testing.T, s search.Searcher[util.Int, int]) {
+	verify := make(map[int]int)
+	BulkDelete(verify, s, 100)
+	BulkInsert(verify, s, 100)
+	BulkDelete(verify, s, 1000)
+	BulkInsert(verify, s, 500)
+	BulkDelete(verify, s, 100)
+	for i := 0; i < 20; i++ {
+		BulkInsert(verify, s, rand.Intn(1000))
 		VerifyResult(t, verify, s)
-		BulkDelete(verify, s, n, kvfn)
+		BulkDelete(verify, s, rand.Intn(1000))
 		VerifyResult(t, verify, s)
 	}
 }
 
-func BulkInsert(verify map[util.Comparable]util.T, s search.Searcher, cnt int, kvfn func() (util.Comparable, util.T)) {
+func BulkInsert(verify map[int]int, s search.Searcher[util.Int, int], cnt int) {
 	for i := 0; i < cnt; i++ {
-		k, v := kvfn()
-		s.Put(k, v)
-		verify[k] = v
+		k := rand.Int()
+		s.Put(util.Int(k), k)
+		verify[k] = k
 	}
 }
 
-func BulkDelete(verify map[util.Comparable]util.T, s search.Searcher, cnt int, gen func() (util.Comparable, util.T)) {
+func BulkDelete(verify map[int]int, s search.Searcher[util.Int, int], cnt int) {
 	for i := 0; i < cnt; i++ {
-		k, _ := gen()
-		s.Del(k)
+		k := rand.Int()
+		s.Del(util.Int(k))
 		delete(verify, k)
 	}
 }
 
-func VerifyResult(t *testing.T, verify map[util.Comparable]util.T, s search.Searcher) {
+func VerifyResult(t *testing.T, verify map[int]int, s search.Searcher[util.Int, int]) {
 	for k, v := range verify {
-		vGot := s.Get(k)
+		vGot, _ := s.Get(util.Int(k))
 		if vGot != v {
 			t.Fatalf("key %v has wrong value %v, should be %v", k, vGot, v)
 		}
@@ -102,8 +72,8 @@ func VerifyResult(t *testing.T, verify map[util.Comparable]util.T, s search.Sear
 }
 
 func TestBenchmark_Put_OrderKeys(t *testing.T) {
-	const benchmark = 10000000
-	//const benchmark = 30000
+	// const benchmark = 10000000
+	const benchmark = 30000
 
 	stdMap := make(map[util.Int]int)
 	elapsed := util.ExecCost(func() {
@@ -113,7 +83,7 @@ func TestBenchmark_Put_OrderKeys(t *testing.T) {
 	})
 	t.Logf("stdMap.Put cost %v", elapsed)
 
-	hm := hash_map.New()
+	hm := hash_map.New[util.Int, int]()
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
 			hm.Put(util.Int(i), i)
@@ -121,7 +91,7 @@ func TestBenchmark_Put_OrderKeys(t *testing.T) {
 	})
 	t.Logf("hashmap.Put cost %v", elapsed)
 
-	avl := avltree.New()
+	avl := avltree.New[util.Int, int]()
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
 			avl.Put(util.Int(i), i)
@@ -129,94 +99,94 @@ func TestBenchmark_Put_OrderKeys(t *testing.T) {
 	})
 	t.Logf("avl.Put cost %v", elapsed)
 
-	//bt := binarytree.New()
-	//elapsed = util.ExecCost(func() {
-	//	for i := 0; i < benchmark; i++ {
-	//		bt.Put(search.Int(i), i)
-	//	}
-	//})
-	//t.Logf("binarytree.Put cost %v", elapsed)
+	bt := binarytree.New[util.Int, int]()
+	elapsed = util.ExecCost(func() {
+		for i := 0; i < benchmark; i++ {
+			bt.Put(util.Int(i), i)
+		}
+	})
+	t.Logf("binarytree.Put cost %v", elapsed)
 }
 
 func TestBenchmark_RandKeys(t *testing.T) {
-	const benchmark = 20000000
+	const benchmark = 200000
 
 	stdMap := make(map[util.Int]int)
 	elapsed := util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
-			stdMap[util.Int(rand.Intn(n))] = i
+			stdMap[util.Int(rand.Intn(benchmark))] = i
 		}
 	})
 	t.Logf("stdMap.Put cost %v", elapsed)
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
-			_ = stdMap[util.Int(rand.Intn(n))]
+			_ = stdMap[util.Int(rand.Intn(benchmark))]
 		}
 	})
 	t.Logf("stdMap.Get cost %v", elapsed)
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
-			delete(stdMap, util.Int(rand.Intn(n)))
+			delete(stdMap, util.Int(rand.Intn(benchmark)))
 		}
 	})
 	t.Logf("stdMap.Del cost %v", elapsed)
 
-	hm := hash_map.New()
+	hm := hash_map.New[util.Int, int]()
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
-			hm.Put(util.Int(rand.Intn(n)), i)
+			hm.Put(util.Int(rand.Intn(benchmark)), i)
 		}
 	})
 	t.Logf("hashmap.Put cost %v", elapsed)
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
-			hm.Get(util.Int(rand.Intn(n)))
+			hm.Get(util.Int(rand.Intn(benchmark)))
 		}
 	})
 	t.Logf("hashmap.Get cost %v", elapsed)
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
-			hm.Del(util.Int(rand.Intn(n)))
+			hm.Del(util.Int(rand.Intn(benchmark)))
 		}
 	})
 	t.Logf("hashmap.Del cost %v", elapsed)
 
-	avl := avltree.New()
+	avl := avltree.New[int, int]()
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
-			avl.Put(util.Int(rand.Intn(n)), i)
+			avl.Put(rand.Intn(benchmark), i)
 		}
 	})
 	t.Logf("avl.Put cost %v", elapsed)
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
-			avl.Get(util.Int(rand.Intn(n)))
+			avl.Get(rand.Intn(benchmark))
 		}
 	})
 	t.Logf("avl.Get cost %v", elapsed)
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
-			avl.Del(util.Int(rand.Intn(n)))
+			avl.Del(rand.Intn(benchmark))
 		}
 	})
 	t.Logf("avl.Del cost %v", elapsed)
 
-	bt := binarytree.New()
+	bt := binarytree.New[int, int]()
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
-			bt.Put(util.Int(rand.Intn(n)), i)
+			bt.Put(rand.Intn(benchmark), i)
 		}
 	})
 	t.Logf("binarytree.Put cost %v", elapsed)
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
-			bt.Get(util.Int(rand.Intn(n)))
+			bt.Get(rand.Intn(benchmark))
 		}
 	})
 	t.Logf("binarytree.Get cost %v", elapsed)
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
-			bt.Del(util.Int(rand.Intn(n)))
+			bt.Del(rand.Intn(benchmark))
 		}
 	})
 	t.Logf("binarytree.Del cost %v", elapsed)

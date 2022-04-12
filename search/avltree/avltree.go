@@ -3,7 +3,7 @@ package avltree
 import (
 	"fmt"
 
-	. "github.com/howz97/algorithm/search"
+	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/util"
 	"golang.org/x/exp/constraints"
 )
@@ -212,11 +212,11 @@ func (n *node[Ord, T]) del(k Ord) (*node[Ord, T], bool) {
 	return n, exist
 }
 
-func (n *node[Ord, T]) Left() ITraversal {
+func (n *node[Ord, T]) Left() search.ITraversal {
 	return n.left
 }
 
-func (n *node[Ord, T]) Right() ITraversal {
+func (n *node[Ord, T]) Right() search.ITraversal {
 	return n.right
 }
 
