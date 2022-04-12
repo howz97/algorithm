@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/search/hash_map"
+
+	"github.com/howz97/algorithm/search/hashmap"
 	"github.com/howz97/algorithm/util"
 )
 
 func main() {
-	hm := hash_map.New(1)
+	hm := hashmap.New(1)
 	hm.Put(util.Str("a"), "A")
 	hm.Put(util.Str("b"), "B")
 	hm.Put(util.Str("c"), "C")
@@ -27,7 +28,7 @@ func main() {
 	fmt.Println(hm.String())
 
 	fmt.Println("delete all ...")
-	hm.Range(func(key hash_map.Key, _ util.T) bool {
+	hm.Range(func(key hashmap.Key, _ util.T) bool {
 		hm.Del(key)
 		return true
 	})

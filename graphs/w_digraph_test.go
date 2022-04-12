@@ -119,6 +119,9 @@ func RandWDigraph(edgeLimit int, negativeEdge float64) (wd *WDigraph) {
 		ne := rand.Intn(edgeLimit)
 		for j := 0; j < ne; j++ {
 			to := rand.Intn(nv)
+			if from == to {
+				continue
+			}
 			w := (rand.Float64() - negativeEdge) * 10000
 			wd.AddEdge(from, to, w)
 		}

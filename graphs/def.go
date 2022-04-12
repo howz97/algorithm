@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io/ioutil"
+
 	"github.com/howz97/algorithm/util"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
 )
 
 var (
@@ -41,10 +42,7 @@ func readYaml(filename string) (*Digraph, error) {
 		}
 		for from, adj := range m {
 			for to, w := range adj {
-				err = g.addWeightedEdge(g.syb2vet[from], g.syb2vet[to], w)
-				if err != nil {
-					return nil, err
-				}
+				g.addWeightedEdge(g.syb2vet[from], g.syb2vet[to], w)
 			}
 		}
 	} else {
@@ -59,10 +57,7 @@ func readYaml(filename string) (*Digraph, error) {
 		g = NewDigraph(uint(len(m)))
 		for from, adj := range m {
 			for to, w := range adj {
-				err = g.addWeightedEdge(from, to, w)
-				if err != nil {
-					return nil, err
-				}
+				g.addWeightedEdge(from, to, w)
 			}
 		}
 	}

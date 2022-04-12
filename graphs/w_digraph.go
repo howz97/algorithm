@@ -30,8 +30,8 @@ type WDigraph struct {
 }
 
 // AddEdge add a weighted and directed edge
-func (g *WDigraph) AddEdge(src, dst int, w float64) error {
-	return g.addWeightedEdge(src, dst, w)
+func (g *WDigraph) AddEdge(src, dst int, w float64) {
+	g.addWeightedEdge(src, dst, w)
 }
 
 // ShortestPathTree get the shortest path tree from src by the specified algorithm
@@ -144,7 +144,7 @@ func (spt *PathTree) initDijkstra(g *WDigraph) {
 }
 
 func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *heap.Heap2[float64, int]) {
-	g.iterateWAdj(v, func(adj int, w float64) bool {
+	g.IterateWAdj(v, func(adj int, w float64) bool {
 		if distTo[v]+w < distTo[adj] {
 			inPQ := distTo[adj] != math.Inf(1)
 			edgeTo[adj] = v
@@ -172,7 +172,7 @@ func (spt *PathTree) initTopological(g *WDigraph) {
 }
 
 func topologicalRelax(g *WDigraph, v int, edgeTo []int, distTo []float64) {
-	g.iterateWAdj(v, func(a int, w float64) bool {
+	g.IterateWAdj(v, func(a int, w float64) bool {
 		if distTo[v]+w < distTo[a] {
 			edgeTo[a] = v
 			distTo[a] = distTo[v] + w
@@ -208,13 +208,13 @@ func (spt *PathTree) toWDigraph(g *WDigraph) *WDigraph {
 		if from < 0 {
 			continue
 		}
-		sptg.AddEdge(from, to, g.getWeightMust(from, to))
+		sptg.AddEdge(from, to, g.GetWeight(from, to))
 	}
 	return sptg
 }
 
 func bellmanFordRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, q *queue.LinkQ[int], onQ []bool) {
-	g.iterateWAdj(v, func(adj int, w float64) bool {
+	g.IterateWAdj(v, func(adj int, w float64) bool {
 		if distTo[v]+w < distTo[adj] {
 			edgeTo[adj] = v
 			distTo[adj] = distTo[v] + w

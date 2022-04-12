@@ -25,7 +25,7 @@ func (g *WGraph) LazyPrim() (mst *WGraph) {
 	mst = NewWGraph(g.NumVert())
 	marked := make([]bool, g.NumVert())
 	marked[0] = true
-	g.iterateWAdj(0, func(dst int, w float64) bool {
+	g.IterateWAdj(0, func(dst int, w float64) bool {
 		pq.Push(w, &edge{
 			from:   0,
 			to:     dst,
@@ -46,7 +46,7 @@ func (g *WGraph) LazyPrim() (mst *WGraph) {
 
 func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *heap.Heap[float64, *edge]) {
 	marked[v] = true
-	g.iterateWAdj(v, func(a int, w float64) bool {
+	g.IterateWAdj(v, func(a int, w float64) bool {
 		if !marked[a] {
 			pq.Push(w, &edge{
 				from:   v,
@@ -64,7 +64,7 @@ func (g *WGraph) Prim() (mst *WGraph) {
 	pq := heap.New2[float64, int](g.NumVert())
 	mst = NewWGraph(g.NumVert())
 	marked[0] = true
-	g.iterateWAdj(0, func(a int, w float64) bool {
+	g.IterateWAdj(0, func(a int, w float64) bool {
 		pq.Push(w, a)
 		mst.AddEdge(0, a, w)
 		return true
@@ -72,7 +72,7 @@ func (g *WGraph) Prim() (mst *WGraph) {
 	for pq.Size() > 0 {
 		v := pq.Pop()
 		from := mst.Adjacent(v)[0]
-		mst.AddEdge(from, v, g.getWeightMust(from, v))
+		mst.AddEdge(from, v, g.GetWeight(from, v))
 		primVisit(g, mst, v, marked, pq)
 	}
 	return
@@ -80,7 +80,7 @@ func (g *WGraph) Prim() (mst *WGraph) {
 
 func primVisit(g, mst *WGraph, v int, marked []bool, pq *heap.Heap2[float64, int]) {
 	marked[v] = true
-	g.iterateWAdj(v, func(a int, w float64) bool {
+	g.IterateWAdj(v, func(a int, w float64) bool {
 		if marked[a] {
 			return true
 		}
@@ -88,7 +88,7 @@ func primVisit(g, mst *WGraph, v int, marked []bool, pq *heap.Heap2[float64, int
 		if len(orig) == 0 {
 			pq.Push(w, a)
 			mst.AddEdge(v, a, w)
-		} else if w < mst.getWeightMust(orig[0], a) {
+		} else if w < mst.GetWeight(orig[0], a) {
 			pq.Fix(w, a)
 			mst.DelEdge(orig[0], a)
 			mst.AddEdge(v, a, w)

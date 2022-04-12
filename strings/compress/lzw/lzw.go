@@ -1,13 +1,13 @@
 package lzw
 
 import (
-	"github.com/howz97/algorithm/search/hash_map"
+	"github.com/howz97/algorithm/search/hashmap"
 	. "github.com/howz97/algorithm/util"
 )
 
 // Compress data using LZW algorithm
 func Compress(data []byte) (out []byte) {
-	table := hash_map.New()
+	table := hashmap.New()
 	unused := uint16(0)
 	for b := 0; b <= 0xFF; b++ {
 		table.Put(Str([]byte{byte(b)}), unused)
@@ -39,7 +39,7 @@ func Compress(data []byte) (out []byte) {
 
 // Decompress data compressed by LZW algorithm
 func Decompress(data []byte) (out []byte) {
-	table := hash_map.New()
+	table := hashmap.New()
 	i := uint16(0)
 	for b := 0; b <= 0xFF; b++ {
 		table.Put(Int(i), []byte{byte(b)})

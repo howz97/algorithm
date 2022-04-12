@@ -7,7 +7,7 @@ import (
 	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/search/avltree"
 	"github.com/howz97/algorithm/search/binarytree"
-	"github.com/howz97/algorithm/search/hash_map"
+	"github.com/howz97/algorithm/search/hashmap"
 	"github.com/howz97/algorithm/search/redblack"
 	"github.com/howz97/algorithm/util"
 )
@@ -25,7 +25,7 @@ func TestRedBlack(t *testing.T) {
 }
 
 func TestHashMap(t *testing.T) {
-	LoopTest(t, hash_map.New[util.Int, int]())
+	LoopTest(t, hashmap.New[util.Int, int]())
 }
 
 func LoopTest(t *testing.T, s search.Searcher[util.Int, int]) {
@@ -83,7 +83,7 @@ func TestBenchmark_Put_OrderKeys(t *testing.T) {
 	})
 	t.Logf("stdMap.Put cost %v", elapsed)
 
-	hm := hash_map.New[util.Int, int]()
+	hm := hashmap.New[util.Int, int]()
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
 			hm.Put(util.Int(i), i)
@@ -131,7 +131,7 @@ func TestBenchmark_RandKeys(t *testing.T) {
 	})
 	t.Logf("stdMap.Del cost %v", elapsed)
 
-	hm := hash_map.New[util.Int, int]()
+	hm := hashmap.New[util.Int, int]()
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
 			hm.Put(util.Int(rand.Intn(benchmark)), i)

@@ -5,21 +5,21 @@ import (
 
 	"github.com/howz97/algorithm/basic/queue"
 	"github.com/howz97/algorithm/basic/stack"
-	"github.com/howz97/algorithm/search/hash_map"
-	"github.com/howz97/algorithm/util"
+	"github.com/howz97/algorithm/search/hashmap"
+	. "github.com/howz97/algorithm/util"
 	"gopkg.in/yaml.v2"
 )
 
 func NewDigraph(size uint) *Digraph {
-	edges := make([]*hash_map.Chaining, size)
+	edges := make([]*hashmap.Chaining[Int, float64], size)
 	for i := range edges {
-		edges[i] = hash_map.New()
+		edges[i] = hashmap.New[Int, float64]()
 	}
 	return &Digraph{Edges: edges}
 }
 
 type Digraph struct {
-	Edges []*hash_map.Chaining
+	Edges []*hashmap.Chaining[Int, float64]
 	*Symbol
 }
 
@@ -34,8 +34,8 @@ func (dg *Digraph) HasVert(v int) bool {
 }
 
 // AddEdge add a new edge
-func (dg *Digraph) AddEdge(from, to int) error {
-	return dg.addWeightedEdge(from, to, 1)
+func (dg *Digraph) AddEdge(from, to int) {
+	dg.addWeightedEdge(from, to, 1)
 }
 
 // NumEdge get the number of edges
@@ -52,18 +52,18 @@ func (dg *Digraph) HasEdge(from, to int) bool {
 	if !dg.HasVert(from) || !dg.HasVert(to) {
 		return false
 	}
-	return dg.Edges[from].Get(util.Int(to)) != nil
+	_, ok := dg.Edges[from].Get(Int(to))
+	return ok
 }
 
-func (dg *Digraph) addWeightedEdge(from, to int, w float64) error {
+func (dg *Digraph) addWeightedEdge(from, to int, w float64) {
 	if !dg.HasVert(from) || !dg.HasVert(to) {
-		return ErrVerticalNotExist
+		panic(ErrVerticalNotExist)
 	}
 	if from == to {
-		return ErrSelfLoop
+		panic(ErrSelfLoop)
 	}
-	dg.Edges[from].Put(util.Int(to), w)
-	return nil
+	dg.Edges[from].Put(Int(to), w)
 }
 
 // DelEdge delete an edge
@@ -71,24 +71,14 @@ func (dg *Digraph) DelEdge(src, dst int) {
 	if !dg.HasVert(src) {
 		return
 	}
-	dg.Edges[src].Del(util.Int(dst))
-}
-
-func (dg *Digraph) getWeightMust(from, to int) float64 {
-	return dg.Edges[from].Get(util.Int(to)).(float64)
+	dg.Edges[src].Del(Int(dst))
 }
 
 // GetWeight get the weight of edge
 // Zero will be returned if edge not exist
 func (dg *Digraph) GetWeight(from, to int) float64 {
-	if !dg.HasVert(from) {
-		return 0
-	}
-	w := dg.Edges[from].Get(util.Int(to))
-	if w == nil {
-		return 0
-	}
-	return w.(float64)
+	w, _ := dg.Edges[from].Get(Int(to))
+	return w
 }
 
 // TotalWeight sum the weight of all edges
@@ -109,16 +99,9 @@ func (dg *Digraph) IterateAdj(v int, fn func(int) bool) {
 }
 
 // IterateWAdj iterate all adjacent vertices and weight of v
-func (dg *Digraph) IterateWAdj(v int, fn func(int, float64) bool) {
-	if !dg.HasVert(v) {
-		return
-	}
-	dg.iterateWAdj(v, fn)
-}
-
-func (dg *Digraph) iterateWAdj(v int, fn func(int, float64) bool) {
-	dg.Edges[v].Range(func(key hash_map.Key, val util.T) bool {
-		return fn(int(key.(util.Int)), val.(float64))
+func (dg *Digraph) IterateWAdj(v int, fn func(int, float64) bool) { // todo: rename
+	dg.Edges[v].Range(func(key Int, val float64) bool {
+		return fn(int(key), val)
 	})
 }
 
@@ -218,7 +201,7 @@ func (dg *Digraph) FindCycleFrom(v int) *Path {
 
 func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path) bool {
 	found := false
-	dg.iterateWAdj(v, func(a int, w float64) bool {
+	dg.IterateWAdj(v, func(a int, w float64) bool {
 		if marked[a] {
 			return true
 		}
@@ -255,8 +238,8 @@ func (dg *Digraph) Topological() (order *stack.Stack[int]) {
 func (dg *Digraph) IterateWEdge(fn func(int, int, float64) bool) {
 	for src, hm := range dg.Edges {
 		goon := true
-		hm.Range(func(dst hash_map.Key, v util.T) bool {
-			goon = fn(src, int(dst.(util.Int)), v.(float64))
+		hm.Range(func(dst Int, v float64) bool {
+			goon = fn(src, int(dst), v)
 			return goon
 		})
 		if !goon {
@@ -276,7 +259,7 @@ func (dg *Digraph) IterateEdge(fn func(int, int) bool) {
 func (dg *Digraph) IterateWEdgeFrom(src int, fn func(int, int, float64) bool) {
 	dg.IterateVertDFS(src, func(v int) bool {
 		goon := true
-		dg.iterateWAdj(v, func(a int, w float64) bool {
+		dg.IterateWAdj(v, func(a int, w float64) bool {
 			goon = fn(v, a, w)
 			return goon
 		})
@@ -440,7 +423,7 @@ func (dg *Digraph) Marshal() ([]byte, error) {
 	m := make(map[string]map[string]float64)
 	for v := 0; v < int(dg.NumVert()); v++ {
 		edges := make(map[string]float64)
-		dg.iterateWAdj(v, func(a int, w float64) bool {
+		dg.IterateWAdj(v, func(a int, w float64) bool {
 			if dg.Symbol == nil {
 				edges[strconv.Itoa(a)] = w
 			} else {

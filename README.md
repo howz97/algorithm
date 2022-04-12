@@ -17,7 +17,7 @@
   * BoyerMoore
   * RabinKarp
 * [平衡二叉树](https://github.com/howz97/algorithm/tree/master/search/avltree)
-* [链式哈希表](https://github.com/howz97/algorithm/tree/master/search/hash_map)
+* [链式哈希表](https://github.com/howz97/algorithm/tree/master/search/hashmap)
 * [优先队列](https://github.com/howz97/algorithm/tree/master/pq)
   * [堆](https://github.com/howz97/algorithm/tree/master/pq/heap)
   * [左式堆](https://github.com/howz97/algorithm/tree/master/pq/leftist)
