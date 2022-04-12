@@ -1,6 +1,7 @@
 package sort
 
 import (
+	"math/rand"
 	"os"
 	"sort"
 	"testing"
@@ -11,38 +12,39 @@ import (
 	"github.com/howz97/algorithm/util"
 )
 
-const filename = "./dna.txt"
+const filename = "./length_rand.txt"
 const testTimes = 1
-const inputSize = 3000
 
-var alpha = alphabet.NewAlphabetImpl(alphabet.UPPERCASE)
+var alpha = alphabet.NewAlphabetImpl(alphabet.ASCII)
 
 func TestCreateInput(t *testing.T) {
-	//CreateInputStrings(t, "./ip.txt", func() string {
-	//	return fmt.Sprintf("%d.%d.%d.%d", rand.Intn(256), rand.Intn(256), rand.Intn(256), rand.Intn(256))
-	//})
-	//
-	//CreateInputStrings(t, "./short.txt", func() string {
-	//	return RandString(5)
-	//})
+	// CreateInputStrings(t, 30000, "./ip.txt", func() string {
+	// 	return fmt.Sprintf("%d.%d.%d.%d", rand.Intn(256), rand.Intn(256), rand.Intn(256), rand.Intn(256))
+	// })
+
+	// alpha = alphabet.NewAlphabetImpl(alphabet.ASCII)
+	// CreateInputStrings(t, 3000, "./short.txt", func() string {
+	// 	return alpha.RandString(5)
+	// })
 
 	// alpha = alphabet.NewAlphabetImpl(alphabet.DNA)
-	// CreateInputStrings(t, "./dna.txt", func() string {
+	// CreateInputStrings(t, 3000, "./dna.txt", func() string {
 	// 	return alpha.RandString(1000)
 	// })
 
-	//CreateInputStrings(t, "./length_rand.txt", func() string {
-	//	return RandString(rand.Intn(100))
-	//})
+	alpha = alphabet.NewAlphabetImpl(alphabet.ASCII)
+	CreateInputStrings(t, 30000, "./length_rand.txt", func() string {
+		return alpha.RandString(rand.Intn(100))
+	})
 }
 
-func CreateInputStrings(t *testing.T, filename string, fn func() string) {
+func CreateInputStrings(t *testing.T, lineCnt int, filename string, fn func() string) {
 	ipf, err := os.Create(filename)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer ipf.Close()
-	for i := 0; i < inputSize; i++ {
+	for i := 0; i < lineCnt; i++ {
 		_, err = ipf.WriteString(fn() + "\n")
 		if err != nil {
 			t.Fatal(err)

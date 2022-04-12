@@ -4,18 +4,87 @@ import (
 	"github.com/howz97/algorithm/strings/alphabet"
 )
 
+// Quick3 seems to be a faster string sorting algorithm than the sort.Strings method in the standard library
+func Quick3(strings []string) {
+	quick3(strings, 0, len(strings)-1, 0)
+}
+
+func quick3(strings []string, lo, hi, depth int) {
+	if lo+1 >= hi {
+		if lo >= hi {
+			return
+		}
+		for depth < len(strings[lo]) && depth < len(strings[hi]) &&
+			byteAt(strings[lo], depth) == byteAt(strings[hi], depth) {
+			depth++
+		}
+		if byteAt(strings[lo], depth) > byteAt(strings[hi], depth) {
+			strings[lo], strings[hi] = strings[hi], strings[lo]
+		}
+		return
+	}
+	median(strings, lo, hi, depth)
+	middleV := byteAt(strings[lo], depth)
+	tail, i := lo, lo+1
+	head := hi
+	for i <= head {
+		v := byteAt(strings[i], depth)
+		switch true {
+		case v < middleV:
+			strings[tail], strings[i] = strings[i], strings[tail]
+			tail++
+			i++
+		case v > middleV:
+			strings[i], strings[head] = strings[head], strings[i]
+			head--
+		default:
+			i++
+		}
+	}
+	// bytes[0...tail] < middleV
+	// bytes[tail...head] = middleV
+	// bytes[head...] > middleV
+
+	quick3(strings, lo, tail-1, depth)
+	if middleV >= 0 {
+		quick3(strings, tail, head, depth+1)
+	}
+	quick3(strings, head+1, hi, depth)
+}
+
+func byteAt(str string, depth int) int {
+	if depth >= len(str) {
+		return -1
+	}
+	return int(str[depth])
+}
+
+func median(bytes []string, lo, hi, depth int) {
+	m := int(uint(lo+hi) >> 1)
+	if byteAt(bytes[m], depth) < byteAt(bytes[lo], depth) {
+		bytes[m], bytes[lo] = bytes[lo], bytes[m]
+	}
+	if byteAt(bytes[hi], depth) < byteAt(bytes[m], depth) {
+		bytes[hi], bytes[m] = bytes[m], bytes[hi]
+		if byteAt(bytes[m], depth) < byteAt(bytes[lo], depth) {
+			bytes[lo], bytes[m] = bytes[m], bytes[lo]
+		}
+	}
+	bytes[hi], bytes[m] = bytes[m], bytes[hi]
+}
+
 func Quick3Alp(a alphabet.Interface, data []string) {
 	runes := make([][]rune, len(data))
 	for i := range runes {
 		runes[i] = []rune(data[i])
 	}
-	quick3(a, runes, 0, len(data)-1, 0)
+	quick3alp(a, runes, 0, len(data)-1, 0)
 	for i := range data {
 		data[i] = string(runes[i])
 	}
 }
 
-func quick3(a alphabet.Interface, runes [][]rune, lo, hi, depth int) {
+func quick3alp(a alphabet.Interface, runes [][]rune, lo, hi, depth int) {
 	if lo+1 >= hi {
 		if lo >= hi {
 			return
@@ -29,7 +98,7 @@ func quick3(a alphabet.Interface, runes [][]rune, lo, hi, depth int) {
 		}
 		return
 	}
-	medianOfTree(a, runes, lo, hi, depth)
+	medianAlp(a, runes, lo, hi, depth)
 	middleV := toIndex(a, runes[lo], depth)
 	tail, i := lo, lo+1
 	head := hi
@@ -51,14 +120,14 @@ func quick3(a alphabet.Interface, runes [][]rune, lo, hi, depth int) {
 	// runes[tail...head] = middleV
 	// runes[head...] > middleV
 
-	quick3(a, runes, lo, tail-1, depth)
+	quick3alp(a, runes, lo, tail-1, depth)
 	if middleV >= 0 {
-		quick3(a, runes, tail, head, depth+1)
+		quick3alp(a, runes, tail, head, depth+1)
 	}
-	quick3(a, runes, head+1, hi, depth)
+	quick3alp(a, runes, head+1, hi, depth)
 }
 
-func medianOfTree(a alphabet.Interface, runes [][]rune, lo, hi, depth int) {
+func medianAlp(a alphabet.Interface, runes [][]rune, lo, hi, depth int) {
 	m := int(uint(lo+hi) >> 1)
 	if toIndex(a, runes[m], depth) < toIndex(a, runes[lo], depth) {
 		runes[m], runes[lo] = runes[lo], runes[m]
@@ -70,80 +139,4 @@ func medianOfTree(a alphabet.Interface, runes [][]rune, lo, hi, depth int) {
 		}
 	}
 	runes[hi], runes[m] = runes[m], runes[hi]
-}
-
-// faster implementation for UTF-8 encoded string
-func Quick3(data []string) {
-	bytes := make([][]byte, len(data))
-	for i := range bytes {
-		bytes[i] = []byte(data[i])
-	}
-	quick3bytes(bytes, 0, len(data)-1, 0)
-	for i := range data {
-		data[i] = string(bytes[i])
-	}
-}
-
-func quick3bytes(bytes [][]byte, lo, hi, depth int) {
-	if lo+1 >= hi {
-		if lo >= hi {
-			return
-		}
-		for depth < len(bytes[lo]) && depth < len(bytes[hi]) &&
-			byteAt(bytes[lo], depth) == byteAt(bytes[hi], depth) {
-			depth++
-		}
-		if byteAt(bytes[lo], depth) > byteAt(bytes[hi], depth) {
-			bytes[lo], bytes[hi] = bytes[hi], bytes[lo]
-		}
-		return
-	}
-	medianOfTreeByte(bytes, lo, hi, depth)
-	middleV := byteAt(bytes[lo], depth)
-	tail, i := lo, lo+1
-	head := hi
-	for i <= head {
-		v := byteAt(bytes[i], depth)
-		switch true {
-		case v < middleV:
-			bytes[tail], bytes[i] = bytes[i], bytes[tail]
-			tail++
-			i++
-		case v > middleV:
-			bytes[i], bytes[head] = bytes[head], bytes[i]
-			head--
-		default:
-			i++
-		}
-	}
-	// bytes[0...tail] < middleV
-	// bytes[tail...head] = middleV
-	// bytes[head...] > middleV
-
-	quick3bytes(bytes, lo, tail-1, depth)
-	if middleV >= 0 {
-		quick3bytes(bytes, tail, head, depth+1)
-	}
-	quick3bytes(bytes, head+1, hi, depth)
-}
-
-func byteAt(bytes []byte, depth int) int16 {
-	if depth >= len(bytes) {
-		return -1
-	}
-	return int16(bytes[depth])
-}
-
-func medianOfTreeByte(bytes [][]byte, lo, hi, depth int) {
-	m := int(uint(lo+hi) >> 1)
-	if byteAt(bytes[m], depth) < byteAt(bytes[lo], depth) {
-		bytes[m], bytes[lo] = bytes[lo], bytes[m]
-	}
-	if byteAt(bytes[hi], depth) < byteAt(bytes[m], depth) {
-		bytes[hi], bytes[m] = bytes[m], bytes[hi]
-		if byteAt(bytes[m], depth) < byteAt(bytes[lo], depth) {
-			bytes[lo], bytes[m] = bytes[m], bytes[lo]
-		}
-	}
-	bytes[hi], bytes[m] = bytes[m], bytes[hi]
 }
