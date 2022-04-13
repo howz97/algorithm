@@ -100,7 +100,7 @@ func primVisit(g, mst *WGraph, v int, marked []bool, pq *heap.Heap2[float64, int
 // Kruskal gets the minimum spanning tree by Kruskal algorithm. g MUST be a connected graph
 func (g *WGraph) Kruskal() (mst *WGraph) {
 	mst = NewWGraph(g.NumVert())
-	uf := unionfind.NewUF(int(g.NumVert()))
+	uf := unionfind.New(int(g.NumVert()))
 	pq := heap.New[float64, *edge](g.NumVert())
 	g.IterateWEdge(func(src int, dst int, w float64) bool {
 		pq.Push(w, &edge{

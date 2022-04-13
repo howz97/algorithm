@@ -9,7 +9,7 @@ type UnionFind struct {
 	numcc int
 }
 
-func NewUF(numV int) *UnionFind {
+func New(numV int) *UnionFind {
 	uf := &UnionFind{
 		id:    make([]int, numV),
 		numcc: numV,

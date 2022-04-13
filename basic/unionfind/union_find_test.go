@@ -6,7 +6,7 @@ import (
 )
 
 func TestUnionFind_Union(t *testing.T) {
-	uf := NewUF(8)
+	uf := New(8)
 	fmt.Printf("NumConnectedComponent: %v\n", uf.NumConnectedComponent())
 	uf.Union(1, 7)
 	uf.Union(7, 0)
