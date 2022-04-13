@@ -8,7 +8,7 @@
 * [字符串排序](https://github.com/howz97/algorithm/tree/master/sort)
   * 高位优先排序
   * 快速三向排序
-* [Trie树](https://github.com/howz97/algorithm/tree/master/trie_tree)
+* [Trie树](https://github.com/howz97/algorithm/tree/master/trie)
   * R向Trie树
   * 3向Trie树
   * 可压缩的3向Trie树

@@ -1,4 +1,4 @@
-package trietree
+package trie
 
 import (
 	"github.com/howz97/algorithm/basic/queue"

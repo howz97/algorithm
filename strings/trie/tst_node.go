@@ -1,4 +1,4 @@
-package trietree
+package trie
 
 import (
 	"errors"

@@ -4,7 +4,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/trie_tree"
+	"github.com/howz97/algorithm/trie"
 )
 
 var dict = map[string]string{
@@ -25,9 +25,9 @@ var dict = map[string]string{
 }
 
 func main() {
-	//trie := trietree.NewTrie(alphabet.Ascii)
-	//trie := trietree.NewTST()
-	trie := trietree.NewTSTC()
+	//trie := trie.NewTrie(alphabet.Ascii)
+	//trie := trie.NewTST()
+	trie := trie.NewTSTC()
 	for k, v := range dict {
 		trie.Upsert(k, v)
 	}
