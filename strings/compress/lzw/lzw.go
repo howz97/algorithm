@@ -7,7 +7,7 @@ import (
 
 // Compress data using LZW algorithm
 func Compress(data []byte) (out []byte) {
-	table := hashmap.New()
+	table := hashmap.New[Str, uint16]()
 	unused := uint16(0)
 	for b := 0; b <= 0xFF; b++ {
 		table.Put(Str([]byte{byte(b)}), unused)
@@ -17,11 +17,11 @@ func Compress(data []byte) (out []byte) {
 		var code uint16
 		i := 1
 		for ; i <= len(data); i++ {
-			e := table.Get(Str(data[:i]))
-			if e == nil {
+			c, ok := table.Get(Str(data[:i]))
+			if !ok {
 				break
 			}
-			code = e.(uint16)
+			code = c
 		}
 		if i > len(data) {
 			out = append(out, byte(code>>8))
@@ -39,7 +39,7 @@ func Compress(data []byte) (out []byte) {
 
 // Decompress data compressed by LZW algorithm
 func Decompress(data []byte) (out []byte) {
-	table := hashmap.New()
+	table := hashmap.New[Int, []byte]()
 	i := uint16(0)
 	for b := 0; b <= 0xFF; b++ {
 		table.Put(Int(i), []byte{byte(b)})
@@ -48,15 +48,15 @@ func Decompress(data []byte) (out []byte) {
 	for {
 		var code uint16
 		code, data = readUint16(data)
-		bytes := table.Get(Int(code)).([]byte)
+		bytes, _ := table.Get(Int(code))
 		out = append(out, bytes...)
 		if len(data) == 0 {
 			break
 		}
 		bytes1 := make([]byte, len(bytes))
 		copy(bytes1, bytes)
-		if e := table.Get(Int(peekUint16(data))); e != nil {
-			bytes1 = append(bytes1, e.([]byte)[0])
+		if e, ok := table.Get(Int(peekUint16(data))); ok {
+			bytes1 = append(bytes1, e[0])
 		} else {
 			bytes1 = append(bytes1, bytes[0])
 		}
