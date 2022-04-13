@@ -52,5 +52,4 @@ func (uf *UnionFind) Union(v1, v2 int) {
 		}
 	}
 	uf.numcc--
-	return
 }
