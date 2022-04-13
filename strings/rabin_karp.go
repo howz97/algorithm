@@ -1,13 +1,16 @@
-package str_search
+package strings
 
 const primeRK = 16777619
 
 func IndexRabinKarp(s, substr string) int {
+	if len(s) == 0 || len(substr) == 0 || len(s) < len(substr) {
+		return -1
+	}
 	m := len(substr)
-	hp, ht := hashStr(substr), hashStr(s[:m])
-	if hp == ht && s[:m] == substr {
+	if s[:m] == substr {
 		return 0
 	}
+	hp, ht := hashStr(substr), hashStr(s[:m])
 	rpm := pow(primeRK, uint32(m-1))
 	for i := m; i < len(s); i++ {
 		ht = (ht-uint32(s[i-m])*rpm)*primeRK + uint32(s[i])
@@ -27,9 +30,6 @@ func hashStr(sep string) uint32 {
 }
 
 func pow(x, y uint32) uint32 {
-	if y < 0 {
-		panic("y must >= 0")
-	}
 	if y == 0 {
 		return 1
 	}

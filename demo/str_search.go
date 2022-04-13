@@ -4,19 +4,19 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/howz97/algorithm/strings/str_search"
+	"github.com/howz97/algorithm/strings"
 )
 
 func main() {
-	txt, err := ioutil.ReadFile("../str_search/tale.txt")
+	txt, err := ioutil.ReadFile("../strings/tale.txt")
 	if err != nil {
 		panic(err)
 	}
 	pattern := "It is a far, far better thing that I do, than I have ever done"
-	searcher := str_search.NewKMP(pattern)
-	//searcher := str_search.NewBM(pattern)
+	searcher := strings.NewKMP(pattern)
+	//searcher := strings.NewBM(pattern)
 	i := searcher.Index(string(txt))
-	//i := str_search.IndexRabinKarp(string(txt), pattern)
+	//i := strings.IndexRabinKarp(string(txt), pattern)
 	fmt.Println(string(txt[i-50 : i+100]))
 
 	/*

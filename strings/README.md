@@ -4,12 +4,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/howz97/algorithm/str_search"
+	"github.com/howz97/algorithm/strings"
 	"os"
 )
 
 func main() {
-	file, err := os.Open("../str_search/tale.txt")
+	file, err := os.Open("../strings/tale.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -25,10 +25,10 @@ func main() {
 	}
 
 	pattern := "It is a far, far better thing that I do, than I have ever done"
-	searcher := str_search.NewKMP(pattern)
-	//searcher := str_search.NewBM(pattern)
+	searcher := strings.NewKMP(pattern)
+	//searcher := strings.NewBM(pattern)
 	i := searcher.Index(string(txt))
-	//i := str_search.IndexRabinKarp(string(txt), pattern)
+	//i := strings.IndexRabinKarp(string(txt), pattern)
 	fmt.Println(string(txt[i-50 : i+100]))
 }
 

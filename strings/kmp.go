@@ -1,12 +1,13 @@
-package str_search
+package strings
 
 const (
-	byteNum = 256
+	byteNum = 1 << 8
 )
 
 type KMP struct {
 	stateCnt int
-	dfa      [][]int // deterministic finite automaton
+	// deterministic finite automaton
+	dfa [][]int
 }
 
 func NewKMP(pattern string) *KMP {
@@ -18,7 +19,7 @@ func NewKMP(pattern string) *KMP {
 		kmp.dfa[i] = make([]int, kmp.stateCnt)
 	}
 
-	// init dfa
+	// construct dfa
 	dfa := kmp.dfa
 	dfa[pattern[0]][0] = 1 // dfa[][0] is special
 
@@ -55,10 +56,11 @@ func (kmp *KMP) IndexAll(s string) (indices []int) {
 	for {
 		i := kmp.Index(s)
 		if i < 0 {
-			return
+			break
 		}
 		indices = append(indices, j+i)
 		j = j + i + kmp.stateCnt
 		s = s[i+kmp.stateCnt:]
 	}
+	return
 }

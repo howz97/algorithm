@@ -12,7 +12,7 @@
   * R向Trie树
   * 3向Trie树
   * 可压缩的3向Trie树
-* [子字符串查找](https://github.com/howz97/algorithm/tree/master/str_search)
+* [子字符串查找](https://github.com/howz97/algorithm/tree/master/strings)
   * KMP
   * BoyerMoore
   * RabinKarp

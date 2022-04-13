@@ -1,4 +1,4 @@
-package str_search
+package strings
 
 import (
 	"fmt"
@@ -83,7 +83,7 @@ func TestPerformance(t *testing.T) {
 	idx := strings.Index(txtStr, pattern)
 	result := make(map[string][]time.Duration)
 	kmp := NewKMP(pattern)
-	bm := NewBM(pattern)
+	bm := NewBoyerMoore(pattern)
 	for i := 0; i < testCount; i++ {
 		start := time.Now()
 		if kmp.Index(txtStr) != idx {

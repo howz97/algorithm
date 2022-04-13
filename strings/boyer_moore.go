@@ -1,11 +1,11 @@
-package str_search
+package strings
 
 type BoyerMoore struct {
 	pattern string
 	right   []int
 }
 
-func NewBM(pattern string) *BoyerMoore {
+func NewBoyerMoore(pattern string) *BoyerMoore {
 	bm := &BoyerMoore{
 		pattern: pattern,
 		right:   make([]int, byteNum),
@@ -38,12 +38,13 @@ func (bm *BoyerMoore) IndexAll(s string) (indices []int) {
 	for {
 		i := bm.Index(s)
 		if i < 0 {
-			return
+			break
 		}
 		indices = append(indices, j+i)
 		j = j + i + bm.LenP()
 		s = s[i+bm.LenP():]
 	}
+	return
 }
 
 func (bm *BoyerMoore) LenP() int {
