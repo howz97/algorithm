@@ -20,13 +20,12 @@ func (s Set[T]) Remove(e T) {
 }
 
 // TakeOne take out an element
-func (s Set[T]) TakeOne() (T, bool) {
+func (s Set[T]) TakeOne() T {
 	for e := range s {
 		delete(s, e)
-		return e, true
+		return e
 	}
-	var v T
-	return v, false
+	panic("set is empty")
 }
 
 func (s Set[T]) Clear() {

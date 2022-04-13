@@ -13,6 +13,25 @@ import (
 	"github.com/howz97/algorithm/graphs"
 )
 
+func Match(pattern, str string) (bool, error) {
+	re, err := Compile(pattern)
+	if err != nil {
+		return false, err
+	}
+	return re.Match(str), nil
+}
+
+func Compile(pattern string) (*Regexp, error) {
+	compiled, err := compile([]rune(pattern))
+	if err != nil {
+		return nil, err
+	}
+	re := new(Regexp)
+	re.table = makeSymbolTable(compiled)
+	re.nfa = makeNFA(re.table)
+	return re, nil
+}
+
 type Regexp struct {
 	table []symbol
 	nfa   *graphs.Digraph
@@ -48,10 +67,10 @@ func (re *Regexp) startStatus() set.Set[int] {
 func (re *Regexp) forwardStatus(curStatus set.Set[int], r rune) set.Set[int] {
 	arrived := set.New[int]()
 	for {
-		s, ok := curStatus.TakeOne()
-		if !ok {
+		if curStatus.Len() == 0 {
 			break
 		}
+		s := curStatus.TakeOne()
 		if re.table[s].match(r) {
 			arrived.Add(s + 1)
 		}
@@ -62,35 +81,16 @@ func (re *Regexp) forwardStatus(curStatus set.Set[int], r rune) set.Set[int] {
 func (re *Regexp) updateCurStatus(src set.Set[int]) set.Set[int] {
 	reachable := set.New[int]()
 	for {
-		vSrc, ok := src.TakeOne()
-		if !ok {
+		if src.Len() == 0 {
 			break
 		}
+		vSrc := src.TakeOne()
 		re.tc.Iterate(vSrc, func(v int) bool {
 			reachable.Add(v)
 			return true
 		})
 	}
 	return reachable
-}
-
-func Compile(pattern string) (*Regexp, error) {
-	compiled, err := compile([]rune(pattern))
-	if err != nil {
-		return nil, err
-	}
-	re := new(Regexp)
-	re.table = makeSymbolTable(compiled)
-	re.nfa = makeNFA(re.table)
-	return re, nil
-}
-
-func Match(pattern, str string) (bool, error) {
-	re, err := Compile(pattern)
-	if err != nil {
-		return false, err
-	}
-	return re.Match(str), nil
 }
 
 func makeSymbolTable(compiled []rune) []symbol {
