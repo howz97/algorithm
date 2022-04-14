@@ -14,7 +14,7 @@ Algorithm (4th, Sedgewick) implemented in golang
   * Quicksort
   * Selectsort
   * Shellsort
-* Searching
+## Searching
   * [Binary Search Tree](https://github.com/howz97/algorithm/tree/master/search/binarytree)
   * [AVL Tree](https://github.com/howz97/algorithm/tree/master/search/avltree)
   * [Red-Black Tree](https://github.com/howz97/algorithm/tree/master/search/redblack)
