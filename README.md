@@ -54,7 +54,7 @@ Algorithm (4th, Sedgewick) implemented in golang
   * Data Compression
     * [Huffman](https://github.com/howz97/algorithm/tree/master/strings/compress/huffman)
     * [LZW](https://github.com/howz97/algorithm/tree/master/strings/compress/lzw)
-## [Priority Queues](https://github.com/howz97/algorithm/tree/master/pq)
+## Priority Queues
   * [Heap](https://github.com/howz97/algorithm/tree/master/pq/heap)
   * [Leftist Heap](https://github.com/howz97/algorithm/tree/master/pq/leftist)
   * [Binomial Heap](https://github.com/howz97/algorithm/tree/master/pq/binomial)

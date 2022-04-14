@@ -99,10 +99,7 @@ func (s *Stack[T]) String() string {
 }
 
 func (s *Stack[T]) PeekIndex(i int) T {
-	if s.top <= 0 {
-		panic("stack is empty")
-	}
-	if i < 0 || i >= s.top {
+	if i >= s.top {
 		panic(fmt.Sprintf("%d out of bound", i))
 	}
 	return s.elems[i]
