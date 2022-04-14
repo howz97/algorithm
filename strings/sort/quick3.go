@@ -73,7 +73,7 @@ func median(bytes []string, lo, hi, depth int) {
 	bytes[hi], bytes[m] = bytes[m], bytes[hi]
 }
 
-func Quick3Alp(a alphabet.Interface, data []string) {
+func Quick3Alp(a alphabet.IAlp, data []string) {
 	runes := make([][]rune, len(data))
 	for i := range runes {
 		runes[i] = []rune(data[i])
@@ -84,7 +84,7 @@ func Quick3Alp(a alphabet.Interface, data []string) {
 	}
 }
 
-func quick3alp(a alphabet.Interface, runes [][]rune, lo, hi, depth int) {
+func quick3alp(a alphabet.IAlp, runes [][]rune, lo, hi, depth int) {
 	if lo+1 >= hi {
 		if lo >= hi {
 			return
@@ -127,7 +127,7 @@ func quick3alp(a alphabet.Interface, runes [][]rune, lo, hi, depth int) {
 	quick3alp(a, runes, head+1, hi, depth)
 }
 
-func medianAlp(a alphabet.Interface, runes [][]rune, lo, hi, depth int) {
+func medianAlp(a alphabet.IAlp, runes [][]rune, lo, hi, depth int) {
 	m := int(uint(lo+hi) >> 1)
 	if toIndex(a, runes[m], depth) < toIndex(a, runes[lo], depth) {
 		runes[m], runes[lo] = runes[lo], runes[m]

@@ -51,7 +51,7 @@ func getByte(runes string, depth int) int {
 }
 
 // HighPriorAlp sort strings with a user-defined alphabet
-func HighPriorAlp(a alphabet.Interface, data []string) {
+func HighPriorAlp(a alphabet.IAlp, data []string) {
 	if len(data) <= 1 {
 		return
 	}
@@ -66,7 +66,7 @@ func HighPriorAlp(a alphabet.Interface, data []string) {
 	}
 }
 
-func highPriorSort(a alphabet.Interface, runes, aux [][]rune, lo, hi, depth int) {
+func highPriorSort(a alphabet.IAlp, runes, aux [][]rune, lo, hi, depth int) {
 	if lo >= hi {
 		return
 	}
@@ -98,7 +98,7 @@ func highPriorSort(a alphabet.Interface, runes, aux [][]rune, lo, hi, depth int)
 	}
 }
 
-func toIndex(a alphabet.Interface, runes []rune, depth int) rune {
+func toIndex(a alphabet.IAlp, runes []rune, depth int) rune {
 	if depth >= len(runes) {
 		return -1
 	}

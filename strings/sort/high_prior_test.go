@@ -15,7 +15,7 @@ import (
 const filename = "./length_rand.txt"
 const testTimes = 1
 
-var alpha = alphabet.NewAlphabetImpl(alphabet.ASCII)
+var alpha = alphabet.NewAlphabet(alphabet.ASCII)
 
 func TestCreateInput(t *testing.T) {
 	// CreateInputStrings(t, 30000, "./ip.txt", func() string {
@@ -32,7 +32,7 @@ func TestCreateInput(t *testing.T) {
 	// 	return alpha.RandString(1000)
 	// })
 
-	alpha = alphabet.NewAlphabetImpl(alphabet.ASCII)
+	alpha = alphabet.NewAlphabet(alphabet.ASCII)
 	CreateInputStrings(t, 30000, "./length_rand.txt", func() string {
 		return alpha.RandString(rand.Intn(100))
 	})

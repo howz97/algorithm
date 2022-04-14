@@ -9,47 +9,8 @@ import (
 )
 
 func TestSliceNode(t *testing.T) {
-	trie := NewTrie(alphabet.NewAlphabetImpl(alphabet.ASCII))
+	trie := NewTrie[string](alphabet.NewAlphabet(alphabet.ASCII))
 	TrieTreeTest(t, trie, DataASCII)
-}
-
-func TestTSTNode(t *testing.T) {
-	trie := NewTST()
-	TrieTreeTest(t, trie, DataASCII)
-	trie = NewTST()
-	TrieTreeTest(t, trie, DataChn)
-}
-
-func TestTSTCNode(t *testing.T) {
-	trie := NewTSTC()
-	TrieTreeTest(t, trie, DataASCII)
-	trie = NewTSTC()
-	TrieTreeTest(t, trie, DataChn)
-}
-
-func TestTSTC_Compress(t *testing.T) {
-	trie := NewTSTC()
-	UpsertAndFind(t, trie, DataChn.m)
-	if trie.IsCompressed() {
-		t.Fatalf("compress failed")
-	}
-	if err := trie.Compress(); err != nil {
-		t.Fatal(err)
-	}
-	if !trie.IsCompressed() {
-		t.Fatalf("compress failed")
-	}
-	for _, pre := range DataChn.prefix {
-		KeysWithPrefix(t, trie, pre)
-	}
-	for _, p := range DataChn.pattern {
-		KeysMatch(t, trie, p)
-	}
-	for _, l := range DataChn.long {
-		LongestPrefixOf(t, trie, l)
-	}
-	UpdateAndFind(t, trie, DataChn.m)
-	Delete(t, trie, DataChn.m)
 }
 
 type Data struct {
@@ -104,7 +65,7 @@ var DataChn = Data{
 	long:    []string{"风牛马不相及！", "芳华绝代", "风度翩翩～"},
 }
 
-func TrieTreeTest(t *testing.T, trie *Trie, data Data) {
+func TrieTreeTest(t *testing.T, trie *Trie[string], data Data) {
 	UpsertAndFind(t, trie, data.m)
 	for _, pre := range data.prefix {
 		KeysWithPrefix(t, trie, pre)
@@ -119,51 +80,45 @@ func TrieTreeTest(t *testing.T, trie *Trie, data Data) {
 	Delete(t, trie, data.m)
 }
 
-func Delete(t *testing.T, trie *Trie, m map[string]string) {
+func Delete(t *testing.T, trie *Trie[string], m map[string]string) {
 	for k := range m {
 		trie.Delete(k)
 	}
 	for k := range m {
-		if trie.Contains(k) {
+		if trie.Find(k) != nil {
 			t.Fatalf("Delete(%s) failed", k)
 		}
 	}
 }
 
-func UpsertAndFind(t *testing.T, trie *Trie, m map[string]string) {
+func UpsertAndFind(t *testing.T, trie *Trie[string], m map[string]string) {
 	for k, v := range m {
 		trie.Upsert(k, v)
 	}
 	for k, v := range m {
-		got := trie.Find(k).(string)
+		got := *trie.Find(k)
 		if got != v {
 			t.Fatalf("Find(%s)==%s, should be %s", k, got, v)
 		}
 	}
 }
 
-func UpdateAndFind(t *testing.T, trie *Trie, m map[string]string) {
+func UpdateAndFind(t *testing.T, trie *Trie[string], m map[string]string) {
 	for k, v := range m {
-		trie.Update(k, v+"#")
+		trie.Upsert(k, v+"#")
 	}
 	for k, v := range m {
 		v = v + "#"
-		got := trie.Find(k).(string)
+		got := *trie.Find(k)
 		if got != v {
 			t.Fatalf("Find(%s)==%s, should be %s", k, got, v)
-		}
-
-		invalidKey := k + "@invalid_suffix"
-		trie.Update(invalidKey, "1")
-		if trie.Find(invalidKey) == "1" {
-			t.Fatalf("shoud not succeed to update")
 		}
 	}
 }
 
-func KeysWithPrefix(t *testing.T, trie *Trie, prefix string) {
+func KeysWithPrefix(t *testing.T, trie *Trie[string], prefix string) {
 	var correct []string
-	for _, k := range trie.Keys() {
+	for _, k := range trie.KeysWithPrefix("") {
 		if strings.HasPrefix(k, prefix) {
 			correct = append(correct, k)
 		}
@@ -174,27 +129,27 @@ func KeysWithPrefix(t *testing.T, trie *Trie, prefix string) {
 	}
 }
 
-func LongestPrefixOf(t *testing.T, trie *Trie, str string) {
+func LongestPrefixOf(t *testing.T, trie *Trie[string], str string) {
 	k := trie.LongestPrefixOf(str)
 	if !strings.HasPrefix(str, k) {
 		t.Fatalf("key %s is not prefix of %s", k, str)
 	}
-	if k != "" && !trie.Contains(k) {
+	if k != "" && trie.Find(k) == nil {
 		t.Fatalf("LongestPrefixOf(%s) key %s not exist", str, k)
 	}
 
 	str = strings.TrimPrefix(str, k)
 	for _, r := range str {
 		k += string(r)
-		if trie.Contains(k) {
+		if trie.Find(k) != nil {
 			t.Fatalf("longger key %s exist", k)
 		}
 	}
 }
 
-func KeysMatch(t *testing.T, trie *Trie, pattern string) {
+func KeysMatch(t *testing.T, trie *Trie[string], pattern string) {
 	var correct []string
-	for _, k := range trie.Keys() {
+	for _, k := range trie.KeysWithPrefix("") {
 		if util.IsRunesMatch([]rune(pattern), []rune(k)) {
 			correct = append(correct, k)
 		}

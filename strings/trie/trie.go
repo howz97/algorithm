@@ -5,123 +5,136 @@ import (
 	"github.com/howz97/algorithm/strings/alphabet"
 )
 
-type T interface{}
-
-type TrieNode interface {
-	SetVal(v T)
-	Find(a alphabet.Interface, k []rune) T
-	Upsert(a alphabet.Interface, k []rune, v T)
-	Delete(a alphabet.Interface, k []rune)
-	Locate(a alphabet.Interface, k []rune) (TrieNode, []rune)
-	LongestPrefixOf(a alphabet.Interface, s []rune, d, l int) int
-	Collect(a alphabet.Interface, prefix string, keys *queue.SliceQ[string])
-	KeysMatch(a alphabet.Interface, pattern []rune, prefix string, keys *queue.SliceQ[string])
-	Keys(a alphabet.Interface, keys *queue.SliceQ[string])
-	Compress() error
-	IsCompressed() bool
-}
-
-type Trie struct {
-	a    alphabet.Interface
-	tree TrieNode
-	size int
-}
-
-func NewTrie(a alphabet.Interface) *Trie {
-	return &Trie{
-		a:    a,
-		tree: newSliceNode(a.R()),
+func NewTrie[T any](alp alphabet.IAlp) *Trie[T] {
+	return &Trie[T]{
+		alp:  alp,
+		root: newNode[T](alp.R()),
 	}
 }
 
-func NewTST() *Trie {
-	return &Trie{
-		a:    alphabet.Unicode,
-		tree: newTSTNode('z'),
-	}
+type Trie[T any] struct {
+	alp  alphabet.IAlp
+	root *node[T]
 }
 
-func NewTSTC() *Trie {
-	return &Trie{
-		a:    alphabet.Unicode,
-		tree: &TSTC{TSTCNode: *newTSTCNode('z')},
-	}
-}
-
-func (t *Trie) Find(k string) T {
-	return t.tree.Find(t.a, []rune(k))
-}
-
-// Upsert update or insert a value
-// Insert a new node if the node not exists
-func (t *Trie) Upsert(k string, v T) {
-	t.tree.Upsert(t.a, []rune(k), v)
-	t.size++ // fixme: update do not inc size
-}
-
-// Update or set a value
-// Can not insert any new node
-func (t *Trie) Update(k string, v T) {
-	node, runes := t.tree.Locate(t.a, []rune(k))
-	if node == nil || len(runes) != 0 {
-		return
-	}
-	node.SetVal(v)
-}
-
-func (t *Trie) Delete(k string) {
-	t.tree.Delete(t.a, []rune(k))
-	t.size--
-}
-
-func (t *Trie) Contains(k string) bool {
-	return t.Find(k) != nil
-}
-
-func (t *Trie) IsEmpty() bool {
-	return t.size == 0
-}
-
-func (t *Trie) LongestPrefixOf(s string) string {
-	runes := []rune(s)
-	l := t.tree.LongestPrefixOf(t.a, runes, 0, 0)
-	return string(runes[:l])
-}
-
-func (t *Trie) KeysWithPrefix(prefix string) []string {
-	if prefix == "" {
-		return t.Keys()
-	}
-	node, runes := t.tree.Locate(t.a, []rune(prefix))
+func (t *Trie[T]) Find(key string) *T {
+	node := t.root.locate(t.alp.ToIndices(key))
 	if node == nil {
 		return nil
 	}
-	prefix += string(runes)
+	return node.val
+}
+
+func (t *Trie[T]) Upsert(key string, v T) {
+	t.root.upsert(t.alp.ToIndices(key), v, t.alp.R())
+}
+
+func (t *Trie[T]) Delete(key string) {
+	node := t.root.locate(t.alp.ToIndices(key))
+	if node != nil {
+		node.val = nil
+	}
+}
+
+func (t *Trie[T]) LongestPrefixOf(s string) string {
+	l := t.root.longestPrefixOf(t.alp.ToIndices(s), 0, 0)
+	return string([]rune(s)[:l])
+}
+
+func (t *Trie[T]) KeysWithPrefix(prefix string) []string {
+	node := t.root.locate(t.alp.ToIndices(prefix))
+	if node == nil {
+		return nil
+	}
 	q := queue.NewSliceQ[string](0)
-	node.Collect(t.a, prefix, q)
+	node.collect(t.alp, prefix, q)
 	return q.Drain()
 }
 
-func (t *Trie) Keys() []string {
+func (t *Trie[T]) KeysMatch(p string) []string {
 	q := queue.NewSliceQ[string](0)
-	t.tree.Keys(t.a, q)
+	t.root.keysMatch(t.alp, []rune(p), "", q)
 	return q.Drain()
 }
 
-func (t *Trie) KeysMatch(p string) []string {
-	q := queue.NewSliceQ[string](0)
-	t.tree.KeysMatch(t.a, []rune(p), "", q)
-	return q.Drain()
+type node[T any] struct {
+	val  *T
+	next []*node[T]
 }
 
-func (t *Trie) Size() int {
-	return t.size
+func newNode[T any](size int) *node[T] {
+	return &node[T]{next: make([]*node[T], size)}
 }
 
-func (t *Trie) Compress() error {
-	return t.tree.Compress()
+func (t *node[T]) locate(k []rune) *node[T] {
+	if len(k) == 0 {
+		return t
+	}
+	next := t.next[k[0]]
+	if next == nil {
+		return nil
+	}
+	return next.locate(k[1:])
 }
 
-func (t *Trie) IsCompressed() bool {
-	return t.tree.IsCompressed()
+func (t *node[T]) upsert(k []rune, v T, r int) {
+	if len(k) == 0 {
+		t.val = &v
+		return
+	}
+	next := t.next[k[0]]
+	if next == nil {
+		next = newNode[T](r)
+		t.next[k[0]] = next
+	}
+	next.upsert(k[1:], v, r)
+}
+
+func (t *node[T]) longestPrefixOf(s []rune, d int, l int) int {
+	if t.val != nil {
+		l = d
+	}
+	if len(s) == d {
+		return l
+	}
+	next := t.next[s[d]]
+	if next == nil {
+		return l
+	}
+	return next.longestPrefixOf(s, d+1, l)
+}
+
+func (t *node[T]) collect(a alphabet.IAlp, prefix string, keys *queue.SliceQ[string]) {
+	if t.val != nil {
+		keys.PushBack(prefix)
+	}
+	for i, next := range t.next {
+		if next == nil {
+			continue
+		}
+		next.collect(a, prefix+string(a.ToRune(rune(i))), keys)
+	}
+}
+
+func (t *node[T]) keysMatch(a alphabet.IAlp, pattern []rune, prefix string, keys *queue.SliceQ[string]) {
+	if len(pattern) == 0 {
+		if t.val != nil {
+			keys.PushBack(prefix)
+		}
+		return
+	}
+	if pattern[0] == '.' {
+		for i, next := range t.next {
+			if next == nil {
+				continue
+			}
+			next.keysMatch(a, pattern[1:], prefix+string(a.ToRune(rune(i))), keys)
+		}
+	} else {
+		next := t.next[a.ToIndex(pattern[0])]
+		if next != nil {
+			prefix = prefix + string(pattern[0])
+			next.keysMatch(a, pattern[1:], prefix, keys)
+		}
+	}
 }
