@@ -43,7 +43,7 @@ Algorithm (4th, Sedgewick) implemented in golang
   * [String Sort](https://github.com/howz97/algorithm/tree/master/strings/sort)
     * Most-significant-digit-first
     * Three-way String Quicksort
-   * [Trie](https://github.com/howz97/algorithm/tree/master/strings/trie)
+  * [Trie](https://github.com/howz97/algorithm/tree/master/strings/trie)
     * R-way Trie
     * Ternary Search Trie (TST)
   * [Substring Search](https://github.com/howz97/algorithm/tree/master/strings)
