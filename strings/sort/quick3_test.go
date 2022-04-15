@@ -1,5 +1,7 @@
-String sort
-```go
+package sort
+
+import "fmt"
+
 func ExampleQuick3() {
 	data := []string{
 		"ABABC",
@@ -14,9 +16,7 @@ func ExampleQuick3() {
 		"王麻子",
 		"李二狗",
 	}
-	// HighPrior(data)
 	Quick3(data)
 	fmt.Println(data)
 	// Output: [AA ABAAA ABABC BBAAA CA HUAWEI 张三 张豪 李二狗 李四 王麻子]
 }
-```

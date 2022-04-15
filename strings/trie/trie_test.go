@@ -1,6 +1,8 @@
 package trie
 
 import (
+	"fmt"
+	"sort"
 	"strings"
 	"testing"
 
@@ -175,4 +177,33 @@ func StringSliceEqual(s0, s1 []string) bool {
 		}
 	}
 	return true
+}
+
+func ExampleTrie() {
+	trie := NewTrie[string](alphabet.NewAlphabet(alphabet.ASCII))
+	for k, v := range dict {
+		trie.Upsert(k, v)
+	}
+	result := trie.KeysWithPrefix("")
+	sort.Strings(result)
+	fmt.Println("all keys:", result)
+
+	pattern := "b.te"
+	result = trie.KeysMatch(pattern)
+	sort.Strings(result)
+	fmt.Printf("keys match '%s': %v\n", pattern, result)
+
+	prefix := "bi"
+	result = trie.KeysWithPrefix(prefix)
+	sort.Strings(result)
+	fmt.Printf("keys with prefix '%s': %v\n", prefix, result)
+
+	str := "bitcoins"
+	fmt.Printf("longest key with prefix '%s': %s\n", str, trie.LongestPrefixOf(str))
+
+	// Output:
+	// all keys: [a abandon abnormal am an apollo archive are automatic best bit bitcoin bite byte]
+	// keys match 'b.te': [bite byte]
+	// keys with prefix 'bi': [bit bitcoin bite]
+	// longest key with prefix 'bitcoins': bitcoin
 }

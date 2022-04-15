@@ -1,6 +1,7 @@
 package sort
 
 import (
+	"fmt"
 	"math/rand"
 	"os"
 	"sort"
@@ -141,4 +142,23 @@ func TestStringCompare(t *testing.T) {
 	t0 = time.Now()
 	b = str1 > str2
 	t.Logf("builtin %v %v", time.Since(t0), b)
+}
+
+func ExampleHighPrior() {
+	data := []string{
+		"ABABC",
+		"ABAAA",
+		"BBAAA",
+		"CA",
+		"HUAWEI",
+		"AA",
+		"张豪",
+		"张三",
+		"李四",
+		"王麻子",
+		"李二狗",
+	}
+	HighPrior(data)
+	fmt.Println(data)
+	// Output: [AA ABAAA ABABC BBAAA CA HUAWEI 张三 张豪 李二狗 李四 王麻子]
 }
