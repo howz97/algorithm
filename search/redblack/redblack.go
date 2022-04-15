@@ -58,10 +58,12 @@ func (tree *Tree[Ord, T]) Put(key Ord, val T) {
 		} else if key > x.key {
 			x = x.right
 		} else {
+			// update value, no insertion
 			x.value = val
 			return
 		}
 	}
+	// p is parent of in.
 	tree.size++
 	in := &node[Ord, T]{
 		key:   key,
@@ -72,7 +74,9 @@ func (tree *Tree[Ord, T]) Put(key Ord, val T) {
 		right: tree.null,
 	}
 	if p == tree.null {
+		// Inset root node into an empty tree
 		tree.node = in
+		// fixInsert only need to set the root to black
 	} else if in.key < p.key {
 		p.left = in
 	} else {
@@ -82,39 +86,45 @@ func (tree *Tree[Ord, T]) Put(key Ord, val T) {
 }
 
 func (tree *Tree[Ord, T]) fixInsert(n *node[Ord, T]) {
+	// only 2 possible problem:
+	// 1. root is red
+	// 2. both n and it's parent is red
+
+	// let us solve them and keep the other properties of RedBlack tree
 	for n.p.color == red {
 		if n.p == n.p.p.left {
 			uncle := n.p.p.right
 			if uncle.color == red {
+				// case 1: swim red-attribute of parent and uncle to grandparent.
 				n.p.color, uncle.color = black, black
 				n = n.p.p
 				n.color = red
-				// continue
+				// continue to fix grandparent
 			} else {
 				// uncle is black
 				if n == n.p.right {
+					// case 2
 					n = n.p
 					tree.leftRotate(n)
 				}
+				// case 3
 				// n is the left son of n.p
 				n.p.color = black
 				n.p.p.color = red
 				tree.rightRotate(n.p.p)
 			}
 		} else {
+			// symmetrical to above
 			uncle := n.p.p.left
 			if uncle.color == red {
 				n.p.color, uncle.color = black, black
 				n = n.p.p
 				n.color = red
-				// continue
 			} else {
-				// uncle is black
 				if n == n.p.left {
 					n = n.p
 					tree.rightRotate(n)
 				}
-				// n is the right son of n.p
 				n.p.color = black
 				n.p.p.color = red
 				tree.leftRotate(n.p.p)
