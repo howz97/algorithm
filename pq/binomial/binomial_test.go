@@ -114,11 +114,7 @@ func binomialTree(height int) *node[int] {
 	return t1
 }
 
-func TestExample(t *testing.T) {
-	ExampleBinomial()
-}
-
-func ExampleBinomial() {
+func Example() {
 	b := New[int]()
 	b.Push(1)
 	b.Push(9)
@@ -132,5 +128,5 @@ func ExampleBinomial() {
 		fmt.Print(b.Pop(), ",")
 	}
 
-	//Output: 1,7,9,9,11,13,
+	// Output: 1,7,9,9,11,13,
 }

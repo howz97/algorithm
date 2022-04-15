@@ -2,14 +2,9 @@ package leftist
 
 import (
 	"fmt"
-	"testing"
 )
 
-func TestExample(t *testing.T) {
-	ExampleHeap()
-}
-
-func ExampleHeap() {
+func Example() {
 	b := New[int]()
 	b.Push(1)
 	b.Push(9)

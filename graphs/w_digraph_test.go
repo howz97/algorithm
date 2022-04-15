@@ -128,3 +128,14 @@ func RandWDigraph(edgeLimit int, negativeEdge float64) (wd *WDigraph) {
 	}
 	return
 }
+
+func ExampleWDigraph() {
+	g, _ := LoadWDigraph("test_data/no_cycle.yml")
+	searcher, _ := g.SearcherDijkstra()
+	// searcher, _ = g.SearcherTopological()
+	// searcher, _ = g.SearcherBellmanFord()
+	fmt.Println(searcher.GetPath(1, 2).Str(nil))
+
+	// Output:
+	// (distance=1.02): 1->3, 3->7, 7->2,
+}

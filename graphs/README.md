@@ -1,14 +1,7 @@
-最小生成树
+Minimum spanning tree
 ```go
-package main
-
-import (
-	"fmt"
-	"github.com/howz97/algorithm/graphs"
-)
-
-func main() {
-	g, err := graphs.LoadWGraph("../graphs/test_data/mst.yml")
+func Example() {
+	g, err := LoadWGraph("test_data/mst.yml")
 	if err != nil {
 		panic(err)
 	}
@@ -17,10 +10,10 @@ func main() {
 	//mst := g.Kruskal()
 	fmt.Println(mst.String())
 
-	// Output:
-	// 0 : 7 2
+	// possible output:
+	// 0 : 2 7
 	// 1 : 7
-	// 2 : 3 0 6
+	// 2 : 0 3 6
 	// 3 : 2
 	// 4 : 5
 	// 5 : 7 4
@@ -29,40 +22,24 @@ func main() {
 }
 ```
 
-最短路径
+Shortest path
 ```go
-package main
-
-import (
-	"fmt"
-	"github.com/howz97/algorithm/graphs"
-)
-
-func main() {
-	g, err := graphs.LoadWDigraph("../graphs/test_data/w_digraph.yml")
-	if err != nil {
-		panic(err)
-	}
-	searcher, err := g.SearcherDijkstra()
-	//searcher, err := g.SearcherTopological()
-	//searcher, err := g.SearcherBellmanFord()
-	if err != nil {
-		panic(err)
-	}
+func ExampleWDigraph() {
+	g, _ := LoadWDigraph("test_data/no_cycle.yml")
+	searcher, _ := g.SearcherDijkstra()
+	// searcher, _ = g.SearcherTopological()
+	// searcher, _ = g.SearcherBellmanFord()
 	fmt.Println(searcher.GetPath(1, 2).Str(nil))
 
 	// Output:
-	// (distance=1.21): 1->3, 3->6, 6->2,
+	// (distance=1.02): 1->3, 3->7, 7->2,
 }
 ```
 
-符号图
+Symbol graph
 ```go
-func TestSymbol(t *testing.T) {
-	g, err := LoadGraph("./test_data/symbol_graph.yml")
-	if err != nil {
-		t.Fatal(err)
-	}
+func ExampleSymbol() {
+	g, _ := LoadGraph("./test_data/symbol_graph.yml")
 	bfs := g.BFS(g.VetOf("姜文"))
 	fmt.Println(bfs.ShortestPathTo(g.VetOf("梁朝伟")).Str(g.Symbol))
 	fmt.Println(bfs.ShortestPathTo(g.VetOf("宋慧乔")).Str(g.Symbol))
@@ -70,7 +47,6 @@ func TestSymbol(t *testing.T) {
 	fmt.Println(bfs.ShortestPathTo(g.VetOf("周星驰")).Str(g.Symbol))
 	fmt.Println(bfs.ShortestPathTo(g.VetOf("梁家辉")).Str(g.Symbol))
 
-	//Output:
 	//(distance=12): 姜文->《让子弹飞》, 《让子弹飞》->刘嘉玲, 刘嘉玲->《阿飞正传》, 《阿飞正传》->张学友, 张学友->《东邪西毒》, 《东邪西毒》->梁朝伟,
 	//(distance=12): 姜文->《让子弹飞》, 《让子弹飞》->周润发, 周润发->《卧虎藏龙》, 《卧虎藏龙》->章子怡, 章子怡->《一代宗师》, 《一代宗师》->宋慧乔,
 	//(distance=8): 姜文->《让子弹飞》, 《让子弹飞》->周润发, 周润发->《卧虎藏龙》, 《卧虎藏龙》->郎雄,

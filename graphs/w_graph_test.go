@@ -1,6 +1,7 @@
 package graphs
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -32,4 +33,25 @@ func TestMST_Prim(t *testing.T) {
 		t.Fatalf("weight %v not equal %v", w0, w2)
 	}
 	t.Logf("MST %v:\n%s \n", w0, g.LazyPrim().String())
+}
+
+func Example() {
+	g, err := LoadWGraph("test_data/mst.yml")
+	if err != nil {
+		panic(err)
+	}
+	mst := g.Prim()
+	//mst := g.LazyPrim()
+	//mst := g.Kruskal()
+	fmt.Println(mst.String())
+
+	// possible output:
+	// 0 : 2 7
+	// 1 : 7
+	// 2 : 0 3 6
+	// 3 : 2
+	// 4 : 5
+	// 5 : 7 4
+	// 6 : 2
+	// 7 : 0 1 5
 }

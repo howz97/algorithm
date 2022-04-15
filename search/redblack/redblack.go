@@ -35,24 +35,22 @@ func (n *node[Ord, T]) String() string {
 	if n.IsNil() {
 		return "Nil"
 	}
-	var color string
 	if n.color == red {
-		color = "r"
+		return fmt.Sprintf("red[%v]", n.key)
 	} else {
-		color = "b"
+		return fmt.Sprintf("(%v)", n.key)
 	}
-	return fmt.Sprintf("%s[%v]", color, n.key)
 }
 
 type Tree[Ord constraints.Ordered, T any] struct {
-	root *node[Ord, T]
+	*node[Ord, T]
 	null *node[Ord, T]
 	size uint
 }
 
 func (tree *Tree[Ord, T]) Put(key Ord, val T) {
 	p := tree.null
-	x := tree.root
+	x := tree.node
 	for x != tree.null {
 		p = x
 		if key < x.key {
@@ -74,7 +72,7 @@ func (tree *Tree[Ord, T]) Put(key Ord, val T) {
 		right: tree.null,
 	}
 	if p == tree.null {
-		tree.root = in
+		tree.node = in
 	} else if in.key < p.key {
 		p.left = in
 	} else {
@@ -123,7 +121,7 @@ func (tree *Tree[Ord, T]) fixInsert(n *node[Ord, T]) {
 			}
 		}
 	}
-	tree.root.color = black
+	tree.node.color = black
 }
 
 func (tree *Tree[Ord, T]) rightRotate(n *node[Ord, T]) {
@@ -151,7 +149,7 @@ func (tree *Tree[Ord, T]) leftRotate(n *node[Ord, T]) {
 func (tree *Tree[Ord, T]) transplant(a, b *node[Ord, T]) {
 	b.p = a.p
 	if b.p == tree.null {
-		tree.root = b
+		tree.node = b
 	} else if a == a.p.left {
 		b.p.left = b
 	} else {
@@ -160,7 +158,7 @@ func (tree *Tree[Ord, T]) transplant(a, b *node[Ord, T]) {
 }
 
 func (tree *Tree[Ord, T]) find(key Ord) *node[Ord, T] {
-	cur := tree.root
+	cur := tree.node
 loop:
 	for cur != tree.null {
 		if key < cur.key {
@@ -212,7 +210,7 @@ func (tree *Tree[Ord, T]) Del(key Ord) {
 }
 
 func (tree *Tree[Ord, T]) fixDelete(n *node[Ord, T]) {
-	for n != tree.root && n.color == black {
+	for n != tree.node && n.color == black {
 		if n == n.p.left {
 			sibling := n.p.right
 			if sibling.color == red {
@@ -237,7 +235,7 @@ func (tree *Tree[Ord, T]) fixDelete(n *node[Ord, T]) {
 				n.p.color, sibling.color = sibling.color, n.p.color
 				sibling.right.color = black
 				tree.leftRotate(n.p)
-				n = tree.root
+				n = tree.node
 			}
 		} else {
 			sibling := n.p.left
@@ -263,7 +261,7 @@ func (tree *Tree[Ord, T]) fixDelete(n *node[Ord, T]) {
 				n.p.color, sibling.color = sibling.color, n.p.color
 				sibling.left.color = black
 				tree.rightRotate(n.p)
-				n = tree.root
+				n = tree.node
 			}
 		}
 	}
@@ -295,7 +293,7 @@ func (tree *Tree[Ord, T]) Size() uint {
 }
 
 func (tree *Tree[Ord, T]) Clean() {
-	tree.root = tree.null
+	tree.node = tree.null
 	tree.size = 0
 }
 
@@ -304,7 +302,7 @@ func New[Ord constraints.Ordered, T any]() *Tree[Ord, T] {
 	null.color = black
 	null.p = null
 	return &Tree[Ord, T]{
-		root: null,
+		node: null,
 		null: null,
 	}
 }

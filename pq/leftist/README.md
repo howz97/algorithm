@@ -1,22 +1,14 @@
-左式堆
+Leftist heap
 ```go
-package main
-
-import (
-	"fmt"
-	"github.com/howz97/algorithm/pq/leftist"
-	. "github.com/howz97/algorithm/util"
-)
-
-func main() {
-	b := leftist.New()
-	b.Push(Int(1))
-	b.Push(Int(9))
-	b.Push(Int(9))
-	b.Push(Int(7))
-	b2 := leftist.New()
-	b2.Push(Int(13))
-	b2.Push(Int(11))
+func Example() {
+	b := New[int]()
+	b.Push(1)
+	b.Push(9)
+	b.Push(9)
+	b.Push(7)
+	b2 := New[int]()
+	b2.Push(13)
+	b2.Push(11)
 	b.Merge(b2)
 	for b.Size() > 0 {
 		fmt.Print(b.Pop(), ",")
