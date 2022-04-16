@@ -35,7 +35,7 @@ func LoopTest(t *testing.T, s search.Searcher[util.Int, int]) {
 	BulkDelete(verify, s, 1000)
 	BulkInsert(verify, s, 500)
 	BulkDelete(verify, s, 100)
-	for i := 0; i < 20; i++ {
+	for i := 0; i < 100; i++ {
 		BulkInsert(verify, s, rand.Intn(1000))
 		VerifyResult(t, verify, s)
 		BulkDelete(verify, s, rand.Intn(1000))

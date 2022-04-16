@@ -134,6 +134,7 @@ func (tree *Tree[Ord, T]) fixInsert(n *node[Ord, T]) {
 	tree.node.color = black
 }
 
+// clockwise
 func (tree *Tree[Ord, T]) rightRotate(n *node[Ord, T]) {
 	top := n.left
 	n.left = top.right
@@ -145,6 +146,7 @@ func (tree *Tree[Ord, T]) rightRotate(n *node[Ord, T]) {
 	n.p = top
 }
 
+// counterclockwise
 func (tree *Tree[Ord, T]) leftRotate(n *node[Ord, T]) {
 	top := n.right
 	n.right = top.left
@@ -189,23 +191,23 @@ func (tree *Tree[Ord, T]) Del(key Ord) {
 	}
 	tree.size--
 	del2 := del
-	d2Orig := del2.color
-	var rep *node[Ord, T]
+	d2color := del2.color
+	var replacer *node[Ord, T]
 	if del.left == tree.null {
-		rep = del.right
-		tree.transplant(del, rep)
+		replacer = del.right
+		tree.transplant(del, replacer)
 	} else if del.right == tree.null {
-		rep = del.left
-		tree.transplant(del, rep)
+		replacer = del.left
+		tree.transplant(del, replacer)
 	} else {
 		del2 = tree.getMin(del.right)
-		d2Orig = del2.color
-		rep = del2.right
+		d2color = del2.color
+		replacer = del2.right
 		if del2.p == del {
-			// If rep is tree.null, assign del2 to null.p to ensure following fixDelete works.
-			rep.p = del2
+			// replacer may be tree.null, but fixDelete require replacer.p non-null
+			replacer.p = del2
 		} else {
-			tree.transplant(del2, rep)
+			tree.transplant(del2, replacer)
 			del2.right = del.right
 			del2.right.p = del2
 		}
@@ -214,8 +216,8 @@ func (tree *Tree[Ord, T]) Del(key Ord) {
 		del2.left.p = del2
 		del2.color = del.color
 	}
-	if d2Orig == black {
-		tree.fixDelete(rep)
+	if d2color == black {
+		tree.fixDelete(replacer)
 	}
 }
 
@@ -224,53 +226,49 @@ func (tree *Tree[Ord, T]) fixDelete(n *node[Ord, T]) {
 		if n == n.p.left {
 			sibling := n.p.right
 			if sibling.color == red {
-				sibling.color = black
-				n.p.color = red
-				tree.leftRotate(n.p)
+				// case 1: convert sibling to black (-> case2,3,4)
+				sibling.color, sibling.p.color = black, red
+				tree.leftRotate(sibling.p)
 				sibling = n.p.right
 			}
 			// sibling is black
 			if sibling.left.color == black && sibling.right.color == black {
+				// case 2: swim black of n and sibling to parent
 				sibling.color = red
 				n = n.p
-				// continue
+				// continue loop to fix parent
 			} else {
 				if sibling.right.color == black {
-					sibling.left.color = black
-					sibling.color = red
+					// case 3: -> case4
+					sibling.left.color, sibling.color = black, red
 					tree.rightRotate(sibling)
 					sibling = n.p.right
 				}
-				// sibling.right is red
-				n.p.color, sibling.color = sibling.color, n.p.color
-				sibling.right.color = black
-				tree.leftRotate(n.p)
+				// case 4
+				sibling.right.color, sibling.color, sibling.p.color = black, sibling.p.color, black
+				tree.leftRotate(sibling.p)
 				n = tree.node
+				// break loop
 			}
 		} else {
+			// symmetrical to above
 			sibling := n.p.left
 			if sibling.color == red {
-				sibling.color = black
-				n.p.color = red
+				sibling.color, sibling.p.color = black, red
 				tree.rightRotate(n.p)
 				sibling = n.p.left
 			}
-			// sibling is black
 			if sibling.left.color == black && sibling.right.color == black {
 				sibling.color = red
 				n = n.p
-				// continue
 			} else {
 				if sibling.left.color == black {
-					sibling.right.color = black
-					sibling.color = red
+					sibling.right.color, sibling.color = black, red
 					tree.leftRotate(sibling)
 					sibling = n.p.left
 				}
-				// sibling.right is red
-				n.p.color, sibling.color = sibling.color, n.p.color
-				sibling.left.color = black
-				tree.rightRotate(n.p)
+				sibling.left.color, sibling.color, sibling.p.color = black, sibling.p.color, black
+				tree.rightRotate(sibling.p)
 				n = tree.node
 			}
 		}
