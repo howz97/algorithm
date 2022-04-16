@@ -200,9 +200,8 @@ func (n *node[Ord, T]) del(k Ord) (*node[Ord, T], bool) {
 		}
 		exist = true
 		replacer := n.right.getMin()
-		n.right, _ = n.right.del(replacer.key)
+		replacer.right, _ = n.right.del(replacer.key)
 		replacer.left = n.left
-		replacer.right = n.right
 		n = replacer
 	}
 	n.updateHeight()
