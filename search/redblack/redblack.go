@@ -89,44 +89,39 @@ func (tree *Tree[Ord, T]) fixInsert(n *node[Ord, T]) {
 	// only 2 possible problem:
 	// 1. root is red
 	// 2. both n and it's parent is red
-
 	// let us solve them and keep the other properties of RedBlack tree
 	for n.p.color == red {
 		if n.p == n.p.p.left {
 			uncle := n.p.p.right
 			if uncle.color == red {
 				// case 1: swim red-attribute of parent and uncle to grandparent.
-				n.p.color, uncle.color = black, black
+				n.p.color, uncle.color, n.p.p.color = black, black, red
 				n = n.p.p
-				n.color = red
-				// continue to fix grandparent
+				// continue loop to fix grandparent
 			} else {
 				// uncle is black
 				if n == n.p.right {
-					// case 2
+					// case 2: -> case3
 					n = n.p
 					tree.leftRotate(n)
 				}
 				// case 3
-				// n is the left son of n.p
-				n.p.color = black
-				n.p.p.color = red
+				n.p.color, n.p.p.color = black, red
 				tree.rightRotate(n.p.p)
+				// break loop
 			}
 		} else {
 			// symmetrical to above
 			uncle := n.p.p.left
 			if uncle.color == red {
-				n.p.color, uncle.color = black, black
+				n.p.color, uncle.color, n.p.p.color = black, black, red
 				n = n.p.p
-				n.color = red
 			} else {
 				if n == n.p.left {
 					n = n.p
 					tree.rightRotate(n)
 				}
-				n.p.color = black
-				n.p.p.color = red
+				n.p.color, n.p.p.color = black, red
 				tree.leftRotate(n.p.p)
 			}
 		}
