@@ -321,9 +321,6 @@ func (dg *Digraph) ReachableSlice(src int) []int {
 
 // ReachableBits get a bit-map contains all reachable vertices from src
 func (dg *Digraph) ReachableBits(src int) []bool {
-	if !dg.HasVert(src) {
-		return nil
-	}
 	marked := make([]bool, dg.NumVert())
 	dg.iterateUnMarkVetDFS(src, marked, func(_ int) bool { return true })
 	return marked
@@ -526,9 +523,6 @@ func (tc Reachable) CanReach(src, dst int) bool {
 
 // Iterate all reachable vertices from src
 func (tc Reachable) Iterate(src int, fn func(v int) bool) {
-	if !tc.hasVertical(src) {
-		return
-	}
 	for w, marked := range tc[src] {
 		if marked {
 			if !fn(w) {
