@@ -112,7 +112,7 @@ func makeSymbolTable(compiled []rune) []symbol {
 	return symbols
 }
 
-// compile high-level grammar into low-level grammar fixme: detect invalid pattern
+// compile high-level grammar into low-level grammar
 func compile(pattern []rune) ([]rune, error) {
 	compiled := make([]rune, 0, len(pattern)<<1)
 	left := 0
