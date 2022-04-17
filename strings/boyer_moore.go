@@ -2,13 +2,12 @@ package strings
 
 type BoyerMoore struct {
 	pattern string
-	right   []int
+	right   [byteNum]int
 }
 
 func NewBoyerMoore(pattern string) *BoyerMoore {
 	bm := &BoyerMoore{
 		pattern: pattern,
-		right:   make([]int, byteNum),
 	}
 	for i := 0; i < len(pattern); i++ {
 		bm.right[pattern[i]] = i
