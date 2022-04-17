@@ -7,13 +7,11 @@ const (
 type KMP struct {
 	stateCnt int
 	// deterministic finite automaton
-	dfa [][]int
+	dfa [byteNum][]int
 }
 
 func NewKMP(pattern string) *KMP {
-	kmp := &KMP{
-		dfa: make([][]int, byteNum),
-	}
+	kmp := &KMP{}
 	kmp.stateCnt = len(pattern)
 	for i := range kmp.dfa {
 		kmp.dfa[i] = make([]int, kmp.stateCnt)
