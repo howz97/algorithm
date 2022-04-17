@@ -1,6 +1,6 @@
 package strings
 
-const primeRK = 16777619
+const primeRK = 16777619 // must greater than 256
 
 func IndexRabinKarp(s, substr string) int {
 	if len(s) == 0 || len(substr) == 0 || len(s) < len(substr) {
