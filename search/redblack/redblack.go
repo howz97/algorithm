@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/howz97/algorithm/search"
-	. "github.com/howz97/algorithm/search"
 	"golang.org/x/exp/constraints"
 )
 
@@ -20,11 +19,11 @@ type Node[Ord constraints.Ordered, T any] struct {
 	p, left, right *Node[Ord, T]
 }
 
-func (n *Node[Ord, T]) Left() ITraversal {
+func (n *Node[Ord, T]) Left() search.ITraversal {
 	return n.left
 }
 
-func (n *Node[Ord, T]) Right() ITraversal {
+func (n *Node[Ord, T]) Right() search.ITraversal {
 	return n.right
 }
 
@@ -301,31 +300,31 @@ func (tree *Tree[Ord, T]) Print() {
 }
 
 func (tree *Tree[Ord, T]) PreOrder(fn func(*Node[Ord, T]) bool) {
-	search.PreOrder(tree.root, func(trv ITraversal) bool {
+	search.PreOrder(tree.root, func(trv search.ITraversal) bool {
 		return fn(trv.(*Node[Ord, T]))
 	})
 }
 
 func (tree *Tree[Ord, T]) InOrder(fn func(*Node[Ord, T]) bool) {
-	search.InOrder(tree.root, func(trv ITraversal) bool {
+	search.InOrder(tree.root, func(trv search.ITraversal) bool {
 		return fn(trv.(*Node[Ord, T]))
 	})
 }
 
 func (tree *Tree[Ord, T]) SufOrder(fn func(*Node[Ord, T]) bool) {
-	search.SufOrder(tree.root, func(trv ITraversal) bool {
+	search.SufOrder(tree.root, func(trv search.ITraversal) bool {
 		return fn(trv.(*Node[Ord, T]))
 	})
 }
 
 func (tree *Tree[Ord, T]) LevelOrder(fn func(*Node[Ord, T]) bool) {
-	search.LevelOrder(tree.root, func(trv ITraversal) bool {
+	search.LevelOrder(tree.root, func(trv search.ITraversal) bool {
 		return fn(trv.(*Node[Ord, T]))
 	})
 }
 
 func (tree *Tree[Ord, T]) ReverseOrder(fn func(*Node[Ord, T]) bool) {
-	search.ReverseOrder(tree.root, func(trv ITraversal) bool {
+	search.ReverseOrder(tree.root, func(trv search.ITraversal) bool {
 		return fn(trv.(*Node[Ord, T]))
 	})
 }

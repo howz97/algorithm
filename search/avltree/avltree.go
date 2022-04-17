@@ -10,7 +10,7 @@ import (
 
 // AVL is a strictly balanced binary search tree
 type AVL[Ord constraints.Ordered, T any] struct {
-	*node[Ord, T]
+	root *Node[Ord, T]
 	size uint
 }
 
@@ -20,14 +20,14 @@ func New[Ord constraints.Ordered, T any]() *AVL[Ord, T] {
 
 func (avl *AVL[Ord, T]) Put(key Ord, val T) {
 	exist := false
-	avl.node, exist = avl.put(key, val)
+	avl.root, exist = avl.root.put(key, val)
 	if !exist {
 		avl.size++
 	}
 }
 
 func (avl *AVL[Ord, T]) Get(key Ord) (T, bool) {
-	n := avl.get(key)
+	n := avl.root.get(key)
 	if n == nil {
 		var v T
 		return v, false
@@ -36,16 +36,16 @@ func (avl *AVL[Ord, T]) Get(key Ord) (T, bool) {
 }
 
 func (avl *AVL[Ord, T]) GetMin() T {
-	return avl.getMin().value
+	return avl.root.getMin().value
 }
 
 func (avl *AVL[Ord, T]) GetMax() T {
-	return avl.getMax().value
+	return avl.root.getMax().value
 }
 
 func (avl *AVL[Ord, T]) Del(key Ord) {
 	exist := false
-	avl.node, exist = avl.del(key)
+	avl.root, exist = avl.root.del(key)
 	if exist {
 		avl.size--
 	}
@@ -55,22 +55,51 @@ func (avl *AVL[Ord, T]) Size() uint {
 	return avl.size
 }
 
-func (avl *AVL[Ord, T]) Clean() {
-	avl.node = nil
-	avl.size = 0
+func (avl *AVL[Ord, T]) Print() {
+	search.PrintBinaryTree(avl.root)
 }
 
-type node[Ord constraints.Ordered, T any] struct {
+func (avl *AVL[Ord, T]) PreOrder(fn func(*Node[Ord, T]) bool) {
+	search.PreOrder(avl.root, func(trv search.ITraversal) bool {
+		return fn(trv.(*Node[Ord, T]))
+	})
+}
+
+func (avl *AVL[Ord, T]) InOrder(fn func(*Node[Ord, T]) bool) {
+	search.InOrder(avl.root, func(trv search.ITraversal) bool {
+		return fn(trv.(*Node[Ord, T]))
+	})
+}
+
+func (avl *AVL[Ord, T]) SufOrder(fn func(*Node[Ord, T]) bool) {
+	search.SufOrder(avl.root, func(trv search.ITraversal) bool {
+		return fn(trv.(*Node[Ord, T]))
+	})
+}
+
+func (avl *AVL[Ord, T]) LevelOrder(fn func(*Node[Ord, T]) bool) {
+	search.LevelOrder(avl.root, func(trv search.ITraversal) bool {
+		return fn(trv.(*Node[Ord, T]))
+	})
+}
+
+func (avl *AVL[Ord, T]) ReverseOrder(fn func(*Node[Ord, T]) bool) {
+	search.ReverseOrder(avl.root, func(trv search.ITraversal) bool {
+		return fn(trv.(*Node[Ord, T]))
+	})
+}
+
+type Node[Ord constraints.Ordered, T any] struct {
 	key   Ord
 	value T
 	h     int8
-	left  *node[Ord, T]
-	right *node[Ord, T]
+	left  *Node[Ord, T]
+	right *Node[Ord, T]
 }
 
-func (n *node[Ord, T]) put(k Ord, v T) (*node[Ord, T], bool) {
+func (n *Node[Ord, T]) put(k Ord, v T) (*Node[Ord, T], bool) {
 	if n == nil {
-		n = new(node[Ord, T])
+		n = new(Node[Ord, T])
 		n.key = k
 		n.value = v
 		return n, false
@@ -95,15 +124,15 @@ func (n *node[Ord, T]) put(k Ord, v T) (*node[Ord, T], bool) {
 	return n, exist
 }
 
-func (n *node[Ord, T]) diff() int8 {
+func (n *Node[Ord, T]) diff() int8 {
 	return n.left.height() - n.right.height()
 }
 
-func (n *node[Ord, T]) updateHeight() {
+func (n *Node[Ord, T]) updateHeight() {
 	n.h = util.Max(n.left.height(), n.right.height()) + 1
 }
 
-func rotation[Ord constraints.Ordered, T any](r *node[Ord, T]) *node[Ord, T] {
+func rotation[Ord constraints.Ordered, T any](r *Node[Ord, T]) *Node[Ord, T] {
 	diff := r.diff()
 	switch true {
 	case diff == 2:
@@ -124,7 +153,7 @@ func rotation[Ord constraints.Ordered, T any](r *node[Ord, T]) *node[Ord, T] {
 	return r
 }
 
-func leftRotation[Ord constraints.Ordered, T any](n *node[Ord, T]) *node[Ord, T] {
+func leftRotation[Ord constraints.Ordered, T any](n *Node[Ord, T]) *Node[Ord, T] {
 	replacer := n.left
 	n.left = replacer.right
 	replacer.right = n
@@ -133,7 +162,7 @@ func leftRotation[Ord constraints.Ordered, T any](n *node[Ord, T]) *node[Ord, T]
 	return replacer
 }
 
-func rightRotation[Ord constraints.Ordered, T any](n *node[Ord, T]) *node[Ord, T] {
+func rightRotation[Ord constraints.Ordered, T any](n *Node[Ord, T]) *Node[Ord, T] {
 	replacer := n.right
 	n.right = replacer.left
 	replacer.left = n
@@ -142,14 +171,14 @@ func rightRotation[Ord constraints.Ordered, T any](n *node[Ord, T]) *node[Ord, T
 	return replacer
 }
 
-func (n *node[Ord, T]) height() int8 {
+func (n *Node[Ord, T]) height() int8 {
 	if n == nil {
 		return -1
 	}
 	return n.h
 }
 
-func (n *node[Ord, T]) get(k Ord) *node[Ord, T] {
+func (n *Node[Ord, T]) get(k Ord) *Node[Ord, T] {
 	if n == nil {
 		return nil
 	}
@@ -162,7 +191,7 @@ func (n *node[Ord, T]) get(k Ord) *node[Ord, T] {
 	}
 }
 
-func (n *node[Ord, T]) getMin() *node[Ord, T] {
+func (n *Node[Ord, T]) getMin() *Node[Ord, T] {
 	if n == nil {
 		return nil
 	}
@@ -172,7 +201,7 @@ func (n *node[Ord, T]) getMin() *node[Ord, T] {
 	return n
 }
 
-func (n *node[Ord, T]) getMax() *node[Ord, T] {
+func (n *Node[Ord, T]) getMax() *Node[Ord, T] {
 	if n == nil {
 		return nil
 	}
@@ -182,7 +211,7 @@ func (n *node[Ord, T]) getMax() *node[Ord, T] {
 	return n
 }
 
-func (n *node[Ord, T]) del(k Ord) (*node[Ord, T], bool) {
+func (n *Node[Ord, T]) del(k Ord) (*Node[Ord, T], bool) {
 	if n == nil {
 		return nil, false
 	}
@@ -211,27 +240,27 @@ func (n *node[Ord, T]) del(k Ord) (*node[Ord, T], bool) {
 	return n, exist
 }
 
-func (n *node[Ord, T]) Left() search.ITraversal {
+func (n *Node[Ord, T]) Left() search.ITraversal {
 	return n.left
 }
 
-func (n *node[Ord, T]) Right() search.ITraversal {
+func (n *Node[Ord, T]) Right() search.ITraversal {
 	return n.right
 }
 
-func (n *node[Ord, T]) IsNil() bool {
+func (n *Node[Ord, T]) IsNil() bool {
 	return n == nil
 }
 
-func (n *node[Ord, T]) Key() Ord {
+func (n *Node[Ord, T]) Key() Ord {
 	return n.key
 }
 
-func (n *node[Ord, T]) String() string {
+func (n *Node[Ord, T]) String() string {
 	return fmt.Sprint(n.value)
 }
 
-func (n *node[Ord, T]) isBalance() bool {
+func (n *Node[Ord, T]) isBalance() bool {
 	diff := n.diff()
 	return diff > -2 && diff < 2
 }

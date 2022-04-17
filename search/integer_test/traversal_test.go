@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/search/avltree"
 )
 
@@ -14,10 +13,10 @@ func TestTraversal(t *testing.T) {
 	for i, v := range data {
 		avl.Put(i, v)
 	}
-	search.PrintBinaryTree(avl)
+	avl.Print()
 
 	str := ""
-	search.ReverseOrder(avl, func(t search.ITraversal) bool {
+	avl.ReverseOrder(func(t *avltree.Node[int, string]) bool {
 		str += fmt.Sprint(t.String())
 		return true
 	})
@@ -26,7 +25,7 @@ func TestTraversal(t *testing.T) {
 	}
 
 	str = ""
-	search.InOrder(avl, func(t search.ITraversal) bool {
+	avl.InOrder(func(t *avltree.Node[int, string]) bool {
 		str += fmt.Sprint(t.String())
 		return true
 	})
@@ -35,7 +34,7 @@ func TestTraversal(t *testing.T) {
 	}
 
 	str = ""
-	search.PreOrder(avl, func(t search.ITraversal) bool {
+	avl.PreOrder(func(t *avltree.Node[int, string]) bool {
 		str += fmt.Sprint(t.String())
 		return true
 	})
@@ -44,7 +43,7 @@ func TestTraversal(t *testing.T) {
 	}
 
 	str = ""
-	search.SufOrder(avl, func(t search.ITraversal) bool {
+	avl.SufOrder(func(t *avltree.Node[int, string]) bool {
 		str += fmt.Sprint(t.String())
 		return true
 	})
@@ -53,7 +52,7 @@ func TestTraversal(t *testing.T) {
 	}
 
 	str = ""
-	search.LevelOrder(avl, func(t search.ITraversal) bool {
+	avl.LevelOrder(func(t *avltree.Node[int, string]) bool {
 		str += fmt.Sprint(t.String())
 		return true
 	})
