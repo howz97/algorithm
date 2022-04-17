@@ -4,19 +4,19 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/howz97/algorithm/search/avltree"
+	"github.com/howz97/algorithm/search/avlst"
 )
 
 func TestTraversal(t *testing.T) {
 	data := []string{"26", "-", "5", "*", "3", "+", "2"}
-	avl := avltree.New[int, string]()
+	avl := avlst.New[int, string]()
 	for i, v := range data {
 		avl.Put(i, v)
 	}
 	avl.Print()
 
 	str := ""
-	avl.ReverseOrder(func(t *avltree.Node[int, string]) bool {
+	avl.ReverseOrder(func(t *avlst.Node[int, string]) bool {
 		str += fmt.Sprint(t.String())
 		return true
 	})
@@ -25,7 +25,7 @@ func TestTraversal(t *testing.T) {
 	}
 
 	str = ""
-	avl.InOrder(func(t *avltree.Node[int, string]) bool {
+	avl.InOrder(func(t *avlst.Node[int, string]) bool {
 		str += fmt.Sprint(t.String())
 		return true
 	})
@@ -34,7 +34,7 @@ func TestTraversal(t *testing.T) {
 	}
 
 	str = ""
-	avl.PreOrder(func(t *avltree.Node[int, string]) bool {
+	avl.PreOrder(func(t *avlst.Node[int, string]) bool {
 		str += fmt.Sprint(t.String())
 		return true
 	})
@@ -43,7 +43,7 @@ func TestTraversal(t *testing.T) {
 	}
 
 	str = ""
-	avl.SufOrder(func(t *avltree.Node[int, string]) bool {
+	avl.SufOrder(func(t *avlst.Node[int, string]) bool {
 		str += fmt.Sprint(t.String())
 		return true
 	})
@@ -52,7 +52,7 @@ func TestTraversal(t *testing.T) {
 	}
 
 	str = ""
-	avl.LevelOrder(func(t *avltree.Node[int, string]) bool {
+	avl.LevelOrder(func(t *avlst.Node[int, string]) bool {
 		str += fmt.Sprint(t.String())
 		return true
 	})

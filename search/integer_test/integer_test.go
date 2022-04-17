@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/howz97/algorithm/search"
-	"github.com/howz97/algorithm/search/avltree"
+	"github.com/howz97/algorithm/search/avlst"
 	"github.com/howz97/algorithm/search/binarytree"
 	"github.com/howz97/algorithm/search/hashmap"
 	"github.com/howz97/algorithm/search/redblack"
@@ -13,7 +13,7 @@ import (
 )
 
 func TestAVL(t *testing.T) {
-	LoopTest(t, avltree.New[util.Int, int]())
+	LoopTest(t, avlst.New[util.Int, int]())
 }
 
 func TestBinaryTree(t *testing.T) {
@@ -91,7 +91,7 @@ func TestBenchmark_Put_OrderKeys(t *testing.T) {
 	})
 	t.Logf("hashmap.Put cost %v", elapsed)
 
-	avl := avltree.New[util.Int, int]()
+	avl := avlst.New[util.Int, int]()
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
 			avl.Put(util.Int(i), i)
@@ -151,7 +151,7 @@ func TestBenchmark_RandKeys(t *testing.T) {
 	})
 	t.Logf("hashmap.Del cost %v", elapsed)
 
-	avl := avltree.New[int, int]()
+	avl := avlst.New[int, int]()
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
 			avl.Put(rand.Intn(benchmark), i)

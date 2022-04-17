@@ -1,4 +1,4 @@
-package avltree
+package avlst
 
 import (
 	"fmt"

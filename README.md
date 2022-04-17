@@ -16,7 +16,7 @@ Algorithm (4th, Sedgewick) implemented in golang
   * Shellsort
 ## Searching
   * [Binary Search Tree](https://github.com/howz97/algorithm/tree/master/search/binarytree)
-  * [AVL Tree](https://github.com/howz97/algorithm/tree/master/search/avltree)
+  * [AVL Tree](https://github.com/howz97/algorithm/tree/master/search/avlst)
   * [Red-Black Tree](https://github.com/howz97/algorithm/tree/master/search/redblack)
   * [Hash Table](https://github.com/howz97/algorithm/tree/master/search/hashmap)
 ## [Graphs](https://github.com/howz97/algorithm/tree/master/graphs)

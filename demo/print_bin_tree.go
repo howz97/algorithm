@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/howz97/algorithm/search"
-	"github.com/howz97/algorithm/search/avltree"
+	"github.com/howz97/algorithm/search/avlst"
 )
 
 var pairs = []string{
@@ -18,7 +18,7 @@ var pairs = []string{
 }
 
 func main() {
-	tree := avltree.New[float64, string]()
+	tree := avlst.New[float64, string]()
 	for k, v := range pairs {
 		tree.Put(float64(k)/100, v)
 	}

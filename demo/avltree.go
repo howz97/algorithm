@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/howz97/algorithm/search"
-	"github.com/howz97/algorithm/search/avltree"
+	"github.com/howz97/algorithm/search/avlst"
 )
 
 func main() {
-	avl := avltree.New[int, int]()
+	avl := avlst.New[int, int]()
 	for i := 0; i < 20; i++ {
 		avl.Put(i, i)
 	}
