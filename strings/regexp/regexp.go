@@ -66,10 +66,7 @@ func (re *Regexp) startStatus() set.Set[int] {
 
 func (re *Regexp) forwardStatus(curStatus set.Set[int], r rune) set.Set[int] {
 	arrived := set.New[int]()
-	for {
-		if curStatus.Len() == 0 {
-			break
-		}
+	for curStatus.Len() > 0 {
 		s := curStatus.TakeOne()
 		if re.table[s].match(r) {
 			arrived.Add(s + 1)
@@ -78,13 +75,10 @@ func (re *Regexp) forwardStatus(curStatus set.Set[int], r rune) set.Set[int] {
 	return arrived
 }
 
-func (re *Regexp) updateCurStatus(src set.Set[int]) set.Set[int] {
+func (re *Regexp) updateCurStatus(sources set.Set[int]) set.Set[int] {
 	reachable := set.New[int]()
-	for {
-		if src.Len() == 0 {
-			break
-		}
-		vSrc := src.TakeOne()
+	for sources.Len() > 0 {
+		vSrc := sources.TakeOne()
 		re.tc.Iterate(vSrc, func(v int) bool {
 			reachable.Add(v)
 			return true
@@ -261,6 +255,8 @@ func makeNFA(table []symbol) *graphs.Digraph {
 				nfa.AddEdge(i, i+1)
 			case '|':
 				stk.Push(i)
+			default:
+				panic(fmt.Sprintf("unknown prime %v", syb.r))
 			}
 		}
 		if i+1 < size && table[i+1].isClosure() {
