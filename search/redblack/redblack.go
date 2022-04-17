@@ -3,6 +3,7 @@ package redblack
 import (
 	"fmt"
 
+	"github.com/howz97/algorithm/search"
 	. "github.com/howz97/algorithm/search"
 	"golang.org/x/exp/constraints"
 )
@@ -12,26 +13,26 @@ const (
 	black = false
 )
 
-type node[Ord constraints.Ordered, T any] struct {
+type Node[Ord constraints.Ordered, T any] struct {
 	key            Ord
 	value          T
 	color          bool
-	p, left, right *node[Ord, T]
+	p, left, right *Node[Ord, T]
 }
 
-func (n *node[Ord, T]) Left() ITraversal {
+func (n *Node[Ord, T]) Left() ITraversal {
 	return n.left
 }
 
-func (n *node[Ord, T]) Right() ITraversal {
+func (n *Node[Ord, T]) Right() ITraversal {
 	return n.right
 }
 
-func (n *node[Ord, T]) IsNil() bool {
+func (n *Node[Ord, T]) IsNil() bool {
 	return n.left == nil && n.right == nil
 }
 
-func (n *node[Ord, T]) String() string {
+func (n *Node[Ord, T]) String() string {
 	if n.IsNil() {
 		return "Nil"
 	}
@@ -43,14 +44,14 @@ func (n *node[Ord, T]) String() string {
 }
 
 type Tree[Ord constraints.Ordered, T any] struct {
-	*node[Ord, T]
-	null *node[Ord, T]
+	root *Node[Ord, T]
+	null *Node[Ord, T]
 	size uint
 }
 
 func (tree *Tree[Ord, T]) Put(key Ord, val T) {
 	p := tree.null
-	x := tree.node
+	x := tree.root
 	for x != tree.null {
 		p = x
 		if key < x.key {
@@ -65,7 +66,7 @@ func (tree *Tree[Ord, T]) Put(key Ord, val T) {
 	}
 	// p is parent of in.
 	tree.size++
-	in := &node[Ord, T]{
+	in := &Node[Ord, T]{
 		key:   key,
 		value: val,
 		color: red,
@@ -75,7 +76,7 @@ func (tree *Tree[Ord, T]) Put(key Ord, val T) {
 	}
 	if p == tree.null {
 		// Inset root node into an empty tree
-		tree.node = in
+		tree.root = in
 		// fixInsert only need to set the root to black
 	} else if in.key < p.key {
 		p.left = in
@@ -85,7 +86,7 @@ func (tree *Tree[Ord, T]) Put(key Ord, val T) {
 	tree.fixInsert(in)
 }
 
-func (tree *Tree[Ord, T]) fixInsert(n *node[Ord, T]) {
+func (tree *Tree[Ord, T]) fixInsert(n *Node[Ord, T]) {
 	// only 2 possible problem:
 	// 1. root is red
 	// 2. both n and it's parent is red
@@ -126,11 +127,11 @@ func (tree *Tree[Ord, T]) fixInsert(n *node[Ord, T]) {
 			}
 		}
 	}
-	tree.node.color = black
+	tree.root.color = black
 }
 
 // clockwise
-func (tree *Tree[Ord, T]) rightRotate(n *node[Ord, T]) {
+func (tree *Tree[Ord, T]) rightRotate(n *Node[Ord, T]) {
 	top := n.left
 	n.left = top.right
 	if n.left != tree.null {
@@ -142,7 +143,7 @@ func (tree *Tree[Ord, T]) rightRotate(n *node[Ord, T]) {
 }
 
 // counterclockwise
-func (tree *Tree[Ord, T]) leftRotate(n *node[Ord, T]) {
+func (tree *Tree[Ord, T]) leftRotate(n *Node[Ord, T]) {
 	top := n.right
 	n.right = top.left
 	if n.right != tree.null {
@@ -153,10 +154,10 @@ func (tree *Tree[Ord, T]) leftRotate(n *node[Ord, T]) {
 	n.p = top
 }
 
-func (tree *Tree[Ord, T]) transplant(a, b *node[Ord, T]) {
+func (tree *Tree[Ord, T]) transplant(a, b *Node[Ord, T]) {
 	b.p = a.p
 	if b.p == tree.null {
-		tree.node = b
+		tree.root = b
 	} else if a == a.p.left {
 		b.p.left = b
 	} else {
@@ -164,8 +165,8 @@ func (tree *Tree[Ord, T]) transplant(a, b *node[Ord, T]) {
 	}
 }
 
-func (tree *Tree[Ord, T]) find(key Ord) *node[Ord, T] {
-	cur := tree.node
+func (tree *Tree[Ord, T]) find(key Ord) *Node[Ord, T] {
+	cur := tree.root
 loop:
 	for cur != tree.null {
 		if key < cur.key {
@@ -187,7 +188,7 @@ func (tree *Tree[Ord, T]) Del(key Ord) {
 	tree.size--
 	del2 := del
 	d2color := del2.color
-	var replacer *node[Ord, T]
+	var replacer *Node[Ord, T]
 	if del.left == tree.null {
 		replacer = del.right
 		tree.transplant(del, replacer)
@@ -216,8 +217,8 @@ func (tree *Tree[Ord, T]) Del(key Ord) {
 	}
 }
 
-func (tree *Tree[Ord, T]) fixDelete(n *node[Ord, T]) {
-	for n != tree.node && n.color == black {
+func (tree *Tree[Ord, T]) fixDelete(n *Node[Ord, T]) {
+	for n != tree.root && n.color == black {
 		if n == n.p.left {
 			sibling := n.p.right
 			if sibling.color == red {
@@ -242,7 +243,7 @@ func (tree *Tree[Ord, T]) fixDelete(n *node[Ord, T]) {
 				// case 4
 				sibling.right.color, sibling.color, sibling.p.color = black, sibling.p.color, black
 				tree.leftRotate(sibling.p)
-				n = tree.node
+				n = tree.root
 				// break loop
 			}
 		} else {
@@ -264,14 +265,14 @@ func (tree *Tree[Ord, T]) fixDelete(n *node[Ord, T]) {
 				}
 				sibling.left.color, sibling.color, sibling.p.color = black, sibling.p.color, black
 				tree.rightRotate(sibling.p)
-				n = tree.node
+				n = tree.root
 			}
 		}
 	}
 	n.color = black
 }
 
-func (tree *Tree[Ord, T]) getMin(n *node[Ord, T]) (min *node[Ord, T]) {
+func (tree *Tree[Ord, T]) getMin(n *Node[Ord, T]) (min *Node[Ord, T]) {
 	if n.IsNil() {
 		return n
 	}
@@ -295,17 +296,46 @@ func (tree *Tree[Ord, T]) Size() uint {
 	return tree.size
 }
 
-func (tree *Tree[Ord, T]) Clean() {
-	tree.node = tree.null
-	tree.size = 0
+func (tree *Tree[Ord, T]) Print() {
+	search.PrintBinaryTree(tree.root)
+}
+
+func (tree *Tree[Ord, T]) PreOrder(fn func(*Node[Ord, T]) bool) {
+	search.PreOrder(tree.root, func(trv ITraversal) bool {
+		return fn(trv.(*Node[Ord, T]))
+	})
+}
+
+func (tree *Tree[Ord, T]) InOrder(fn func(*Node[Ord, T]) bool) {
+	search.InOrder(tree.root, func(trv ITraversal) bool {
+		return fn(trv.(*Node[Ord, T]))
+	})
+}
+
+func (tree *Tree[Ord, T]) SufOrder(fn func(*Node[Ord, T]) bool) {
+	search.SufOrder(tree.root, func(trv ITraversal) bool {
+		return fn(trv.(*Node[Ord, T]))
+	})
+}
+
+func (tree *Tree[Ord, T]) LevelOrder(fn func(*Node[Ord, T]) bool) {
+	search.LevelOrder(tree.root, func(trv ITraversal) bool {
+		return fn(trv.(*Node[Ord, T]))
+	})
+}
+
+func (tree *Tree[Ord, T]) ReverseOrder(fn func(*Node[Ord, T]) bool) {
+	search.ReverseOrder(tree.root, func(trv ITraversal) bool {
+		return fn(trv.(*Node[Ord, T]))
+	})
 }
 
 func New[Ord constraints.Ordered, T any]() *Tree[Ord, T] {
-	null := new(node[Ord, T])
+	null := new(Node[Ord, T])
 	null.color = black
 	null.p = null
 	return &Tree[Ord, T]{
-		node: null,
+		root: null,
 		null: null,
 	}
 }

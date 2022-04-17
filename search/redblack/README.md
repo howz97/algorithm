@@ -7,22 +7,20 @@ func Example() {
 	}
 	v, ok := rb.Get(5)
 	fmt.Printf("Size=%d Get(5)=(%v,%v)\n", rb.Size(), v, ok)
-	search.PrintBinaryTree(rb)
+	rb.Print()
 
 	for i := 0; i < 10; i++ {
 		rb.Del(i)
 	}
 	v, ok = rb.Get(5)
 	fmt.Printf("Size=%d Get(5)=(%v,%v)\n", rb.Size(), v, ok)
-	search.PrintBinaryTree(rb)
-
+	rb.Print()
 	fmt.Println("traversal in order:")
-	search.InOrder(rb, func(t search.ITraversal) bool {
-		fmt.Printf("%v,", t.String())
+	rb.InOrder(func(n *Node[int, int]) bool {
+		fmt.Printf("%v,", n.String())
 		return true
 	})
 
-	// Output:
 	// Size=20 Get(5)=(5,true)
 	//               (7)
 	//               / \
