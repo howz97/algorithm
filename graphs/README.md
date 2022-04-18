@@ -21,7 +21,7 @@ func ExampleDigraph_FindCycle() {
 }
 ```
 Topological sort
-![](.\testdata/no_cycle.jpg)
+![figure1](.\testdata/no_cycle.jpg)
 ```go
 func ExampleDigraph_Topological() {
 	dg, err := LoadDigraph(`.\testdata\no_cycle.yml`)
@@ -35,6 +35,97 @@ func ExampleDigraph_Topological() {
 	// Output: 5->1->3->6->4->7->0->2->
 }
 ```
+
+Bipartite
+```go
+func ExampleDigraph_IsBipartite() {
+	dg, err := LoadDigraph(`.\testdata\no_cycle.yml`)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(dg.IsBipartite())
+
+	// Output: false
+}
+```
+
+Reachable
+```go
+func ExampleReachable() {
+	dg, err := LoadDigraph(`.\testdata\no_cycle.yml`)
+	if err != nil {
+		panic(err)
+	}
+	reach := dg.Reachable()
+	fmt.Println(reach.CanReach(5, 2))
+	fmt.Println(reach.CanReach(2, 5))
+
+	// Output:
+	// true
+	// false
+}
+```
+
+BFS
+```go
+func ExampleBFS() {
+	dg, err := LoadDigraph(`.\testdata\no_cycle.yml`)
+	if err != nil {
+		panic(err)
+	}
+	bfs := dg.BFS(1)
+	fmt.Println(bfs.CanReach(5))
+	fmt.Println(bfs.ShortestPathTo(2).Str(nil))
+
+	// Output:
+	// false
+	// (distance=6): 1->3, 3->6, 6->2,
+}
+```
+
+Strongly connected components
+```go
+func ExampleSCC() {
+	g := NewDigraph(13)
+	g.AddEdge(0, 1)
+	g.AddEdge(0, 5)
+	g.AddEdge(5, 4)
+	g.AddEdge(4, 3)
+	g.AddEdge(4, 2)
+	g.AddEdge(3, 2)
+	g.AddEdge(2, 3)
+	g.AddEdge(2, 0)
+	g.AddEdge(6, 0)
+	g.AddEdge(6, 4)
+	g.AddEdge(6, 9)
+	g.AddEdge(9, 10)
+	g.AddEdge(10, 12)
+	g.AddEdge(12, 9)
+	g.AddEdge(9, 11)
+	g.AddEdge(11, 12)
+	g.AddEdge(11, 4)
+	g.AddEdge(7, 6)
+	g.AddEdge(7, 8)
+	g.AddEdge(8, 7)
+	g.AddEdge(8, 9)
+	scc := g.SCC()
+	fmt.Println("amount of strongly connected component:", scc.NumComponents())
+	var vertices []int
+	scc.IterateComponent(0, func(v int) bool {
+		vertices = append(vertices, v)
+		return true
+	})
+	sort.Shell(vertices)
+	fmt.Println("vertices strongly connected with 0:", vertices)
+	fmt.Println(scc.IsStronglyConn(0, 6))
+
+	// Output:
+	// amount of strongly connected component: 5
+	// vertices strongly connected with 0: [0 2 3 4 5]
+	// false
+}
+```
+
 Minimum spanning tree
 ```go
 func Example() {

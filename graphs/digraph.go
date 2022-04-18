@@ -464,25 +464,16 @@ func (dg Digraph) SCC() *SCC {
 
 // IsStronglyConn check whether src is strongly connected to dst
 func (scc *SCC) IsStronglyConn(src, dst int) bool {
-	if !scc.hasVertical(src) || !scc.hasVertical(dst) {
-		return false
-	}
 	return scc.locate[src] == scc.locate[dst]
 }
 
 // GetCompID get the strongly connected component ID of vertical v
 func (scc *SCC) GetCompID(v int) int {
-	if !scc.hasVertical(v) {
-		return -1
-	}
 	return scc.locate[v]
 }
 
 // IterateComponent iterate all vertices strongly connected to vertical v (include v)
 func (scc *SCC) IterateComponent(v int, fn func(int) bool) {
-	if !scc.hasVertical(v) {
-		return
-	}
 	for _, w := range scc.components[scc.locate[v]] {
 		if !fn(w) {
 			break
@@ -493,10 +484,6 @@ func (scc *SCC) IterateComponent(v int, fn func(int) bool) {
 // NumComponents get the number of components
 func (scc *SCC) NumComponents() int {
 	return len(scc.components)
-}
-
-func (scc *SCC) hasVertical(v int) bool {
-	return v >= 0 && v < len(scc.locate)
 }
 
 type Reachable [][]bool
@@ -512,9 +499,6 @@ func (dg Digraph) Reachable() Reachable {
 
 // CanReach check whether src can reach dst
 func (tc Reachable) CanReach(src, dst int) bool {
-	if !tc.hasVertical(src) || !tc.hasVertical(dst) {
-		return false
-	}
 	return tc[src][dst]
 }
 
@@ -527,10 +511,6 @@ func (tc Reachable) Iterate(src int, fn func(v int) bool) {
 			}
 		}
 	}
-}
-
-func (tc Reachable) hasVertical(v int) bool {
-	return v >= 0 || v < len(tc)
 }
 
 type BFS struct {
