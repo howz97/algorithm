@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	Any = iota
+	Auto = iota
 	Dijkstra
 	Topological
 	BellmanFord
@@ -93,25 +93,16 @@ func newShortestPathTree(g *WDigraph, src int) *PathTree {
 
 // CanReach check whether src can reach dst
 func (spt *PathTree) CanReach(dst int) bool {
-	if !spt.hasVert(dst) {
-		return false
-	}
 	return spt.distTo[dst] != math.Inf(1)
 }
 
 // DistanceTo get the distance from src to dst
 func (spt *PathTree) DistanceTo(dst int) float64 {
-	if !spt.hasVert(dst) {
-		return math.Inf(1)
-	}
 	return spt.distTo[dst]
 }
 
 // PathTo get the path from src to dst
 func (spt *PathTree) PathTo(dst int) *Path {
-	if !spt.hasVert(dst) {
-		return nil
-	}
 	src := spt.edgeTo[dst]
 	if src < 0 {
 		return nil
@@ -127,10 +118,6 @@ func (spt *PathTree) PathTo(dst int) *Path {
 	}
 	path.Reverse()
 	return path
-}
-
-func (spt *PathTree) hasVert(v int) bool {
-	return v >= 0 && v < len(spt.distTo)
 }
 
 func (spt *PathTree) initDijkstra(g *WDigraph) {
@@ -289,21 +276,11 @@ type Searcher struct {
 }
 
 func (s *Searcher) GetDistance(src, dst int) float64 {
-	if !s.HasVertical(src) {
-		return math.Inf(1)
-	}
 	return s.spt[src].DistanceTo(dst)
 }
 
 func (s *Searcher) GetPath(src, dst int) *Path {
-	if !s.HasVertical(src) {
-		return nil
-	}
 	return s.spt[src].PathTo(dst)
-}
-
-func (s *Searcher) HasVertical(v int) bool {
-	return v >= 0 && v < len(s.spt)
 }
 
 func NewPath() *Path {
