@@ -1,4 +1,4 @@
-Detect ring
+Ring detection
 ```go
 func ExampleDigraph_FindCycle() {
 	// (0)-------->(2)
