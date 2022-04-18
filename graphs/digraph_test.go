@@ -146,3 +146,27 @@ func TestRevDFS(t *testing.T) {
 		t.Errorf("rev dfs order %v not equal %v", order, correct)
 	}
 }
+
+func ExampleDigraph_FindCycle() {
+
+}
+
+func ExampleDigraph_Topological() {
+
+}
+
+func ExampleDigraph_IsBipartite() {
+
+}
+
+func ExampleSCC() {
+
+}
+
+func ExampleReachable() {
+
+}
+
+func ExampleBFS() {
+
+}

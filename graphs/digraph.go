@@ -15,22 +15,22 @@ func NewDigraph(size uint) *Digraph {
 	for i := range edges {
 		edges[i] = hashmap.New[Int, float64]()
 	}
-	return &Digraph{Edges: edges}
+	return &Digraph{edges: edges}
 }
 
 type Digraph struct {
-	Edges []*hashmap.Chaining[Int, float64]
+	edges []*hashmap.Chaining[Int, float64]
 	*Symbol
 }
 
 // NumVert get the number of vertices
 func (dg *Digraph) NumVert() uint {
-	return uint(len(dg.Edges))
+	return uint(len(dg.edges))
 }
 
 // HasVert indicate whether dg contains vertical v
 func (dg *Digraph) HasVert(v int) bool {
-	return v >= 0 && v < len(dg.Edges)
+	return v >= 0 && v < len(dg.edges)
 }
 
 // AddEdge add a new edge
@@ -41,8 +41,8 @@ func (dg *Digraph) AddEdge(from, to int) {
 // NumEdge get the number of edges
 func (dg *Digraph) NumEdge() uint {
 	n := uint(0)
-	for i := range dg.Edges {
-		n += dg.Edges[i].Size()
+	for i := range dg.edges {
+		n += dg.edges[i].Size()
 	}
 	return n
 }
@@ -52,7 +52,7 @@ func (dg *Digraph) HasEdge(from, to int) bool {
 	if !dg.HasVert(from) || !dg.HasVert(to) {
 		return false
 	}
-	_, ok := dg.Edges[from].Get(Int(to))
+	_, ok := dg.edges[from].Get(Int(to))
 	return ok
 }
 
@@ -63,21 +63,18 @@ func (dg *Digraph) addWeightedEdge(from, to int, w float64) {
 	if from == to {
 		panic(ErrSelfLoop)
 	}
-	dg.Edges[from].Put(Int(to), w)
+	dg.edges[from].Put(Int(to), w)
 }
 
 // DelEdge delete an edge
 func (dg *Digraph) DelEdge(src, dst int) {
-	if !dg.HasVert(src) {
-		return
-	}
-	dg.Edges[src].Del(Int(dst))
+	dg.edges[src].Del(Int(dst))
 }
 
 // GetWeight get the weight of edge
 // Zero will be returned if edge not exist
 func (dg *Digraph) GetWeight(from, to int) float64 {
-	w, _ := dg.Edges[from].Get(Int(to))
+	w, _ := dg.edges[from].Get(Int(to))
 	return w
 }
 
@@ -100,7 +97,7 @@ func (dg *Digraph) IterateAdj(v int, fn func(int) bool) {
 
 // IterateWAdj iterate all adjacent vertices and weight of v
 func (dg *Digraph) IterateWAdj(v int, fn func(int, float64) bool) { // todo: rename
-	dg.Edges[v].Range(func(key Int, val float64) bool {
+	dg.edges[v].Range(func(key Int, val float64) bool {
 		return fn(int(key), val)
 	})
 }
@@ -122,7 +119,7 @@ func (dg *Digraph) String() string {
 		i2a = strconv.Itoa
 	}
 	out := ""
-	for i := range dg.Edges {
+	for i := range dg.edges {
 		out += i2a(i) + " :"
 		dg.IterateAdj(i, func(j int) bool {
 			out += " " + i2a(j)
@@ -236,7 +233,7 @@ func (dg *Digraph) Topological() (order *stack.Stack[int]) {
 
 // IterateWEdge iterate all edges and their weight in dg
 func (dg *Digraph) IterateWEdge(fn func(int, int, float64) bool) {
-	for src, hm := range dg.Edges {
+	for src, hm := range dg.edges {
 		goon := true
 		hm.Range(func(dst Int, v float64) bool {
 			goon = fn(src, int(dst), v)
@@ -571,9 +568,6 @@ func (dg Digraph) BFS(src int) *BFS {
 
 // CanReach check whether src can reach dst
 func (bfs *BFS) CanReach(dst int) bool {
-	if !bfs.checkVertical(dst) {
-		return false
-	}
 	return bfs.marked[dst]
 }
 
@@ -593,8 +587,4 @@ func (bfs *BFS) ShortestPathTo(dst int) *Path {
 	}
 	path.Reverse()
 	return path
-}
-
-func (bfs *BFS) checkVertical(v int) bool {
-	return v >= 0 && v < len(bfs.marked)
 }

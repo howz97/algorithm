@@ -32,8 +32,8 @@ func (g *Graph) addWeightedEdge(src, dst int, w float64) error {
 	if src == dst {
 		return ErrSelfLoop
 	}
-	g.Digraph.Edges[src].Put(util.Int(dst), w)
-	g.Digraph.Edges[dst].Put(util.Int(src), w)
+	g.Digraph.edges[src].Put(util.Int(dst), w)
+	g.Digraph.edges[dst].Put(util.Int(src), w)
 	return nil
 }
 
