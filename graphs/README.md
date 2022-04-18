@@ -1,7 +1,7 @@
 Minimum spanning tree
 ```go
 func Example() {
-	g, err := LoadWGraph("test_data/mst.yml")
+	g, err := LoadWGraph("testdata/mst.yml")
 	if err != nil {
 		panic(err)
 	}
@@ -25,7 +25,7 @@ func Example() {
 Shortest path
 ```go
 func ExampleWDigraph() {
-	g, _ := LoadWDigraph("test_data/no_cycle.yml")
+	g, _ := LoadWDigraph("testdata/no_cycle.yml")
 	searcher, _ := g.SearcherDijkstra()
 	// searcher, _ = g.SearcherTopological()
 	// searcher, _ = g.SearcherBellmanFord()
@@ -39,7 +39,7 @@ func ExampleWDigraph() {
 Symbol graph
 ```go
 func ExampleSymbol() {
-	g, _ := LoadGraph("./test_data/symbol_graph.yml")
+	g, _ := LoadGraph("./testdata/symbol_graph.yml")
 	bfs := g.BFS(g.VetOf("姜文"))
 	fmt.Println(bfs.ShortestPathTo(g.VetOf("梁朝伟")).Str(g.Symbol))
 	fmt.Println(bfs.ShortestPathTo(g.VetOf("宋慧乔")).Str(g.Symbol))

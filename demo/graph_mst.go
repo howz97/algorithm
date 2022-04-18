@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/howz97/algorithm/graphs"
 )
 
 func main() {
-	g, err := graphs.LoadWGraph("../graphs/test_data/mst.yml")
+	g, err := graphs.LoadWGraph("../graphs/testdata/mst.yml")
 	if err != nil {
 		panic(err)
 	}

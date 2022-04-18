@@ -103,7 +103,7 @@ func TestDFS_Graph(t *testing.T) {
 }
 
 func TestDFS_Digraph(t *testing.T) {
-	dg, err := LoadDigraph(".\\test_data\\dfs.yml")
+	dg, err := LoadDigraph(".\\testdata\\dfs.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -132,7 +132,7 @@ func checkDFSResults(t *testing.T, g *Digraph, dfsResults [][]int) {
 }
 
 func TestRevDFS(t *testing.T) {
-	g, err := LoadDigraph(".\\test_data\\dfs.yml")
+	g, err := LoadDigraph(".\\testdata\\dfs.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
