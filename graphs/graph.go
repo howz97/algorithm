@@ -150,26 +150,16 @@ func (g *Graph) SubGraphs() *SubGraphs {
 
 // IsConn check whether a and b located in the same sub-graph
 func (tc *SubGraphs) IsConn(a, b int) bool {
-	if !tc.hasVertical(a) || !tc.hasVertical(b) {
-		return false
-	}
 	return tc.locate[a] == tc.locate[b]
 }
 
 // Iterate all vertices of sub-graph where v located
 func (tc *SubGraphs) Iterate(v int, fn func(int) bool) {
-	if !tc.hasVertical(v) {
-		return
-	}
 	for _, v := range tc.subGraphs[tc.locate[v]] {
 		if !fn(v) {
 			break
 		}
 	}
-}
-
-func (tc *SubGraphs) hasVertical(v int) bool {
-	return v >= 0 || v < len(tc.locate)
 }
 
 // NumSubGraph get the number of sub-graphs
@@ -179,8 +169,5 @@ func (tc *SubGraphs) NumSubGraph() int {
 
 // Locate get the ID of sub-graph where v located
 func (tc *SubGraphs) Locate(v int) int {
-	if !tc.hasVertical(v) {
-		return -1
-	}
 	return tc.locate[v]
 }
