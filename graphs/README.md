@@ -1,3 +1,40 @@
+Detect ring
+```go
+func ExampleDigraph_FindCycle() {
+	// (0)-------->(2)
+	// 	| ^	        ^
+	// 	|  \	    |
+	// 	|	------  |
+	// 	|		  \	|
+	// 	v		   \|
+	// (1)-------->(3)
+	g := NewDigraph(4)
+	g.AddEdge(0, 1)
+	g.AddEdge(0, 2)
+	g.AddEdge(1, 3)
+	g.AddEdge(3, 0)
+	g.AddEdge(3, 2)
+	c := g.FindCycle()
+	fmt.Println(c.Error())
+
+	// Output: (distance=3): 0->1, 1->3, 3->0,
+}
+```
+Topological sort
+
+```go
+func ExampleDigraph_Topological() {
+	dg, err := LoadDigraph(`.\testdata\no_cycle.yml`)
+	if err != nil {
+		panic(err)
+	}
+	for _, vet := range dg.Topological().Drain() {
+		fmt.Printf("%d->", vet)
+	}
+
+	// Output: 5->1->3->6->4->7->0->2->
+}
+```
 Minimum spanning tree
 ```go
 func Example() {

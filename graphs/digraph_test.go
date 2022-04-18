@@ -168,7 +168,15 @@ func ExampleDigraph_FindCycle() {
 }
 
 func ExampleDigraph_Topological() {
+	dg, err := LoadDigraph(`.\testdata\no_cycle.yml`)
+	if err != nil {
+		panic(err)
+	}
+	for _, vet := range dg.Topological().Drain() {
+		fmt.Printf("%d->", vet)
+	}
 
+	// Output: 5->1->3->6->4->7->0->2->
 }
 
 func ExampleDigraph_IsBipartite() {
