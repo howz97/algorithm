@@ -1,19 +1,14 @@
-[哈夫曼编码压缩](https://pkg.go.dev/github.com/howz97/algorithm/compress/huffman)
-
+Huffman compression
 ```go
-package main
-
-import (
-	"fmt"
-	"github.com/howz97/algorithm/compress/huffman"
-)
-
-func main() {
+func Example() {
 	data := []byte("zhang how, zhang how, zhang how, zhang how,")
-	compressed := huffman.Compress(data)
-	fmt.Printf("performance %.4f \n", float64(len(compressed))/float64(len(data)))
-	huffman.Decompress(compressed)
-}
+	compressed := Compress(data)
+	fmt.Printf("performance %.4f\n", float64(len(compressed))/float64(len(data)))
+	de, _ := Decompress(compressed)
+	fmt.Println(string(de))
 
-//output:  performance 0.7674
+	// Output:
+	// performance 0.7674
+	// zhang how, zhang how, zhang how, zhang how,
+}
 ```
