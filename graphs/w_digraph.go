@@ -117,7 +117,6 @@ func (spt *PathTree) PathTo(dst int) *Path {
 		return nil
 	}
 	path := NewPath()
-	path.distance = spt.distTo[dst]
 	for {
 		path.Push(src, dst, 0)
 		dst = src
@@ -309,14 +308,12 @@ func (s *Searcher) HasVertical(v int) bool {
 
 func NewPath() *Path {
 	return &Path{
-		Stack:    stack.New[edge](2),
-		distance: 0,
+		Stack: stack.New[edge](2),
 	}
 }
 
 type Path struct {
 	*stack.Stack[edge]
-	distance float64
 }
 
 func (p *Path) Push(from, to int, w float64) {
@@ -325,13 +322,20 @@ func (p *Path) Push(from, to int, w float64) {
 		to:     to,
 		weight: w,
 	})
-	p.distance += w
 }
 
 func (p *Path) Pop() edge {
 	e := p.Stack.Pop()
-	p.distance -= e.weight
 	return e
+}
+
+func (p *Path) Distance() float64 {
+	d := 0.0
+	p.Iterate(func(e edge) bool {
+		d += e.weight
+		return true
+	})
+	return d
 }
 
 func (p *Path) ContainsVert(v int) bool {
@@ -362,7 +366,7 @@ func (p *Path) Str(s *Symbol) string {
 	} else {
 		i2s = s.SymbolOf
 	}
-	str := fmt.Sprintf("(distance=%v): ", p.distance)
+	str := fmt.Sprintf("(distance=%v): ", p.Distance())
 	p.Iterate(func(e edge) bool {
 		str += e.string(i2s) + ", "
 		return true

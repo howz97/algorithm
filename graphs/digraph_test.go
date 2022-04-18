@@ -214,7 +214,7 @@ func ExampleBFS() {
 
 	// Output:
 	// false
-	// (distance=6): 1->3, 3->6, 6->2,
+	// (distance=3): 1->3, 3->6, 6->2,
 }
 
 func ExampleSCC() {
