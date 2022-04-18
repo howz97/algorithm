@@ -2,11 +2,11 @@ Detect ring
 ```go
 func ExampleDigraph_FindCycle() {
 	// (0)-------->(2)
-	// 	| ^	        ^
-	// 	|  \	    |
-	// 	|	------  |
-	// 	|		  \	|
-	// 	v		   \|
+	//  | ^         ^
+	//  |  \        |
+	//  |   ------  |
+	//  |         \ |
+	//  v          \|
 	// (1)-------->(3)
 	g := NewDigraph(4)
 	g.AddEdge(0, 1)
@@ -20,8 +20,11 @@ func ExampleDigraph_FindCycle() {
 	// Output: (distance=3): 0->1, 1->3, 3->0,
 }
 ```
+
 Topological sort
+
 ![figure1](https://github.com/howz97/algorithm/blob/master/graphs/testdata/no_cycle.jpg)
+
 ```go
 func ExampleDigraph_Topological() {
 	dg, err := LoadDigraph(`.\testdata\no_cycle.yml`)
