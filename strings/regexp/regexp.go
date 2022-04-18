@@ -68,7 +68,7 @@ func (re *Regexp) forwardStatus(curStatus set.Set[int], r rune) set.Set[int] {
 	arrived := set.New[int]()
 	for curStatus.Len() > 0 {
 		s := curStatus.TakeOne()
-		if re.table[s].match(r) {
+		if s < len(re.table) && re.table[s].match(r) {
 			arrived.Add(s + 1)
 		}
 	}
@@ -255,6 +255,7 @@ func makeNFA(table []symbol) *graphs.Digraph {
 				nfa.AddEdge(i, i+1)
 			case '|':
 				stk.Push(i)
+			case '.':
 			default:
 				panic(fmt.Sprintf("unknown prime %v", syb.r))
 			}
