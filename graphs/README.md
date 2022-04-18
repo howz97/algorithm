@@ -21,7 +21,7 @@ func ExampleDigraph_FindCycle() {
 }
 ```
 Topological sort
-
+![](.\testdata/no_cycle.jpg)
 ```go
 func ExampleDigraph_Topological() {
 	dg, err := LoadDigraph(`.\testdata\no_cycle.yml`)
