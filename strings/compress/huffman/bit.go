@@ -102,7 +102,7 @@ func (bw *bitWriter) WriteUint32(n uint32) {
 	bw.WriteBit((n & 1) == 1)
 }
 
-func (bw *bitWriter) Close() {
+func (bw *bitWriter) Flush() {
 	if bw.nBits > 0 {
 		bw.output = append(bw.output, bw.bits)
 		bw.bits = 0

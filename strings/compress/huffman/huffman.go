@@ -50,6 +50,7 @@ func newNode(br *bitReader) (n *node) {
 		n.isLeaf = true
 		n.b = byte(br.ReadBits(8))
 	} else {
+		// non-leaf node MUST have two kids in a huffman tree
 		n.left = newNode(br)
 		n.right = newNode(br)
 	}
@@ -63,7 +64,7 @@ func Compress(data []byte) []byte {
 	for _, b := range data {
 		bw.WriteBits(table[b])
 	}
-	bw.Close()
+	bw.Flush()
 	return bw.output
 }
 
