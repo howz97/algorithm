@@ -37,7 +37,7 @@ func TestSCC_IsStronglyConnected(t *testing.T) {
 	scc := g.SCC()
 	fmt.Println("number of SCC:", scc.NumComponents())
 	for i := 0; i < int(g.NumVert()); i++ {
-		fmt.Printf("SCC ID of vertical(%v): %v\n", i, scc.GetCompID(i))
+		fmt.Printf("SCC ID of vertical(%v): %v\n", i, scc.Comp(i))
 	}
 	if !scc.IsStronglyConn(1, 1) {
 		t.Fatal()
@@ -243,7 +243,7 @@ func ExampleSCC() {
 	scc := g.SCC()
 	fmt.Println("amount of strongly connected component:", scc.NumComponents())
 	var vertices []int
-	scc.IterateComponent(0, func(v int) bool {
+	scc.IterateComponent(scc.Comp(0), func(v int) bool {
 		vertices = append(vertices, v)
 		return true
 	})

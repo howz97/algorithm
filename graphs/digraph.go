@@ -467,14 +467,13 @@ func (scc *SCC) IsStronglyConn(src, dst int) bool {
 	return scc.locate[src] == scc.locate[dst]
 }
 
-// GetCompID get the strongly connected component ID of vertical v
-func (scc *SCC) GetCompID(v int) int {
+// Comp get the strongly connected component ID of vertical v
+func (scc *SCC) Comp(v int) int {
 	return scc.locate[v]
 }
 
-// IterateComponent iterate all vertices strongly connected to vertical v (include v)
-func (scc *SCC) IterateComponent(v int, fn func(int) bool) {
-	for _, w := range scc.components[scc.locate[v]] {
+func (scc *SCC) IterateComponent(c int, fn func(int) bool) {
+	for _, w := range scc.components[c] {
 		if !fn(w) {
 			break
 		}
