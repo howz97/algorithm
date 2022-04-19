@@ -532,10 +532,10 @@ func (dg Digraph) BFS(src int) *BFS {
 	bfs.marked[src] = true
 	q.PushBack(src)
 	for q.Size() > 0 {
-		edge := q.Front()
-		dg.IterateAdj(edge, func(adj int) bool {
+		vet := q.Front()
+		dg.IterateAdj(vet, func(adj int) bool {
 			if !bfs.marked[adj] {
-				bfs.edgeTo[adj] = edge
+				bfs.edgeTo[adj] = vet
 				bfs.marked[adj] = true
 				q.PushBack(adj)
 			}
