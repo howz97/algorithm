@@ -224,7 +224,7 @@ func (dg *Digraph) Topological() (order *stack.Stack[int]) {
 		return
 	}
 	order = stack.New[int](int(dg.NumVert()))
-	dg.IterVetRDFS(func(v int) bool {
+	dg.IterVetBDFS(func(v int) bool {
 		order.Push(v)
 		return true
 	})
@@ -323,29 +323,29 @@ func (dg *Digraph) ReachableBits(src int) []bool {
 	return marked
 }
 
-// IterVetRDFS iterate all vertices in Reverse-DFS order
-func (dg *Digraph) IterVetRDFS(fn func(int) bool) {
+// IterVetBDFS iterate all vertices in Back-DFS order
+func (dg *Digraph) IterVetBDFS(fn func(int) bool) {
 	marked := make([]bool, dg.NumVert())
 	for v := range marked {
 		if marked[v] {
 			continue
 		}
-		dg.rDFS(v, marked, fn)
+		dg.bDFS(v, marked, fn)
 	}
 }
 
-// IterRDFSFrom iterate all reachable vertices from vertical src in RDFS order
-func (dg *Digraph) IterRDFSFrom(src int, fn func(int) bool) {
+// IterBDFSFrom iterate all reachable vertices from vertical src in RDFS order
+func (dg *Digraph) IterBDFSFrom(src int, fn func(int) bool) {
 	marked := make([]bool, dg.NumVert())
-	dg.rDFS(src, marked, fn)
+	dg.bDFS(src, marked, fn)
 }
 
-func (dg *Digraph) rDFS(v int, marked []bool, fn func(int) bool) bool {
+func (dg *Digraph) bDFS(v int, marked []bool, fn func(int) bool) bool {
 	marked[v] = true
 	goon := true // continue DFS or abort
 	dg.IterAdjacent(v, func(a int) bool {
 		if !marked[a] {
-			if !dg.rDFS(a, marked, fn) {
+			if !dg.bDFS(a, marked, fn) {
 				goon = false
 			}
 		}
@@ -444,7 +444,7 @@ func (dg Digraph) SCC() *SCC {
 		locate: make([]int, dg.NumVert()),
 	}
 	marked := make([]bool, dg.NumVert())
-	dg.IterVetRDFS(func(v int) bool {
+	dg.IterVetBDFS(func(v int) bool {
 		if !marked[v] {
 			c := make([]int, 0, 8)
 			dg.iterUnMarkVetFrom(v, marked, func(w int) bool {

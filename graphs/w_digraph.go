@@ -147,7 +147,7 @@ func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *heap.
 
 func (spt *PathTree) initTopological(g *WDigraph) {
 	order := stack.New[int](int(g.NumVert()))
-	g.IterRDFSFrom(spt.src, func(v int) bool {
+	g.IterBDFSFrom(spt.src, func(v int) bool {
 		order.Push(v)
 		return true
 	})

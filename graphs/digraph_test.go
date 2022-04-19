@@ -137,7 +137,7 @@ func TestRevDFS(t *testing.T) {
 		t.Fatal(err)
 	}
 	order := stack.New[int](0)
-	g.IterRDFSFrom(0, func(v int) bool {
+	g.IterBDFSFrom(0, func(v int) bool {
 		order.Push(v)
 		return true
 	})
