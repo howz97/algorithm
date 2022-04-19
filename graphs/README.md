@@ -114,7 +114,7 @@ func ExampleSCC() {
 	scc := g.SCC()
 	fmt.Println("amount of strongly connected component:", scc.NumComponents())
 	var vertices []int
-	scc.IterateComponent(0, func(v int) bool {
+	scc.IterComponent(0, func(v int) bool {
 		vertices = append(vertices, v)
 		return true
 	})

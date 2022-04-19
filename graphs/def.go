@@ -87,7 +87,7 @@ func LoadGraph(filename string) (*Graph, error) {
 }
 
 func dropWeight(dg *Digraph) {
-	dg.IterateEdge(func(from int, to int) bool {
+	dg.IterEdge(func(from int, to int) bool {
 		dg.edges[from].Put(util.Int(to), float64(1))
 		return true
 	})
@@ -95,7 +95,7 @@ func dropWeight(dg *Digraph) {
 
 func checkNoDirection(dg *Digraph) error {
 	var err error
-	dg.IterateWEdge(func(from, to int, w float64) bool {
+	dg.IterWEdge(func(from, to int, w float64) bool {
 		wr := dg.GetWeight(to, from)
 		if wr == 0 {
 			err = errors.New(fmt.Sprintf("edge %d->%d has direction", from, to))

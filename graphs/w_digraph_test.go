@@ -61,7 +61,7 @@ func CheckSearcher(t *testing.T, s *Searcher, dg *WDigraph) {
 }
 
 func CheckSPT(t *testing.T, tree *PathTree, dg *WDigraph) {
-	dg.IterateWEdge(func(from int, to int, w float64) bool {
+	dg.IterWEdge(func(from int, to int, w float64) bool {
 		if tree.distTo[from]+w < tree.distTo[to] {
 			t.Errorf("edge %d->%d should belong to SPT: %v + %v < %v", from, to, tree.distTo[from], w, tree.distTo[to])
 			return false

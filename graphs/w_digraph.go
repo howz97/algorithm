@@ -130,7 +130,7 @@ func (spt *PathTree) initDijkstra(g *WDigraph) {
 }
 
 func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *heap.Heap2[float64, int]) {
-	g.IterateWAdj(v, func(adj int, w float64) bool {
+	g.IterWAdjacent(v, func(adj int, w float64) bool {
 		if distTo[v]+w < distTo[adj] {
 			inPQ := distTo[adj] != math.Inf(1)
 			edgeTo[adj] = v
@@ -147,7 +147,7 @@ func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *heap.
 
 func (spt *PathTree) initTopological(g *WDigraph) {
 	order := stack.New[int](int(g.NumVert()))
-	g.IterateRDFSFrom(spt.src, func(v int) bool {
+	g.IterRDFSFrom(spt.src, func(v int) bool {
 		order.Push(v)
 		return true
 	})
@@ -158,7 +158,7 @@ func (spt *PathTree) initTopological(g *WDigraph) {
 }
 
 func topologicalRelax(g *WDigraph, v int, edgeTo []int, distTo []float64) {
-	g.IterateWAdj(v, func(a int, w float64) bool {
+	g.IterWAdjacent(v, func(a int, w float64) bool {
 		if distTo[v]+w < distTo[a] {
 			edgeTo[a] = v
 			distTo[a] = distTo[v] + w
@@ -200,7 +200,7 @@ func (spt *PathTree) toWDigraph(g *WDigraph) *WDigraph {
 }
 
 func bellmanFordRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, q *queue.LinkQ[int], onQ []bool) {
-	g.IterateWAdj(v, func(adj int, w float64) bool {
+	g.IterWAdjacent(v, func(adj int, w float64) bool {
 		if distTo[v]+w < distTo[adj] {
 			edgeTo[adj] = v
 			distTo[adj] = distTo[v] + w

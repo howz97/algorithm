@@ -48,10 +48,10 @@ func (g *Graph) TotalWeight() float64 {
 	return g.Digraph.TotalWeight() / 2
 }
 
-// IterateWEdge iterate all no-direction edges and their weight
-func (g *Graph) IterateWEdge(fn func(int, int, float64) bool) {
+// IterWEdge iterate all no-direction edges and their weight
+func (g *Graph) IterWEdge(fn func(int, int, float64) bool) {
 	visited := make(map[uint64]struct{})
-	g.Digraph.IterateWEdge(func(from int, to int, w float64) bool {
+	g.Digraph.IterWEdge(func(from int, to int, w float64) bool {
 		if _, v := visited[uint64(to)<<32+uint64(from)]; v {
 			return true
 		}
@@ -60,17 +60,17 @@ func (g *Graph) IterateWEdge(fn func(int, int, float64) bool) {
 	})
 }
 
-// IterateEdge iterate all no-direction edges
-func (g *Graph) IterateEdge(fn func(int, int) bool) {
-	g.IterateWEdge(func(src int, dst int, _ float64) bool {
+// IterEdge iterate all no-direction edges
+func (g *Graph) IterEdge(fn func(int, int) bool) {
+	g.IterWEdge(func(src int, dst int, _ float64) bool {
 		return fn(src, dst)
 	})
 }
 
-// IterateWEdgeFrom iterate all reachable edges and their weight from vertical src
-func (g *Graph) IterateWEdgeFrom(src int, fn func(int, int, float64) bool) {
+// IterWEdgeFrom iterate all reachable edges and their weight from vertical src
+func (g *Graph) IterWEdgeFrom(src int, fn func(int, int, float64) bool) {
 	visited := make(map[uint64]struct{})
-	g.Digraph.IterateWEdgeFrom(src, func(from int, to int, w float64) bool {
+	g.Digraph.IterWEdgeFrom(src, func(from int, to int, w float64) bool {
 		if _, v := visited[uint64(to)<<32+uint64(from)]; v {
 			return true
 		}
@@ -79,9 +79,9 @@ func (g *Graph) IterateWEdgeFrom(src int, fn func(int, int, float64) bool) {
 	})
 }
 
-// IterateEdgeFrom iterate all reachable edges from vertical src
-func (g *Graph) IterateEdgeFrom(src int, fn func(int, int) bool) {
-	g.IterateWEdgeFrom(src, func(a int, b int, _ float64) bool {
+// IterEdgeFrom iterate all reachable edges from vertical src
+func (g *Graph) IterEdgeFrom(src int, fn func(int, int) bool) {
+	g.IterWEdgeFrom(src, func(a int, b int, _ float64) bool {
 		return fn(a, b)
 	})
 }
@@ -103,7 +103,7 @@ func (g *Graph) HasCycle() bool {
 func (g *Graph) detectCycleDFS(last, cur int, marked []bool) bool {
 	marked[cur] = true
 	found := false
-	g.IterateAdj(cur, func(adj int) bool {
+	g.IterAdjacent(cur, func(adj int) bool {
 		if adj == last { // here is different from digraph
 			return true
 		}

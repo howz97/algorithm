@@ -81,22 +81,22 @@ func (dg *Digraph) GetWeight(from, to int) float64 {
 // TotalWeight sum the weight of all edges
 func (dg *Digraph) TotalWeight() float64 {
 	var total float64
-	dg.IterateWEdge(func(_ int, _ int, w float64) bool {
+	dg.IterWEdge(func(_ int, _ int, w float64) bool {
 		total += w
 		return true
 	})
 	return total
 }
 
-// IterateAdj iterate all adjacent vertices of v
-func (dg *Digraph) IterateAdj(v int, fn func(int) bool) {
-	dg.IterateWAdj(v, func(a int, _ float64) bool {
+// IterAdjacent iterate all adjacent vertices of v
+func (dg *Digraph) IterAdjacent(v int, fn func(int) bool) {
+	dg.IterWAdjacent(v, func(a int, _ float64) bool {
 		return fn(a)
 	})
 }
 
-// IterateWAdj iterate all adjacent vertices and weight of v
-func (dg *Digraph) IterateWAdj(v int, fn func(int, float64) bool) { // todo: rename
+// IterWAdjacent iterate all adjacent vertices and weight of v
+func (dg *Digraph) IterWAdjacent(v int, fn func(int, float64) bool) {
 	dg.edges[v].Range(func(key Int, val float64) bool {
 		return fn(int(key), val)
 	})
@@ -104,7 +104,7 @@ func (dg *Digraph) IterateWAdj(v int, fn func(int, float64) bool) { // todo: ren
 
 // Adjacent return a slice contains all adjacent vertices of v
 func (dg *Digraph) Adjacent(v int) (adj []int) {
-	dg.IterateAdj(v, func(a int) bool {
+	dg.IterAdjacent(v, func(a int) bool {
 		adj = append(adj, a)
 		return true
 	})
@@ -121,7 +121,7 @@ func (dg *Digraph) String() string {
 	out := ""
 	for i := range dg.edges {
 		out += i2a(i) + " :"
-		dg.IterateAdj(i, func(j int) bool {
+		dg.IterAdjacent(i, func(j int) bool {
 			out += " " + i2a(j)
 			return true
 		})
@@ -134,7 +134,7 @@ func (dg *Digraph) String() string {
 // Reverse all edges of dg
 func (dg *Digraph) Reverse() *Digraph {
 	rg := NewDigraph(dg.NumVert())
-	dg.IterateWEdge(func(from int, to int, w float64) bool {
+	dg.IterWEdge(func(from int, to int, w float64) bool {
 		rg.addWeightedEdge(to, from, w)
 		return true
 	})
@@ -145,7 +145,7 @@ func (dg *Digraph) Reverse() *Digraph {
 // If here is no negative edge, (-1, -1) will be returned
 func (dg *Digraph) FindNegativeEdge() (src, dst int) {
 	src, dst = -1, -1
-	dg.IterateWEdge(func(v int, v2 int, w float64) bool {
+	dg.IterWEdge(func(v int, v2 int, w float64) bool {
 		if w < 0 {
 			src = v
 			dst = v2
@@ -160,7 +160,7 @@ func (dg *Digraph) FindNegativeEdge() (src, dst int) {
 // If here is no negative edge, (-1, -1) will be returned
 func (dg *Digraph) FindNegativeEdgeFrom(start int) (src int, dst int) {
 	src, dst = -1, -1
-	dg.IterateWEdgeFrom(start, func(v0 int, v1 int, w float64) bool {
+	dg.IterWEdgeFrom(start, func(v0 int, v1 int, w float64) bool {
 		if w < 0 {
 			src = v0
 			dst = v1
@@ -198,7 +198,7 @@ func (dg *Digraph) FindCycleFrom(v int) *Path {
 
 func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path) bool {
 	found := false
-	dg.IterateWAdj(v, func(a int, w float64) bool {
+	dg.IterWAdjacent(v, func(a int, w float64) bool {
 		if marked[a] {
 			return true
 		}
@@ -224,15 +224,15 @@ func (dg *Digraph) Topological() (order *stack.Stack[int]) {
 		return
 	}
 	order = stack.New[int](int(dg.NumVert()))
-	dg.IterateVetRDFS(func(v int) bool {
+	dg.IterVetRDFS(func(v int) bool {
 		order.Push(v)
 		return true
 	})
 	return
 }
 
-// IterateWEdge iterate all edges and their weight in dg
-func (dg *Digraph) IterateWEdge(fn func(int, int, float64) bool) {
+// IterWEdge iterate all edges and their weight in dg
+func (dg *Digraph) IterWEdge(fn func(int, int, float64) bool) {
 	for src, hm := range dg.edges {
 		goon := true
 		hm.Range(func(dst Int, v float64) bool {
@@ -245,18 +245,18 @@ func (dg *Digraph) IterateWEdge(fn func(int, int, float64) bool) {
 	}
 }
 
-// IterateEdge iterate all edges in dg
-func (dg *Digraph) IterateEdge(fn func(int, int) bool) {
-	dg.IterateWEdge(func(src int, dst int, _ float64) bool {
+// IterEdge iterate all edges in dg
+func (dg *Digraph) IterEdge(fn func(int, int) bool) {
+	dg.IterWEdge(func(src int, dst int, _ float64) bool {
 		return fn(src, dst)
 	})
 }
 
-// IterateWEdgeFrom iterate all reachable edges and their weight from vertical src
-func (dg *Digraph) IterateWEdgeFrom(src int, fn func(int, int, float64) bool) {
-	dg.IterateVertDFS(src, func(v int) bool {
+// IterWEdgeFrom iterate all reachable edges and their weight from vertical src
+func (dg *Digraph) IterWEdgeFrom(src int, fn func(int, int, float64) bool) {
+	dg.IterVertDFS(src, func(v int) bool {
 		goon := true
-		dg.IterateWAdj(v, func(a int, w float64) bool {
+		dg.IterWAdjacent(v, func(a int, w float64) bool {
 			goon = fn(v, a, w)
 			return goon
 		})
@@ -264,37 +264,37 @@ func (dg *Digraph) IterateWEdgeFrom(src int, fn func(int, int, float64) bool) {
 	})
 }
 
-// IterateEdgeFrom iterate all reachable edges from vertical src
-func (dg *Digraph) IterateEdgeFrom(src int, fn func(int, int) bool) {
-	dg.IterateWEdgeFrom(src, func(src int, dst int, _ float64) bool {
+// IterEdgeFrom iterate all reachable edges from vertical src
+func (dg *Digraph) IterEdgeFrom(src int, fn func(int, int) bool) {
+	dg.IterWEdgeFrom(src, func(src int, dst int, _ float64) bool {
 		return fn(src, dst)
 	})
 }
 
-// IterateVertDFS iterate all reachable vertices from vertical src in DFS order
-func (dg *Digraph) IterateVertDFS(src int, fn func(int) bool) {
-	dg.iterateUnMarkVetFrom(src, nil, fn)
+// IterVertDFS iterate all reachable vertices from vertical src in DFS order
+func (dg *Digraph) IterVertDFS(src int, fn func(int) bool) {
+	dg.iterUnMarkVetFrom(src, nil, fn)
 }
 
-func (dg *Digraph) iterateUnMarkVetFrom(src int, marked []bool, fn func(int) bool) {
+func (dg *Digraph) iterUnMarkVetFrom(src int, marked []bool, fn func(int) bool) {
 	if !dg.HasVert(src) {
 		return
 	}
 	if len(marked) == 0 {
 		marked = make([]bool, dg.NumVert())
 	}
-	dg.iterateUnMarkVetDFS(src, marked, fn)
+	dg.iterUnMarkVetDFS(src, marked, fn)
 }
 
-func (dg *Digraph) iterateUnMarkVetDFS(v int, marked []bool, fn func(int) bool) bool {
+func (dg *Digraph) iterUnMarkVetDFS(v int, marked []bool, fn func(int) bool) bool {
 	marked[v] = true
 	if !fn(v) {
 		return false
 	}
 	goon := true // continue DFS or abort
-	dg.IterateAdj(v, func(adj int) bool {
+	dg.IterAdjacent(v, func(adj int) bool {
 		if !marked[adj] {
-			if !dg.iterateUnMarkVetDFS(adj, marked, fn) {
+			if !dg.iterUnMarkVetDFS(adj, marked, fn) {
 				goon = false
 			}
 		}
@@ -309,7 +309,7 @@ func (dg *Digraph) ReachableSlice(src int) []int {
 		return nil
 	}
 	var arrived []int
-	dg.IterateVertDFS(src, func(v int) bool {
+	dg.IterVertDFS(src, func(v int) bool {
 		arrived = append(arrived, v)
 		return true
 	})
@@ -319,12 +319,12 @@ func (dg *Digraph) ReachableSlice(src int) []int {
 // ReachableBits get a bit-map contains all reachable vertices from src
 func (dg *Digraph) ReachableBits(src int) []bool {
 	marked := make([]bool, dg.NumVert())
-	dg.iterateUnMarkVetDFS(src, marked, func(_ int) bool { return true })
+	dg.iterUnMarkVetDFS(src, marked, func(_ int) bool { return true })
 	return marked
 }
 
-// IterateVetRDFS iterate all vertices in RDFS order
-func (dg *Digraph) IterateVetRDFS(fn func(int) bool) {
+// IterVetRDFS iterate all vertices in Reverse-DFS order
+func (dg *Digraph) IterVetRDFS(fn func(int) bool) {
 	marked := make([]bool, dg.NumVert())
 	for v := range marked {
 		if marked[v] {
@@ -334,11 +334,8 @@ func (dg *Digraph) IterateVetRDFS(fn func(int) bool) {
 	}
 }
 
-// IterateRDFSFrom iterate all reachable vertices from vertical src in RDFS order
-func (dg *Digraph) IterateRDFSFrom(src int, fn func(int) bool) {
-	if !dg.HasVert(src) {
-		return
-	}
+// IterRDFSFrom iterate all reachable vertices from vertical src in RDFS order
+func (dg *Digraph) IterRDFSFrom(src int, fn func(int) bool) {
 	marked := make([]bool, dg.NumVert())
 	dg.rDFS(src, marked, fn)
 }
@@ -346,7 +343,7 @@ func (dg *Digraph) IterateRDFSFrom(src int, fn func(int) bool) {
 func (dg *Digraph) rDFS(v int, marked []bool, fn func(int) bool) bool {
 	marked[v] = true
 	goon := true // continue DFS or abort
-	dg.IterateAdj(v, func(a int) bool {
+	dg.IterAdjacent(v, func(a int) bool {
 		if !marked[a] {
 			if !dg.rDFS(a, marked, fn) {
 				goon = false
@@ -380,7 +377,7 @@ func (dg *Digraph) isBipartiteDFS(cur int, color bool, colors []bool, marked []b
 	if !marked[cur] {
 		marked[cur] = true
 		colors[cur] = color
-		dg.IterateAdj(cur, func(adj int) bool {
+		dg.IterAdjacent(cur, func(adj int) bool {
 			if !dg.isBipartiteDFS(adj, !color, colors, marked) {
 				isBip = false
 				return false
@@ -402,7 +399,7 @@ func (dg *Digraph) IsSameWith(other Digraph) bool {
 		return false
 	}
 	isSame := true
-	dg.IterateWEdge(func(from int, to int, w float64) bool {
+	dg.IterWEdge(func(from int, to int, w float64) bool {
 		if w != other.GetWeight(from, to) {
 			isSame = false
 			return false
@@ -417,7 +414,7 @@ func (dg *Digraph) Marshal() ([]byte, error) {
 	m := make(map[string]map[string]float64)
 	for v := 0; v < int(dg.NumVert()); v++ {
 		edges := make(map[string]float64)
-		dg.IterateWAdj(v, func(a int, w float64) bool {
+		dg.IterWAdjacent(v, func(a int, w float64) bool {
 			if dg.Symbol == nil {
 				edges[strconv.Itoa(a)] = w
 			} else {
@@ -447,10 +444,10 @@ func (dg Digraph) SCC() *SCC {
 		locate: make([]int, dg.NumVert()),
 	}
 	marked := make([]bool, dg.NumVert())
-	dg.IterateVetRDFS(func(v int) bool {
+	dg.IterVetRDFS(func(v int) bool {
 		if !marked[v] {
 			c := make([]int, 0, 8)
-			dg.iterateUnMarkVetFrom(v, marked, func(w int) bool {
+			dg.iterUnMarkVetFrom(v, marked, func(w int) bool {
 				scc.locate[w] = len(scc.components)
 				c = append(c, w)
 				return true
@@ -472,7 +469,7 @@ func (scc *SCC) Comp(v int) int {
 	return scc.locate[v]
 }
 
-func (scc *SCC) IterateComponent(c int, fn func(int) bool) {
+func (scc *SCC) IterComponent(c int, fn func(int) bool) {
 	for _, w := range scc.components[c] {
 		if !fn(w) {
 			break
@@ -530,7 +527,7 @@ func (dg Digraph) BFS(src int) *BFS {
 	q.PushBack(src)
 	for q.Size() > 0 {
 		vet := q.Front()
-		dg.IterateAdj(vet, func(adj int) bool {
+		dg.IterAdjacent(vet, func(adj int) bool {
 			if !bfs.marked[adj] {
 				bfs.edgeTo[adj] = vet
 				bfs.marked[adj] = true

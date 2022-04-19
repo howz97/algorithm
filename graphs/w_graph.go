@@ -25,7 +25,7 @@ func (g *WGraph) LazyPrim() (mst *WGraph) {
 	mst = NewWGraph(g.NumVert())
 	marked := make([]bool, g.NumVert())
 	marked[0] = true
-	g.IterateWAdj(0, func(dst int, w float64) bool {
+	g.IterWAdjacent(0, func(dst int, w float64) bool {
 		pq.Push(w, &edge{
 			from:   0,
 			to:     dst,
@@ -46,7 +46,7 @@ func (g *WGraph) LazyPrim() (mst *WGraph) {
 
 func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *heap.Heap[float64, *edge]) {
 	marked[v] = true
-	g.IterateWAdj(v, func(a int, w float64) bool {
+	g.IterWAdjacent(v, func(a int, w float64) bool {
 		if !marked[a] {
 			pq.Push(w, &edge{
 				from:   v,
@@ -64,7 +64,7 @@ func (g *WGraph) Prim() (mst *WGraph) {
 	pq := heap.New2[float64, int](g.NumVert())
 	mst = NewWGraph(g.NumVert())
 	marked[0] = true
-	g.IterateWAdj(0, func(a int, w float64) bool {
+	g.IterWAdjacent(0, func(a int, w float64) bool {
 		pq.Push(w, a)
 		mst.AddEdge(0, a, w)
 		return true
@@ -80,7 +80,7 @@ func (g *WGraph) Prim() (mst *WGraph) {
 
 func primVisit(g, mst *WGraph, v int, marked []bool, pq *heap.Heap2[float64, int]) {
 	marked[v] = true
-	g.IterateWAdj(v, func(a int, w float64) bool {
+	g.IterWAdjacent(v, func(a int, w float64) bool {
 		if marked[a] {
 			return true
 		}
@@ -102,7 +102,7 @@ func (g *WGraph) Kruskal() (mst *WGraph) {
 	mst = NewWGraph(g.NumVert())
 	uf := unionfind.New(int(g.NumVert()))
 	pq := heap.New[float64, *edge](g.NumVert())
-	g.IterateWEdge(func(src int, dst int, w float64) bool {
+	g.IterWEdge(func(src int, dst int, w float64) bool {
 		pq.Push(w, &edge{
 			from:   src,
 			to:     dst,

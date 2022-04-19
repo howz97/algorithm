@@ -137,7 +137,7 @@ func TestRevDFS(t *testing.T) {
 		t.Fatal(err)
 	}
 	order := stack.New[int](0)
-	g.IterateRDFSFrom(0, func(v int) bool {
+	g.IterRDFSFrom(0, func(v int) bool {
 		order.Push(v)
 		return true
 	})
@@ -243,7 +243,7 @@ func ExampleSCC() {
 	scc := g.SCC()
 	fmt.Println("amount of strongly connected component:", scc.NumComponents())
 	var vertices []int
-	scc.IterateComponent(scc.Comp(0), func(v int) bool {
+	scc.IterComponent(scc.Comp(0), func(v int) bool {
 		vertices = append(vertices, v)
 		return true
 	})
