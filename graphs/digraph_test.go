@@ -179,14 +179,14 @@ func ExampleDigraph_Topological() {
 	// Output: 5->1->3->6->4->7->0->2->
 }
 
-func ExampleDigraph_IsBipartite() {
+func ExampleDigraph_Bipartite() {
 	dg, err := LoadDigraph(`.\testdata\no_cycle.yml`)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(dg.IsBipartite())
+	fmt.Println(dg.Bipartite())
 
-	// Output: false
+	// Output: []
 }
 
 func ExampleReachable() {

@@ -357,19 +357,19 @@ func (dg *Digraph) bDFS(v int, marked []bool, fn func(int) bool) bool {
 	return fn(v)
 }
 
-// IsBipartite check whether dg is a bipartite graph
-func (dg *Digraph) IsBipartite() bool {
+// Bipartite put two colors on all nodes while any connected nodes have different color
+func (dg *Digraph) Bipartite() (colors []bool) {
 	marks := make([]bool, dg.NumVert())
-	colors := make([]bool, dg.NumVert())
+	colors = make([]bool, dg.NumVert())
 	for i, m := range marks {
 		if m {
 			continue
 		}
 		if !dg.isBipartiteDFS(i, true, colors, marks) {
-			return false
+			return nil
 		}
 	}
-	return true
+	return
 }
 
 func (dg *Digraph) isBipartiteDFS(cur int, color bool, colors []bool, marked []bool) bool {
