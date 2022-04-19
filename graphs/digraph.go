@@ -459,7 +459,7 @@ func (dg Digraph) SCC() *SCC {
 	return scc
 }
 
-// IsStronglyConn check whether src is strongly connected to dst
+// IsStronglyConn check whether src is strongly connected with dst
 func (scc *SCC) IsStronglyConn(src, dst int) bool {
 	return scc.locate[src] == scc.locate[dst]
 }
