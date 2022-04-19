@@ -41,14 +41,14 @@ func ExampleDigraph_Topological() {
 
 Bipartite
 ```go
-func ExampleDigraph_IsBipartite() {
+func ExampleDigraph_Bipartite() {
 	dg, err := LoadDigraph(`.\testdata\no_cycle.yml`)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(dg.IsBipartite())
+	fmt.Println(dg.Bipartite())
 
-	// Output: false
+	// Output: []
 }
 ```
 
