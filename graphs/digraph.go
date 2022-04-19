@@ -520,9 +520,6 @@ type BFS struct {
 
 // BFS save all BFS information from src
 func (dg Digraph) BFS(src int) *BFS {
-	if !dg.HasVert(src) {
-		return nil
-	}
 	bfs := &BFS{
 		src:    src,
 		marked: make([]bool, dg.NumVert()),
