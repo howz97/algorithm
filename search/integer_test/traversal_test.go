@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/howz97/algorithm/search/avlst"
+	"github.com/howz97/algorithm/search/binarytree"
 )
 
 func TestTraversal(t *testing.T) {
@@ -59,4 +60,18 @@ func TestTraversal(t *testing.T) {
 	if str != "*-+26532" {
 		t.Errorf("LevelOrder: %s", str)
 	}
+}
+
+func ExamplePreOrderIter() {
+	bt := binarytree.New[int, int]()
+	nodes := []int{50, 20, 10, 15, 30, 25, 40, 35, 45, 60, 55, 70}
+	for _, v := range nodes {
+		bt.Put(v, v)
+	}
+	bt.PreOrder(func(n *binarytree.Node[int, int]) bool {
+		fmt.Print(n.Key(), ", ")
+		return true
+	})
+
+	// Output: 50, 20, 10, 15, 30, 25, 40, 35, 45, 60, 55, 70,
 }

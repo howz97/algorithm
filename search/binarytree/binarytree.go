@@ -10,7 +10,7 @@ import (
 
 // BinaryTree is a simple binary search tree that does not guarantee balance
 type BinaryTree[Ord constraints.Ordered, T any] struct {
-	*node[Ord, T]
+	root *Node[Ord, T]
 	size uint
 }
 
@@ -20,14 +20,14 @@ func New[Ord constraints.Ordered, T any]() *BinaryTree[Ord, T] {
 
 func (st *BinaryTree[Ord, T]) Put(key Ord, val T) {
 	exist := false
-	st.node, exist = st.put(key, val)
+	st.root, exist = st.root.put(key, val)
 	if !exist {
 		st.size++
 	}
 }
 
 func (st *BinaryTree[Ord, T]) Get(key Ord) (T, bool) {
-	n := st.get(key)
+	n := st.root.get(key)
 	if n == nil {
 		var v T
 		return v, false
@@ -36,16 +36,16 @@ func (st *BinaryTree[Ord, T]) Get(key Ord) (T, bool) {
 }
 
 func (st *BinaryTree[Ord, T]) GetMin() T {
-	return st.getMin().value
+	return st.root.getMin().value
 }
 
 func (st *BinaryTree[Ord, T]) GetMax() T {
-	return st.getMax().value
+	return st.root.getMax().value
 }
 
 func (st *BinaryTree[Ord, T]) Del(key Ord) {
 	exist := false
-	st.node, exist = st.del(key)
+	st.root, exist = st.root.del(key)
 	if exist {
 		st.size--
 	}
@@ -55,21 +55,46 @@ func (st *BinaryTree[Ord, T]) Size() uint {
 	return st.size
 }
 
-func (st *BinaryTree[Ord, T]) Clean() {
-	st.node = nil
-	st.size = 0
+func (st *BinaryTree[Ord, T]) PreOrder(fn func(*Node[Ord, T]) bool) {
+	search.PreOrderIter(st.root, func(trv search.ITraversal) bool {
+		return fn(trv.(*Node[Ord, T]))
+	})
 }
 
-type node[Ord constraints.Ordered, T any] struct {
+func (st *BinaryTree[Ord, T]) InOrder(fn func(*Node[Ord, T]) bool) {
+	search.InOrder(st.root, func(trv search.ITraversal) bool {
+		return fn(trv.(*Node[Ord, T]))
+	})
+}
+
+func (st *BinaryTree[Ord, T]) SufOrder(fn func(*Node[Ord, T]) bool) {
+	search.SufOrder(st.root, func(trv search.ITraversal) bool {
+		return fn(trv.(*Node[Ord, T]))
+	})
+}
+
+func (st *BinaryTree[Ord, T]) LevelOrder(fn func(*Node[Ord, T]) bool) {
+	search.LevelOrder(st.root, func(trv search.ITraversal) bool {
+		return fn(trv.(*Node[Ord, T]))
+	})
+}
+
+func (st *BinaryTree[Ord, T]) ReverseOrder(fn func(*Node[Ord, T]) bool) {
+	search.ReverseOrder(st.root, func(trv search.ITraversal) bool {
+		return fn(trv.(*Node[Ord, T]))
+	})
+}
+
+type Node[Ord constraints.Ordered, T any] struct {
 	value T
 	key   Ord
-	left  *node[Ord, T]
-	right *node[Ord, T]
+	left  *Node[Ord, T]
+	right *Node[Ord, T]
 }
 
-func (n *node[Ord, T]) put(k Ord, v T) (*node[Ord, T], bool) {
+func (n *Node[Ord, T]) put(k Ord, v T) (*Node[Ord, T], bool) {
 	if n == nil {
-		n = new(node[Ord, T])
+		n = new(Node[Ord, T])
 		n.key = k
 		n.value = v
 		return n, false
@@ -86,7 +111,7 @@ func (n *node[Ord, T]) put(k Ord, v T) (*node[Ord, T], bool) {
 	return n, exist
 }
 
-func (n *node[Ord, T]) get(k Ord) *node[Ord, T] {
+func (n *Node[Ord, T]) get(k Ord) *Node[Ord, T] {
 	if n == nil {
 		return nil
 	}
@@ -98,7 +123,7 @@ func (n *node[Ord, T]) get(k Ord) *node[Ord, T] {
 	return n
 }
 
-func (n *node[Ord, T]) getMin() *node[Ord, T] {
+func (n *Node[Ord, T]) getMin() *Node[Ord, T] {
 	if n == nil {
 		return nil
 	}
@@ -108,7 +133,7 @@ func (n *node[Ord, T]) getMin() *node[Ord, T] {
 	return n
 }
 
-func (n *node[Ord, T]) getMax() *node[Ord, T] {
+func (n *Node[Ord, T]) getMax() *Node[Ord, T] {
 	if n == nil {
 		return nil
 	}
@@ -118,7 +143,7 @@ func (n *node[Ord, T]) getMax() *node[Ord, T] {
 	return n
 }
 
-func (n *node[Ord, T]) del(k Ord) (*node[Ord, T], bool) {
+func (n *Node[Ord, T]) del(k Ord) (*Node[Ord, T], bool) {
 	if n == nil {
 		return nil, false
 	}
@@ -135,7 +160,7 @@ func (n *node[Ord, T]) del(k Ord) (*node[Ord, T], bool) {
 			return n.left, true
 		}
 		exist = true
-		var replacer *node[Ord, T]
+		var replacer *Node[Ord, T]
 		if time.Now().UnixNano()&1 == 1 { // to make it randomly
 			replacer = n.left.getMax()
 			n.left, _ = n.left.del(replacer.key)
@@ -150,22 +175,22 @@ func (n *node[Ord, T]) del(k Ord) (*node[Ord, T], bool) {
 	return n, exist
 }
 
-func (n *node[Ord, T]) Left() search.ITraversal {
+func (n *Node[Ord, T]) Left() search.ITraversal {
 	return n.left
 }
 
-func (n *node[Ord, T]) Right() search.ITraversal {
+func (n *Node[Ord, T]) Right() search.ITraversal {
 	return n.right
 }
 
-func (n *node[Ord, T]) IsNil() bool {
+func (n *Node[Ord, T]) IsNil() bool {
 	return n == nil
 }
 
-func (n *node[Ord, T]) Key() Ord {
+func (n *Node[Ord, T]) Key() Ord {
 	return n.key
 }
 
-func (n *node[Ord, T]) String() string {
+func (n *Node[Ord, T]) String() string {
 	return fmt.Sprint(n.value)
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/howz97/algorithm/basic/queue"
+	"github.com/howz97/algorithm/basic/stack"
 	"github.com/waiyva/binary-tree/btprinter"
 )
 
@@ -29,6 +30,24 @@ func PreOrder(bt ITraversal, fn func(ITraversal) bool) bool {
 		}
 	}
 	return true
+}
+
+// PreOrderIter traverse nodes in pre-order non-recursively
+func PreOrderIter(bt ITraversal, fn func(ITraversal) bool) {
+	right := stack.New[ITraversal](0)
+	right.Push(bt)
+	for right.Size() > 0 {
+		n := right.Pop()
+		for !n.IsNil() {
+			if !fn(n) {
+				return
+			}
+			if !n.Right().IsNil() {
+				right.Push(n.Right())
+			}
+			n = n.Left()
+		}
+	}
 }
 
 func InOrder(bt ITraversal, fn func(ITraversal) bool) bool {
