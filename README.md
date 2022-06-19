@@ -1,4 +1,4 @@
-Algorithm (4th, Sedgewick) implemented in golang
+Algorithm (Sedgewick, 4th) implemented in golang
 ## Basic
   * [Stack](https://github.com/howz97/algorithm/tree/master/basic/stack)
   * [Queue](https://github.com/howz97/algorithm/tree/master/basic/queue)
