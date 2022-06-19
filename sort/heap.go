@@ -3,19 +3,19 @@ package sort
 import "golang.org/x/exp/constraints"
 
 func Heap[Ord constraints.Ordered](data []Ord) {
-	adjust(data)
+	// construct big top heap
+	// leaf do not need to sink
+	for i := (len(data) - 2) / 2; i >= 0; i-- {
+		percolateDown(data, i)
+	}
+	// pop biggest value in heap to end position
 	for i := len(data) - 1; i > 0; i-- {
 		data[0], data[i] = data[i], data[0]
 		percolateDown(data[:i], 0)
 	}
 }
 
-func adjust[Ord constraints.Ordered](h []Ord) {
-	for i := (len(h) - 2) / 2; i >= 0; i-- {
-		percolateDown(h, i)
-	}
-}
-
+// big top heap
 func percolateDown[Ord constraints.Ordered](h []Ord, i int) {
 	k := h[i]
 	cavIdx := i
