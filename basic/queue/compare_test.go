@@ -1,35 +1,43 @@
 package queue
 
 import (
-	"fmt"
 	"testing"
-	"time"
 )
 
-const (
-	testTimes = 30000000
-)
+func BenchmarkQueue_PushBack(b *testing.B) {
+	q := NewQueue[int](b.N)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		q.PushBack(i)
+	}
+}
 
-func TestInterfaceQ(t *testing.T) {
-	qSlice := NewQueue[int](0)
-	start := time.Now()
-	for i := 0; i < testTimes; i++ {
-		qSlice.PushBack(i)
+func BenchmarkQueue_PopFront(b *testing.B) {
+	q := NewQueue[int](b.N)
+	for i := 0; i < b.N; i++ {
+		q.PushBack(i)
 	}
-	for i := 0; i < testTimes; i++ {
-		qSlice.PopFront()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		q.PopFront()
 	}
-	elapsed := time.Since(start)
-	fmt.Printf("Slice cost [%v]\n", elapsed.String())
+}
 
-	qLinked := NewLinkQ[int]()
-	start = time.Now()
-	for i := 0; i < testTimes; i++ {
-		qLinked.PushBack(i)
+func BenchmarkLinkQueue_PushBack(b *testing.B) {
+	q := NewLinkQ[int]()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		q.PushBack(i)
 	}
-	for i := 0; i < testTimes; i++ {
-		qLinked.PopFront()
+}
+
+func BenchmarkLinkQueue_PopFront(b *testing.B) {
+	q := NewLinkQ[int]()
+	for i := 0; i < b.N; i++ {
+		q.PushBack(i)
 	}
-	elapsed = time.Since(start)
-	fmt.Printf("Linked [%v]\n", elapsed.String())
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		q.PopFront()
+	}
 }
