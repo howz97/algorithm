@@ -63,13 +63,13 @@ func (t *Ternary[T]) KeysWithPrefix(prefix string) []string {
 	if node != nil {
 		node.collect(prefix, q)
 	}
-	return q.Drain()
+	return q.Clone()
 }
 
 func (t *Ternary[T]) KeysMatch(p string) []string {
 	q := queue.NewQueue[string](0)
 	t.root.keysMatch([]rune(p), "", q)
-	return q.Drain()
+	return q.Clone()
 }
 
 func (t *Ternary[T]) Compress() {

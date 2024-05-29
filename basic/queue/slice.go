@@ -19,6 +19,14 @@ func NewQueue[T any](cap int) *Queue[T] {
 	}
 }
 
+func QueueFrom[T any](elems []T) *Queue[T] {
+	return &Queue[T]{
+		elems: elems[:cap(elems)],
+		back:  len(elems) - 1,
+		size:  len(elems),
+	}
+}
+
 func (q *Queue[T]) Peek() *T {
 	if q.size <= 0 {
 		return nil
@@ -66,16 +74,16 @@ func (q *Queue[T]) PushBack(e T) {
 }
 
 func (q *Queue[T]) isFull() bool {
-	return q.Size() == len(q.elems)
+	return q.size == len(q.elems)
 }
 
 func (q *Queue[T]) Size() int {
 	return q.size
 }
 
-func (q *Queue[T]) Drain() []T {
-	var elems []T
-	for q.Size() > 0 {
+func (q *Queue[T]) Clone() []T {
+	elems := make([]T, 0, q.size)
+	for q.size > 0 {
 		elems = append(elems, q.Front())
 	}
 	return elems

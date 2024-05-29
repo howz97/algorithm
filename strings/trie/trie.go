@@ -48,13 +48,13 @@ func (t *Trie[T]) KeysWithPrefix(prefix string) []string {
 	}
 	q := queue.NewQueue[string](0)
 	node.collect(t.alp, prefix, q)
-	return q.Drain()
+	return q.Clone()
 }
 
 func (t *Trie[T]) KeysMatch(p string) []string {
 	q := queue.NewQueue[string](0)
 	t.root.keysMatch(t.alp, []rune(p), "", q)
-	return q.Drain()
+	return q.Clone()
 }
 
 type node[T any] struct {
