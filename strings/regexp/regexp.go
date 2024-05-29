@@ -117,7 +117,7 @@ func compile(pattern []rune) ([]rune, error) {
 			left = i
 			i++
 			if !isTransferable(pattern[i]) {
-				return nil, errors.New(fmt.Sprintf("invalid transfer: \\%v", string(pattern[i])))
+				return nil, fmt.Errorf("invalid transfer: \\%v", string(pattern[i]))
 			}
 			compiled = append(compiled, '\\', pattern[i])
 		case '(':
@@ -143,12 +143,12 @@ func compile(pattern []rune) ([]rune, error) {
 		case '{':
 			rb := indexRune(pattern[i:], '}')
 			if rb < 0 {
-				return nil, errors.New(fmt.Sprintf("[surround %v] no corresponding right bracket", i))
+				return nil, fmt.Errorf("[surround %v] no corresponding right bracket", i)
 			}
 			inBrackets := pattern[i+1 : rb+i]
 			i += rb
 			if len(inBrackets) == 0 {
-				return nil, errors.New(fmt.Sprintf("[surround %v] nothing in bracket", i))
+				return nil, fmt.Errorf("[surround %v] nothing in bracket", i)
 			}
 			hyphen := indexRune(inBrackets, '-')
 			lastRegExp := make([]rune, len(compiled[left:]))
@@ -158,10 +158,10 @@ func compile(pattern []rune) ([]rune, error) {
 				// example: "(regexp){3}" -> "(regexp)(regexp)(regexp)"
 				n, err := strconv.Atoi(string(inBrackets))
 				if err != nil {
-					return nil, errors.New(fmt.Sprintf("[surround %v] not a number in bracket: %v", i, err.Error()))
+					return nil, fmt.Errorf("[surround %v] not a number in bracket: %v", i, err.Error())
 				}
 				if n < 1 {
-					return nil, errors.New(fmt.Sprintf("[surround %v] number in bracket less than 1", i))
+					return nil, fmt.Errorf("[surround %v] number in bracket less than 1", i)
 				}
 				compiled = append(compiled, repeatRunes(lastRegExp, n-1)...)
 			} else {
@@ -169,17 +169,17 @@ func compile(pattern []rune) ([]rune, error) {
 				// example: "(regexp){1-3}" -> "((regexp)|(regexp)(regexp)|(regexp)(regexp)(regexp))"
 				lo, err := strconv.Atoi(string(inBrackets[:hyphen]))
 				if err != nil {
-					return nil, errors.New(fmt.Sprintf("[surround %v] invalid range in bracket: %v", i, err.Error()))
+					return nil, fmt.Errorf("[surround %v] invalid range in bracket: %v", i, err.Error())
 				}
 				if lo < 0 {
-					return nil, errors.New(fmt.Sprintf("[surround %v] invalid range in bracket", i))
+					return nil, fmt.Errorf("[surround %v] invalid range in bracket", i)
 				}
 				hi, err := strconv.Atoi(string(inBrackets[hyphen+1:]))
 				if err != nil {
-					return nil, errors.New(fmt.Sprintf("[surround %v] invalid range in bracket: %v", i, err.Error()))
+					return nil, fmt.Errorf("[surround %v] invalid range in bracket: %v", i, err.Error())
 				}
 				if hi <= lo {
-					return nil, errors.New(fmt.Sprintf("[surround %v] invalid range in bracket", i))
+					return nil, fmt.Errorf("[surround %v] invalid range in bracket", i)
 				}
 				compiled = append(compiled[:left], '(')
 				for j := lo; j <= hi; j++ {
@@ -247,7 +247,7 @@ func makeNFA(table []symbol) *graphs.Digraph {
 					}
 				}
 				for allOr.Size() > 0 {
-					or := allOr.Front()
+					or := allOr.PopFront()
 					nfa.AddEdge(left, or+1)
 					nfa.AddEdge(or, i)
 				}

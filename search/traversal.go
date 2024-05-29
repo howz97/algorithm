@@ -88,7 +88,7 @@ func LevelOrder(bt ITraversal, fn func(ITraversal) bool) {
 	q := queue.NewLinkQ[ITraversal]()
 	q.PushBack(bt)
 	for q.Size() > 0 {
-		bt = q.Front()
+		bt = q.PopFront()
 		if !fn(bt) {
 			break
 		}
@@ -123,7 +123,7 @@ func PrintBinaryTree(bt ITraversal) {
 	q := queue.NewLinkQ[ITraversal]()
 	q.PushBack(bt)
 	for q.Size() > 0 {
-		bt = q.Front()
+		bt = q.PopFront()
 		if bt.IsNil() {
 			sli = append(sli, "#")
 			continue

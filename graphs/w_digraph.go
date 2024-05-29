@@ -174,7 +174,7 @@ func (spt *PathTree) initBellmanFord(g *WDigraph) error {
 	onQ[spt.src] = true
 	cnt := uint(0)
 	for q.Size() > 0 {
-		v := q.Front()
+		v := q.PopFront()
 		onQ[v] = false
 		bellmanFordRelax(g, v, spt.edgeTo, spt.distTo, q, onQ)
 		cnt++

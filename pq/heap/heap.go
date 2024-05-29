@@ -54,6 +54,22 @@ func (h *Heap[O, T]) Pop() T {
 	return v
 }
 
+func (h *Heap[O, T]) Top() T {
+	return h.elems[1].val
+}
+
+func (h *Heap[O, T]) TopPtr() *Elem[O, T] {
+	if h.len == 0 {
+		return nil
+	}
+	return &h.elems[1]
+}
+
+func (h *Heap[O, T]) FixTop(p O) {
+	h.elems[1].p = p
+	h.sink(1)
+}
+
 func (h *Heap[O, T]) sink(vac int) {
 	elem := h.elems[vac] // copy-out the element and left a vacancy
 	sub := vac * 2

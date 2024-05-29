@@ -34,7 +34,7 @@ func (q *Queue[T]) Peek() *T {
 	return &q.elems[q.head]
 }
 
-func (q *Queue[T]) Front() T {
+func (q *Queue[T]) PopFront() T {
 	if q.size <= 0 {
 		panic("empty queue")
 	}
@@ -84,7 +84,7 @@ func (q *Queue[T]) Size() int {
 func (q *Queue[T]) Clone() []T {
 	elems := make([]T, 0, q.size)
 	for q.size > 0 {
-		elems = append(elems, q.Front())
+		elems = append(elems, q.PopFront())
 	}
 	return elems
 }

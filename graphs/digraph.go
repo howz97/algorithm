@@ -526,7 +526,7 @@ func (dg Digraph) BFS(src int) *BFS {
 	bfs.marked[src] = true
 	q.PushBack(src)
 	for q.Size() > 0 {
-		vet := q.Front()
+		vet := q.PopFront()
 		dg.IterAdjacent(vet, func(adj int) bool {
 			if !bfs.marked[adj] {
 				bfs.edgeTo[adj] = vet

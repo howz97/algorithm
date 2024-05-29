@@ -14,6 +14,26 @@ type AVL[Ord constraints.Ordered, T any] struct {
 	size uint
 }
 
+// IsNil implements search.ITraversal.
+func (avl *AVL[Ord, T]) IsNil() bool {
+	panic("unimplemented")
+}
+
+// Left implements search.ITraversal.
+func (avl *AVL[Ord, T]) Left() search.ITraversal {
+	panic("unimplemented")
+}
+
+// Right implements search.ITraversal.
+func (avl *AVL[Ord, T]) Right() search.ITraversal {
+	panic("unimplemented")
+}
+
+// String implements search.ITraversal.
+func (avl *AVL[Ord, T]) String() string {
+	panic("unimplemented")
+}
+
 func New[Ord constraints.Ordered, T any]() *AVL[Ord, T] {
 	return new(AVL[Ord, T])
 }

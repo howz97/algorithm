@@ -19,7 +19,7 @@ func (q *LinkQ[T]) Peek() *T {
 	return &q.head.v
 }
 
-func (q *LinkQ[T]) Front() T {
+func (q *LinkQ[T]) PopFront() T {
 	e := q.head.v
 	q.head = q.head.next
 	if q.head == nil {

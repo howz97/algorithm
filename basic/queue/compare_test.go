@@ -17,7 +17,7 @@ func TestInterfaceQ(t *testing.T) {
 		qSlice.PushBack(i)
 	}
 	for i := 0; i < testTimes; i++ {
-		qSlice.Front()
+		qSlice.PopFront()
 	}
 	elapsed := time.Since(start)
 	fmt.Printf("Slice cost [%v]\n", elapsed.String())
@@ -28,7 +28,7 @@ func TestInterfaceQ(t *testing.T) {
 		qLinked.PushBack(i)
 	}
 	for i := 0; i < testTimes; i++ {
-		qLinked.Front()
+		qLinked.PopFront()
 	}
 	elapsed = time.Since(start)
 	fmt.Printf("Linked [%v]\n", elapsed.String())
