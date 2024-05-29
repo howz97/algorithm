@@ -46,13 +46,13 @@ func (t *Trie[T]) KeysWithPrefix(prefix string) []string {
 	if node == nil {
 		return nil
 	}
-	q := queue.NewSliceQ[string](0)
+	q := queue.NewQueue[string](0)
 	node.collect(t.alp, prefix, q)
 	return q.Drain()
 }
 
 func (t *Trie[T]) KeysMatch(p string) []string {
-	q := queue.NewSliceQ[string](0)
+	q := queue.NewQueue[string](0)
 	t.root.keysMatch(t.alp, []rune(p), "", q)
 	return q.Drain()
 }
@@ -104,7 +104,7 @@ func (t *node[T]) longestPrefixOf(s []rune, d int, l int) int {
 	return next.longestPrefixOf(s, d+1, l)
 }
 
-func (t *node[T]) collect(a alphabet.IAlp, prefix string, keys *queue.SliceQ[string]) {
+func (t *node[T]) collect(a alphabet.IAlp, prefix string, keys *queue.Queue[string]) {
 	if t.val != nil {
 		keys.PushBack(prefix)
 	}
@@ -116,7 +116,7 @@ func (t *node[T]) collect(a alphabet.IAlp, prefix string, keys *queue.SliceQ[str
 	}
 }
 
-func (t *node[T]) keysMatch(a alphabet.IAlp, pattern []rune, prefix string, keys *queue.SliceQ[string]) {
+func (t *node[T]) keysMatch(a alphabet.IAlp, pattern []rune, prefix string, keys *queue.Queue[string]) {
 	if len(pattern) == 0 {
 		if t.val != nil {
 			keys.PushBack(prefix)

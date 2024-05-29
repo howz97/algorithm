@@ -11,7 +11,7 @@ const (
 )
 
 func TestInterfaceQ(t *testing.T) {
-	qSlice := NewSliceQ[int](0)
+	qSlice := NewQueue[int](0)
 	start := time.Now()
 	for i := 0; i < testTimes; i++ {
 		qSlice.PushBack(i)

@@ -4,22 +4,29 @@ const (
 	MinCap = 4
 )
 
-type SliceQ[T any] struct {
+type Queue[T any] struct {
 	elems      []T
 	head, back int
 	size       int
 }
 
-func NewSliceQ[T any](cap int) *SliceQ[T] {
+func NewQueue[T any](cap int) *Queue[T] {
 	if cap < MinCap {
 		cap = MinCap
 	}
-	return &SliceQ[T]{
+	return &Queue[T]{
 		elems: make([]T, cap),
 	}
 }
 
-func (q *SliceQ[T]) Front() T {
+func (q *Queue[T]) Peek() *T {
+	if q.size <= 0 {
+		return nil
+	}
+	return &q.elems[q.head]
+}
+
+func (q *Queue[T]) Front() T {
 	if q.size <= 0 {
 		panic("empty queue")
 	}
@@ -32,7 +39,7 @@ func (q *SliceQ[T]) Front() T {
 	return e
 }
 
-func (q *SliceQ[T]) PushBack(e T) {
+func (q *Queue[T]) PushBack(e T) {
 	if q.size <= 0 {
 		q.elems[0] = e
 		q.head = 0
@@ -58,15 +65,15 @@ func (q *SliceQ[T]) PushBack(e T) {
 	q.size++
 }
 
-func (q *SliceQ[T]) isFull() bool {
+func (q *Queue[T]) isFull() bool {
 	return q.Size() == len(q.elems)
 }
 
-func (q *SliceQ[T]) Size() int {
+func (q *Queue[T]) Size() int {
 	return q.size
 }
 
-func (q *SliceQ[T]) Drain() []T {
+func (q *Queue[T]) Drain() []T {
 	var elems []T
 	for q.Size() > 0 {
 		elems = append(elems, q.Front())

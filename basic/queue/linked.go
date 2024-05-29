@@ -15,6 +15,10 @@ type elem[T any] struct {
 	next *elem[T]
 }
 
+func (q *LinkQ[T]) Peek() *T {
+	return &q.head.v
+}
+
 func (q *LinkQ[T]) Front() T {
 	e := q.head.v
 	q.head = q.head.next
