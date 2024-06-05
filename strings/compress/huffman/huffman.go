@@ -3,8 +3,8 @@ package huffman
 import (
 	"strconv"
 
-	"github.com/howz97/algorithm/pq/heap"
-	. "github.com/howz97/algorithm/search"
+	"github.com/howz97/algorithm/pq"
+	"github.com/howz97/algorithm/search"
 )
 
 type node struct {
@@ -26,11 +26,11 @@ func (n *node) String() string {
 	return str + strconv.Itoa(n.cnt)
 }
 
-func (n *node) Left() ITraversal {
+func (n *node) Left() search.ITraversal {
 	return n.left
 }
 
-func (n *node) Right() ITraversal {
+func (n *node) Right() search.ITraversal {
 	return n.right
 }
 
@@ -74,7 +74,7 @@ func compile(data []byte) (*bitWriter, [256][]bool) {
 	var table [256][]bool
 	huffmanTree.makeTable(make([]bool, 0, 256), table[:])
 	// Encode huffman tree
-	PreOrder(huffmanTree, func(t ITraversal) bool {
+	search.PreOrder(huffmanTree, func(t search.ITraversal) bool {
 		n := t.(*node)
 		if n.isLeaf {
 			bw.WriteBit(true)
@@ -92,7 +92,7 @@ func genHuffmanTree(data []byte) (huffmanTree *node) {
 	for _, b := range data {
 		stat[b]++
 	}
-	pq := heap.NewPaired[int, *node](256)
+	pq := pq.NewPaired[int, *node](256)
 	for b, cnt := range stat {
 		if cnt > 0 {
 			pq.PushPair(cnt, &node{
