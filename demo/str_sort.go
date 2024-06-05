@@ -6,7 +6,7 @@ import (
 	"github.com/howz97/algorithm/strings/sort"
 )
 
-func main() {
+func demo_strSort() {
 	data := []string{
 		"ABABC",
 		"ABAAA",

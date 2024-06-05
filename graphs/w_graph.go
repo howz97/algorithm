@@ -2,7 +2,7 @@ package graphs
 
 import (
 	"github.com/howz97/algorithm/basic/unionfind"
-	"github.com/howz97/algorithm/pq/heap"
+	"github.com/howz97/algorithm/pq"
 )
 
 func NewWGraph(size uint) *WGraph {
@@ -21,12 +21,12 @@ func (g *WGraph) AddEdge(src, dst int, w float64) error {
 
 // LazyPrim gets the minimum spanning tree by Lazy-Prim algorithm. g MUST be a connected graph
 func (g *WGraph) LazyPrim() (mst *WGraph) {
-	pq := heap.New[float64, *edge](g.NumVert())
+	pq := pq.NewPaired[float64, *edge](g.NumVert())
 	mst = NewWGraph(g.NumVert())
 	marked := make([]bool, g.NumVert())
 	marked[0] = true
 	g.IterWAdjacent(0, func(dst int, w float64) bool {
-		pq.Push(w, &edge{
+		pq.PushPair(w, &edge{
 			from:   0,
 			to:     dst,
 			weight: w,
@@ -44,11 +44,11 @@ func (g *WGraph) LazyPrim() (mst *WGraph) {
 	return
 }
 
-func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *heap.Heap[float64, *edge]) {
+func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *pq.Paired[float64, *edge]) {
 	marked[v] = true
 	g.IterWAdjacent(v, func(a int, w float64) bool {
 		if !marked[a] {
-			pq.Push(w, &edge{
+			pq.PushPair(w, &edge{
 				from:   v,
 				to:     a,
 				weight: w,
@@ -61,11 +61,11 @@ func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *heap.Heap[float64, *edge
 // Prim gets the minimum spanning tree by Prim algorithm. g MUST be a connected graph
 func (g *WGraph) Prim() (mst *WGraph) {
 	marked := make([]bool, g.NumVert())
-	pq := heap.New2[float64, int](g.NumVert())
+	pq := pq.NewFixable[float64, int](g.NumVert())
 	mst = NewWGraph(g.NumVert())
 	marked[0] = true
 	g.IterWAdjacent(0, func(a int, w float64) bool {
-		pq.Push(w, a)
+		pq.PushPair(w, a)
 		mst.AddEdge(0, a, w)
 		return true
 	})
@@ -78,7 +78,7 @@ func (g *WGraph) Prim() (mst *WGraph) {
 	return
 }
 
-func primVisit(g, mst *WGraph, v int, marked []bool, pq *heap.Heap2[float64, int]) {
+func primVisit(g, mst *WGraph, v int, marked []bool, pq *pq.Fixable[float64, int]) {
 	marked[v] = true
 	g.IterWAdjacent(v, func(a int, w float64) bool {
 		if marked[a] {
@@ -86,7 +86,7 @@ func primVisit(g, mst *WGraph, v int, marked []bool, pq *heap.Heap2[float64, int
 		}
 		orig := mst.Adjacent(a)
 		if len(orig) == 0 {
-			pq.Push(w, a)
+			pq.PushPair(w, a)
 			mst.AddEdge(v, a, w)
 		} else if w < mst.GetWeight(orig[0], a) {
 			pq.Fix(w, a)
@@ -101,9 +101,9 @@ func primVisit(g, mst *WGraph, v int, marked []bool, pq *heap.Heap2[float64, int
 func (g *WGraph) Kruskal() (mst *WGraph) {
 	mst = NewWGraph(g.NumVert())
 	uf := unionfind.New(int(g.NumVert()))
-	pq := heap.New[float64, *edge](g.NumVert())
+	pq := pq.NewPaired[float64, *edge](g.NumVert())
 	g.IterWEdge(func(src int, dst int, w float64) bool {
-		pq.Push(w, &edge{
+		pq.PushPair(w, &edge{
 			from:   src,
 			to:     dst,
 			weight: w,

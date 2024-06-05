@@ -6,7 +6,7 @@ import (
 	"github.com/howz97/algorithm/graphs"
 )
 
-func main() {
+func graph_mst() {
 	g, err := graphs.LoadWGraph("../graphs/testdata/mst.yml")
 	if err != nil {
 		panic(err)

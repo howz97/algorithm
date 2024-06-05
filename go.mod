@@ -1,6 +1,6 @@
 module github.com/howz97/algorithm
 
-go 1.18
+go 1.21
 
 require github.com/waiyva/binary-tree v1.0.0
 

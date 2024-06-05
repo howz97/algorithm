@@ -7,7 +7,7 @@ import (
 	"github.com/howz97/algorithm/search/avlst"
 )
 
-func main() {
+func avltree() {
 	avl := avlst.New[int, int]()
 	for i := 0; i < 20; i++ {
 		avl.Put(i, i)
