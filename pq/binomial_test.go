@@ -1,4 +1,4 @@
-package binomial
+package pq
 
 import (
 	"fmt"
@@ -7,11 +7,11 @@ import (
 )
 
 func Test_BQ(t *testing.T) {
-	bq := New[int]()
+	bq := NewBinomial[int]()
 	for i := 0; i <= 50; i++ {
 		bq.Push(i)
 	}
-	bq1 := New[int]()
+	bq1 := NewBinomial[int]()
 	for i := 51; i < 100; i++ {
 		bq1.Push(i)
 	}
@@ -26,7 +26,7 @@ func Test_BQ(t *testing.T) {
 }
 
 func Test_DelMin(t *testing.T) {
-	bq := New[int]()
+	bq := NewBinomial[int]()
 	var err error
 	for i := 100; i < 200; i++ {
 		bq.Push(i)
@@ -44,7 +44,7 @@ func Test_DelMin(t *testing.T) {
 }
 
 func Test_Insert(t *testing.T) {
-	bq := New[int]()
+	bq := NewBinomial[int]()
 	for i := 0; i < 198; i++ {
 		bq.Push(i)
 	}
@@ -88,7 +88,7 @@ func newBQSize(size int) *Binomial[int] {
 		panic("size < 0")
 	}
 	maxTrees := int(math.Logb(float64(size))) + 1
-	bq := New[int]()
+	bq := NewBinomial[int]()
 	for i := 0; i <= maxTrees; i++ {
 		if 1<<uint(i)&size != 0 {
 			bq.trees[i] = binomialTree(i)
@@ -98,12 +98,12 @@ func newBQSize(size int) *Binomial[int] {
 	return bq
 }
 
-func binomialTree(height int) *node[int] {
+func binomialTree(height int) *bNode[int] {
 	if height < 0 {
 		panic("height < 0")
 	}
 	if height == 0 {
-		return &node[int]{
+		return &bNode[int]{
 			p: 1,
 		}
 	}
@@ -112,21 +112,4 @@ func binomialTree(height int) *node[int] {
 	t2.sibling = t1.son
 	t1.son = t2
 	return t1
-}
-
-func Example() {
-	b := New[int]()
-	b.Push(1)
-	b.Push(9)
-	b.Push(9)
-	b.Push(7)
-	b2 := New[int]()
-	b2.Push(13)
-	b2.Push(11)
-	b.Merge(b2)
-	for b.Size() > 0 {
-		fmt.Print(b.Pop(), ",")
-	}
-
-	// Output: 1,7,9,9,11,13,
 }

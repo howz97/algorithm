@@ -92,10 +92,10 @@ func genHuffmanTree(data []byte) (huffmanTree *node) {
 	for _, b := range data {
 		stat[b]++
 	}
-	pq := heap.New[int, *node](256)
+	pq := heap.NewPaired[int, *node](256)
 	for b, cnt := range stat {
 		if cnt > 0 {
-			pq.Push(cnt, &node{
+			pq.PushPair(cnt, &node{
 				isLeaf: true,
 				b:      byte(b),
 				cnt:    cnt,
@@ -106,7 +106,7 @@ func genHuffmanTree(data []byte) (huffmanTree *node) {
 		n1 := pq.Pop()
 		n2 := pq.Pop()
 		cnt := n1.cnt + n2.cnt
-		pq.Push(cnt, &node{
+		pq.PushPair(cnt, &node{
 			isLeaf: false,
 			cnt:    cnt,
 			left:   n1,

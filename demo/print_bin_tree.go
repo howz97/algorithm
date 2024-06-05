@@ -17,7 +17,7 @@ var pairs = []string{
 	8: "8",
 }
 
-func main() {
+func demo_printAvl() {
 	tree := avlst.New[float64, string]()
 	for k, v := range pairs {
 		tree.Put(float64(k)/100, v)

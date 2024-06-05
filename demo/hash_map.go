@@ -7,7 +7,7 @@ import (
 	. "github.com/howz97/algorithm/util"
 )
 
-func main() {
+func demo_hashmap() {
 	hm := hashmap.New[Str, string]()
 	hm.Put(Str("a"), "A")
 	hm.Put(Str("b"), "B")

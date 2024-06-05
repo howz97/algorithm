@@ -7,7 +7,7 @@ import (
 	"github.com/howz97/algorithm/strings"
 )
 
-func main() {
+func demo_strSearch() {
 	txt, err := ioutil.ReadFile("../strings/tale.txt")
 	if err != nil {
 		panic(err)

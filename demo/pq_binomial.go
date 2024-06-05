@@ -3,16 +3,16 @@ package main
 import (
 	"fmt"
 
-	"github.com/howz97/algorithm/pq/binomial"
+	"github.com/howz97/algorithm/pq"
 )
 
-func main() {
-	b := binomial.New[int]()
+func demo_binomial() {
+	b := pq.NewBinomial[int]()
 	b.Push(1)
 	b.Push(9)
 	b.Push(9)
 	b.Push(7)
-	b2 := binomial.New[int]()
+	b2 := pq.NewBinomial[int]()
 	b2.Push(13)
 	b2.Push(11)
 	b.Merge(b2)
