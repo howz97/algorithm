@@ -1,13 +1,13 @@
-package queue
+package basic
 
-type LinkQ[T any] struct {
+type LinkQueue[T any] struct {
 	head *elem[T]
 	tail *elem[T]
 	size int
 }
 
-func NewLinkQ[T any]() *LinkQ[T] {
-	return new(LinkQ[T])
+func NewLinkQueue[T any]() *LinkQueue[T] {
+	return new(LinkQueue[T])
 }
 
 type elem[T any] struct {
@@ -15,11 +15,11 @@ type elem[T any] struct {
 	next *elem[T]
 }
 
-func (q *LinkQ[T]) Peek() *T {
+func (q *LinkQueue[T]) Peek() *T {
 	return &q.head.v
 }
 
-func (q *LinkQ[T]) PopFront() T {
+func (q *LinkQueue[T]) PopFront() T {
 	e := q.head.v
 	q.head = q.head.next
 	if q.head == nil {
@@ -29,7 +29,7 @@ func (q *LinkQ[T]) PopFront() T {
 	return e
 }
 
-func (q *LinkQ[T]) PushBack(e T) {
+func (q *LinkQueue[T]) PushBack(e T) {
 	q.size++
 	if q.head == nil {
 		q.head = &elem[T]{
@@ -44,6 +44,6 @@ func (q *LinkQ[T]) PushBack(e T) {
 	q.tail = q.tail.next
 }
 
-func (q *LinkQ[T]) Size() int {
+func (q *LinkQueue[T]) Size() int {
 	return q.size
 }

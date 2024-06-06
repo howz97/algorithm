@@ -1,4 +1,4 @@
-package stack
+package basic
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 
 func TestNewStack(t *testing.T) {
 	testTimes := 100
-	s := New[int](10)
+	s := NewStack[int](10)
 	for i := 0; i < testTimes; i++ {
 		s.Push(i)
 	}

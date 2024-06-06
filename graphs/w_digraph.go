@@ -6,8 +6,7 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/howz97/algorithm/basic/queue"
-	"github.com/howz97/algorithm/basic/stack"
+	"github.com/howz97/algorithm/basic"
 	"github.com/howz97/algorithm/pq"
 )
 
@@ -146,7 +145,7 @@ func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *pq.Fi
 }
 
 func (spt *PathTree) initTopological(g *WDigraph) {
-	order := stack.New[int](int(g.NumVert()))
+	order := basic.NewStack[int](int(g.NumVert()))
 	g.IterBDFSFrom(spt.src, func(v int) bool {
 		order.Push(v)
 		return true
@@ -168,7 +167,7 @@ func topologicalRelax(g *WDigraph, v int, edgeTo []int, distTo []float64) {
 }
 
 func (spt *PathTree) initBellmanFord(g *WDigraph) error {
-	q := queue.NewLinkQ[int]()
+	q := basic.NewLinkQueue[int]()
 	onQ := make([]bool, g.NumVert())
 	q.PushBack(spt.src)
 	onQ[spt.src] = true
@@ -199,7 +198,7 @@ func (spt *PathTree) toWDigraph(g *WDigraph) *WDigraph {
 	return sptg
 }
 
-func bellmanFordRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, q *queue.LinkQ[int], onQ []bool) {
+func bellmanFordRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, q *basic.LinkQueue[int], onQ []bool) {
 	g.IterWAdjacent(v, func(adj int, w float64) bool {
 		if distTo[v]+w < distTo[adj] {
 			edgeTo[adj] = v
@@ -285,12 +284,12 @@ func (s *Searcher) GetPath(src, dst int) *Path {
 
 func NewPath() *Path {
 	return &Path{
-		Stack: stack.New[edge](2),
+		Stack: basic.NewStack[edge](2),
 	}
 }
 
 type Path struct {
-	*stack.Stack[edge]
+	*basic.Stack[edge]
 }
 
 func (p *Path) Push(from, to int, w float64) {

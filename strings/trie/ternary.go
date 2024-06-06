@@ -1,7 +1,7 @@
 package trie
 
 import (
-	"github.com/howz97/algorithm/basic/queue"
+	"github.com/howz97/algorithm/basic"
 	"github.com/howz97/algorithm/util"
 )
 
@@ -42,7 +42,7 @@ func (t *Ternary[T]) LongestPrefixOf(s string) string {
 }
 
 func (t *Ternary[T]) KeysWithPrefix(prefix string) []string {
-	q := queue.NewQueue[string](0)
+	q := basic.NewQueue[string](0)
 	var node *tnode[T]
 	if prefix == "" {
 		node = t.root
@@ -67,7 +67,7 @@ func (t *Ternary[T]) KeysWithPrefix(prefix string) []string {
 }
 
 func (t *Ternary[T]) KeysMatch(p string) []string {
-	q := queue.NewQueue[string](0)
+	q := basic.NewQueue[string](0)
 	t.root.keysMatch([]rune(p), "", q)
 	return q.Clone()
 }
@@ -202,7 +202,7 @@ func (t *tnode[T]) longestPrefixOf(s []rune, d, l int) int {
 	return l
 }
 
-func (t *tnode[T]) collect(prefix string, keys *queue.Queue[string]) {
+func (t *tnode[T]) collect(prefix string, keys *basic.Queue[string]) {
 	if t.val != nil {
 		keys.PushBack(prefix + string(t.rs))
 	}
@@ -217,7 +217,7 @@ func (t *tnode[T]) collect(prefix string, keys *queue.Queue[string]) {
 	}
 }
 
-func (t *tnode[T]) keysMatch(pattern []rune, prefix string, keys *queue.Queue[string]) {
+func (t *tnode[T]) keysMatch(pattern []rune, prefix string, keys *basic.Queue[string]) {
 	if len(pattern) < len(t.rs) || !util.IsRunesMatch(pattern[:len(t.rs)-1], t.rs[:len(t.rs)-1]) {
 		return
 	}

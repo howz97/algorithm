@@ -1,8 +1,4 @@
-package queue
-
-const (
-	MinCap = 4
-)
+package basic
 
 type Queue[T any] struct {
 	elems      []T

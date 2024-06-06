@@ -3,8 +3,7 @@ package search
 import (
 	"fmt"
 
-	"github.com/howz97/algorithm/basic/queue"
-	"github.com/howz97/algorithm/basic/stack"
+	"github.com/howz97/algorithm/basic"
 	"github.com/waiyva/binary-tree/btprinter"
 )
 
@@ -34,7 +33,7 @@ func PreOrder(bt ITraversal, fn func(ITraversal) bool) bool {
 
 // PreOrderIter traverse nodes in pre-order non-recursively
 func PreOrderIter(bt ITraversal, fn func(ITraversal) bool) {
-	right := stack.New[ITraversal](0)
+	right := basic.NewStack[ITraversal](0)
 	right.Push(bt)
 	for right.Size() > 0 {
 		n := right.Pop()
@@ -85,7 +84,7 @@ func LevelOrder(bt ITraversal, fn func(ITraversal) bool) {
 	if bt.IsNil() {
 		return
 	}
-	q := queue.NewLinkQ[ITraversal]()
+	q := basic.NewLinkQueue[ITraversal]()
 	q.PushBack(bt)
 	for q.Size() > 0 {
 		bt = q.PopFront()
@@ -120,7 +119,7 @@ func ReverseOrder(bt ITraversal, fn func(ITraversal) bool) bool {
 
 func PrintBinaryTree(bt ITraversal) {
 	var sli []string
-	q := queue.NewLinkQ[ITraversal]()
+	q := basic.NewLinkQueue[ITraversal]()
 	q.PushBack(bt)
 	for q.Size() > 0 {
 		bt = q.PopFront()

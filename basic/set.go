@@ -1,8 +1,8 @@
-package set
+package basic
 
 type Set[T comparable] map[T]struct{}
 
-func New[T comparable]() Set[T] {
+func NewSet[T comparable]() Set[T] {
 	return make(map[T]struct{})
 }
 

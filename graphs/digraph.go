@@ -3,8 +3,7 @@ package graphs
 import (
 	"strconv"
 
-	"github.com/howz97/algorithm/basic/queue"
-	"github.com/howz97/algorithm/basic/stack"
+	"github.com/howz97/algorithm/basic"
 	"github.com/howz97/algorithm/search/hashmap"
 	. "github.com/howz97/algorithm/util"
 	"gopkg.in/yaml.v2"
@@ -219,11 +218,11 @@ func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path) bool {
 }
 
 // Topological return a stack that will pop vertices in topological order
-func (dg *Digraph) Topological() (order *stack.Stack[int]) {
+func (dg *Digraph) Topological() (order *basic.Stack[int]) {
 	if dg.FindCycle() != nil {
 		return
 	}
-	order = stack.New[int](int(dg.NumVert()))
+	order = basic.NewStack[int](int(dg.NumVert()))
 	dg.IterVetBDFS(func(v int) bool {
 		order.Push(v)
 		return true
@@ -522,7 +521,7 @@ func (dg Digraph) BFS(src int) *BFS {
 		marked: make([]bool, dg.NumVert()),
 		edgeTo: make([]int, dg.NumVert()),
 	}
-	q := queue.NewLinkQ[int]()
+	q := basic.NewLinkQueue[int]()
 	bfs.marked[src] = true
 	q.PushBack(src)
 	for q.Size() > 0 {

@@ -1,7 +1,7 @@
 package graphs
 
 import (
-	"github.com/howz97/algorithm/basic/unionfind"
+	"github.com/howz97/algorithm/basic"
 	"github.com/howz97/algorithm/pq"
 )
 
@@ -100,7 +100,7 @@ func primVisit(g, mst *WGraph, v int, marked []bool, pq *pq.Fixable[float64, int
 // Kruskal gets the minimum spanning tree by Kruskal algorithm. g MUST be a connected graph
 func (g *WGraph) Kruskal() (mst *WGraph) {
 	mst = NewWGraph(g.NumVert())
-	uf := unionfind.New(int(g.NumVert()))
+	uf := basic.NewUnionFind(int(g.NumVert()))
 	pq := pq.NewPaired[float64, *edge](g.NumVert())
 	g.IterWEdge(func(src int, dst int, w float64) bool {
 		pq.PushPair(w, &edge{

@@ -1,4 +1,4 @@
-package stack
+package basic
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ type Stack[T any] struct {
 	top   int
 }
 
-func New[T any](c int) *Stack[T] {
+func NewStack[T any](c int) *Stack[T] {
 	if c < MinCap {
 		c = MinCap
 	}
@@ -119,4 +119,23 @@ func (s *Stack[T]) Drain() []T {
 		elems = append(elems, s.Pop())
 	}
 	return elems
+}
+
+type StackCmp[T comparable] struct {
+	Stack[T]
+}
+
+func NewStackCmp[T comparable](c int) *StackCmp[T] {
+	return &StackCmp[T]{
+		Stack: *NewStack[T](c),
+	}
+}
+
+func (s *StackCmp[T]) Contains(e T) bool {
+	for i := 0; i < s.top; i++ {
+		if s.elems[i] == e {
+			return true
+		}
+	}
+	return false
 }

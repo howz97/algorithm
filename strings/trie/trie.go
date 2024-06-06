@@ -1,7 +1,7 @@
 package trie
 
 import (
-	"github.com/howz97/algorithm/basic/queue"
+	"github.com/howz97/algorithm/basic"
 	"github.com/howz97/algorithm/strings/alphabet"
 )
 
@@ -46,13 +46,13 @@ func (t *Trie[T]) KeysWithPrefix(prefix string) []string {
 	if node == nil {
 		return nil
 	}
-	q := queue.NewQueue[string](0)
+	q := basic.NewQueue[string](0)
 	node.collect(t.alp, prefix, q)
 	return q.Clone()
 }
 
 func (t *Trie[T]) KeysMatch(p string) []string {
-	q := queue.NewQueue[string](0)
+	q := basic.NewQueue[string](0)
 	t.root.keysMatch(t.alp, []rune(p), "", q)
 	return q.Clone()
 }
@@ -104,7 +104,7 @@ func (t *node[T]) longestPrefixOf(s []rune, d int, l int) int {
 	return next.longestPrefixOf(s, d+1, l)
 }
 
-func (t *node[T]) collect(a alphabet.IAlp, prefix string, keys *queue.Queue[string]) {
+func (t *node[T]) collect(a alphabet.IAlp, prefix string, keys *basic.Queue[string]) {
 	if t.val != nil {
 		keys.PushBack(prefix)
 	}
@@ -116,7 +116,7 @@ func (t *node[T]) collect(a alphabet.IAlp, prefix string, keys *queue.Queue[stri
 	}
 }
 
-func (t *node[T]) keysMatch(a alphabet.IAlp, pattern []rune, prefix string, keys *queue.Queue[string]) {
+func (t *node[T]) keysMatch(a alphabet.IAlp, pattern []rune, prefix string, keys *basic.Queue[string]) {
 	if len(pattern) == 0 {
 		if t.val != nil {
 			keys.PushBack(prefix)

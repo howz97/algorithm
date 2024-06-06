@@ -1,4 +1,4 @@
-package queue
+package basic
 
 import (
 	"testing"
@@ -24,7 +24,7 @@ func BenchmarkQueue_PopFront(b *testing.B) {
 }
 
 func BenchmarkLinkQueue_PushBack(b *testing.B) {
-	q := NewLinkQ[int]()
+	q := NewLinkQueue[int]()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		q.PushBack(i)
@@ -32,7 +32,7 @@ func BenchmarkLinkQueue_PushBack(b *testing.B) {
 }
 
 func BenchmarkLinkQueue_PopFront(b *testing.B) {
-	q := NewLinkQ[int]()
+	q := NewLinkQueue[int]()
 	for i := 0; i < b.N; i++ {
 		q.PushBack(i)
 	}

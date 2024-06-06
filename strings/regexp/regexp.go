@@ -7,9 +7,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/howz97/algorithm/basic/queue"
-	"github.com/howz97/algorithm/basic/set"
-	"github.com/howz97/algorithm/basic/stack"
+	"github.com/howz97/algorithm/basic"
 	"github.com/howz97/algorithm/graphs"
 )
 
@@ -55,8 +53,8 @@ func (re *Regexp) Match(str string) bool {
 	return curStatus.Contains(len(re.table))
 }
 
-func (re *Regexp) startStatus() set.Set[int] {
-	start := set.New[int]()
+func (re *Regexp) startStatus() basic.Set[int] {
+	start := basic.NewSet[int]()
 	re.tc.Iterate(0, func(v int) bool {
 		start.Add(v)
 		return true
@@ -64,8 +62,8 @@ func (re *Regexp) startStatus() set.Set[int] {
 	return start
 }
 
-func (re *Regexp) forwardStatus(curStatus set.Set[int], r rune) set.Set[int] {
-	arrived := set.New[int]()
+func (re *Regexp) forwardStatus(curStatus basic.Set[int], r rune) basic.Set[int] {
+	arrived := basic.NewSet[int]()
 	for curStatus.Len() > 0 {
 		s := curStatus.TakeOne()
 		if s < len(re.table) && re.table[s].match(r) {
@@ -75,8 +73,8 @@ func (re *Regexp) forwardStatus(curStatus set.Set[int], r rune) set.Set[int] {
 	return arrived
 }
 
-func (re *Regexp) updateCurStatus(sources set.Set[int]) set.Set[int] {
-	reachable := set.New[int]()
+func (re *Regexp) updateCurStatus(sources basic.Set[int]) basic.Set[int] {
+	reachable := basic.NewSet[int]()
 	for sources.Len() > 0 {
 		vSrc := sources.TakeOne()
 		re.tc.Iterate(vSrc, func(v int) bool {
@@ -110,7 +108,7 @@ func makeSymbolTable(compiled []rune) []symbol {
 func compile(pattern []rune) ([]rune, error) {
 	compiled := make([]rune, 0, len(pattern)<<1)
 	left := 0
-	lpStack := stack.New[int](0)
+	lpStack := basic.NewStack[int](0)
 	for i := 0; i < len(pattern); i++ {
 		switch pattern[i] {
 		case '\\': // must put \ on top case
@@ -225,7 +223,7 @@ func indexRune(runes []rune, r rune) int {
 func makeNFA(table []symbol) *graphs.Digraph {
 	size := len(table)
 	nfa := graphs.NewDigraph(uint(size + 1))
-	stk := stack.New[int](size)
+	stk := basic.NewStack[int](size)
 	for i, syb := range table {
 		left := i
 		if syb.isPrime {
@@ -235,7 +233,7 @@ func makeNFA(table []symbol) *graphs.Digraph {
 				stk.Push(i)
 			case ')':
 				nfa.AddEdge(i, i+1)
-				allOr := queue.NewLinkQ[int]()
+				allOr := basic.NewLinkQueue[int]()
 				for {
 					out := stk.Pop()
 					if table[out].r == '|' {

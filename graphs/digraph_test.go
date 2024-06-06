@@ -5,7 +5,7 @@ import (
 	stdsort "sort"
 	"testing"
 
-	"github.com/howz97/algorithm/basic/stack"
+	"github.com/howz97/algorithm/basic"
 	"github.com/howz97/algorithm/sort"
 	"github.com/howz97/algorithm/util"
 )
@@ -136,7 +136,7 @@ func TestRevDFS(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	order := stack.New[int](0)
+	order := basic.NewStack[int](0)
 	g.IterBDFSFrom(0, func(v int) bool {
 		order.Push(v)
 		return true

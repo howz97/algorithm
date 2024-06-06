@@ -1,4 +1,4 @@
-package unionfind
+package basic
 
 const (
 	verticalOverflow = "vertical overflow"
@@ -9,7 +9,7 @@ type UnionFind struct {
 	numcc int
 }
 
-func New(numV int) *UnionFind {
+func NewUnionFind(numV int) *UnionFind {
 	uf := &UnionFind{
 		id:    make([]int, numV),
 		numcc: numV,

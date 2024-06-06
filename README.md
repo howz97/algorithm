@@ -1,12 +1,14 @@
-Algorithm (Sedgewick, 4th) implemented in golang
-## Basic
-  * [Stack](https://github.com/howz97/algorithm/tree/master/basic/stack)
-  * [Queue](https://github.com/howz97/algorithm/tree/master/basic/queue)
+Algorithm (Sedgewick, 4th) implemented in golang.  
+[Document](https://pkg.go.dev/github.com/howz97/algorithm)
+
+## [Basic](basic)
+  * Stack
+  * Queue
     * Array List
     * Linked List
-  * [Set](https://github.com/howz97/algorithm/tree/master/basic/set)
-  * [Union-Find](https://github.com/howz97/algorithm/tree/master/basic/unionfind)
-## [Sorting](https://github.com/howz97/algorithm/tree/master/sort)
+  * Set
+  * Union-Find
+## [Sorting](sort)
   * Bubblesort
   * Heapsort
   * Insertsort
@@ -15,11 +17,11 @@ Algorithm (Sedgewick, 4th) implemented in golang
   * Selectsort
   * Shellsort
 ## Searching
-  * [Binary Search Tree](https://github.com/howz97/algorithm/tree/master/search/binarytree)
-  * [AVL Tree](https://github.com/howz97/algorithm/tree/master/search/avlst)
-  * [Red-Black Tree](https://github.com/howz97/algorithm/tree/master/search/redblack)
-  * [Hash Table](https://github.com/howz97/algorithm/tree/master/search/hashmap)
-## [Graphs](https://github.com/howz97/algorithm/tree/master/graphs)
+  * [Binary Search Tree](search/binarytree)
+  * [AVL Tree](search/avlst)
+  * [Red-Black Tree](search/redblack)
+  * [Hash Table](search/hashmap)
+## [Graphs](graphs)
   * Directed Graph
     * BFS
     * DFS
@@ -40,23 +42,22 @@ Algorithm (Sedgewick, 4th) implemented in golang
     * Topological
     * BellmanFord
 ## Strings
-  * [String Sort](https://github.com/howz97/algorithm/tree/master/strings/sort)
+  * [String Sort](strings/sort)
     * Most-significant-digit-first
     * Three-way String Quicksort
-  * [Trie](https://github.com/howz97/algorithm/tree/master/strings/trie)
+  * [Trie](strings/trie)
     * R-way Trie
     * Ternary Search Trie (TST)
-  * [Substring Search](https://github.com/howz97/algorithm/tree/master/strings)
+  * [Substring Search](strings)
     * Knuth-Morris-Pratt
     * Boyer-Moore
     * Rabin-Karp
-  * [Regular Expression](https://github.com/howz97/algorithm/tree/master/strings/regexp)
+  * [Regular Expression](strings/regexp)
   * Data Compression
-    * [Huffman](https://github.com/howz97/algorithm/tree/master/strings/compress/huffman)
-    * [LZW](https://github.com/howz97/algorithm/tree/master/strings/compress/lzw)
-## Priority Queues
-  * [Heap](https://github.com/howz97/algorithm/tree/master/pq/heap)
-  * [Leftist Heap](https://github.com/howz97/algorithm/tree/master/pq/leftist)
-  * [Binomial Heap](https://github.com/howz97/algorithm/tree/master/pq/binomial)
+    * [Huffman](strings/compress/huffman)
+    * [LZW](strings/compress/lzw)
+## [Priority Queues](pq)
+  * Heap
+  * Leftist Heap
+  * Binomial Heap
 
-[Document](https://pkg.go.dev/github.com/howz97/algorithm)
