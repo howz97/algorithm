@@ -1,4 +1,4 @@
-package hashmap
+package search
 
 import (
 	"fmt"
@@ -7,23 +7,22 @@ import (
 const (
 	maxLoadFactor = 8
 	minLoadFactor = 1
-
-	MinSizeTbl = 1
+	MinSizeTbl    = 1
 )
 
-// ComparableHasher is a type constraint that matches all
+// CmpHash is a type constraint that matches all
 // comparable types with a Hash method.
-type ComparableHasher interface {
+type CmpHash interface {
 	comparable
 	Hash() uintptr
 }
 
-type Chaining[CH ComparableHasher, T any] struct {
+type HashMap[K CmpHash, V any] struct {
 	Num uint
-	tbl table[CH, T]
+	tbl hTable[K, V]
 }
 
-func New[CH ComparableHasher, T any](args ...uint) *Chaining[CH, T] {
+func NewHashMap[K CmpHash, V any](args ...uint) *HashMap[K, V] {
 	if len(args) > 1 {
 		panic("too many arguments")
 	}
@@ -34,16 +33,16 @@ func New[CH ComparableHasher, T any](args ...uint) *Chaining[CH, T] {
 	if size < MinSizeTbl {
 		size = MinSizeTbl
 	}
-	return &Chaining[CH, T]{
-		tbl: make(table[CH, T], size),
+	return &HashMap[K, V]{
+		tbl: make(hTable[K, V], size),
 	}
 }
 
-func (c *Chaining[CH, T]) Get(k CH) (T, bool) {
+func (c *HashMap[K, V]) Get(k K) (V, bool) {
 	return c.tbl.get(k)
 }
 
-func (c *Chaining[CH, T]) Put(k CH, v T) {
+func (c *HashMap[K, V]) Put(k K, v V) {
 	exist := c.tbl.put(k, v)
 	if !exist {
 		c.Num++
@@ -53,7 +52,7 @@ func (c *Chaining[CH, T]) Put(k CH, v T) {
 	}
 }
 
-func (c *Chaining[CH, T]) Del(k CH) {
+func (c *HashMap[K, V]) Del(k K) {
 	exist := c.tbl.del(k)
 	if exist {
 		c.Num--
@@ -63,44 +62,44 @@ func (c *Chaining[CH, T]) Del(k CH) {
 	}
 }
 
-func (c *Chaining[CH, T]) Clean() {
+func (c *HashMap[K, V]) Clean() {
 	c.Num = 0
-	c.tbl = make(table[CH, T], MinSizeTbl)
+	c.tbl = make(hTable[K, V], MinSizeTbl)
 }
 
-func (c *Chaining[CH, T]) numBuckets() uint {
+func (c *HashMap[K, V]) numBuckets() uint {
 	return c.tbl.size()
 }
 
-func (c *Chaining[CH, T]) Size() uint {
+func (c *HashMap[K, V]) Size() uint {
 	return c.Num
 }
 
-func (c *Chaining[CH, T]) loadFactor() uint {
+func (c *HashMap[K, V]) loadFactor() uint {
 	return c.Size() / c.numBuckets()
 }
 
-func (c *Chaining[CH, T]) expand() {
-	newTbl := make([]bucket[CH, T], c.numBuckets()*2)
+func (c *HashMap[K, V]) expand() {
+	newTbl := make([]hBucket[K, V], c.numBuckets()*2)
 	tblMove(c.tbl, newTbl)
 	c.tbl = newTbl
 }
 
-func (c *Chaining[CH, T]) shrink() {
+func (c *HashMap[K, V]) shrink() {
 	size := c.numBuckets() >> 1
 	if size < MinSizeTbl {
 		return
 	}
-	newTbl := make([]bucket[CH, T], size)
+	newTbl := make([]hBucket[K, V], size)
 	tblMove(c.tbl, newTbl)
 	c.tbl = newTbl
 }
 
-func (c *Chaining[CH, T]) Range(fn func(key CH, val T) bool) {
+func (c *HashMap[K, V]) Range(fn func(key K, val V) bool) {
 	c.tbl.Range(fn)
 }
 
-func (c *Chaining[CH, T]) String() string {
+func (c *HashMap[K, V]) String() string {
 	str := fmt.Sprintf("size=%d\n", c.Size())
 	for i, b := range c.tbl {
 		str += fmt.Sprintf("bucket%d: ", i)
@@ -114,7 +113,7 @@ func (c *Chaining[CH, T]) String() string {
 	return str
 }
 
-func tblMove[CH ComparableHasher, T any](src table[CH, T], dst table[CH, T]) {
+func tblMove[K CmpHash, V any](src hTable[K, V], dst hTable[K, V]) {
 	for _, b := range src {
 		n := b.head
 		for n != nil {
@@ -124,25 +123,25 @@ func tblMove[CH ComparableHasher, T any](src table[CH, T], dst table[CH, T]) {
 	}
 }
 
-type table[CH ComparableHasher, T any] []bucket[CH, T]
+type hTable[K CmpHash, V any] []hBucket[K, V]
 
-func (t table[CH, T]) put(k CH, v T) bool {
+func (t hTable[K, V]) put(k K, v V) bool {
 	return t[uint(k.Hash())%t.size()].put(k, v)
 }
 
-func (t table[CH, T]) get(k CH) (T, bool) {
+func (t hTable[K, V]) get(k K) (V, bool) {
 	return t[uint(k.Hash())%t.size()].get(k)
 }
 
-func (t table[CH, T]) del(k CH) bool {
+func (t hTable[K, V]) del(k K) bool {
 	return t[uint(k.Hash())%t.size()].del(k)
 }
 
-func (t table[CH, T]) size() uint {
+func (t hTable[K, V]) size() uint {
 	return uint(len(t))
 }
 
-func (t table[Cmp, T]) Range(fn func(key Cmp, val T) bool) {
+func (t hTable[Cmp, V]) Range(fn func(key Cmp, val V) bool) {
 	for _, bkt := range t {
 		nd := bkt.head
 		for nd != nil {
@@ -154,19 +153,19 @@ func (t table[Cmp, T]) Range(fn func(key Cmp, val T) bool) {
 	}
 }
 
-type node[Cmp comparable, T any] struct {
+type hNode[Cmp comparable, V any] struct {
 	k    Cmp
-	v    T
-	next *node[Cmp, T]
+	v    V
+	next *hNode[Cmp, V]
 }
 
-type bucket[Cmp comparable, T any] struct {
-	head *node[Cmp, T]
+type hBucket[Cmp comparable, V any] struct {
+	head *hNode[Cmp, V]
 }
 
-func (b *bucket[Cmp, T]) put(k Cmp, v T) bool {
+func (b *hBucket[Cmp, V]) put(k Cmp, v V) bool {
 	if b.head == nil {
-		b.head = &node[Cmp, T]{
+		b.head = &hNode[Cmp, V]{
 			k: k,
 			v: v,
 		}
@@ -186,14 +185,14 @@ func (b *bucket[Cmp, T]) put(k Cmp, v T) bool {
 		pre = n
 		n = n.next
 	}
-	pre.next = &node[Cmp, T]{
+	pre.next = &hNode[Cmp, V]{
 		k: k,
 		v: v,
 	}
 	return false
 }
 
-func (b *bucket[Cmp, T]) get(k Cmp) (T, bool) {
+func (b *hBucket[Cmp, V]) get(k Cmp) (V, bool) {
 	n := b.head
 	for n != nil {
 		if n.k == k {
@@ -201,11 +200,11 @@ func (b *bucket[Cmp, T]) get(k Cmp) (T, bool) {
 		}
 		n = n.next
 	}
-	var v T
+	var v V
 	return v, false
 }
 
-func (b *bucket[Cmp, T]) del(k Cmp) bool {
+func (b *hBucket[Cmp, V]) del(k Cmp) bool {
 	if b.head == nil {
 		return false
 	}

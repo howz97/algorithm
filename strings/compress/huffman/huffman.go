@@ -26,11 +26,11 @@ func (n *node) String() string {
 	return str + strconv.Itoa(n.cnt)
 }
 
-func (n *node) Left() search.ITraversal {
+func (n *node) Left() search.BNode {
 	return n.left
 }
 
-func (n *node) Right() search.ITraversal {
+func (n *node) Right() search.BNode {
 	return n.right
 }
 
@@ -74,8 +74,7 @@ func compile(data []byte) (*bitWriter, [256][]bool) {
 	var table [256][]bool
 	huffmanTree.makeTable(make([]bool, 0, 256), table[:])
 	// Encode huffman tree
-	search.PreOrder(huffmanTree, func(t search.ITraversal) bool {
-		n := t.(*node)
+	search.PreorderRecur(huffmanTree, func(n *node) bool {
 		if n.isLeaf {
 			bw.WriteBit(true)
 			bw.WriteByte(n.b)

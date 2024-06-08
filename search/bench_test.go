@@ -1,75 +1,11 @@
-package integer
+package search
 
 import (
 	"math/rand"
 	"testing"
 
-	"github.com/howz97/algorithm/search"
-	"github.com/howz97/algorithm/search/avlst"
-	"github.com/howz97/algorithm/search/binarytree"
-	"github.com/howz97/algorithm/search/hashmap"
-	"github.com/howz97/algorithm/search/redblack"
 	"github.com/howz97/algorithm/util"
 )
-
-func TestAVL(t *testing.T) {
-	LoopTest(t, avlst.New[util.Int, int]())
-}
-
-func TestBinaryTree(t *testing.T) {
-	LoopTest(t, binarytree.New[util.Int, int]())
-}
-
-func TestRedBlack(t *testing.T) {
-	LoopTest(t, redblack.New[util.Int, int]())
-}
-
-func TestHashMap(t *testing.T) {
-	LoopTest(t, hashmap.New[util.Int, int]())
-}
-
-func LoopTest(t *testing.T, s search.Searcher[util.Int, int]) {
-	verify := make(map[int]int)
-	BulkDelete(verify, s, 100)
-	BulkInsert(verify, s, 100)
-	BulkDelete(verify, s, 1000)
-	BulkInsert(verify, s, 500)
-	BulkDelete(verify, s, 100)
-	for i := 0; i < 100; i++ {
-		BulkInsert(verify, s, rand.Intn(1000))
-		VerifyResult(t, verify, s)
-		BulkDelete(verify, s, rand.Intn(1000))
-		VerifyResult(t, verify, s)
-	}
-}
-
-func BulkInsert(verify map[int]int, s search.Searcher[util.Int, int], cnt int) {
-	for i := 0; i < cnt; i++ {
-		k := rand.Int()
-		s.Put(util.Int(k), k)
-		verify[k] = k
-	}
-}
-
-func BulkDelete(verify map[int]int, s search.Searcher[util.Int, int], cnt int) {
-	for i := 0; i < cnt; i++ {
-		k := rand.Int()
-		s.Del(util.Int(k))
-		delete(verify, k)
-	}
-}
-
-func VerifyResult(t *testing.T, verify map[int]int, s search.Searcher[util.Int, int]) {
-	for k, v := range verify {
-		vGot, _ := s.Get(util.Int(k))
-		if vGot != v {
-			t.Fatalf("key %v has wrong value %v, should be %v", k, vGot, v)
-		}
-	}
-	if uint(len(verify)) != s.Size() {
-		t.Fatalf("size not equal %d != %d", len(verify), s.Size())
-	}
-}
 
 func TestBenchmark_Put_OrderKeys(t *testing.T) {
 	// const benchmark = 10000000
@@ -83,7 +19,7 @@ func TestBenchmark_Put_OrderKeys(t *testing.T) {
 	})
 	t.Logf("stdMap.Put cost %v", elapsed)
 
-	hm := hashmap.New[util.Int, int]()
+	hm := NewHashMap[util.Int, int]()
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
 			hm.Put(util.Int(i), i)
@@ -91,7 +27,7 @@ func TestBenchmark_Put_OrderKeys(t *testing.T) {
 	})
 	t.Logf("hashmap.Put cost %v", elapsed)
 
-	avl := avlst.New[util.Int, int]()
+	avl := NewAVL[util.Int, int]()
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
 			avl.Put(util.Int(i), i)
@@ -99,7 +35,7 @@ func TestBenchmark_Put_OrderKeys(t *testing.T) {
 	})
 	t.Logf("avl.Put cost %v", elapsed)
 
-	bt := binarytree.New[util.Int, int]()
+	bt := NewBinTree[util.Int, int]()
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
 			bt.Put(util.Int(i), i)
@@ -131,7 +67,7 @@ func TestBenchmark_RandKeys(t *testing.T) {
 	})
 	t.Logf("stdMap.Del cost %v", elapsed)
 
-	hm := hashmap.New[util.Int, int]()
+	hm := NewHashMap[util.Int, int]()
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
 			hm.Put(util.Int(rand.Intn(benchmark)), i)
@@ -151,7 +87,7 @@ func TestBenchmark_RandKeys(t *testing.T) {
 	})
 	t.Logf("hashmap.Del cost %v", elapsed)
 
-	avl := avlst.New[int, int]()
+	avl := NewAVL[int, int]()
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
 			avl.Put(rand.Intn(benchmark), i)
@@ -171,7 +107,7 @@ func TestBenchmark_RandKeys(t *testing.T) {
 	})
 	t.Logf("avl.Del cost %v", elapsed)
 
-	bt := binarytree.New[int, int]()
+	bt := NewBinTree[int, int]()
 	elapsed = util.ExecCost(func() {
 		for i := 0; i < benchmark; i++ {
 			bt.Put(rand.Intn(benchmark), i)

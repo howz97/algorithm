@@ -1,40 +1,47 @@
 package search
 
 import (
-	"fmt"
+	"cmp"
 
 	"github.com/howz97/algorithm/basic"
 	"github.com/waiyva/binary-tree/btprinter"
 )
 
-type ITraversal interface {
-	fmt.Stringer
-	IsNil() bool
-	Left() ITraversal
-	Right() ITraversal
+type Searcher[K cmp.Ordered, V any] interface {
+	Put(key K, val V)
+	Get(key K) (V, bool)
+	Del(key K)
+	Size() uint
 }
 
-func PreOrder(bt ITraversal, fn func(ITraversal) bool) bool {
-	if !fn(bt) {
+type BNode interface {
+	IsNil() bool
+	Left() BNode
+	Right() BNode
+}
+
+// Preorder traverse nodes in pre-order recursively
+func PreorderRecur[A BNode](nd A, fn func(A) bool) bool {
+	if !fn(nd) {
 		return false
 	}
-	if !bt.Left().IsNil() {
-		if !PreOrder(bt.Left(), fn) {
+	if !nd.Left().IsNil() {
+		if !PreorderRecur(nd.Left().(A), fn) {
 			return false
 		}
 	}
-	if !bt.Right().IsNil() {
-		if !PreOrder(bt.Right(), fn) {
+	if !nd.Right().IsNil() {
+		if !PreorderRecur(nd.Right().(A), fn) {
 			return false
 		}
 	}
 	return true
 }
 
-// PreOrderIter traverse nodes in pre-order non-recursively
-func PreOrderIter(bt ITraversal, fn func(ITraversal) bool) {
-	right := basic.NewStack[ITraversal](0)
-	right.Push(bt)
+// Preorder traverse nodes in pre-order non-recursively
+func Preorder[A BNode](nd A, fn func(A) bool) {
+	right := basic.NewStack[A](0)
+	right.Push(nd)
 	for right.Size() > 0 {
 		n := right.Pop()
 		for !n.IsNil() {
@@ -42,94 +49,94 @@ func PreOrderIter(bt ITraversal, fn func(ITraversal) bool) {
 				return
 			}
 			if !n.Right().IsNil() {
-				right.Push(n.Right())
+				right.Push(n.Right().(A))
 			}
-			n = n.Left()
+			n = n.Left().(A)
 		}
 	}
 }
 
-func InOrder(bt ITraversal, fn func(ITraversal) bool) bool {
-	if !bt.Left().IsNil() {
-		if !InOrder(bt.Left(), fn) {
+func Inorder[A BNode](nd A, fn func(A) bool) bool {
+	if !nd.Left().IsNil() {
+		if !Inorder(nd.Left().(A), fn) {
 			return false
 		}
 	}
-	if !fn(bt) {
+	if !fn(nd) {
 		return false
 	}
-	if !bt.Right().IsNil() {
-		if !InOrder(bt.Right(), fn) {
+	if !nd.Right().IsNil() {
+		if !Inorder(nd.Right().(A), fn) {
 			return false
 		}
 	}
 	return true
 }
 
-func SufOrder(bt ITraversal, fn func(ITraversal) bool) bool {
-	if !bt.Left().IsNil() {
-		if !SufOrder(bt.Left(), fn) {
+func Postorder[A BNode](nd A, fn func(A) bool) bool {
+	if !nd.Left().IsNil() {
+		if !Postorder(nd.Left().(A), fn) {
 			return false
 		}
 	}
-	if !bt.Right().IsNil() {
-		if !SufOrder(bt.Right(), fn) {
+	if !nd.Right().IsNil() {
+		if !Postorder(nd.Right().(A), fn) {
 			return false
 		}
 	}
-	return fn(bt)
+	return fn(nd)
 }
 
-func LevelOrder(bt ITraversal, fn func(ITraversal) bool) {
-	if bt.IsNil() {
+func LevelOrder[A BNode](nd A, fn func(A) bool) {
+	if nd.IsNil() {
 		return
 	}
-	q := basic.NewLinkQueue[ITraversal]()
-	q.PushBack(bt)
+	q := basic.NewLinkQueue[A]()
+	q.PushBack(nd)
 	for q.Size() > 0 {
-		bt = q.PopFront()
-		if !fn(bt) {
+		nd = q.PopFront()
+		if !fn(nd) {
 			break
 		}
-		if !bt.Left().IsNil() {
-			q.PushBack(bt.Left())
+		if !nd.Left().IsNil() {
+			q.PushBack(nd.Left().(A))
 		}
-		if !bt.Right().IsNil() {
-			q.PushBack(bt.Right())
+		if !nd.Right().IsNil() {
+			q.PushBack(nd.Right().(A))
 		}
 	}
 }
 
-func ReverseOrder(bt ITraversal, fn func(ITraversal) bool) bool {
-	if !bt.Right().IsNil() {
-		if !ReverseOrder(bt.Right(), fn) {
+func RevOrder[A BNode](nd A, fn func(A) bool) bool {
+	if !nd.Right().IsNil() {
+		if !RevOrder(nd.Right().(A), fn) {
 			return false
 		}
 	}
-	if !fn(bt) {
+	if !fn(nd) {
 		return false
 	}
-	if !bt.Left().IsNil() {
-		if !ReverseOrder(bt.Left(), fn) {
+	if !nd.Left().IsNil() {
+		if !RevOrder(nd.Left().(A), fn) {
 			return false
 		}
 	}
 	return true
 }
 
-func PrintBinaryTree(bt ITraversal) {
+func PrintTree[A BNode](nd A, toStr func(A) string) {
 	var sli []string
-	q := basic.NewLinkQueue[ITraversal]()
-	q.PushBack(bt)
+	q := basic.NewLinkQueue[A]()
+	q.PushBack(nd)
 	for q.Size() > 0 {
-		bt = q.PopFront()
-		if bt.IsNil() {
+		nd = q.PopFront()
+		if nd.IsNil() {
 			sli = append(sli, "#")
 			continue
 		}
-		sli = append(sli, bt.String())
-		q.PushBack(bt.Left())
-		q.PushBack(bt.Right())
+		sli = append(sli, toStr(nd))
+		q.PushBack(nd.Left().(A))
+		q.PushBack(nd.Right().(A))
 	}
 	btprinter.PrintTree(sli)
 }

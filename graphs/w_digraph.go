@@ -1,7 +1,6 @@
 package graphs
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"strconv"
@@ -43,7 +42,7 @@ func (g *WDigraph) ShortestPathTree(src int, alg int) (*PathTree, error) {
 	switch alg {
 	case Dijkstra:
 		if src, dst := g.FindNegativeEdgeFrom(src); src >= 0 {
-			err = errors.New(fmt.Sprintf("negative edge %d->%d", src, dst))
+			err = fmt.Errorf(fmt.Sprintf("negative edge %d->%d", src, dst))
 			break
 		}
 		spt.initDijkstra(g)
@@ -214,7 +213,7 @@ func bellmanFordRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, q *bas
 
 func (g *WDigraph) SearcherDijkstra() (*Searcher, error) {
 	if src, dst := g.FindNegativeEdge(); src >= 0 {
-		return nil, errors.New(fmt.Sprintf("negative edge %d->%d", src, dst))
+		return nil, fmt.Errorf(fmt.Sprintf("negative edge %d->%d", src, dst))
 	}
 	sps := &Searcher{
 		spt: make([]*PathTree, g.NumVert()),

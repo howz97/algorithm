@@ -4,21 +4,21 @@ import (
 	"strconv"
 
 	"github.com/howz97/algorithm/basic"
-	"github.com/howz97/algorithm/search/hashmap"
-	. "github.com/howz97/algorithm/util"
+	"github.com/howz97/algorithm/search"
+	"github.com/howz97/algorithm/util"
 	"gopkg.in/yaml.v2"
 )
 
 func NewDigraph(size uint) *Digraph {
-	edges := make([]*hashmap.Chaining[Int, float64], size)
+	edges := make([]*search.HashMap[util.Int, float64], size)
 	for i := range edges {
-		edges[i] = hashmap.New[Int, float64]()
+		edges[i] = search.NewHashMap[util.Int, float64]()
 	}
 	return &Digraph{edges: edges}
 }
 
 type Digraph struct {
-	edges []*hashmap.Chaining[Int, float64]
+	edges []*search.HashMap[util.Int, float64]
 	*Symbol
 }
 
@@ -51,7 +51,7 @@ func (dg *Digraph) HasEdge(from, to int) bool {
 	if !dg.HasVert(from) || !dg.HasVert(to) {
 		return false
 	}
-	_, ok := dg.edges[from].Get(Int(to))
+	_, ok := dg.edges[from].Get(util.Int(to))
 	return ok
 }
 
@@ -62,18 +62,18 @@ func (dg *Digraph) addWeightedEdge(from, to int, w float64) {
 	if from == to {
 		panic(ErrSelfLoop)
 	}
-	dg.edges[from].Put(Int(to), w)
+	dg.edges[from].Put(util.Int(to), w)
 }
 
 // DelEdge delete an edge
 func (dg *Digraph) DelEdge(src, dst int) {
-	dg.edges[src].Del(Int(dst))
+	dg.edges[src].Del(util.Int(dst))
 }
 
 // GetWeight get the weight of edge
 // Zero will be returned if edge not exist
 func (dg *Digraph) GetWeight(from, to int) float64 {
-	w, _ := dg.edges[from].Get(Int(to))
+	w, _ := dg.edges[from].Get(util.Int(to))
 	return w
 }
 
@@ -96,7 +96,7 @@ func (dg *Digraph) IterAdjacent(v int, fn func(int) bool) {
 
 // IterWAdjacent iterate all adjacent vertices and weight of v
 func (dg *Digraph) IterWAdjacent(v int, fn func(int, float64) bool) {
-	dg.edges[v].Range(func(key Int, val float64) bool {
+	dg.edges[v].Range(func(key util.Int, val float64) bool {
 		return fn(int(key), val)
 	})
 }
@@ -234,7 +234,7 @@ func (dg *Digraph) Topological() (order *basic.Stack[int]) {
 func (dg *Digraph) IterWEdge(fn func(int, int, float64) bool) {
 	for src, hm := range dg.edges {
 		goon := true
-		hm.Range(func(dst Int, v float64) bool {
+		hm.Range(func(dst util.Int, v float64) bool {
 			goon = fn(src, int(dst), v)
 			return goon
 		})

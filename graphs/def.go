@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/howz97/algorithm/util"
 	"gopkg.in/yaml.v2"
@@ -17,7 +17,7 @@ var (
 )
 
 func readYaml(filename string) (*Digraph, error) {
-	content, err := ioutil.ReadFile(filename)
+	content, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -98,11 +98,11 @@ func checkNoDirection(dg *Digraph) error {
 	dg.IterWEdge(func(from, to int, w float64) bool {
 		wr := dg.GetWeight(to, from)
 		if wr == 0 {
-			err = errors.New(fmt.Sprintf("edge %d->%d has direction", from, to))
+			err = fmt.Errorf(fmt.Sprintf("edge %d->%d has direction", from, to))
 			return false
 		}
 		if wr != w {
-			err = errors.New(fmt.Sprintf("edge %d->%d has weight %v, but %d->%d has weight %v",
+			err = fmt.Errorf(fmt.Sprintf("edge %d->%d has weight %v, but %d->%d has weight %v",
 				from, to, w, to, from, wr))
 			return false
 		}

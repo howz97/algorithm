@@ -1,23 +1,23 @@
 package lzw
 
 import (
-	"github.com/howz97/algorithm/search/hashmap"
-	. "github.com/howz97/algorithm/util"
+	"github.com/howz97/algorithm/search"
+	"github.com/howz97/algorithm/util"
 )
 
 // Compress data using LZW algorithm
 func Compress(data []byte) (out []byte) {
-	table := hashmap.New[Str, uint16]()
+	table := search.NewHashMap[util.Str, uint16]()
 	unused := uint16(0)
 	for b := 0; b <= 0xFF; b++ {
-		table.Put(Str([]byte{byte(b)}), unused)
+		table.Put(util.Str([]byte{byte(b)}), unused)
 		unused++
 	}
 	for len(data) > 0 {
 		var code uint16
 		i := 1
 		for ; i <= len(data); i++ {
-			c, ok := table.Get(Str(data[:i]))
+			c, ok := table.Get(util.Str(data[:i]))
 			if !ok {
 				break
 			}
@@ -28,7 +28,7 @@ func Compress(data []byte) (out []byte) {
 			out = append(out, byte(code))
 			break
 		}
-		table.Put(Str(data[:i]), unused)
+		table.Put(util.Str(data[:i]), unused)
 		unused++
 		out = append(out, byte(code>>8))
 		out = append(out, byte(code))
@@ -39,28 +39,28 @@ func Compress(data []byte) (out []byte) {
 
 // Decompress data compressed by LZW algorithm
 func Decompress(data []byte) (out []byte) {
-	table := hashmap.New[Int, []byte]()
+	table := search.NewHashMap[util.Int, []byte]()
 	i := uint16(0)
 	for b := 0; b <= 0xFF; b++ {
-		table.Put(Int(i), []byte{byte(b)})
+		table.Put(util.Int(i), []byte{byte(b)})
 		i++
 	}
 	for {
 		var code uint16
 		code, data = readUint16(data)
-		bytes, _ := table.Get(Int(code))
+		bytes, _ := table.Get(util.Int(code))
 		out = append(out, bytes...)
 		if len(data) == 0 {
 			break
 		}
 		bytes1 := make([]byte, len(bytes))
 		copy(bytes1, bytes)
-		if e, ok := table.Get(Int(peekUint16(data))); ok {
+		if e, ok := table.Get(util.Int(peekUint16(data))); ok {
 			bytes1 = append(bytes1, e[0])
 		} else {
 			bytes1 = append(bytes1, bytes[0])
 		}
-		table.Put(Int(i), bytes1)
+		table.Put(util.Int(i), bytes1)
 		i++
 	}
 	return
