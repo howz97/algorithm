@@ -17,10 +17,10 @@ Algorithm (Sedgewick, 4th) implemented in golang.
   * Selectsort
   * Shellsort
 ## Searching
-  * [Binary Search Tree](search/binarytree)
-  * [AVL Tree](search/avlst)
-  * [Red-Black Tree](search/redblack)
-  * [Hash Table](search/hashmap)
+  * [Binary Search Tree](search/binarytree.go)
+  * [AVL Tree](search/avl.go)
+  * [Red-Black Tree](search/redblack.go)
+  * [Hash Table](search/hashmap.go)
 ## [Graphs](graphs)
   * Directed Graph
     * BFS
