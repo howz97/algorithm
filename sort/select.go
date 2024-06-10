@@ -14,9 +14,9 @@
 
 package sort
 
-import "golang.org/x/exp/constraints"
+import "cmp"
 
-func Select[Ord constraints.Ordered](data []Ord) {
+func Select[Ord cmp.Ordered](data []Ord) {
 	for i := 0; i < len(data)-1; i++ {
 		idxMin := i
 		for j := i + 1; j < len(data); j++ {

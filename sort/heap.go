@@ -14,9 +14,9 @@
 
 package sort
 
-import "golang.org/x/exp/constraints"
+import "cmp"
 
-func Heap[Ord constraints.Ordered](data []Ord) {
+func Heap[Ord cmp.Ordered](data []Ord) {
 	// construct big top heap
 	// leaf do not need to sink
 	for i := (len(data) - 2) / 2; i >= 0; i-- {
@@ -30,7 +30,7 @@ func Heap[Ord constraints.Ordered](data []Ord) {
 }
 
 // big top heap
-func percolateDown[Ord constraints.Ordered](h []Ord, i int) {
+func percolateDown[Ord cmp.Ordered](h []Ord, i int) {
 	k := h[i]
 	cavIdx := i
 	for {

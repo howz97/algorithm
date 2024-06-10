@@ -14,9 +14,9 @@
 
 package sort
 
-import "golang.org/x/exp/constraints"
+import "cmp"
 
-func Shell[Ord constraints.Ordered](data []Ord) {
+func Shell[Ord cmp.Ordered](data []Ord) {
 	// shell increment
 	for incre := len(data) >> 1; incre > 1; incre >>= 1 {
 		// sort $incre arries with interval of $incre in one loop

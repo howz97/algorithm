@@ -14,14 +14,14 @@
 
 package sort
 
-import "golang.org/x/exp/constraints"
+import "cmp"
 
-func Merge[Ord constraints.Ordered](data []Ord) {
+func Merge[Ord cmp.Ordered](data []Ord) {
 	aux := make([]Ord, len(data))
 	mergeSort(data, aux)
 }
 
-func mergeSort[Ord constraints.Ordered](data []Ord, aux []Ord) {
+func mergeSort[Ord cmp.Ordered](data []Ord, aux []Ord) {
 	if len(data) < 2 {
 		return
 	}
@@ -31,7 +31,7 @@ func mergeSort[Ord constraints.Ordered](data []Ord, aux []Ord) {
 	merge(data, mid, aux)
 }
 
-func merge[Ord constraints.Ordered](data []Ord, mid int, aux []Ord) {
+func merge[Ord cmp.Ordered](data []Ord, mid int, aux []Ord) {
 	i, j, k := 0, mid, 0
 	for i < mid && j < len(data) {
 		if data[i] < data[j] {

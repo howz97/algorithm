@@ -14,9 +14,9 @@
 
 package sort
 
-import "golang.org/x/exp/constraints"
+import "cmp"
 
-func Insert[Ord constraints.Ordered](data []Ord) {
+func Insert[Ord cmp.Ordered](data []Ord) {
 	for i := 1; i < len(data); i++ {
 		insrtNum := data[i]
 		j := i - 1

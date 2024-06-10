@@ -16,16 +16,14 @@ package util
 
 import (
 	"bufio"
-	"io/ioutil"
+	"cmp"
 	"os"
 	"strings"
 	"time"
-
-	"golang.org/x/exp/constraints"
 )
 
 func ReadAllLines(filename string) []string {
-	content, err := ioutil.ReadFile(filename)
+	content, err := os.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
@@ -86,7 +84,7 @@ func MaxInt8(a, b int8) int8 {
 	return b
 }
 
-func Max[Ord constraints.Ordered](a, b Ord) Ord {
+func Max[Ord cmp.Ordered](a, b Ord) Ord {
 	if a > b {
 		return a
 	}

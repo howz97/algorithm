@@ -14,13 +14,13 @@
 
 package sort
 
-import "golang.org/x/exp/constraints"
+import "cmp"
 
-func Quick[Ord constraints.Ordered](data []Ord) {
+func Quick[Ord cmp.Ordered](data []Ord) {
 	quickSort(data, 0, len(data)-1)
 }
 
-func quickSort[Ord constraints.Ordered](data []Ord, lo, hi int) {
+func quickSort[Ord cmp.Ordered](data []Ord, lo, hi int) {
 	if hi <= lo {
 		return
 	}
@@ -37,7 +37,7 @@ func quickSort[Ord constraints.Ordered](data []Ord, lo, hi int) {
 }
 
 // 把 data[0] data[len(data)/2] data[len(data)-1] 中的中位数（枢纽元）交换到data[len(data)-1]
-func median2end[Ord constraints.Ordered](data []Ord, lo, hi int) {
+func median2end[Ord cmp.Ordered](data []Ord, lo, hi int) {
 	m := int(uint(lo+hi) >> 1)
 	if data[m] < data[lo] {
 		data[m], data[lo] = data[lo], data[m]
@@ -52,7 +52,7 @@ func median2end[Ord constraints.Ordered](data []Ord, lo, hi int) {
 }
 
 // 此时枢纽元在 data[len(data)-1] , 开始分割data[:len(data)-1], 并将枢纽元交换到i最终位置
-func cutOff[Ord constraints.Ordered](data []Ord, lo, hi int) int {
+func cutOff[Ord cmp.Ordered](data []Ord, lo, hi int) int {
 	i, j := lo, hi-1
 	for i <= j {
 		for i <= hi && data[i] < data[hi] {
