@@ -50,7 +50,7 @@ func TestMST_Prim(t *testing.T) {
 }
 
 func Example() {
-	g, err := LoadWGraph("testdata/mst.yml")
+	g, err := LoadWGraph(testDir + "mst.yml")
 	if err != nil {
 		panic(err)
 	}

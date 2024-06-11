@@ -21,7 +21,7 @@ import (
 )
 
 func TestDijkstra_Simple(t *testing.T) {
-	g, err := LoadWDigraph(".\\testdata\\w_digraph.yml")
+	g, err := LoadWDigraph(testDir + "w_digraph.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -33,7 +33,7 @@ func TestDijkstra_Simple(t *testing.T) {
 }
 
 func TestTopological_Simple(t *testing.T) {
-	g, err := LoadWDigraph(".\\testdata\\no_cycle.yml")
+	g, err := LoadWDigraph(testDir + "no_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -45,7 +45,7 @@ func TestTopological_Simple(t *testing.T) {
 }
 
 func TestBellmanFord_Simple(t *testing.T) {
-	g, err := LoadWDigraph(".\\testdata\\w_digraph.yml")
+	g, err := LoadWDigraph(testDir + "w_digraph.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -57,7 +57,7 @@ func TestBellmanFord_Simple(t *testing.T) {
 }
 
 func TestNegativeCycle(t *testing.T) {
-	g, err := LoadWDigraph(".\\testdata\\negative_cycle.yml")
+	g, err := LoadWDigraph(testDir + "negative_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -144,10 +144,10 @@ func RandWDigraph(edgeLimit int, negativeEdge float64) (wd *WDigraph) {
 }
 
 func ExampleWDigraph() {
-	g, _ := LoadWDigraph("testdata/no_cycle.yml")
+	g, _ := LoadWDigraph(testDir + "no_cycle.yml")
 	searcher, _ := g.SearcherDijkstra()
-	// searcher, _ = g.SearcherTopological()
-	// searcher, _ = g.SearcherBellmanFord()
+	// searcher, _ := g.SearcherTopological()
+	// searcher, _ := g.SearcherBellmanFord()
 	fmt.Println(searcher.GetPath(1, 2).Str(nil))
 
 	// Output:

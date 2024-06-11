@@ -24,6 +24,8 @@ import (
 	"github.com/howz97/algorithm/util"
 )
 
+const testDir = "../assets/graphs/"
+
 func TestSCC_IsStronglyConnected(t *testing.T) {
 	g := NewDigraph(13)
 	g.AddEdge(0, 1)
@@ -117,7 +119,7 @@ func TestDFS_Graph(t *testing.T) {
 }
 
 func TestDFS_Digraph(t *testing.T) {
-	dg, err := LoadDigraph(".\\testdata\\dfs.yml")
+	dg, err := LoadDigraph(testDir + "dfs.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -146,7 +148,7 @@ func checkDFSResults(t *testing.T, g *Digraph, dfsResults [][]int) {
 }
 
 func TestRevDFS(t *testing.T) {
-	g, err := LoadDigraph(".\\testdata\\dfs.yml")
+	g, err := LoadDigraph(testDir + "dfs.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -182,7 +184,7 @@ func ExampleDigraph_FindCycle() {
 }
 
 func ExampleDigraph_Topological() {
-	dg, err := LoadDigraph(`.\testdata\no_cycle.yml`)
+	dg, err := LoadDigraph(testDir + "no_cycle.yml")
 	if err != nil {
 		panic(err)
 	}
@@ -194,7 +196,7 @@ func ExampleDigraph_Topological() {
 }
 
 func ExampleDigraph_Bipartite() {
-	dg, err := LoadDigraph(`.\testdata\no_cycle.yml`)
+	dg, err := LoadDigraph(testDir + "no_cycle.yml")
 	if err != nil {
 		panic(err)
 	}
@@ -204,7 +206,7 @@ func ExampleDigraph_Bipartite() {
 }
 
 func ExampleReachable() {
-	dg, err := LoadDigraph(`.\testdata\no_cycle.yml`)
+	dg, err := LoadDigraph(testDir + "no_cycle.yml")
 	if err != nil {
 		panic(err)
 	}
@@ -218,7 +220,7 @@ func ExampleReachable() {
 }
 
 func ExampleBFS() {
-	dg, err := LoadDigraph(`.\testdata\no_cycle.yml`)
+	dg, err := LoadDigraph(testDir + "no_cycle.yml")
 	if err != nil {
 		panic(err)
 	}

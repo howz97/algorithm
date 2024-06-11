@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package lzw
+package compress
 
 import (
 	"github.com/howz97/algorithm/search"
 	"github.com/howz97/algorithm/util"
 )
 
-// Compress data using LZW algorithm
-func Compress(data []byte) (out []byte) {
+// LzwCompress data using LZW algorithm
+func LzwCompress(data []byte) (out []byte) {
 	table := search.NewHashMap[util.Str, uint16]()
 	unused := uint16(0)
 	for b := 0; b <= 0xFF; b++ {
@@ -51,8 +51,8 @@ func Compress(data []byte) (out []byte) {
 	return
 }
 
-// Decompress data compressed by LZW algorithm
-func Decompress(data []byte) (out []byte) {
+// LzwDecompress data compressed by LZW algorithm
+func LzwDecompress(data []byte) (out []byte) {
 	table := search.NewHashMap[util.Int, []byte]()
 	i := uint16(0)
 	for b := 0; b <= 0xFF; b++ {

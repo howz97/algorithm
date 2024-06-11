@@ -54,8 +54,8 @@ Algorithm (Sedgewick, 4th) implemented in golang.
     * Rabin-Karp
   * [Regular Expression](strings/regexp)
   * Data Compression
-    * [Huffman](strings/compress/huffman)
-    * [LZW](strings/compress/lzw)
+    * [Huffman](strings/compress/huffman.go)
+    * [LZW](strings/compress/lzw.go)
 ## [Priority Queues](pq)
   * Heap
   * Leftist Heap

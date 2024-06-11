@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package huffman
+package compress
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
 func TestCompress(t *testing.T) {
-	data, err := ioutil.ReadFile("..\\testdata\\tale.txt")
+	data, err := os.ReadFile("../../assets/compress/tale.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
-	compressed := Compress(data)
+	compressed := HuffmanCompress(data)
 	t.Logf("compress performance %.4f", float64(len(compressed))/float64(len(data)))
-	decompressed, err := Decompress(compressed)
+	decompressed, err := HuffmanDecompress(compressed)
 	if err != nil {
 		t.Error(err)
 	}
@@ -48,7 +48,7 @@ func TestCompress(t *testing.T) {
 
 func TestSimple(t *testing.T) {
 	data := "zhang how 1997"
-	de, err := Decompress(Compress([]byte(data)))
+	de, err := HuffmanDecompress(HuffmanCompress([]byte(data)))
 	if err != nil {
 		t.Error(err)
 	}
@@ -60,9 +60,9 @@ func TestSimple(t *testing.T) {
 
 func Example() {
 	data := []byte("zhang how, zhang how, zhang how, zhang how,")
-	compressed := Compress(data)
+	compressed := HuffmanCompress(data)
 	fmt.Printf("performance %.4f\n", float64(len(compressed))/float64(len(data)))
-	de, _ := Decompress(compressed)
+	de, _ := HuffmanDecompress(compressed)
 	fmt.Println(string(de))
 
 	// Output:

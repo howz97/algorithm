@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package huffman
+package compress
 
 import (
 	"strconv"
@@ -71,8 +71,8 @@ func newNode(br *bitReader) (n *node) {
 	return
 }
 
-// Compress data using huffman algorithm
-func Compress(data []byte) []byte {
+// HuffmanCompress data using huffman algorithm
+func HuffmanCompress(data []byte) []byte {
 	bw, table := compile(data)
 	bw.WriteUint32(uint32(len(data)))
 	for _, b := range data {
@@ -129,8 +129,8 @@ func genHuffmanTree(data []byte) (huffmanTree *node) {
 	return pq.Pop()
 }
 
-// Decompress data compressed by huffman algorithm
-func Decompress(data []byte) ([]byte, error) {
+// HuffmanDecompress data compressed by huffman algorithm
+func HuffmanDecompress(data []byte) ([]byte, error) {
 	br := newBitReader(data)
 	huffmanTree := newNode(br)
 	size := br.ReadBits(32)

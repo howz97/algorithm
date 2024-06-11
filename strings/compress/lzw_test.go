@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package lzw
+package compress
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
-func TestCompress(t *testing.T) {
-	data, err := ioutil.ReadFile("..\\testdata\\tale_1.txt")
+func TestCompressLZW(t *testing.T) {
+	data, err := os.ReadFile("../../assets/compress/tale_1.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
-	compressed := Compress(data)
+	compressed := LzwCompress(data)
 	t.Logf("compress performance %v", float64(len(compressed))/float64(len(data)))
-	decompressed := Decompress(compressed)
+	decompressed := LzwDecompress(compressed)
 
 	if len(data) != len(decompressed) {
 		t.Fatalf("raw data length is %v, decompressed length is %v", len(data), len(decompressed))
@@ -43,11 +43,11 @@ func TestCompress(t *testing.T) {
 	}
 }
 
-func Example() {
+func ExampleCompressLZW() {
 	data := []byte("howhowhowhowhowhowhowhowhow")
-	compressed := Compress(data)
+	compressed := LzwCompress(data)
 	fmt.Printf("performance %.4f\n", float64(len(compressed))/float64(len(data)))
-	fmt.Println(string(Decompress(compressed)))
+	fmt.Println(string(LzwDecompress(compressed)))
 
 	// Output:
 	// performance 0.8889
