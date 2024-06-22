@@ -21,8 +21,8 @@ type Queue[T any] struct {
 }
 
 func NewQueue[T any](cap int) *Queue[T] {
-	if cap < MinCap {
-		cap = MinCap
+	if cap < 2 {
+		cap = 2
 	}
 	return &Queue[T]{
 		elems: make([]T, cap),
@@ -32,59 +32,75 @@ func NewQueue[T any](cap int) *Queue[T] {
 func QueueFrom[T any](elems []T) *Queue[T] {
 	return &Queue[T]{
 		elems: elems[:cap(elems)],
-		back:  len(elems) - 1,
+		back:  len(elems),
 		size:  len(elems),
 	}
 }
 
-func (q *Queue[T]) Peek() *T {
-	if q.size <= 0 {
-		return nil
-	}
-	return &q.elems[q.head]
-}
-
-func (q *Queue[T]) PopFront() T {
+func (q *Queue[T]) Front() T {
 	if q.size <= 0 {
 		panic("empty queue")
 	}
-	e := q.elems[q.head]
+	return q.elems[q.head]
+}
+
+func (q *Queue[T]) Back() T {
+	if q.size <= 0 {
+		panic("empty queue")
+	}
+	back := q.back - 1
+	if back < 0 {
+		back = len(q.elems) - 1
+	}
+	return q.elems[back]
+}
+
+func (q *Queue[T]) PopFront() {
+	if q.size <= 0 {
+		panic("empty queue")
+	}
+	q.size--
 	q.head++
 	if q.head == len(q.elems) {
 		q.head = 0
 	}
+}
+
+func (q *Queue[T]) PopBack() {
+	if q.size <= 0 {
+		panic("empty queue")
+	}
 	q.size--
-	return e
+	q.back--
+	if q.back < 0 {
+		q.back = len(q.elems) - 1
+	}
 }
 
 func (q *Queue[T]) PushBack(e T) {
 	if q.size <= 0 {
 		q.elems[0] = e
 		q.head = 0
-		q.back = 0
+		q.back = 1
 		q.size = 1
 		return
 	}
-	if q.isFull() {
+	if q.size == len(q.elems) {
 		expand := make([]T, 2*len(q.elems))
-		n := q.Size()
+		n := q.size
 		for i := 0; i < n; i++ {
 			expand[i] = q.elems[(q.head+i)%len(q.elems)]
 		}
 		q.elems = expand
 		q.head = 0
-		q.back = n - 1
+		q.back = n
 	}
+	q.size++
+	q.elems[q.back] = e
 	q.back++
 	if q.back == len(q.elems) {
 		q.back = 0
 	}
-	q.elems[q.back] = e
-	q.size++
-}
-
-func (q *Queue[T]) isFull() bool {
-	return q.size == len(q.elems)
 }
 
 func (q *Queue[T]) Size() int {
@@ -93,8 +109,8 @@ func (q *Queue[T]) Size() int {
 
 func (q *Queue[T]) Clone() []T {
 	elems := make([]T, 0, q.size)
-	for q.size > 0 {
-		elems = append(elems, q.PopFront())
+	for q.Size() > 0 {
+		elems = append(elems, q.Front())
 	}
 	return elems
 }

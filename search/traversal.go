@@ -55,15 +55,16 @@ func PreorderRecur[A BNode](nd A, fn func(A) bool) bool {
 // Preorder traverse nodes in pre-order non-recursively
 func Preorder[A BNode](nd A, fn func(A) bool) {
 	right := basic.NewStack[A](0)
-	right.Push(nd)
+	right.PushBack(nd)
 	for right.Size() > 0 {
-		n := right.Pop()
+		n := right.Back()
+		right.PopBack()
 		for !n.IsNil() {
 			if !fn(n) {
 				return
 			}
 			if !n.Right().IsNil() {
-				right.Push(n.Right().(A))
+				right.PushBack(n.Right().(A))
 			}
 			n = n.Left().(A)
 		}
@@ -105,10 +106,11 @@ func LevelOrder[A BNode](nd A, fn func(A) bool) {
 	if nd.IsNil() {
 		return
 	}
-	q := basic.NewLinkQueue[A]()
+	q := basic.NewList[A]()
 	q.PushBack(nd)
 	for q.Size() > 0 {
-		nd = q.PopFront()
+		nd = q.Front()
+		q.PopFront()
 		if !fn(nd) {
 			break
 		}
@@ -140,10 +142,11 @@ func RevOrder[A BNode](nd A, fn func(A) bool) bool {
 
 func PrintTree[A BNode](nd A, toStr func(A) string) {
 	var sli []string
-	q := basic.NewLinkQueue[A]()
+	q := basic.NewList[A]()
 	q.PushBack(nd)
 	for q.Size() > 0 {
-		nd = q.PopFront()
+		nd = q.Front()
+		q.PopFront()
 		if nd.IsNil() {
 			sli = append(sli, "#")
 			continue

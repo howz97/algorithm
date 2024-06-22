@@ -14,14 +14,14 @@
 
 package basic
 
-type LinkQueue[T any] struct {
+type List[T any] struct {
 	head *elem[T]
 	tail *elem[T]
 	size int
 }
 
-func NewLinkQueue[T any]() *LinkQueue[T] {
-	return new(LinkQueue[T])
+func NewList[T any]() *List[T] {
+	return new(List[T])
 }
 
 type elem[T any] struct {
@@ -29,21 +29,19 @@ type elem[T any] struct {
 	next *elem[T]
 }
 
-func (q *LinkQueue[T]) Peek() *T {
-	return &q.head.v
+func (q *List[T]) Front() T {
+	return q.head.v
 }
 
-func (q *LinkQueue[T]) PopFront() T {
-	e := q.head.v
+func (q *List[T]) PopFront() {
+	q.size--
 	q.head = q.head.next
 	if q.head == nil {
 		q.tail = nil
 	}
-	q.size--
-	return e
 }
 
-func (q *LinkQueue[T]) PushBack(e T) {
+func (q *List[T]) PushBack(e T) {
 	q.size++
 	if q.head == nil {
 		q.head = &elem[T]{
@@ -58,6 +56,12 @@ func (q *LinkQueue[T]) PushBack(e T) {
 	q.tail = q.tail.next
 }
 
-func (q *LinkQueue[T]) Size() int {
+func (q *List[T]) Size() int {
 	return q.size
+}
+
+type Fifo[T any] interface {
+	Front() T
+	PopFront()
+	PushBack(v T)
 }

@@ -133,13 +133,14 @@ func compile(pattern []rune) ([]rune, error) {
 			}
 			compiled = append(compiled, '\\', pattern[i])
 		case '(':
-			lpStack.Push(len(compiled))
+			lpStack.PushBack(len(compiled))
 			compiled = append(compiled, '(')
 		case ')':
 			if lpStack.Size() <= 0 {
 				return nil, errors.New("'(' missing")
 			}
-			left = lpStack.Pop()
+			left = lpStack.Back()
+			lpStack.PopBack()
 			compiled = append(compiled, ')')
 		case '+':
 			// "(regexp)+" -> "(regexp)(regexp)*"
@@ -244,12 +245,13 @@ func makeNFA(table []symbol) *graphs.Digraph {
 			switch syb.r {
 			case '(':
 				nfa.AddEdge(i, i+1)
-				stk.Push(i)
+				stk.PushBack(i)
 			case ')':
 				nfa.AddEdge(i, i+1)
-				allOr := basic.NewLinkQueue[int]()
+				allOr := basic.NewList[int]()
 				for {
-					out := stk.Pop()
+					out := stk.Back()
+					stk.PopBack()
 					if table[out].r == '|' {
 						allOr.PushBack(out)
 					} else {
@@ -259,14 +261,15 @@ func makeNFA(table []symbol) *graphs.Digraph {
 					}
 				}
 				for allOr.Size() > 0 {
-					or := allOr.PopFront()
+					or := allOr.Front()
+					allOr.PopFront()
 					nfa.AddEdge(left, or+1)
 					nfa.AddEdge(or, i)
 				}
 			case '*':
 				nfa.AddEdge(i, i+1)
 			case '|':
-				stk.Push(i)
+				stk.PushBack(i)
 			case '.':
 			default:
 				panic(fmt.Sprintf("unknown prime %v", syb.r))

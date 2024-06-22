@@ -121,14 +121,14 @@ func (spt *PathTree) PathTo(dst int) *Path {
 	}
 	path := NewPath()
 	for {
-		path.Push(src, dst, 0)
+		path.Push(src, dst, spt.distTo[dst]-spt.distTo[src])
 		dst = src
 		src = spt.edgeTo[dst]
 		if src < 0 {
 			break
 		}
 	}
-	path.Reverse()
+	// path.Reverse()
 	return path
 }
 
@@ -160,11 +160,12 @@ func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *pq.Fi
 func (spt *PathTree) initTopological(g *WDigraph) {
 	order := basic.NewStack[int](int(g.NumVert()))
 	g.IterBDFSFrom(spt.src, func(v int) bool {
-		order.Push(v)
+		order.PushBack(v)
 		return true
 	})
 	for order.Size() > 0 {
-		v := order.Pop()
+		v := order.Back()
+		order.PopBack()
 		topologicalRelax(g, v, spt.edgeTo, spt.distTo)
 	}
 }
@@ -180,13 +181,14 @@ func topologicalRelax(g *WDigraph, v int, edgeTo []int, distTo []float64) {
 }
 
 func (spt *PathTree) initBellmanFord(g *WDigraph) error {
-	q := basic.NewLinkQueue[int]()
+	q := basic.NewList[int]()
 	onQ := make([]bool, g.NumVert())
 	q.PushBack(spt.src)
 	onQ[spt.src] = true
 	cnt := uint(0)
 	for q.Size() > 0 {
-		v := q.PopFront()
+		v := q.Front()
+		q.PopFront()
 		onQ[v] = false
 		bellmanFordRelax(g, v, spt.edgeTo, spt.distTo, q, onQ)
 		cnt++
@@ -211,7 +213,7 @@ func (spt *PathTree) toWDigraph(g *WDigraph) *WDigraph {
 	return sptg
 }
 
-func bellmanFordRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, q *basic.LinkQueue[int], onQ []bool) {
+func bellmanFordRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, q *basic.List[int], onQ []bool) {
 	g.IterWAdjacent(v, func(adj int, w float64) bool {
 		if distTo[v]+w < distTo[adj] {
 			edgeTo[adj] = v
@@ -306,7 +308,7 @@ type Path struct {
 }
 
 func (p *Path) Push(from, to int, w float64) {
-	p.Stack.Push(edge{
+	p.Stack.PushBack(edge{
 		from:   from,
 		to:     to,
 		weight: w,
@@ -314,25 +316,26 @@ func (p *Path) Push(from, to int, w float64) {
 }
 
 func (p *Path) Pop() edge {
-	e := p.Stack.Pop()
+	e := p.Stack.Back()
+	p.Stack.PopBack()
 	return e
 }
 
 func (p *Path) Distance() float64 {
 	d := 0.0
-	p.Iterate(func(e edge) bool {
+	p.Iterate(false, func(e edge) bool {
 		d += e.weight
 		return true
 	})
 	return d
 }
 
-func (p *Path) ContainsVert(v int) bool {
+func (p *Path) HasVert(v int) bool {
 	if p.Size() <= 0 {
 		return false
 	}
 	found := false
-	p.Iterate(func(e edge) bool {
+	p.Iterate(false, func(e edge) bool {
 		if e.from == v {
 			found = true
 			return false
@@ -355,9 +358,9 @@ func (p *Path) Str(s *Symbol) string {
 	} else {
 		i2s = s.SymbolOf
 	}
-	str := fmt.Sprintf("(distance=%v): ", p.Distance())
-	p.Iterate(func(e edge) bool {
-		str += e.string(i2s) + ", "
+	str := fmt.Sprintf("[TotalDistance=%v]", p.Distance())
+	p.Iterate(true, func(e edge) bool {
+		str += " " + e.string(i2s)
 		return true
 	})
 	return str
@@ -369,11 +372,11 @@ func (p *Path) Cycle() *Cycle {
 	}
 	e := p.Peek()
 	x := e.to
-	i := p.Index(func(v edge) bool {
+	i := p.Find(func(v edge) bool {
 		return v.from == x
 	})
 	path := NewPath()
-	p.IterateRange(i, p.Size(), func(e edge) bool {
+	p.IterRange(i, p.Size()-1, func(e edge) bool {
 		path.Push(e.from, e.to, e.weight)
 		return true
 	})
@@ -398,5 +401,5 @@ type edge struct {
 }
 
 func (e *edge) string(i2s func(int) string) string {
-	return i2s(e.from) + "->" + i2s(e.to)
+	return fmt.Sprintf("%s->%s(%.2f)", i2s(e.from), i2s(e.to), e.weight)
 }

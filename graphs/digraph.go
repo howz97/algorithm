@@ -215,7 +215,7 @@ func (dg *Digraph) detectCycleDFS(v int, marked []bool, path *Path) bool {
 		if marked[a] {
 			return true
 		}
-		if path.ContainsVert(a) {
+		if path.HasVert(a) {
 			path.Push(v, a, w)
 			found = true
 			return false
@@ -238,7 +238,7 @@ func (dg *Digraph) Topological() (order *basic.Stack[int]) {
 	}
 	order = basic.NewStack[int](int(dg.NumVert()))
 	dg.IterVetBDFS(func(v int) bool {
-		order.Push(v)
+		order.PushBack(v)
 		return true
 	})
 	return
@@ -535,11 +535,12 @@ func (dg Digraph) BFS(src int) *BFS {
 		marked: make([]bool, dg.NumVert()),
 		edgeTo: make([]int, dg.NumVert()),
 	}
-	q := basic.NewLinkQueue[int]()
+	q := basic.NewList[int]()
 	bfs.marked[src] = true
 	q.PushBack(src)
 	for q.Size() > 0 {
-		vet := q.PopFront()
+		vet := q.Front()
+		q.PopFront()
 		dg.IterAdjacent(vet, func(adj int) bool {
 			if !bfs.marked[adj] {
 				bfs.edgeTo[adj] = vet
@@ -570,6 +571,6 @@ func (bfs *BFS) ShortestPathTo(dst int) *Path {
 		path.Push(bfs.edgeTo[dst], dst, 1)
 		dst = bfs.edgeTo[dst]
 	}
-	path.Reverse()
+	// path.Reverse()
 	return path
 }

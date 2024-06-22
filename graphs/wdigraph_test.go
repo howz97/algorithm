@@ -150,6 +150,5 @@ func ExampleWDigraph() {
 	// searcher, _ := g.SearcherBellmanFord()
 	fmt.Println(searcher.GetPath(1, 2).Str(nil))
 
-	// Output:
-	// (distance=1.02): 1->3, 3->7, 7->2,
+	// [TotalDistance=1.02] 1->3(0.29) 3->7(0.39) 7->2(0.34)
 }

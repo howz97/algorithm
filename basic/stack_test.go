@@ -19,14 +19,60 @@ import (
 	"testing"
 )
 
-func TestNewStack(t *testing.T) {
+func ExampleStack() {
 	testTimes := 100
 	s := NewStack[int](10)
 	for i := 0; i < testTimes; i++ {
-		s.Push(i)
+		s.PushBack(i)
 	}
 	for i := 0; i < testTimes; i++ {
-		e := s.Pop()
+		e := s.Back()
+		s.PopBack()
 		fmt.Print(e, " ")
+	}
+}
+
+func TestStack(t *testing.T) {
+	var stacks = [2]Filo[int]{
+		NewStack[int](0),
+		NewQueue[int](0),
+	}
+	pushFn := func(v int) {
+		for _, q := range stacks {
+			q.PushBack(v)
+		}
+	}
+	popFn := func() {
+		v := stacks[0].Back()
+		for _, stk := range stacks {
+			if v != stk.Back() {
+				t.Fatal()
+			}
+			stk.PopBack()
+		}
+	}
+	for i := 0; i < 1000; i++ {
+		pushFn(i)
+	}
+	for i := 0; i < 500; i++ {
+		popFn()
+	}
+	for i := 0; i < 2000; i++ {
+		pushFn(i)
+	}
+	for i := 0; i < 1500; i++ {
+		popFn()
+	}
+	for i := 0; i < 1000; i++ {
+		pushFn(i)
+	}
+	for i := 0; i < 2000; i++ {
+		popFn()
+	}
+	for i := 0; i < 100; i++ {
+		pushFn(i)
+	}
+	for i := 0; i < 100; i++ {
+		popFn()
 	}
 }

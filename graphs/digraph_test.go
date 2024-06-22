@@ -154,11 +154,11 @@ func TestRevDFS(t *testing.T) {
 	}
 	order := basic.NewStack[int](0)
 	g.IterBDFSFrom(0, func(v int) bool {
-		order.Push(v)
+		order.PushBack(v)
 		return true
 	})
 	correct := []int{0, 3, 6, 7}
-	if !util.SliceEqual(order.Drain(), correct) {
+	if !util.SliceEqual(order.ToSlice(), correct) {
 		t.Errorf("rev dfs order %v not equal %v", order, correct)
 	}
 }
@@ -180,7 +180,7 @@ func ExampleDigraph_FindCycle() {
 	c := g.FindCycle()
 	fmt.Println(c.Error())
 
-	// Output: (distance=3): 0->1, 1->3, 3->0,
+	// [TotalDistance=3] 0->1(1.00) 1->3(1.00) 3->0(1.00)
 }
 
 func ExampleDigraph_Topological() {
@@ -188,7 +188,7 @@ func ExampleDigraph_Topological() {
 	if err != nil {
 		panic(err)
 	}
-	for _, vet := range dg.Topological().Drain() {
+	for _, vet := range dg.Topological().ToSlice() {
 		fmt.Printf("%d->", vet)
 	}
 
@@ -228,9 +228,8 @@ func ExampleBFS() {
 	fmt.Println(bfs.CanReach(5))
 	fmt.Println(bfs.ShortestPathTo(2).Str(nil))
 
-	// Output:
 	// false
-	// (distance=3): 1->3, 3->6, 6->2,
+	// [TotalDistance=3] 7->2(1.00) 3->7(1.00) 1->3(1.00)
 }
 
 func ExampleSCC() {
@@ -267,7 +266,6 @@ func ExampleSCC() {
 	fmt.Println("vertices strongly connected with 0:", vertices)
 	fmt.Println(scc.IsStronglyConn(0, 6))
 
-	// Output:
 	// amount of strongly connected component: 5
 	// vertices strongly connected with 0: [0 2 3 4 5]
 	// false
