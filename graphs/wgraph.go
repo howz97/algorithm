@@ -16,7 +16,7 @@ package graphs
 
 import (
 	"github.com/howz97/algorithm/basic"
-	"github.com/howz97/algorithm/pq"
+	"github.com/howz97/algorithm/pqueue"
 )
 
 func NewWGraph(size uint) *WGraph {
@@ -35,7 +35,7 @@ func (g *WGraph) AddEdge(src, dst int, w float64) error {
 
 // LazyPrim gets the minimum spanning tree by Lazy-Prim algorithm. g MUST be a connected graph
 func (g *WGraph) LazyPrim() (mst *WGraph) {
-	pq := pq.NewPaired[float64, *edge](g.NumVert())
+	pq := pqueue.NewPaired[float64, *edge](g.NumVert())
 	mst = NewWGraph(g.NumVert())
 	marked := make([]bool, g.NumVert())
 	marked[0] = true
@@ -58,7 +58,7 @@ func (g *WGraph) LazyPrim() (mst *WGraph) {
 	return
 }
 
-func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *pq.Paired[float64, *edge]) {
+func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *pqueue.Paired[float64, *edge]) {
 	marked[v] = true
 	g.IterWAdjacent(v, func(a int, w float64) bool {
 		if !marked[a] {
@@ -75,7 +75,7 @@ func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *pq.Paired[float64, *edge
 // Prim gets the minimum spanning tree by Prim algorithm. g MUST be a connected graph
 func (g *WGraph) Prim() (mst *WGraph) {
 	marked := make([]bool, g.NumVert())
-	pq := pq.NewFixable[float64, int](g.NumVert())
+	pq := pqueue.NewFixable[float64, int](g.NumVert())
 	mst = NewWGraph(g.NumVert())
 	marked[0] = true
 	g.IterWAdjacent(0, func(a int, w float64) bool {
@@ -92,7 +92,7 @@ func (g *WGraph) Prim() (mst *WGraph) {
 	return
 }
 
-func primVisit(g, mst *WGraph, v int, marked []bool, pq *pq.Fixable[float64, int]) {
+func primVisit(g, mst *WGraph, v int, marked []bool, pq *pqueue.Fixable[float64, int]) {
 	marked[v] = true
 	g.IterWAdjacent(v, func(a int, w float64) bool {
 		if marked[a] {
@@ -115,7 +115,7 @@ func primVisit(g, mst *WGraph, v int, marked []bool, pq *pq.Fixable[float64, int
 func (g *WGraph) Kruskal() (mst *WGraph) {
 	mst = NewWGraph(g.NumVert())
 	uf := basic.NewUnionFind(int(g.NumVert()))
-	pq := pq.NewPaired[float64, *edge](g.NumVert())
+	pq := pqueue.NewPaired[float64, *edge](g.NumVert())
 	g.IterWEdge(func(src int, dst int, w float64) bool {
 		pq.PushPair(w, &edge{
 			from:   src,

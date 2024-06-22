@@ -17,16 +17,16 @@ package main
 import (
 	"fmt"
 
-	"github.com/howz97/algorithm/pq"
+	"github.com/howz97/algorithm/pqueue"
 )
 
 func demo_binomial() {
-	b := pq.NewBinomial[int]()
+	b := pqueue.NewBinomial[int]()
 	b.Push(1)
 	b.Push(9)
 	b.Push(9)
 	b.Push(7)
-	b2 := pq.NewBinomial[int]()
+	b2 := pqueue.NewBinomial[int]()
 	b2.Push(13)
 	b2.Push(11)
 	b.Merge(b2)

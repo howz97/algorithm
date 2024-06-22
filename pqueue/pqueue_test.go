@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /*
-go test -bench="^Benchmark.*_Push" -cpu=1 -benchtime=10000000x github.com/howz97/algorithm/pq
-go test -bench="^Benchmark.*_Pop" -cpu=1 -benchtime=1000000x github.com/howz97/algorithm/pq
-go test -bench="^Benchmark.*_Merge" -cpu=1 -benchtime=10000x github.com/howz97/algorithm/pq
+go test -bench="^Benchmark.*_Push" -cpu=1 -benchtime=10000000x github.com/howz97/algorithm/pqueue
+go test -bench="^Benchmark.*_Pop" -cpu=1 -benchtime=1000000x github.com/howz97/algorithm/pqueue
+go test -bench="^Benchmark.*_Merge" -cpu=1 -benchtime=10000x github.com/howz97/algorithm/pqueue
 */
-package pq
+package pqueue
 
 import (
 	"fmt"

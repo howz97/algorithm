@@ -17,7 +17,7 @@ package compress
 import (
 	"strconv"
 
-	"github.com/howz97/algorithm/pq"
+	"github.com/howz97/algorithm/pqueue"
 	"github.com/howz97/algorithm/search"
 )
 
@@ -105,7 +105,7 @@ func genHuffmanTree(data []byte) (huffmanTree *node) {
 	for _, b := range data {
 		stat[b]++
 	}
-	pq := pq.NewPaired[int, *node](256)
+	pq := pqueue.NewPaired[int, *node](256)
 	for b, cnt := range stat {
 		if cnt > 0 {
 			pq.PushPair(cnt, &node{

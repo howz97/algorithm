@@ -20,7 +20,7 @@ import (
 	"strconv"
 
 	"github.com/howz97/algorithm/basic"
-	"github.com/howz97/algorithm/pq"
+	"github.com/howz97/algorithm/pqueue"
 )
 
 const (
@@ -133,7 +133,7 @@ func (spt *PathTree) PathTo(dst int) *Path {
 }
 
 func (spt *PathTree) initDijkstra(g *WDigraph) {
-	pq := pq.NewFixable[float64, int](g.NumVert())
+	pq := pqueue.NewFixable[float64, int](g.NumVert())
 	dijkstraRelax(g, spt.src, spt.edgeTo, spt.distTo, pq)
 	for pq.Size() > 0 {
 		m := pq.Pop()
@@ -141,7 +141,7 @@ func (spt *PathTree) initDijkstra(g *WDigraph) {
 	}
 }
 
-func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *pq.Fixable[float64, int]) {
+func dijkstraRelax(g *WDigraph, v int, edgeTo []int, distTo []float64, pq *pqueue.Fixable[float64, int]) {
 	g.IterWAdjacent(v, func(adj int, w float64) bool {
 		if distTo[v]+w < distTo[adj] {
 			inPQ := distTo[adj] != math.Inf(1)
