@@ -15,31 +15,30 @@
 package graphs
 
 import (
-	"github.com/howz97/algorithm/basic"
 	"github.com/howz97/algorithm/pqueue"
 )
 
-func NewWGraph(size uint) *WGraph {
-	return &WGraph{
-		Graph: NewGraph(size),
+func NewWGraph[T any](size uint) *WGraph[T] {
+	return &WGraph[T]{
+		Graph: NewGraph[T](size),
 	}
 }
 
-type WGraph struct {
-	*Graph
+type WGraph[T any] struct {
+	*Graph[T]
 }
 
-func (g *WGraph) AddEdge(src, dst int, w float64) error {
+func (g *WGraph[T]) AddEdge(src, dst Id, w float64) error {
 	return g.Graph.addWeightedEdge(src, dst, w)
 }
 
 // LazyPrim gets the minimum spanning tree by Lazy-Prim algorithm. g MUST be a connected graph
-func (g *WGraph) LazyPrim() (mst *WGraph) {
+func (g *WGraph[T]) LazyPrim() (mst *WGraph[T]) {
 	pq := pqueue.NewPaired[float64, *edge](g.NumVert())
-	mst = NewWGraph(g.NumVert())
+	mst = NewWGraph[T](g.NumVert())
 	marked := make([]bool, g.NumVert())
 	marked[0] = true
-	g.IterWAdjacent(0, func(dst int, w float64) bool {
+	g.IterWAdjacent(0, func(dst Id, w float64) bool {
 		pq.PushPair(w, &edge{
 			from:   0,
 			to:     dst,
@@ -58,9 +57,9 @@ func (g *WGraph) LazyPrim() (mst *WGraph) {
 	return
 }
 
-func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *pqueue.Paired[float64, *edge]) {
+func lazyPrimVisit[T any](g *WGraph[T], v Id, marked []bool, pq *pqueue.Paired[float64, *edge]) {
 	marked[v] = true
-	g.IterWAdjacent(v, func(a int, w float64) bool {
+	g.IterWAdjacent(v, func(a Id, w float64) bool {
 		if !marked[a] {
 			pq.PushPair(w, &edge{
 				from:   v,
@@ -73,12 +72,12 @@ func lazyPrimVisit(g *WGraph, v int, marked []bool, pq *pqueue.Paired[float64, *
 }
 
 // Prim gets the minimum spanning tree by Prim algorithm. g MUST be a connected graph
-func (g *WGraph) Prim() (mst *WGraph) {
+func (g *WGraph[T]) Prim() (mst *WGraph[T]) {
 	marked := make([]bool, g.NumVert())
-	pq := pqueue.NewFixable[float64, int](g.NumVert())
-	mst = NewWGraph(g.NumVert())
+	pq := pqueue.NewFixable[float64, Id](g.NumVert())
+	mst = NewWGraph[T](g.NumVert())
 	marked[0] = true
-	g.IterWAdjacent(0, func(a int, w float64) bool {
+	g.IterWAdjacent(0, func(a Id, w float64) bool {
 		pq.PushPair(w, a)
 		mst.AddEdge(0, a, w)
 		return true
@@ -92,9 +91,9 @@ func (g *WGraph) Prim() (mst *WGraph) {
 	return
 }
 
-func primVisit(g, mst *WGraph, v int, marked []bool, pq *pqueue.Fixable[float64, int]) {
+func primVisit[T any](g, mst *WGraph[T], v Id, marked []bool, pq *pqueue.Fixable[float64, Id]) {
 	marked[v] = true
-	g.IterWAdjacent(v, func(a int, w float64) bool {
+	g.IterWAdjacent(v, func(a Id, w float64) bool {
 		if marked[a] {
 			return true
 		}
@@ -112,11 +111,11 @@ func primVisit(g, mst *WGraph, v int, marked []bool, pq *pqueue.Fixable[float64,
 }
 
 // Kruskal gets the minimum spanning tree by Kruskal algorithm. g MUST be a connected graph
-func (g *WGraph) Kruskal() (mst *WGraph) {
-	mst = NewWGraph(g.NumVert())
-	uf := basic.NewUnionFind(int(g.NumVert()))
+func (g *WGraph[T]) Kruskal() (mst *WGraph[T]) {
+	mst = NewWGraph[T](g.NumVert())
+	uf := NewUnionFind(int(g.NumVert()))
 	pq := pqueue.NewPaired[float64, *edge](g.NumVert())
-	g.IterWEdge(func(src int, dst int, w float64) bool {
+	g.IterWEdge(func(src, dst Id, w float64) bool {
 		pq.PushPair(w, &edge{
 			from:   src,
 			to:     dst,
@@ -135,8 +134,8 @@ func (g *WGraph) Kruskal() (mst *WGraph) {
 	return
 }
 
-func (g *WGraph) ToWDigraph() *WDigraph {
-	return &WDigraph{
+func (g *WGraph[T]) ToWDigraph() *WDigraph[T] {
+	return &WDigraph[T]{
 		Digraph: g.Digraph,
 	}
 }

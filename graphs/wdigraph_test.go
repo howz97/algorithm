@@ -21,7 +21,7 @@ import (
 )
 
 func TestDijkstra_Simple(t *testing.T) {
-	g, err := LoadWDigraph(testDir + "w_digraph.yml")
+	g, err := LoadSymbWDigraph(testDir + "w_digraph.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -29,11 +29,11 @@ func TestDijkstra_Simple(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	CheckSearcher(t, sps, g)
+	CheckSearcher(t, sps, g.WDigraph)
 }
 
 func TestTopological_Simple(t *testing.T) {
-	g, err := LoadWDigraph(testDir + "no_cycle.yml")
+	g, err := LoadSymbWDigraph(testDir + "no_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -41,11 +41,11 @@ func TestTopological_Simple(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	CheckSearcher(t, sps, g)
+	CheckSearcher(t, sps, g.WDigraph)
 }
 
 func TestBellmanFord_Simple(t *testing.T) {
-	g, err := LoadWDigraph(testDir + "w_digraph.yml")
+	g, err := LoadSymbWDigraph(testDir + "w_digraph.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,11 +53,11 @@ func TestBellmanFord_Simple(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	CheckSearcher(t, sps, g)
+	CheckSearcher(t, sps, g.WDigraph)
 }
 
 func TestNegativeCycle(t *testing.T) {
-	g, err := LoadWDigraph(testDir + "negative_cycle.yml")
+	g, err := LoadSymbWDigraph(testDir + "negative_cycle.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -68,14 +68,14 @@ func TestNegativeCycle(t *testing.T) {
 	fmt.Println("negative cycle detected:", err)
 }
 
-func CheckSearcher(t *testing.T, s *Searcher, dg *WDigraph) {
+func CheckSearcher(t *testing.T, s *Searcher[string], dg *WDigraph[string]) {
 	for _, spt := range s.spt {
 		CheckSPT(t, spt, dg)
 	}
 }
 
-func CheckSPT(t *testing.T, tree *PathTree, dg *WDigraph) {
-	dg.IterWEdge(func(from int, to int, w float64) bool {
+func CheckSPT(t *testing.T, tree *PathTree[string], dg *WDigraph[string]) {
+	dg.IterWEdge(func(from, to Id, w float64) bool {
 		if tree.distTo[from]+w < tree.distTo[to] {
 			t.Errorf("edge %d->%d should belong to SPT: %v + %v < %v", from, to, tree.distTo[from], w, tree.distTo[to])
 			return false
@@ -90,31 +90,31 @@ const (
 )
 
 func TestTopological(t *testing.T) {
-	LoopTestSearcher(t, 2, 0.5, func(wd *WDigraph) (*Searcher, error) {
+	LoopTestSearcher(t, 2, 0.5, func(wd *WDigraph[string]) (*Searcher[string], error) {
 		return wd.SearcherTopological()
 	})
 }
 
 func TestDijkstra(t *testing.T) {
-	LoopTestSearcher(t, 10, 0.00001, func(wd *WDigraph) (*Searcher, error) {
+	LoopTestSearcher(t, 10, 0.00001, func(wd *WDigraph[string]) (*Searcher[string], error) {
 		return wd.SearcherDijkstra()
 	})
 }
 
 func TestBellmanFord(t *testing.T) {
-	LoopTestSearcher(t, 10, 0.0005, func(wd *WDigraph) (*Searcher, error) {
+	LoopTestSearcher(t, 10, 0.0005, func(wd *WDigraph[string]) (*Searcher[string], error) {
 		return wd.SearcherBellmanFord()
 	})
 }
 
 func TestSearcher(t *testing.T) {
-	LoopTestSearcher(t, 10, 0.0005, func(wd *WDigraph) (*Searcher, error) {
+	LoopTestSearcher(t, 10, 0.0005, func(wd *WDigraph[string]) (*Searcher[string], error) {
 		return wd.Searcher()
 	})
 }
 
 func LoopTestSearcher(t *testing.T, edgeLimit int, negativeEdge float64,
-	fn func(*WDigraph) (*Searcher, error)) {
+	fn func(*WDigraph[string]) (*Searcher[string], error)) {
 	for i := 0; i < 10; i++ {
 		wd := RandWDigraph(edgeLimit, negativeEdge)
 		sps, err := fn(wd)
@@ -126,8 +126,8 @@ func LoopTestSearcher(t *testing.T, edgeLimit int, negativeEdge float64,
 	}
 }
 
-func RandWDigraph(edgeLimit int, negativeEdge float64) (wd *WDigraph) {
-	wd = NewWDigraph(uint(vertLowerLimit + rand.Intn(vertRange)))
+func RandWDigraph(edgeLimit int, negativeEdge float64) (wd *WDigraph[string]) {
+	wd = NewWDigraph[string](uint(vertLowerLimit + rand.Intn(vertRange)))
 	nv := int(wd.NumVert())
 	for from := 0; from < nv; from++ {
 		ne := rand.Intn(edgeLimit)
@@ -137,18 +137,19 @@ func RandWDigraph(edgeLimit int, negativeEdge float64) (wd *WDigraph) {
 				continue
 			}
 			w := (rand.Float64() - negativeEdge) * 10000
-			wd.AddEdge(from, to, w)
+			wd.AddEdge(Id(from), Id(to), w)
 		}
 	}
 	return
 }
 
 func ExampleWDigraph() {
-	g, _ := LoadWDigraph(testDir + "no_cycle.yml")
+	g, _ := LoadSymbWDigraph(testDir + "no_cycle.yml")
 	searcher, _ := g.SearcherDijkstra()
 	// searcher, _ := g.SearcherTopological()
 	// searcher, _ := g.SearcherBellmanFord()
-	fmt.Println(searcher.GetPath(1, 2).Str(nil))
+	fmt.Println(searcher.GetPath(1, 2).Str())
 
+	// Output:
 	// [TotalDistance=1.02] 1->3(0.29) 3->7(0.39) 7->2(0.34)
 }

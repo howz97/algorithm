@@ -20,7 +20,7 @@ import (
 )
 
 func TestMST_Prim(t *testing.T) {
-	g := NewWGraph(8) // 算法4th 图4.3.10 (P399)
+	g := NewWGraph[int](8) // 算法4th 图4.3.10 (P399)
 	g.AddEdge(0, 2, 0.26)
 	g.AddEdge(0, 4, 0.38)
 	g.AddEdge(0, 6, 0.58)
@@ -50,7 +50,7 @@ func TestMST_Prim(t *testing.T) {
 }
 
 func Example() {
-	g, err := LoadWGraph(testDir + "mst.yml")
+	g, err := LoadSymbWGraph(testDir + "mst.yml")
 	if err != nil {
 		panic(err)
 	}

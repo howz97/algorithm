@@ -106,7 +106,7 @@ func IndexInt(ints []int, n int) int {
 	return -1
 }
 
-func SliceEqual(a, b []int) bool {
+func SliceEqual[T comparable](a, b []T) bool {
 	if len(a) != len(b) {
 		return false
 	}

@@ -46,7 +46,7 @@ func Compile(pattern string) (*Regexp, error) {
 
 type Regexp struct {
 	table []symbol
-	nfa   *graphs.Digraph
+	nfa   *graphs.Digraph[int]
 	tc    graphs.Reachable
 }
 
@@ -235,19 +235,19 @@ func indexRune(runes []rune, r rune) int {
 	return -1
 }
 
-func makeNFA(table []symbol) *graphs.Digraph {
+func makeNFA(table []symbol) *graphs.Digraph[int] {
 	size := len(table)
-	nfa := graphs.NewDigraph(uint(size + 1))
+	nfa := graphs.NewDigraph[int](uint(size + 1))
 	stk := basic.NewStack[int](size)
 	for i, syb := range table {
 		left := i
 		if syb.isPrime {
 			switch syb.r {
 			case '(':
-				nfa.AddEdge(i, i+1)
+				nfa.AddEdge(graphs.Id(i), graphs.Id(i+1))
 				stk.PushBack(i)
 			case ')':
-				nfa.AddEdge(i, i+1)
+				nfa.AddEdge(graphs.Id(i), graphs.Id(i+1))
 				allOr := basic.NewList[int]()
 				for {
 					out := stk.Back()
@@ -263,11 +263,11 @@ func makeNFA(table []symbol) *graphs.Digraph {
 				for allOr.Size() > 0 {
 					or := allOr.Front()
 					allOr.PopFront()
-					nfa.AddEdge(left, or+1)
-					nfa.AddEdge(or, i)
+					nfa.AddEdge(graphs.Id(left), graphs.Id(or+1))
+					nfa.AddEdge(graphs.Id(or), graphs.Id(i))
 				}
 			case '*':
-				nfa.AddEdge(i, i+1)
+				nfa.AddEdge(graphs.Id(i), graphs.Id(i+1))
 			case '|':
 				stk.PushBack(i)
 			case '.':
@@ -276,8 +276,8 @@ func makeNFA(table []symbol) *graphs.Digraph {
 			}
 		}
 		if i+1 < size && table[i+1].isClosure() {
-			nfa.AddEdge(left, i+1)
-			nfa.AddEdge(i+1, left)
+			nfa.AddEdge(graphs.Id(left), graphs.Id(i+1))
+			nfa.AddEdge(graphs.Id(i+1), graphs.Id(left))
 		}
 	}
 	return nfa

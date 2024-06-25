@@ -14,58 +14,54 @@
 
 package graphs
 
-import (
-	"github.com/howz97/algorithm/util"
-)
-
-func NewGraph(size uint) *Graph {
-	return &Graph{
-		Digraph: NewDigraph(size),
+func NewGraph[T any](size uint) *Graph[T] {
+	return &Graph[T]{
+		Digraph: NewDigraph[T](size),
 	}
 }
 
 // Graph has no direction
-type Graph struct {
-	*Digraph
+type Graph[T any] struct {
+	*Digraph[T]
 }
 
 // NumEdge get the number of no-direction edges
-func (g *Graph) NumEdge() uint {
+func (g *Graph[T]) NumEdge() uint {
 	return g.Digraph.NumEdge() / 2
 }
 
 // AddEdge add an edge
-func (g *Graph) AddEdge(a, b int) error {
+func (g *Graph[T]) AddEdge(a, b Id) error {
 	return g.addWeightedEdge(a, b, 1)
 }
 
-func (g *Graph) addWeightedEdge(src, dst int, w float64) error {
+func (g *Graph[T]) addWeightedEdge(src, dst Id, w float64) error {
 	if !g.HasVert(src) || !g.HasVert(dst) {
-		return ErrVerticalNotExist
+		return ErrInvalidVertex
 	}
 	if src == dst {
-		return ErrSelfLoop
+		return ErrInvalidEdge
 	}
-	g.Digraph.edges[src].Put(util.Int(dst), w)
-	g.Digraph.edges[dst].Put(util.Int(src), w)
+	g.Digraph.edges[src].Put(dst, w)
+	g.Digraph.edges[dst].Put(src, w)
 	return nil
 }
 
 // DelEdge delete an edge
-func (g *Graph) DelEdge(a, b int) {
+func (g *Graph[T]) DelEdge(a, b Id) {
 	g.Digraph.DelEdge(a, b)
 	g.Digraph.DelEdge(b, a)
 }
 
 // TotalWeight sum the weight of all edges
-func (g *Graph) TotalWeight() float64 {
+func (g *Graph[T]) TotalWeight() float64 {
 	return g.Digraph.TotalWeight() / 2
 }
 
 // IterWEdge iterate all no-direction edges and their weight
-func (g *Graph) IterWEdge(fn func(int, int, float64) bool) {
+func (g *Graph[T]) IterWEdge(fn func(Id, Id, float64) bool) {
 	visited := make(map[uint64]struct{})
-	g.Digraph.IterWEdge(func(from int, to int, w float64) bool {
+	g.Digraph.IterWEdge(func(from Id, to Id, w float64) bool {
 		if _, v := visited[uint64(to)<<32+uint64(from)]; v {
 			return true
 		}
@@ -75,16 +71,16 @@ func (g *Graph) IterWEdge(fn func(int, int, float64) bool) {
 }
 
 // IterEdge iterate all no-direction edges
-func (g *Graph) IterEdge(fn func(int, int) bool) {
-	g.IterWEdge(func(src int, dst int, _ float64) bool {
+func (g *Graph[T]) IterEdge(fn func(Id, Id) bool) {
+	g.IterWEdge(func(src Id, dst Id, _ float64) bool {
 		return fn(src, dst)
 	})
 }
 
 // IterWEdgeFrom iterate all reachable edges and their weight from vertical src
-func (g *Graph) IterWEdgeFrom(src int, fn func(int, int, float64) bool) {
+func (g *Graph[T]) IterWEdgeFrom(src Id, fn func(Id, Id, float64) bool) {
 	visited := make(map[uint64]struct{})
-	g.Digraph.IterWEdgeFrom(src, func(from int, to int, w float64) bool {
+	g.Digraph.IterWEdgeFrom(src, func(from Id, to Id, w float64) bool {
 		if _, v := visited[uint64(to)<<32+uint64(from)]; v {
 			return true
 		}
@@ -94,30 +90,30 @@ func (g *Graph) IterWEdgeFrom(src int, fn func(int, int, float64) bool) {
 }
 
 // IterEdgeFrom iterate all reachable edges from vertical src
-func (g *Graph) IterEdgeFrom(src int, fn func(int, int) bool) {
-	g.IterWEdgeFrom(src, func(a int, b int, _ float64) bool {
+func (g *Graph[T]) IterEdgeFrom(src Id, fn func(Id, Id) bool) {
+	g.IterWEdgeFrom(src, func(a Id, b Id, _ float64) bool {
 		return fn(a, b)
 	})
 }
 
 // HasCycle check whether graph contains cycle
-func (g *Graph) HasCycle() bool {
+func (g *Graph[T]) HasCycle() bool {
 	marked := make([]bool, g.NumVert())
 	for i, m := range marked {
 		if m {
 			continue
 		}
-		if g.detectCycleDFS(i, i, marked) {
+		if g.detectCycleDFS(Id(i), Id(i), marked) {
 			return true
 		}
 	}
 	return false
 }
 
-func (g *Graph) detectCycleDFS(last, cur int, marked []bool) bool {
+func (g *Graph[T]) detectCycleDFS(last, cur Id, marked []bool) bool {
 	marked[cur] = true
 	found := false
-	g.IterAdjacent(cur, func(adj int) bool {
+	g.IterAdjacent(cur, func(adj Id) bool {
 		if adj == last { // here is different from digraph
 			return true
 		}
@@ -135,23 +131,23 @@ func (g *Graph) detectCycleDFS(last, cur int, marked []bool) bool {
 }
 
 type SubGraphs struct {
-	locate    []int   // vertical -> subGraphID
-	subGraphs [][]int // subGraphID -> all vertices
+	locate    []Id   // vertical -> subGraphID
+	subGraphs [][]Id // subGraphID -> all vertices
 }
 
 // SubGraphs calculate all sub-graphs of g
-func (g *Graph) SubGraphs() *SubGraphs {
+func (g *Graph[T]) SubGraphs() *SubGraphs {
 	tc := &SubGraphs{
-		locate: make([]int, g.NumVert()),
+		locate: make([]Id, g.NumVert()),
 	}
 	for i := range tc.locate {
 		tc.locate[i] = -1
 	}
 
-	subGraphID := 0
+	var subGraphID Id
 	for i, c := range tc.locate {
 		if c < 0 {
-			dfs := g.ReachableSlice(i)
+			dfs := g.ReachableSlice(Id(i))
 			for _, v := range dfs {
 				tc.locate[v] = subGraphID
 			}
@@ -163,12 +159,12 @@ func (g *Graph) SubGraphs() *SubGraphs {
 }
 
 // IsConn check whether a and b located in the same sub-graph
-func (tc *SubGraphs) IsConn(a, b int) bool {
-	return tc.locate[a] == tc.locate[b]
+func (tc *SubGraphs) IsConn(a, b Id) bool {
+	return tc.locate[a] >= 0 && tc.locate[a] == tc.locate[b]
 }
 
 // Iterate all vertices of sub-graph where v located
-func (tc *SubGraphs) Iterate(v int, fn func(int) bool) {
+func (tc *SubGraphs) Iterate(v Id, fn func(Id) bool) {
 	for _, v := range tc.subGraphs[tc.locate[v]] {
 		if !fn(v) {
 			break
@@ -182,6 +178,6 @@ func (tc *SubGraphs) NumSubGraph() int {
 }
 
 // Locate get the ID of sub-graph where v located
-func (tc *SubGraphs) Locate(v int) int {
+func (tc *SubGraphs) Locate(v Id) Id {
 	return tc.locate[v]
 }

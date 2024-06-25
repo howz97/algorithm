@@ -16,7 +16,6 @@ package graphs
 
 import (
 	"fmt"
-	stdsort "sort"
 	"testing"
 
 	"github.com/howz97/algorithm/basic"
@@ -27,7 +26,10 @@ import (
 const testDir = "../assets/graphs/"
 
 func TestSCC_IsStronglyConnected(t *testing.T) {
-	g := NewDigraph(13)
+	g := NewDigraph[int](13)
+	for i := 0; i < 13; i++ {
+		g.AddVertex(i)
+	}
 	g.AddEdge(0, 1)
 	g.AddEdge(0, 5)
 	g.AddEdge(5, 4)
@@ -52,7 +54,7 @@ func TestSCC_IsStronglyConnected(t *testing.T) {
 	fmt.Println("number of edge: ", g.NumEdge())
 	scc := g.SCC()
 	fmt.Println("number of SCC:", scc.NumComponents())
-	for i := 0; i < int(g.NumVert()); i++ {
+	for i := Id(0); uint(i) < g.NumVert(); i++ {
 		fmt.Printf("SCC ID of vertical(%v): %v\n", i, scc.Comp(i))
 	}
 	if !scc.IsStronglyConn(1, 1) {
@@ -72,8 +74,54 @@ func TestSCC_IsStronglyConnected(t *testing.T) {
 	}
 }
 
+func ExampleSCC() {
+	g := NewDigraph[int](13)
+	for i := 0; i < 13; i++ {
+		g.AddVertex(i)
+	}
+	g.AddEdge(0, 1)
+	g.AddEdge(0, 5)
+	g.AddEdge(5, 4)
+	g.AddEdge(4, 3)
+	g.AddEdge(4, 2)
+	g.AddEdge(3, 2)
+	g.AddEdge(2, 3)
+	g.AddEdge(2, 0)
+	g.AddEdge(6, 0)
+	g.AddEdge(6, 4)
+	g.AddEdge(6, 9)
+	g.AddEdge(9, 10)
+	g.AddEdge(10, 12)
+	g.AddEdge(12, 9)
+	g.AddEdge(9, 11)
+	g.AddEdge(11, 12)
+	g.AddEdge(11, 4)
+	g.AddEdge(7, 6)
+	g.AddEdge(7, 8)
+	g.AddEdge(8, 7)
+	g.AddEdge(8, 9)
+	scc := g.SCC()
+	fmt.Println("amount of strongly connected component:", scc.NumComponents())
+	var vertices []Id
+	scc.IterComponent(scc.Comp(0), func(v Id) bool {
+		vertices = append(vertices, v)
+		return true
+	})
+	sort.Shell(vertices)
+	fmt.Println("vertices strongly connected with 0:", vertices)
+	fmt.Println(scc.IsStronglyConn(0, 6))
+
+	// Output:
+	// amount of strongly connected component: 5
+	// vertices strongly connected with 0: [0 2 3 4 5]
+	// false
+}
+
 func TestDFS_Graph(t *testing.T) {
-	g := NewGraph(9)
+	g := NewGraph[int](9)
+	for i := 0; i < 9; i++ {
+		g.AddVertex(i)
+	}
 	var err error
 	err = g.AddEdge(0, 1)
 	if err != nil {
@@ -104,7 +152,7 @@ func TestDFS_Graph(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	dfsResults := [][]int{
+	dfsResults := [][]Id{
 		0: {0, 1, 3, 6},
 		1: {0, 1, 3, 6},
 		2: {2, 5},
@@ -119,11 +167,11 @@ func TestDFS_Graph(t *testing.T) {
 }
 
 func TestDFS_Digraph(t *testing.T) {
-	dg, err := LoadDigraph(testDir + "dfs.yml")
+	dg, err := LoadSymbDigraph(testDir + "dfs.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
-	dfsResults := [][]int{
+	dfsResults := [][]Id{
 		0: {0, 3, 6, 7},
 		1: {1, 2, 5, 7, 8},
 		2: {1, 2, 5, 7, 8},
@@ -134,13 +182,13 @@ func TestDFS_Digraph(t *testing.T) {
 		7: {7},
 		8: {7, 8},
 	}
-	checkDFSResults(t, dg, dfsResults)
+	checkDFSResults(t, dg.Digraph, dfsResults)
 }
 
-func checkDFSResults(t *testing.T, g *Digraph, dfsResults [][]int) {
+func checkDFSResults[T any](t *testing.T, g *Digraph[T], dfsResults [][]Id) {
 	for src := range dfsResults {
-		reach := g.ReachableSlice(src)
-		sort.Quick(stdsort.IntSlice(reach))
+		reach := g.ReachableSlice(Id(src))
+		sort.Quick(reach)
 		if !util.SliceEqual(reach, dfsResults[src]) {
 			t.Errorf("v %d reach %v not equal %v", src, reach, dfsResults[src])
 		}
@@ -148,16 +196,16 @@ func checkDFSResults(t *testing.T, g *Digraph, dfsResults [][]int) {
 }
 
 func TestRevDFS(t *testing.T) {
-	g, err := LoadDigraph(testDir + "dfs.yml")
+	g, err := LoadSymbDigraph(testDir + "dfs.yml")
 	if err != nil {
 		t.Fatal(err)
 	}
-	order := basic.NewStack[int](0)
-	g.IterBDFSFrom(0, func(v int) bool {
+	order := basic.NewStack[Id](0)
+	g.IterBDFSFrom(0, func(v Id) bool {
 		order.PushBack(v)
 		return true
 	})
-	correct := []int{0, 3, 6, 7}
+	correct := []Id{0, 3, 6, 7}
 	if !util.SliceEqual(order.ToSlice(), correct) {
 		t.Errorf("rev dfs order %v not equal %v", order, correct)
 	}
@@ -171,7 +219,10 @@ func ExampleDigraph_FindCycle() {
 	// 	|		  \	|
 	// 	v		   \|
 	// (1)-------->(3)
-	g := NewDigraph(4)
+	g := NewDigraph[int](4)
+	for i := 0; i < 4; i++ {
+		g.AddVertex(i)
+	}
 	g.AddEdge(0, 1)
 	g.AddEdge(0, 2)
 	g.AddEdge(1, 3)
@@ -180,11 +231,12 @@ func ExampleDigraph_FindCycle() {
 	c := g.FindCycle()
 	fmt.Println(c.Error())
 
+	// Output:
 	// [TotalDistance=3] 0->1(1.00) 1->3(1.00) 3->0(1.00)
 }
 
 func ExampleDigraph_Topological() {
-	dg, err := LoadDigraph(testDir + "no_cycle.yml")
+	dg, err := LoadSymbDigraph(testDir + "no_cycle.yml")
 	if err != nil {
 		panic(err)
 	}
@@ -196,7 +248,7 @@ func ExampleDigraph_Topological() {
 }
 
 func ExampleDigraph_Bipartite() {
-	dg, err := LoadDigraph(testDir + "no_cycle.yml")
+	dg, err := LoadSymbDigraph(testDir + "no_cycle.yml")
 	if err != nil {
 		panic(err)
 	}
@@ -206,7 +258,7 @@ func ExampleDigraph_Bipartite() {
 }
 
 func ExampleReachable() {
-	dg, err := LoadDigraph(testDir + "no_cycle.yml")
+	dg, err := LoadSymbDigraph(testDir + "no_cycle.yml")
 	if err != nil {
 		panic(err)
 	}
@@ -220,53 +272,15 @@ func ExampleReachable() {
 }
 
 func ExampleBFS() {
-	dg, err := LoadDigraph(testDir + "no_cycle.yml")
+	dg, err := LoadSymbDigraph(testDir + "no_cycle.yml")
 	if err != nil {
 		panic(err)
 	}
 	bfs := dg.BFS(1)
 	fmt.Println(bfs.CanReach(5))
-	fmt.Println(bfs.ShortestPathTo(2).Str(nil))
+	fmt.Println(bfs.ShortestPathTo(2).Str())
 
+	// Output:
 	// false
 	// [TotalDistance=3] 7->2(1.00) 3->7(1.00) 1->3(1.00)
-}
-
-func ExampleSCC() {
-	g := NewDigraph(13)
-	g.AddEdge(0, 1)
-	g.AddEdge(0, 5)
-	g.AddEdge(5, 4)
-	g.AddEdge(4, 3)
-	g.AddEdge(4, 2)
-	g.AddEdge(3, 2)
-	g.AddEdge(2, 3)
-	g.AddEdge(2, 0)
-	g.AddEdge(6, 0)
-	g.AddEdge(6, 4)
-	g.AddEdge(6, 9)
-	g.AddEdge(9, 10)
-	g.AddEdge(10, 12)
-	g.AddEdge(12, 9)
-	g.AddEdge(9, 11)
-	g.AddEdge(11, 12)
-	g.AddEdge(11, 4)
-	g.AddEdge(7, 6)
-	g.AddEdge(7, 8)
-	g.AddEdge(8, 7)
-	g.AddEdge(8, 9)
-	scc := g.SCC()
-	fmt.Println("amount of strongly connected component:", scc.NumComponents())
-	var vertices []int
-	scc.IterComponent(scc.Comp(0), func(v int) bool {
-		vertices = append(vertices, v)
-		return true
-	})
-	sort.Shell(vertices)
-	fmt.Println("vertices strongly connected with 0:", vertices)
-	fmt.Println(scc.IsStronglyConn(0, 6))
-
-	// amount of strongly connected component: 5
-	// vertices strongly connected with 0: [0 2 3 4 5]
-	// false
 }

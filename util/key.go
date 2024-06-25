@@ -18,14 +18,6 @@ import (
 	"unsafe"
 )
 
-type Result int
-
-const (
-	Equal Result = iota
-	Less
-	More
-)
-
 type Int int
 
 func (v Int) Hash() uintptr {
