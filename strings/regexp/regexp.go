@@ -69,8 +69,8 @@ func (re *Regexp) Match(str string) bool {
 
 func (re *Regexp) startStatus() basic.Set[int] {
 	start := basic.NewSet[int]()
-	re.tc.Iterate(0, func(v int) bool {
-		start.Add(v)
+	re.tc.Iterate(0, func(v graphs.Id) bool {
+		start.Add(int(v))
 		return true
 	})
 	return start
@@ -91,8 +91,8 @@ func (re *Regexp) updateCurStatus(sources basic.Set[int]) basic.Set[int] {
 	reachable := basic.NewSet[int]()
 	for sources.Len() > 0 {
 		vSrc := sources.TakeOne()
-		re.tc.Iterate(vSrc, func(v int) bool {
-			reachable.Add(v)
+		re.tc.Iterate(graphs.Id(vSrc), func(v graphs.Id) bool {
+			reachable.Add(int(v))
 			return true
 		})
 	}
@@ -238,6 +238,12 @@ func indexRune(runes []rune, r rune) int {
 func makeNFA(table []symbol) *graphs.Digraph[int] {
 	size := len(table)
 	nfa := graphs.NewDigraph[int](uint(size + 1))
+	for i := 0; i <= size; i++ {
+		id := nfa.AddVertex(i)
+		if id != graphs.Id(i) {
+			panic("id != graphs.Id(i)")
+		}
+	}
 	stk := basic.NewStack[int](size)
 	for i, syb := range table {
 		left := i

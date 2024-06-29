@@ -42,8 +42,8 @@ type WDigraph[T any] struct {
 }
 
 // AddEdge add a weighted and directed edge
-func (g *WDigraph[T]) AddEdge(src, dst Id, w float64) {
-	g.addWeightedEdge(src, dst, w)
+func (g *WDigraph[T]) AddEdge(src, dst Id, w float64) error {
+	return g.addWeightedEdge(src, dst, w)
 }
 
 // ShortestPathTree get the shortest path tree from src by the specified algorithm
@@ -62,7 +62,7 @@ func (g *WDigraph[T]) ShortestPathTree(src Id, alg int) (*PathTree[T], error) {
 		spt.initDijkstra(g)
 	case Topological:
 		if p := g.FindCycleFrom(src); p != nil {
-			err = p.Cycle()
+			err = ErrCycle(p.Cycle())
 			break
 		}
 		spt.initTopological(g)
@@ -161,7 +161,7 @@ func (spt *PathTree[T]) dijkstraRelax(v Id, pq *pqueue.Fixable[float64, Id]) {
 
 func (spt *PathTree[T]) initTopological(g *WDigraph[T]) {
 	order := basic.NewStack[Id](int(g.NumVert()))
-	g.IterBDFSFrom(spt.src, func(v Id) bool {
+	g.VetBackDfsFrom(spt.src, func(v Id) bool {
 		order.PushBack(v)
 		return true
 	})
@@ -197,7 +197,7 @@ func (spt *PathTree[T]) initBellmanFord() error {
 		if cnt%spt.wdg.NumVert() == 0 {
 			c := spt.toWDigraph().FindCycle()
 			if c != nil {
-				return c
+				return ErrCycle(c)
 			}
 		}
 	}
@@ -231,7 +231,7 @@ func (spt *PathTree[T]) bellmanFordRelax(v Id, q *basic.List[Id], onQ []bool) {
 
 func (g *WDigraph[T]) SearcherDijkstra() (*Searcher[T], error) {
 	if src, dst := g.FindNegativeEdge(); src >= 0 {
-		return nil, fmt.Errorf(fmt.Sprintf("negative edge %d->%d", src, dst))
+		return nil, fmt.Errorf(fmt.Sprintf("negative edge %d->%d: %f", src, dst, g.GetWeight(src, dst)))
 	}
 	sps := &Searcher[T]{
 		spt: make([]*PathTree[T], g.NumVert()),
@@ -246,7 +246,7 @@ func (g *WDigraph[T]) SearcherDijkstra() (*Searcher[T], error) {
 
 func (g *WDigraph[T]) SearcherTopological() (*Searcher[T], error) {
 	if c := g.FindCycle(); c != nil {
-		return nil, c
+		return nil, ErrCycle(c)
 	}
 	sps := &Searcher[T]{
 		spt: make([]*PathTree[T], g.NumVert()),
@@ -363,7 +363,7 @@ func (p *Path) Str() string {
 	return str
 }
 
-func (p *Path) Cycle() *Cycle {
+func (p *Path) Cycle() []Id {
 	if p.Size() == 0 {
 		return nil
 	}
@@ -372,24 +372,25 @@ func (p *Path) Cycle() *Cycle {
 	i := p.Find(func(v edge) bool {
 		return v.from == x
 	})
-	path := NewPath()
+	cycle := make([]Id, 0, p.Size())
 	p.IterRange(i, p.Size()-1, func(e edge) bool {
-		path.Push(e.from, e.to, e.weight)
+		cycle = append(cycle, e.from)
 		return true
 	})
-	return &Cycle{path}
+	return cycle
 }
 
-type Cycle struct {
-	*Path
-}
+type ErrCycle []Id
 
-func (c *Cycle) Error() string {
-	return c.Str()
-}
-
-func (c *Cycle) Cycle() *Cycle {
-	return c
+func (c ErrCycle) Error() string {
+	str := "cycle path exists: "
+	for i, v := range c {
+		if i > 0 {
+			str += " -> "
+		}
+		str += fmt.Sprint(v)
+	}
+	return str
 }
 
 type edge struct {

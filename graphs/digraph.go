@@ -50,9 +50,13 @@ func (dg *Digraph[T]) HasVert(v Id) bool {
 	return int(v) < len(dg.edges)
 }
 
+func (dg *Digraph[T]) Vertex(v Id) T {
+	return dg.vertices[v]
+}
+
 // AddEdge add a new edge
-func (dg *Digraph[T]) AddEdge(src, dst Id) {
-	dg.addWeightedEdge(src, dst, 1)
+func (dg *Digraph[T]) AddEdge(src, dst Id) error {
+	return dg.addWeightedEdge(src, dst, 1)
 }
 
 // NumEdge get the number of edges
@@ -73,15 +77,16 @@ func (dg *Digraph[T]) HasEdge(from, to Id) bool {
 	return ok
 }
 
-func (dg *Digraph[T]) addWeightedEdge(src, dst Id, w float64) {
-	if !dg.HasVert(dst) {
-		panic("invalid destination vertex")
+func (dg *Digraph[T]) addWeightedEdge(src, dst Id, w float64) error {
+	if !dg.HasVert(src) || !dg.HasVert(dst) {
+		return ErrInvalidVertex
 	}
 	if src == dst {
-		panic("invalid edge self loop")
+		return ErrInvalidEdge
 	}
 	// invalid source vertex will panic
 	dg.edges[src].Put(dst, w)
+	return nil
 }
 
 // DelEdge delete an edge
@@ -182,7 +187,7 @@ func (dg *Digraph[T]) FindNegativeEdgeFrom(start Id) (src Id, dst Id) {
 }
 
 // FindCycle find any directed cycle in dg
-func (dg *Digraph[T]) FindCycle() *Cycle {
+func (dg *Digraph[T]) FindCycle() []Id {
 	marks := make([]bool, dg.NumVert())
 	path := NewPath()
 	for v, m := range marks {
@@ -234,7 +239,7 @@ func (dg *Digraph[T]) Topological() (order *basic.Stack[Id]) {
 		return
 	}
 	order = basic.NewStack[Id](int(dg.NumVert()))
-	dg.IterVetBDFS(func(v Id) bool {
+	dg.VetBackDfs(func(v Id) bool {
 		order.PushBack(v)
 		return true
 	})
@@ -333,29 +338,29 @@ func (dg *Digraph[T]) ReachableBits(src Id) []bool {
 	return marked
 }
 
-// IterVetBDFS iterate all vertices in Back-DFS order
-func (dg *Digraph[T]) IterVetBDFS(fn func(Id) bool) {
+// VetBackDfs iterate all vertices in Back-DFS order
+func (dg *Digraph[T]) VetBackDfs(fn func(Id) bool) {
 	marked := make([]bool, dg.NumVert())
 	for v := range marked {
 		if marked[v] {
 			continue
 		}
-		dg.bDFS(Id(v), marked, fn)
+		dg.bDfs(Id(v), marked, fn)
 	}
 }
 
-// IterBDFSFrom iterate all reachable vertices from vertical src in RDFS order
-func (dg *Digraph[T]) IterBDFSFrom(src Id, fn func(Id) bool) {
+// VetBackDfsFrom iterate all reachable vertices from vertical src in RDFS order
+func (dg *Digraph[T]) VetBackDfsFrom(src Id, fn func(Id) bool) {
 	marked := make([]bool, dg.NumVert())
-	dg.bDFS(src, marked, fn)
+	dg.bDfs(src, marked, fn)
 }
 
-func (dg *Digraph[T]) bDFS(v Id, marked []bool, fn func(Id) bool) bool {
+func (dg *Digraph[T]) bDfs(v Id, marked []bool, fn func(Id) bool) bool {
 	marked[v] = true
 	goon := true // continue DFS or abort
 	dg.IterAdjacent(v, func(a Id) bool {
 		if !marked[a] {
-			if !dg.bDFS(a, marked, fn) {
+			if !dg.bDfs(a, marked, fn) {
 				goon = false
 			}
 		}
@@ -443,18 +448,20 @@ type SCC struct {
 // SCC calculate strong connected components of digraph with kosaraju algorithm
 func (dg *Digraph[T]) SCC() *SCC {
 	scc := &SCC{
-		locate: make([]Id, dg.NumVert()),
+		locate:     make([]Id, dg.NumVert()),
+		components: make([][]Id, 1),
 	}
 	marked := make([]bool, dg.NumVert())
-	dg.IterVetBDFS(func(v Id) bool {
+	dg.VetBackDfs(func(v Id) bool {
 		if !marked[v] {
-			c := make([]Id, 0, 8)
+			cmpnId := Id(len(scc.components))
+			cmpn := make([]Id, 0, 8)
 			dg.iterUnMarkVetFrom(v, marked, func(w Id) bool {
-				scc.locate[w] = Id(len(scc.components))
-				c = append(c, w)
+				scc.locate[w] = cmpnId
+				cmpn = append(cmpn, w)
 				return true
 			})
-			scc.components = append(scc.components, c)
+			scc.components = append(scc.components, cmpn)
 		}
 		return true
 	})
@@ -481,7 +488,7 @@ func (scc *SCC) IterComponent(c Id, fn func(Id) bool) {
 
 // NumComponents get the number of components
 func (scc *SCC) NumComponents() int {
-	return len(scc.components)
+	return len(scc.components) - 1
 }
 
 type Reachable [][]bool
@@ -496,15 +503,15 @@ func (dg *Digraph[T]) Reachable() Reachable {
 }
 
 // CanReach check whether src can reach dst
-func (tc Reachable) CanReach(src, dst int) bool {
+func (tc Reachable) CanReach(src, dst Id) bool {
 	return tc[src][dst]
 }
 
 // Iterate all reachable vertices from src
-func (tc Reachable) Iterate(src int, fn func(v int) bool) {
+func (tc Reachable) Iterate(src Id, fn func(v Id) bool) {
 	for w, marked := range tc[src] {
 		if marked {
-			if !fn(w) {
+			if !fn(Id(w)) {
 				break
 			}
 		}

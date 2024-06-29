@@ -15,18 +15,23 @@
 package graphs
 
 import (
-	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v2"
 )
 
 func LoadSymbDigraph(filename string) (*SymbDigraph, error) {
-	graph, symbols, err := readYaml(filename)
+	content, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
-	dropWeight(graph)
+	var m map[string][]string
+	err = yaml.Unmarshal(content, &m)
+	if err != nil {
+		return nil, err
+	}
+	graph := NewDigraph[string](uint(len(m)))
+	symbols := Populate(graph, m)
 	return &SymbDigraph{
 		Digraph: graph,
 		symbols: symbols,
@@ -34,90 +39,57 @@ func LoadSymbDigraph(filename string) (*SymbDigraph, error) {
 }
 
 func LoadSymbGraph(filename string) (*SymbGraph, error) {
-	graph, symbols, err := readYaml(filename)
+	content, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
-	if err = checkNoDirection(graph); err != nil {
+	var m map[string][]string
+	err = yaml.Unmarshal(content, &m)
+	if err != nil {
 		return nil, err
 	}
-	dropWeight(graph)
+	graph := NewGraph[string](uint(len(m)))
+	symbols := Populate(graph, m)
 	return &SymbGraph{
-		Graph:   &Graph[string]{Digraph: graph},
+		Graph:   graph,
 		symbols: symbols,
 	}, nil
 }
 
 func LoadSymbWDigraph(filename string) (*SymbWDigraph, error) {
-	graph, symbols, err := readYaml(filename)
-	if err != nil {
-		return nil, err
-	}
-	return &SymbWDigraph{WDigraph: &WDigraph[string]{Digraph: graph}, symbols: symbols}, nil
-}
-
-func LoadSymbWGraph(filename string) (*SymbWGraph, error) {
-	graph, symbols, err := readYaml(filename)
-	if err != nil {
-		return nil, err
-	}
-	if err = checkNoDirection(graph); err != nil {
-		return nil, err
-	}
-	return &SymbWGraph{WGraph: &WGraph[string]{Graph: &Graph[string]{Digraph: graph}}, symbols: symbols}, nil
-}
-
-func readYaml(filename string) (*Digraph[string], map[string]Id, error) {
 	content, err := os.ReadFile(filename)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	var m map[string]map[string]float64
 	err = yaml.Unmarshal(content, &m)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	symbols := make(map[string]Id, len(m))
-	g := NewDigraph[string](uint(len(m)))
-	for fr, adj := range m {
-		for to, w := range adj {
-			frId, ok := symbols[fr]
-			if !ok {
-				frId = g.AddVertex(fr)
-			}
-			toId, ok := symbols[to]
-			if !ok {
-				toId = g.AddVertex(to)
-			}
-			g.addWeightedEdge(frId, toId, w)
-		}
-	}
-	return g, symbols, nil
+	graph := NewWDigraph[string](uint(len(m)))
+	symbols := WPopulate(graph, m)
+	return &SymbWDigraph{
+		WDigraph: graph,
+		symbols:  symbols,
+	}, nil
 }
 
-func dropWeight(dg *Digraph[string]) {
-	dg.IterEdge(func(from Id, to Id) bool {
-		dg.edges[from].Put(to, float64(1))
-		return true
-	})
-}
-
-func checkNoDirection(dg *Digraph[string]) error {
-	var err error
-	dg.IterWEdge(func(from, to Id, w float64) bool {
-		wr := dg.GetWeight(to, from)
-		if wr == 0 {
-			err = fmt.Errorf(fmt.Sprintf("edge %d->%d has direction", from, to))
-			return false
-		}
-		if wr != w {
-			err = fmt.Errorf(fmt.Sprintf("edge %d->%d has weight %v, but %d->%d has weight %v",
-				from, to, w, to, from, wr))
-			return false
-		}
-		return true
-	})
-	return err
+func LoadSymbWGraph(filename string) (*SymbWGraph, error) {
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	var m map[string]map[string]float64
+	err = yaml.Unmarshal(content, &m)
+	if err != nil {
+		return nil, err
+	}
+	graph := NewWGraph[string](uint(len(m)))
+	symbols := WPopulate(graph, m)
+	return &SymbWGraph{
+		WGraph:  graph,
+		symbols: symbols,
+	}, nil
 }
 
 func NewSymbDigraph(cap uint) *SymbDigraph {
@@ -148,11 +120,11 @@ func (sg *SymbDigraph) AddVertex(v string) {
 func (sg *SymbDigraph) AddEdge(src, dst string) error {
 	srcId, ok := sg.symbols[src]
 	if !ok {
-		return ErrInvalidEdge
+		srcId = sg.Digraph.AddVertex(src)
 	}
 	dstId, ok := sg.symbols[dst]
 	if !ok {
-		return ErrInvalidEdge
+		dstId = sg.Digraph.AddVertex(dst)
 	}
 	sg.Digraph.AddEdge(srcId, dstId)
 	return nil
@@ -180,11 +152,11 @@ func (sg *SymbGraph) AddVertex(v string) {
 func (sg *SymbGraph) AddEdge(src, dst string) error {
 	srcId, ok := sg.symbols[src]
 	if !ok {
-		return ErrInvalidEdge
+		srcId = sg.Graph.AddVertex(src)
 	}
 	dstId, ok := sg.symbols[dst]
 	if !ok {
-		return ErrInvalidEdge
+		dstId = sg.Graph.AddVertex(dst)
 	}
 	sg.Graph.AddEdge(srcId, dstId)
 	return nil
@@ -212,11 +184,11 @@ func (sg *SymbWGraph) AddVertex(v string) {
 func (sg *SymbWGraph) AddEdge(src, dst string, w float64) error {
 	srcId, ok := sg.symbols[src]
 	if !ok {
-		return ErrInvalidEdge
+		srcId = sg.WGraph.AddVertex(src)
 	}
 	dstId, ok := sg.symbols[dst]
 	if !ok {
-		return ErrInvalidEdge
+		dstId = sg.WGraph.AddVertex(dst)
 	}
 	sg.WGraph.AddEdge(srcId, dstId, w)
 	return nil
@@ -244,11 +216,11 @@ func (sg *SymbWDigraph) AddVertex(v string) {
 func (sg *SymbWDigraph) AddEdge(src, dst string, w float64) error {
 	srcId, ok := sg.symbols[src]
 	if !ok {
-		return ErrInvalidEdge
+		srcId = sg.WDigraph.AddVertex(src)
 	}
 	dstId, ok := sg.symbols[dst]
 	if !ok {
-		return ErrInvalidEdge
+		dstId = sg.WDigraph.AddVertex(dst)
 	}
 	sg.WDigraph.AddEdge(srcId, dstId, w)
 	return nil

@@ -59,6 +59,7 @@ func Example() {
 	//mst := g.Kruskal()
 	fmt.Println(mst.String())
 
+	// Output:
 	// possible output:
 	// 0 : 2 7
 	// 1 : 7

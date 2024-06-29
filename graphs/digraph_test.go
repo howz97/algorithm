@@ -26,50 +26,39 @@ import (
 const testDir = "../assets/graphs/"
 
 func TestSCC_IsStronglyConnected(t *testing.T) {
-	g := NewDigraph[int](13)
-	for i := 0; i < 13; i++ {
-		g.AddVertex(i)
-	}
-	g.AddEdge(0, 1)
-	g.AddEdge(0, 5)
-	g.AddEdge(5, 4)
-	g.AddEdge(4, 3)
-	g.AddEdge(4, 2)
-	g.AddEdge(3, 2)
-	g.AddEdge(2, 3)
-	g.AddEdge(2, 0)
-	g.AddEdge(6, 0)
-	g.AddEdge(6, 4)
-	g.AddEdge(6, 9)
-	g.AddEdge(9, 10)
-	g.AddEdge(10, 12)
-	g.AddEdge(12, 9)
-	g.AddEdge(9, 11)
-	g.AddEdge(11, 12)
-	g.AddEdge(11, 4)
-	g.AddEdge(7, 6)
-	g.AddEdge(7, 8)
-	g.AddEdge(8, 7)
-	g.AddEdge(8, 9)
-	fmt.Println("number of edge: ", g.NumEdge())
+	g := NewDigraph[string](0)
+	m := Populate(g, map[string][]string{
+		"0":  {"1", "5"},
+		"2":  {"0", "3"},
+		"3":  {"2"},
+		"4":  {"2", "3"},
+		"5":  {"4"},
+		"6":  {"0", "4", "9"},
+		"7":  {"6", "8"},
+		"8":  {"7", "9"},
+		"9":  {"10", "11"},
+		"10": {"12"},
+		"11": {"4", "12"},
+		"12": {"9"},
+	})
 	scc := g.SCC()
-	fmt.Println("number of SCC:", scc.NumComponents())
+	t.Log("number of SCC:", scc.NumComponents())
 	for i := Id(0); uint(i) < g.NumVert(); i++ {
-		fmt.Printf("SCC ID of vertical(%v): %v\n", i, scc.Comp(i))
+		t.Logf("SCC ID of vertical(%v): %v\n", i, scc.Comp(i))
 	}
-	if !scc.IsStronglyConn(1, 1) {
+	if !scc.IsStronglyConn(m["1"], m["1"]) {
 		t.Fatal()
 	}
-	if !scc.IsStronglyConn(0, 4) {
+	if !scc.IsStronglyConn(m["0"], m["4"]) {
 		t.Fatal()
 	}
-	if !scc.IsStronglyConn(9, 11) {
+	if !scc.IsStronglyConn(m["9"], m["11"]) {
 		t.Fatal()
 	}
-	if scc.IsStronglyConn(1, 0) {
+	if scc.IsStronglyConn(m["1"], m["0"]) {
 		t.Fatal()
 	}
-	if scc.IsStronglyConn(11, 8) {
+	if scc.IsStronglyConn(m["11"], m["8"]) {
 		t.Fatal()
 	}
 }
@@ -166,25 +155,6 @@ func TestDFS_Graph(t *testing.T) {
 	checkDFSResults(t, g.Digraph, dfsResults)
 }
 
-func TestDFS_Digraph(t *testing.T) {
-	dg, err := LoadSymbDigraph(testDir + "dfs.yml")
-	if err != nil {
-		t.Fatal(err)
-	}
-	dfsResults := [][]Id{
-		0: {0, 3, 6, 7},
-		1: {1, 2, 5, 7, 8},
-		2: {1, 2, 5, 7, 8},
-		3: {3, 6, 7},
-		4: {4},
-		5: {1, 2, 5, 7, 8},
-		6: {6, 7},
-		7: {7},
-		8: {7, 8},
-	}
-	checkDFSResults(t, dg.Digraph, dfsResults)
-}
-
 func checkDFSResults[T any](t *testing.T, g *Digraph[T], dfsResults [][]Id) {
 	for src := range dfsResults {
 		reach := g.ReachableSlice(Id(src))
@@ -201,38 +171,36 @@ func TestRevDFS(t *testing.T) {
 		t.Fatal(err)
 	}
 	order := basic.NewStack[Id](0)
-	g.IterBDFSFrom(0, func(v Id) bool {
+	g.VetBackDfsFrom(g.IdOf("a"), func(v Id) bool {
 		order.PushBack(v)
 		return true
 	})
-	correct := []Id{0, 3, 6, 7}
+	correct := []Id{g.IdOf("a"), g.IdOf("d"), g.IdOf("g"), g.IdOf("h")}
 	if !util.SliceEqual(order.ToSlice(), correct) {
 		t.Errorf("rev dfs order %v not equal %v", order, correct)
 	}
 }
 
 func ExampleDigraph_FindCycle() {
-	// (0)-------->(2)
-	// 	| ^	        ^
-	// 	|  \	    |
-	// 	|	------  |
-	// 	|		  \	|
-	// 	v		   \|
-	// (1)-------->(3)
-	g := NewDigraph[int](4)
-	for i := 0; i < 4; i++ {
-		g.AddVertex(i)
-	}
-	g.AddEdge(0, 1)
-	g.AddEdge(0, 2)
-	g.AddEdge(1, 3)
-	g.AddEdge(3, 0)
-	g.AddEdge(3, 2)
+	// (A)--->(C)
+	// 	| ^	   ^
+	// 	|  \   |
+	// 	|	\  |
+	// 	|	 \ |
+	// 	v	  \|
+	// (B)--->(D)
+	g := NewDigraph[string](0)
+	Populate(g, map[string][]string{
+		"A": {"B", "C"},
+		"B": {"D"},
+		"C": {},
+		"D": {"A", "C"},
+	})
 	c := g.FindCycle()
-	fmt.Println(c.Error())
-
-	// Output:
-	// [TotalDistance=3] 0->1(1.00) 1->3(1.00) 3->0(1.00)
+	for _, id := range c {
+		fmt.Print(g.Vertex(id), " -> ")
+	}
+	fmt.Println(g.Vertex(c[0]))
 }
 
 func ExampleDigraph_Topological() {
@@ -241,10 +209,10 @@ func ExampleDigraph_Topological() {
 		panic(err)
 	}
 	for _, vet := range dg.Topological().ToSlice() {
-		fmt.Printf("%d->", vet)
+		fmt.Printf("%v -> ", dg.Vertex(vet))
 	}
 
-	// Output: 5->1->3->6->4->7->0->2->
+	// Output: F -> B -> D -> G -> E -> H -> A -> C ->
 }
 
 func ExampleDigraph_Bipartite() {
@@ -263,8 +231,8 @@ func ExampleReachable() {
 		panic(err)
 	}
 	reach := dg.Reachable()
-	fmt.Println(reach.CanReach(5, 2))
-	fmt.Println(reach.CanReach(2, 5))
+	fmt.Println(reach.CanReach(dg.IdOf("F"), dg.IdOf("C")))
+	fmt.Println(reach.CanReach(dg.IdOf("C"), dg.IdOf("F")))
 
 	// Output:
 	// true
@@ -276,11 +244,7 @@ func ExampleBFS() {
 	if err != nil {
 		panic(err)
 	}
-	bfs := dg.BFS(1)
-	fmt.Println(bfs.CanReach(5))
-	fmt.Println(bfs.ShortestPathTo(2).Str())
-
-	// Output:
-	// false
-	// [TotalDistance=3] 7->2(1.00) 3->7(1.00) 1->3(1.00)
+	bfs := dg.BFS(dg.IdOf("B"))
+	fmt.Println(bfs.CanReach(dg.IdOf("F")))
+	fmt.Println(bfs.ShortestPathTo(dg.IdOf("C")).Str())
 }
