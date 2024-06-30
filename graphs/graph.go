@@ -35,7 +35,7 @@ func (g *Graph[T]) AddEdge(a, b Id) error {
 	return g.addWeightedEdge(a, b, 1)
 }
 
-func (g *Graph[T]) addWeightedEdge(src, dst Id, w float64) error {
+func (g *Graph[T]) addWeightedEdge(src, dst Id, w Weight) error {
 	if !g.HasVert(src) || !g.HasVert(dst) {
 		return ErrInvalidVertex
 	}
@@ -54,14 +54,14 @@ func (g *Graph[T]) DelEdge(a, b Id) {
 }
 
 // TotalWeight sum the weight of all edges
-func (g *Graph[T]) TotalWeight() float64 {
+func (g *Graph[T]) TotalWeight() Weight {
 	return g.Digraph.TotalWeight() / 2
 }
 
 // IterWEdge iterate all no-direction edges and their weight
-func (g *Graph[T]) IterWEdge(fn func(Id, Id, float64) bool) {
+func (g *Graph[T]) IterWEdge(fn func(Id, Id, Weight) bool) {
 	visited := make(map[uint64]struct{})
-	g.Digraph.IterWEdge(func(from Id, to Id, w float64) bool {
+	g.Digraph.IterWEdge(func(from Id, to Id, w Weight) bool {
 		if _, v := visited[uint64(to)<<32+uint64(from)]; v {
 			return true
 		}
@@ -72,15 +72,15 @@ func (g *Graph[T]) IterWEdge(fn func(Id, Id, float64) bool) {
 
 // IterEdge iterate all no-direction edges
 func (g *Graph[T]) IterEdge(fn func(Id, Id) bool) {
-	g.IterWEdge(func(src Id, dst Id, _ float64) bool {
+	g.IterWEdge(func(src Id, dst Id, _ Weight) bool {
 		return fn(src, dst)
 	})
 }
 
 // IterWEdgeFrom iterate all reachable edges and their weight from vertical src
-func (g *Graph[T]) IterWEdgeFrom(src Id, fn func(Id, Id, float64) bool) {
+func (g *Graph[T]) IterWEdgeFrom(src Id, fn func(Id, Id, Weight) bool) {
 	visited := make(map[uint64]struct{})
-	g.Digraph.IterWEdgeFrom(src, func(from Id, to Id, w float64) bool {
+	g.Digraph.IterWEdgeFrom(src, func(from Id, to Id, w Weight) bool {
 		if _, v := visited[uint64(to)<<32+uint64(from)]; v {
 			return true
 		}
@@ -91,7 +91,7 @@ func (g *Graph[T]) IterWEdgeFrom(src Id, fn func(Id, Id, float64) bool) {
 
 // IterEdgeFrom iterate all reachable edges from vertical src
 func (g *Graph[T]) IterEdgeFrom(src Id, fn func(Id, Id) bool) {
-	g.IterWEdgeFrom(src, func(a Id, b Id, _ float64) bool {
+	g.IterWEdgeFrom(src, func(a Id, b Id, _ Weight) bool {
 		return fn(a, b)
 	})
 }

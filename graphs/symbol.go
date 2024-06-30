@@ -61,7 +61,7 @@ func LoadSymbWDigraph(filename string) (*SymbWDigraph, error) {
 	if err != nil {
 		return nil, err
 	}
-	var m map[string]map[string]float64
+	var m map[string]map[string]Weight
 	err = yaml.Unmarshal(content, &m)
 	if err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func LoadSymbWGraph(filename string) (*SymbWGraph, error) {
 	if err != nil {
 		return nil, err
 	}
-	var m map[string]map[string]float64
+	var m map[string]map[string]Weight
 	err = yaml.Unmarshal(content, &m)
 	if err != nil {
 		return nil, err
@@ -181,7 +181,7 @@ func (sg *SymbWGraph) AddVertex(v string) {
 	}
 }
 
-func (sg *SymbWGraph) AddEdge(src, dst string, w float64) error {
+func (sg *SymbWGraph) AddEdge(src, dst string, w Weight) error {
 	srcId, ok := sg.symbols[src]
 	if !ok {
 		srcId = sg.WGraph.AddVertex(src)
@@ -213,7 +213,7 @@ func (sg *SymbWDigraph) AddVertex(v string) {
 	}
 }
 
-func (sg *SymbWDigraph) AddEdge(src, dst string, w float64) error {
+func (sg *SymbWDigraph) AddEdge(src, dst string, w Weight) error {
 	srcId, ok := sg.symbols[src]
 	if !ok {
 		srcId = sg.WDigraph.AddVertex(src)

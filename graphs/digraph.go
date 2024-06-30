@@ -24,18 +24,18 @@ import (
 )
 
 func NewDigraph[T any](size uint) *Digraph[T] {
-	edges := make([]*search.HashMap[Id, float64], 0, size)
+	edges := make([]*search.HashMap[Id, Weight], 0, size)
 	return &Digraph[T]{edges: edges}
 }
 
 type Digraph[T any] struct {
-	edges    []*search.HashMap[Id, float64]
+	edges    []*search.HashMap[Id, Weight]
 	vertices []T
 }
 
 func (dg *Digraph[T]) AddVertex(vtx T) Id {
 	id := Id(len(dg.vertices))
-	dg.edges = append(dg.edges, search.NewHashMap[Id, float64]())
+	dg.edges = append(dg.edges, search.NewHashMap[Id, Weight]())
 	dg.vertices = append(dg.vertices, vtx)
 	return id
 }
@@ -77,7 +77,7 @@ func (dg *Digraph[T]) HasEdge(from, to Id) bool {
 	return ok
 }
 
-func (dg *Digraph[T]) addWeightedEdge(src, dst Id, w float64) error {
+func (dg *Digraph[T]) addWeightedEdge(src, dst Id, w Weight) error {
 	if !dg.HasVert(src) || !dg.HasVert(dst) {
 		return ErrInvalidVertex
 	}
@@ -96,15 +96,15 @@ func (dg *Digraph[T]) DelEdge(src, dst Id) {
 
 // GetWeight get the weight of edge
 // Zero will be returned if edge not exist
-func (dg *Digraph[T]) GetWeight(from, to Id) float64 {
+func (dg *Digraph[T]) GetWeight(from, to Id) Weight {
 	w, _ := dg.edges[from].Get(to)
 	return w
 }
 
 // TotalWeight sum the weight of all edges
-func (dg *Digraph[T]) TotalWeight() float64 {
-	var total float64
-	dg.IterWEdge(func(_ Id, _ Id, w float64) bool {
+func (dg *Digraph[T]) TotalWeight() Weight {
+	var total Weight
+	dg.IterWEdge(func(_ Id, _ Id, w Weight) bool {
 		total += w
 		return true
 	})
@@ -113,14 +113,14 @@ func (dg *Digraph[T]) TotalWeight() float64 {
 
 // IterAdjacent iterate all adjacent vertices of v
 func (dg *Digraph[T]) IterAdjacent(v Id, fn func(Id) bool) {
-	dg.IterWAdjacent(v, func(a Id, _ float64) bool {
+	dg.IterWAdjacent(v, func(a Id, _ Weight) bool {
 		return fn(a)
 	})
 }
 
 // IterWAdjacent iterate all adjacent vertices and weight of v
-func (dg *Digraph[T]) IterWAdjacent(v Id, fn func(Id, float64) bool) {
-	dg.edges[v].Range(func(key Id, val float64) bool {
+func (dg *Digraph[T]) IterWAdjacent(v Id, fn func(Id, Weight) bool) {
+	dg.edges[v].Range(func(key Id, val Weight) bool {
 		return fn(key, val)
 	})
 }
@@ -151,7 +151,7 @@ func (dg *Digraph[T]) String() string {
 // Reverse all edges of dg
 func (dg *Digraph[T]) Reverse() *Digraph[T] {
 	rg := NewDigraph[T](dg.NumVert())
-	dg.IterWEdge(func(from Id, to Id, w float64) bool {
+	dg.IterWEdge(func(from Id, to Id, w Weight) bool {
 		rg.addWeightedEdge(to, from, w)
 		return true
 	})
@@ -161,7 +161,7 @@ func (dg *Digraph[T]) Reverse() *Digraph[T] {
 // FindNegativeEdge find a negative edge.
 // If here is no negative edge, (0, 0) will be returned
 func (dg *Digraph[T]) FindNegativeEdge() (src, dst Id) {
-	dg.IterWEdge(func(v Id, v2 Id, w float64) bool {
+	dg.IterWEdge(func(v Id, v2 Id, w Weight) bool {
 		if w < 0 {
 			src = v
 			dst = v2
@@ -175,7 +175,7 @@ func (dg *Digraph[T]) FindNegativeEdge() (src, dst Id) {
 // FindNegativeEdgeFrom find a reachable negative edge from the specified start vertical
 // If here is no negative edge, (0, 0) will be returned
 func (dg *Digraph[T]) FindNegativeEdgeFrom(start Id) (src Id, dst Id) {
-	dg.IterWEdgeFrom(start, func(v0 Id, v1 Id, w float64) bool {
+	dg.IterWEdgeFrom(start, func(v0 Id, v1 Id, w Weight) bool {
 		if w < 0 {
 			src = v0
 			dst = v1
@@ -213,7 +213,7 @@ func (dg *Digraph[T]) FindCycleFrom(v Id) *Path {
 
 func (dg *Digraph[T]) detectCycleDFS(v Id, marked []bool, path *Path) bool {
 	found := false
-	dg.IterWAdjacent(v, func(a Id, w float64) bool {
+	dg.IterWAdjacent(v, func(a Id, w Weight) bool {
 		if marked[a] {
 			return true
 		}
@@ -247,10 +247,10 @@ func (dg *Digraph[T]) Topological() (order *basic.Stack[Id]) {
 }
 
 // IterWEdge iterate all edges and their weight in dg
-func (dg *Digraph[T]) IterWEdge(fn func(Id, Id, float64) bool) {
+func (dg *Digraph[T]) IterWEdge(fn func(Id, Id, Weight) bool) {
 	for src, hm := range dg.edges {
 		goon := true
-		hm.Range(func(dst Id, v float64) bool {
+		hm.Range(func(dst Id, v Weight) bool {
 			goon = fn(Id(src), dst, v)
 			return goon
 		})
@@ -262,16 +262,16 @@ func (dg *Digraph[T]) IterWEdge(fn func(Id, Id, float64) bool) {
 
 // IterEdge iterate all edges in dg
 func (dg *Digraph[T]) IterEdge(fn func(Id, Id) bool) {
-	dg.IterWEdge(func(src Id, dst Id, _ float64) bool {
+	dg.IterWEdge(func(src Id, dst Id, _ Weight) bool {
 		return fn(src, dst)
 	})
 }
 
 // IterWEdgeFrom iterate all reachable edges and their weight from vertical src
-func (dg *Digraph[T]) IterWEdgeFrom(src Id, fn func(Id, Id, float64) bool) {
+func (dg *Digraph[T]) IterWEdgeFrom(src Id, fn func(Id, Id, Weight) bool) {
 	dg.IterVertDFS(src, func(v Id) bool {
 		goon := true
-		dg.IterWAdjacent(v, func(a Id, w float64) bool {
+		dg.IterWAdjacent(v, func(a Id, w Weight) bool {
 			goon = fn(v, a, w)
 			return goon
 		})
@@ -281,7 +281,7 @@ func (dg *Digraph[T]) IterWEdgeFrom(src Id, fn func(Id, Id, float64) bool) {
 
 // IterEdgeFrom iterate all reachable edges from vertical src
 func (dg *Digraph[T]) IterEdgeFrom(src Id, fn func(Id, Id) bool) {
-	dg.IterWEdgeFrom(src, func(src Id, dst Id, _ float64) bool {
+	dg.IterWEdgeFrom(src, func(src Id, dst Id, _ Weight) bool {
 		return fn(src, dst)
 	})
 }
@@ -414,7 +414,7 @@ func (dg *Digraph[T]) IsSameWith(other Digraph[T]) bool {
 		return false
 	}
 	isSame := true
-	dg.IterWEdge(func(from Id, to Id, w float64) bool {
+	dg.IterWEdge(func(from Id, to Id, w Weight) bool {
 		if w != other.GetWeight(from, to) {
 			isSame = false
 			return false
@@ -426,10 +426,10 @@ func (dg *Digraph[T]) IsSameWith(other Digraph[T]) bool {
 
 // Marshal dg into yaml format
 func (dg *Digraph[T]) Marshal() ([]byte, error) {
-	m := make(map[string]map[string]float64)
+	m := make(map[string]map[string]Weight)
 	for v := Id(0); uint(v) < dg.NumVert(); v++ {
-		edges := make(map[string]float64)
-		dg.IterWAdjacent(v, func(a Id, w float64) bool {
+		edges := make(map[string]Weight)
+		dg.IterWAdjacent(v, func(a Id, w Weight) bool {
 			edges[strconv.Itoa(int(a))] = w
 			return true
 		})

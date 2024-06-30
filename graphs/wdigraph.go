@@ -16,7 +16,6 @@ package graphs
 
 import (
 	"fmt"
-	"math"
 	"strconv"
 
 	"github.com/howz97/algorithm/basic"
@@ -42,7 +41,7 @@ type WDigraph[T any] struct {
 }
 
 // AddEdge add a weighted and directed edge
-func (g *WDigraph[T]) AddEdge(src, dst Id, w float64) error {
+func (g *WDigraph[T]) AddEdge(src, dst Id, w Weight) error {
 	return g.addWeightedEdge(src, dst, w)
 }
 
@@ -84,7 +83,7 @@ func (g *WDigraph[T]) ShortestPathTree(src Id, alg int) (*PathTree[T], error) {
 type PathTree[T any] struct {
 	wdg    *WDigraph[T]
 	src    Id
-	distTo []float64
+	distTo []Weight
 	edgeTo []Id
 }
 
@@ -92,11 +91,11 @@ func newShortestPathTree[T any](g *WDigraph[T], src Id) *PathTree[T] {
 	spt := &PathTree[T]{
 		wdg:    g,
 		src:    src,
-		distTo: make([]float64, g.NumVert()),
+		distTo: make([]Weight, g.NumVert()),
 		edgeTo: make([]Id, g.NumVert()),
 	}
 	for i := range spt.distTo {
-		spt.distTo[i] = math.Inf(1)
+		spt.distTo[i] = DistanceMax
 	}
 	spt.distTo[src] = 0
 	for i := range spt.edgeTo {
@@ -107,11 +106,11 @@ func newShortestPathTree[T any](g *WDigraph[T], src Id) *PathTree[T] {
 
 // CanReach check whether src can reach dst
 func (spt *PathTree[T]) CanReach(dst Id) bool {
-	return spt.distTo[dst] != math.Inf(1)
+	return spt.distTo[dst] != DistanceMax
 }
 
 // DistanceTo get the distance from src to dst
-func (spt *PathTree[T]) DistanceTo(dst Id) float64 {
+func (spt *PathTree[T]) DistanceTo(dst Id) Weight {
 	return spt.distTo[dst]
 }
 
@@ -135,7 +134,7 @@ func (spt *PathTree[T]) PathTo(dst Id) *Path {
 }
 
 func (spt *PathTree[T]) initDijkstra(g *WDigraph[T]) {
-	pq := pqueue.NewFixable[float64, Id](g.NumVert())
+	pq := pqueue.NewFixable[Weight, Id](g.NumVert())
 	spt.dijkstraRelax(spt.src, pq)
 	for pq.Size() > 0 {
 		m := pq.Pop()
@@ -143,10 +142,10 @@ func (spt *PathTree[T]) initDijkstra(g *WDigraph[T]) {
 	}
 }
 
-func (spt *PathTree[T]) dijkstraRelax(v Id, pq *pqueue.Fixable[float64, Id]) {
-	spt.wdg.IterWAdjacent(v, func(adj Id, w float64) bool {
+func (spt *PathTree[T]) dijkstraRelax(v Id, pq *pqueue.Fixable[Weight, Id]) {
+	spt.wdg.IterWAdjacent(v, func(adj Id, w Weight) bool {
 		if spt.distTo[v]+w < spt.distTo[adj] {
-			inPQ := spt.distTo[adj] != math.Inf(1)
+			inPQ := spt.distTo[adj] != DistanceMax
 			spt.edgeTo[adj] = v
 			spt.distTo[adj] = spt.distTo[v] + w
 			if inPQ {
@@ -173,7 +172,7 @@ func (spt *PathTree[T]) initTopological(g *WDigraph[T]) {
 }
 
 func (spt *PathTree[T]) topologicalRelax(v Id) {
-	spt.wdg.IterWAdjacent(v, func(a Id, w float64) bool {
+	spt.wdg.IterWAdjacent(v, func(a Id, w Weight) bool {
 		if spt.distTo[v]+w < spt.distTo[a] {
 			spt.edgeTo[a] = v
 			spt.distTo[a] = spt.distTo[v] + w
@@ -216,7 +215,7 @@ func (spt *PathTree[T]) toWDigraph() *WDigraph[T] {
 }
 
 func (spt *PathTree[T]) bellmanFordRelax(v Id, q *basic.List[Id], onQ []bool) {
-	spt.wdg.IterWAdjacent(v, func(adj Id, w float64) bool {
+	spt.wdg.IterWAdjacent(v, func(adj Id, w Weight) bool {
 		if spt.distTo[v]+w < spt.distTo[adj] {
 			spt.edgeTo[adj] = v
 			spt.distTo[adj] = spt.distTo[v] + w
@@ -231,7 +230,7 @@ func (spt *PathTree[T]) bellmanFordRelax(v Id, q *basic.List[Id], onQ []bool) {
 
 func (g *WDigraph[T]) SearcherDijkstra() (*Searcher[T], error) {
 	if src, dst := g.FindNegativeEdge(); src >= 0 {
-		return nil, fmt.Errorf(fmt.Sprintf("negative edge %d->%d: %f", src, dst, g.GetWeight(src, dst)))
+		return nil, fmt.Errorf(fmt.Sprintf("negative edge %d->%d: %v", src, dst, g.GetWeight(src, dst)))
 	}
 	sps := &Searcher[T]{
 		spt: make([]*PathTree[T], g.NumVert()),
@@ -291,7 +290,7 @@ type Searcher[T any] struct {
 	spt []*PathTree[T]
 }
 
-func (s *Searcher[T]) GetDistance(src, dst Id) float64 {
+func (s *Searcher[T]) GetDistance(src, dst Id) Weight {
 	return s.spt[src].DistanceTo(dst)
 }
 
@@ -309,7 +308,7 @@ type Path struct {
 	*basic.Stack[edge]
 }
 
-func (p *Path) Push(from, to Id, w float64) {
+func (p *Path) Push(from, to Id, w Weight) {
 	p.Stack.PushBack(edge{
 		from:   from,
 		to:     to,
@@ -323,8 +322,8 @@ func (p *Path) Pop() edge {
 	return e
 }
 
-func (p *Path) Distance() float64 {
-	d := 0.0
+func (p *Path) Distance() Weight {
+	d := DistanceZero
 	p.Iterate(false, func(e edge) bool {
 		d += e.weight
 		return true
@@ -395,9 +394,9 @@ func (c ErrCycle) Error() string {
 
 type edge struct {
 	from, to Id
-	weight   float64
+	weight   Weight
 }
 
 func (e *edge) string(i2s func(int) string) string {
-	return fmt.Sprintf("%s->%s(%.2f)", i2s(int(e.from)), i2s(int(e.to)), e.weight)
+	return fmt.Sprintf("%s->%s(%d)", i2s(int(e.from)), i2s(int(e.to)), e.weight)
 }

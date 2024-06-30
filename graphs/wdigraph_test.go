@@ -68,14 +68,14 @@ func TestNegativeCycle(t *testing.T) {
 	// fmt.Println("negative cycle detected:", err)
 }
 
-func CheckSearcher(t *testing.T, s *Searcher[string], dg *WDigraph[string]) {
+func CheckSearcher[T any](t *testing.T, s *Searcher[T], dg *WDigraph[T]) {
 	for _, spt := range s.spt {
 		CheckSPT(t, spt, dg)
 	}
 }
 
-func CheckSPT(t *testing.T, tree *PathTree[string], dg *WDigraph[string]) {
-	dg.IterWEdge(func(from, to Id, w float64) bool {
+func CheckSPT[T any](t *testing.T, tree *PathTree[T], dg *WDigraph[T]) {
+	dg.IterWEdge(func(from, to Id, w Weight) bool {
 		if tree.distTo[from]+w < tree.distTo[to] {
 			t.Errorf("edge %d->%d should belong to SPT: %v + %v < %v", from, to, tree.distTo[from], w, tree.distTo[to])
 			return false
@@ -90,33 +90,33 @@ const (
 )
 
 func TestTopological(t *testing.T) {
-	LoopTestSearcher(t, 2, 0.5, func(wd *WDigraph[string]) (*Searcher[string], error) {
+	LoopTestSearcher(t, 2, func(wd *WDigraph[int]) (*Searcher[int], error) {
 		return wd.SearcherTopological()
 	})
 }
 
 func TestDijkstra(t *testing.T) {
-	LoopTestSearcher(t, 10, 0.00001, func(wd *WDigraph[string]) (*Searcher[string], error) {
+	LoopTestSearcher(t, 10, func(wd *WDigraph[int]) (*Searcher[int], error) {
 		return wd.SearcherDijkstra()
 	})
 }
 
 func TestBellmanFord(t *testing.T) {
-	LoopTestSearcher(t, 10, 0.0005, func(wd *WDigraph[string]) (*Searcher[string], error) {
+	LoopTestSearcher(t, 10, func(wd *WDigraph[int]) (*Searcher[int], error) {
 		return wd.SearcherBellmanFord()
 	})
 }
 
 func TestSearcher(t *testing.T) {
-	LoopTestSearcher(t, 10, 0.0005, func(wd *WDigraph[string]) (*Searcher[string], error) {
+	LoopTestSearcher(t, 10, func(wd *WDigraph[int]) (*Searcher[int], error) {
 		return wd.Searcher()
 	})
 }
 
-func LoopTestSearcher(t *testing.T, edgeLimit int, negativeEdge float64,
-	fn func(*WDigraph[string]) (*Searcher[string], error)) {
+func LoopTestSearcher(t *testing.T, edgeLimit int,
+	fn func(*WDigraph[int]) (*Searcher[int], error)) {
 	for i := 0; i < 10; i++ {
-		wd := RandWDigraph(edgeLimit, negativeEdge)
+		wd := RandWDigraph(edgeLimit)
 		sps, err := fn(wd)
 		if err != nil {
 			t.Log(err)
@@ -126,9 +126,12 @@ func LoopTestSearcher(t *testing.T, edgeLimit int, negativeEdge float64,
 	}
 }
 
-func RandWDigraph(edgeLimit int, negativeEdge float64) (wd *WDigraph[string]) {
-	wd = NewWDigraph[string](uint(vertLowerLimit + rand.Intn(vertRange)))
-	nv := int(wd.NumVert())
+func RandWDigraph(edgeLimit int) (wd *WDigraph[int]) {
+	wd = NewWDigraph[int](0)
+	nv := 200 + rand.Intn(800)
+	for i := 0; i < nv; i++ {
+		wd.AddVertex(i)
+	}
 	for from := 0; from < nv; from++ {
 		ne := rand.Intn(edgeLimit)
 		for j := 0; j < ne; j++ {
@@ -136,8 +139,7 @@ func RandWDigraph(edgeLimit int, negativeEdge float64) (wd *WDigraph[string]) {
 			if from == to {
 				continue
 			}
-			w := (rand.Float64() - negativeEdge) * 10000
-			wd.AddEdge(Id(from), Id(to), w)
+			wd.AddEdge(Id(from), Id(to), Weight(rand.Intn(10000)))
 		}
 	}
 	return

@@ -16,6 +16,7 @@ package graphs
 
 import (
 	"errors"
+	"math"
 )
 
 var (
@@ -23,6 +24,11 @@ var (
 	ErrInvalidEdge   = errors.New("invalid edge")
 	ErrInvalidYaml   = errors.New("invalid yaml file")
 )
+
+const DistanceMax Weight = math.MaxInt
+const DistanceZero Weight = 0
+
+type Weight int
 
 type Id int
 
@@ -37,7 +43,7 @@ type IGraph[V any] interface {
 
 type IWGraph[V any] interface {
 	AddVertex(v V) Id
-	AddEdge(Id, Id, float64) error
+	AddEdge(Id, Id, Weight) error
 }
 
 func Populate[T comparable](g IGraph[T], m map[T][]T) map[T]Id {
@@ -60,7 +66,7 @@ func Populate[T comparable](g IGraph[T], m map[T][]T) map[T]Id {
 	return symbols
 }
 
-func WPopulate[T comparable](g IWGraph[T], m map[T]map[T]float64) map[T]Id {
+func WPopulate[T comparable](g IWGraph[T], m map[T]map[T]Weight) map[T]Id {
 	symbols := make(map[T]Id, len(m))
 	for fr, edges := range m {
 		for to, w := range edges {
