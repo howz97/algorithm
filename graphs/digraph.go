@@ -25,7 +25,8 @@ import (
 
 func NewDigraph[T any](size uint) *Digraph[T] {
 	edges := make([]*search.HashMap[Id, Weight], 0, size)
-	return &Digraph[T]{edges: edges}
+	vertices := make([]T, 0, size)
+	return &Digraph[T]{edges, vertices}
 }
 
 type Digraph[T any] struct {
