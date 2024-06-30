@@ -39,14 +39,14 @@ func Compile(pattern string) (*Regexp, error) {
 		return nil, err
 	}
 	re := new(Regexp)
-	re.table = makeSymbolTable(compiled)
-	re.nfa = makeNFA(re.table)
+	re.makeSymbolTable(compiled)
+	re.makeNFA()
 	return re, nil
 }
 
 type Regexp struct {
 	table []symbol
-	nfa   *graphs.Digraph
+	nfa   *graphs.Digraph[int]
 	tc    graphs.Reachable
 }
 
@@ -69,8 +69,8 @@ func (re *Regexp) Match(str string) bool {
 
 func (re *Regexp) startStatus() basic.Set[int] {
 	start := basic.NewSet[int]()
-	re.tc.Iterate(0, func(v int) bool {
-		start.Add(v)
+	re.tc.Iterate(0, func(v graphs.Id) bool {
+		start.Add(int(v))
 		return true
 	})
 	return start
@@ -91,15 +91,15 @@ func (re *Regexp) updateCurStatus(sources basic.Set[int]) basic.Set[int] {
 	reachable := basic.NewSet[int]()
 	for sources.Len() > 0 {
 		vSrc := sources.TakeOne()
-		re.tc.Iterate(vSrc, func(v int) bool {
-			reachable.Add(v)
+		re.tc.Iterate(graphs.Id(vSrc), func(v graphs.Id) bool {
+			reachable.Add(int(v))
 			return true
 		})
 	}
 	return reachable
 }
 
-func makeSymbolTable(compiled []rune) []symbol {
+func (re *Regexp) makeSymbolTable(compiled []rune) {
 	symbols := make([]symbol, 0, len(compiled))
 	for i := 0; i < len(compiled); i++ {
 		if compiled[i] == '\\' {
@@ -115,7 +115,16 @@ func makeSymbolTable(compiled []rune) []symbol {
 			r:       compiled[i],
 		})
 	}
-	return symbols
+	re.table = symbols
+
+	nfa := graphs.NewDigraph[int](uint(len(symbols) + 1))
+	for i := 0; i <= len(symbols); i++ {
+		id := nfa.AddVertex(i)
+		if id != graphs.Id(i) {
+			panic("id != graphs.Id(i)")
+		}
+	}
+	re.nfa = nfa
 }
 
 // compile high-level grammar into low-level grammar
@@ -235,24 +244,23 @@ func indexRune(runes []rune, r rune) int {
 	return -1
 }
 
-func makeNFA(table []symbol) *graphs.Digraph {
-	size := len(table)
-	nfa := graphs.NewDigraph(uint(size + 1))
+func (re *Regexp) makeNFA() {
+	size := len(re.table)
 	stk := basic.NewStack[int](size)
-	for i, syb := range table {
+	for i, syb := range re.table {
 		left := i
 		if syb.isPrime {
 			switch syb.r {
 			case '(':
-				nfa.AddEdge(i, i+1)
+				re.nfa.AddEdge(graphs.Id(i), graphs.Id(i+1))
 				stk.PushBack(i)
 			case ')':
-				nfa.AddEdge(i, i+1)
+				re.nfa.AddEdge(graphs.Id(i), graphs.Id(i+1))
 				allOr := basic.NewList[int]()
 				for {
 					out := stk.Back()
 					stk.PopBack()
-					if table[out].r == '|' {
+					if re.table[out].r == '|' {
 						allOr.PushBack(out)
 					} else {
 						// got '('
@@ -263,11 +271,11 @@ func makeNFA(table []symbol) *graphs.Digraph {
 				for allOr.Size() > 0 {
 					or := allOr.Front()
 					allOr.PopFront()
-					nfa.AddEdge(left, or+1)
-					nfa.AddEdge(or, i)
+					re.nfa.AddEdge(graphs.Id(left), graphs.Id(or+1))
+					re.nfa.AddEdge(graphs.Id(or), graphs.Id(i))
 				}
 			case '*':
-				nfa.AddEdge(i, i+1)
+				re.nfa.AddEdge(graphs.Id(i), graphs.Id(i+1))
 			case '|':
 				stk.PushBack(i)
 			case '.':
@@ -275,12 +283,11 @@ func makeNFA(table []symbol) *graphs.Digraph {
 				panic(fmt.Sprintf("unknown prime %v", syb.r))
 			}
 		}
-		if i+1 < size && table[i+1].isClosure() {
-			nfa.AddEdge(left, i+1)
-			nfa.AddEdge(i+1, left)
+		if i+1 < size && re.table[i+1].isClosure() {
+			re.nfa.AddEdge(graphs.Id(left), graphs.Id(i+1))
+			re.nfa.AddEdge(graphs.Id(i+1), graphs.Id(left))
 		}
 	}
-	return nfa
 }
 
 type symbol struct {

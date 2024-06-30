@@ -12,24 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package basic
+package graphs
 
 const (
 	verticalOverflow = "vertical overflow"
 )
 
 type UnionFind struct {
-	id    []int
+	id    []Id
 	numcc int
 }
 
 func NewUnionFind(numV int) *UnionFind {
 	uf := &UnionFind{
-		id:    make([]int, numV),
+		id:    make([]Id, numV),
 		numcc: numV,
 	}
 	for i := range uf.id {
-		uf.id[i] = i
+		uf.id[i] = Id(i)
 	}
 	return uf
 }
@@ -38,22 +38,22 @@ func (uf *UnionFind) NumConnectedComponent() int {
 	return uf.numcc
 }
 
-func (uf *UnionFind) Find(v int) int {
-	if v < 0 || v >= len(uf.id) {
+func (uf *UnionFind) Find(v Id) Id {
+	if v < 0 || int(v) >= len(uf.id) {
 		panic(verticalOverflow)
 	}
 	return uf.id[v]
 }
 
-func (uf *UnionFind) IsConnected(v1, v2 int) bool {
-	if v1 < 0 || v1 >= len(uf.id) || v2 < 0 || v2 >= len(uf.id) {
+func (uf *UnionFind) IsConnected(v1, v2 Id) bool {
+	if v1 < 0 || int(v1) >= len(uf.id) || v2 < 0 || int(v2) >= len(uf.id) {
 		panic(verticalOverflow)
 	}
 	return uf.id[v1] == uf.id[v2]
 }
 
-func (uf *UnionFind) Union(v1, v2 int) {
-	if v1 < 0 || v1 >= len(uf.id) || v2 < 0 || v2 >= len(uf.id) {
+func (uf *UnionFind) Union(v1, v2 Id) {
+	if v1 < 0 || int(v1) >= len(uf.id) || v2 < 0 || int(v2) >= len(uf.id) {
 		panic(verticalOverflow)
 	}
 	if uf.IsConnected(v1, v2) {

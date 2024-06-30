@@ -12,31 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package graphs
 
 import (
 	"fmt"
-
-	"github.com/howz97/algorithm/graphs"
+	"testing"
 )
 
-func graph_mst() {
-	g, err := graphs.LoadWGraph("../graphs/testdata/mst.yml")
-	if err != nil {
-		panic(err)
-	}
-	mst := g.Prim()
-	//mst := g.LazyPrim()
-	//mst := g.Kruskal()
-	fmt.Println(mst.String())
-
-	// Output:
-	// 0 : 7 2
-	// 1 : 7
-	// 2 : 3 0 6
-	// 3 : 2
-	// 4 : 5
-	// 5 : 7 4
-	// 6 : 2
-	// 7 : 0 1 5
+func TestUnionFind_Union(t *testing.T) {
+	uf := NewUnionFind(8)
+	fmt.Printf("NumConnectedComponent: %v\n", uf.NumConnectedComponent())
+	uf.Union(1, 7)
+	uf.Union(7, 0)
+	uf.Union(0, 2)
+	uf.Union(2, 3)
+	uf.Union(5, 7)
+	fmt.Println(uf.IsConnected(1, 3))
+	fmt.Printf("NumConnectedComponent: %v\n", uf.NumConnectedComponent())
 }

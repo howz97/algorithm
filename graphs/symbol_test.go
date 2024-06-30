@@ -18,18 +18,22 @@ import (
 	"fmt"
 )
 
-func ExampleSymbol() {
-	g, _ := LoadGraph("./testdata/symbol_graph.yml")
-	bfs := g.BFS(g.VetOf("姜文"))
-	fmt.Println(bfs.ShortestPathTo(g.VetOf("梁朝伟")).Str(g.Symbol))
-	fmt.Println(bfs.ShortestPathTo(g.VetOf("宋慧乔")).Str(g.Symbol))
-	fmt.Println(bfs.ShortestPathTo(g.VetOf("郎雄")).Str(g.Symbol))
-	fmt.Println(bfs.ShortestPathTo(g.VetOf("周星驰")).Str(g.Symbol))
-	fmt.Println(bfs.ShortestPathTo(g.VetOf("梁家辉")).Str(g.Symbol))
+func ExampleSymbGraph() {
+	g, err := LoadSymbGraph("../assets/graphs/symbol_graph.yml")
+	if err != nil {
+		panic(err)
+	}
+	bfs := g.BFS(g.IdOf("姜文"))
+	fmt.Println(bfs.ShortestPathTo(g.IdOf("宋慧乔")))
+	fmt.Println(bfs.ShortestPathTo(g.IdOf("郎雄")))
+	fmt.Println(bfs.ShortestPathTo(g.IdOf("梁家辉")))
+	fmt.Println(bfs.ShortestPathTo(g.IdOf("赵本山")))
+	fmt.Println(bfs.ShortestPathTo(g.IdOf("赵文瑄")))
 
-	//(distance=12): 姜文->《让子弹飞》, 《让子弹飞》->刘嘉玲, 刘嘉玲->《阿飞正传》, 《阿飞正传》->张学友, 张学友->《东邪西毒》, 《东邪西毒》->梁朝伟,
-	//(distance=12): 姜文->《让子弹飞》, 《让子弹飞》->周润发, 周润发->《卧虎藏龙》, 《卧虎藏龙》->章子怡, 章子怡->《一代宗师》, 《一代宗师》->宋慧乔,
-	//(distance=8): 姜文->《让子弹飞》, 《让子弹飞》->周润发, 周润发->《卧虎藏龙》, 《卧虎藏龙》->郎雄,
-	//(distance=12): 姜文->《让子弹飞》, 《让子弹飞》->刘嘉玲, 刘嘉玲->《阿飞正传》, 《阿飞正传》->张曼玉, 张曼玉->《家有喜事》, 《家有喜事》->周星驰,
-	//(distance=8): 姜文->《让子弹飞》, 《让子弹飞》->周润发, 周润发->《赌神2》, 《赌神2》->梁家辉,
+	// Output:
+	// [Distance=6] 姜文->《让子弹飞》 《让子弹飞》->周润发 周润发->《卧虎藏龙》 《卧虎藏龙》->章子怡 章子怡->《一代宗师》 《一代宗师》->宋慧乔
+	// [Distance=4] 姜文->《让子弹飞》 《让子弹飞》->周润发 周润发->《卧虎藏龙》 《卧虎藏龙》->郎雄
+	// [Distance=4] 姜文->《让子弹飞》 《让子弹飞》->周润发 周润发->《赌神2》 《赌神2》->梁家辉
+	// [Distance=6] 姜文->《让子弹飞》 《让子弹飞》->周润发 周润发->《卧虎藏龙》 《卧虎藏龙》->章子怡 章子怡->《一代宗师》 《一代宗师》->赵本山
+	// [Distance=6] 姜文->《让子弹飞》 《让子弹飞》->周润发 周润发->《卧虎藏龙》 《卧虎藏龙》->郎雄 郎雄->《喜宴》 《喜宴》->赵文瑄
 }

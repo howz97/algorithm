@@ -14,33 +14,222 @@
 
 package graphs
 
-func NewSymbolGraph() *Symbol {
-	return &Symbol{
-		syb2vet: make(map[string]int),
-		vet2syb: nil,
+import (
+	"os"
+
+	"gopkg.in/yaml.v2"
+)
+
+func LoadSymbDigraph(filename string) (*SymbDigraph, error) {
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	var m map[string][]string
+	err = yaml.Unmarshal(content, &m)
+	if err != nil {
+		return nil, err
+	}
+	graph := NewDigraph[string](uint(len(m)))
+	symbols := Populate(graph, m)
+	return &SymbDigraph{
+		Digraph: graph,
+		symbols: symbols,
+	}, nil
+}
+
+func LoadSymbGraph(filename string) (*SymbGraph, error) {
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	var m map[string][]string
+	err = yaml.Unmarshal(content, &m)
+	if err != nil {
+		return nil, err
+	}
+	graph := NewGraph[string](uint(len(m)))
+	symbols := Populate(graph, m)
+	return &SymbGraph{
+		Graph:   graph,
+		symbols: symbols,
+	}, nil
+}
+
+func LoadSymbWDigraph(filename string) (*SymbWDigraph, error) {
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	var m map[string]map[string]Weight
+	err = yaml.Unmarshal(content, &m)
+	if err != nil {
+		return nil, err
+	}
+	graph := NewWDigraph[string](uint(len(m)))
+	symbols := WPopulate(graph, m)
+	return &SymbWDigraph{
+		WDigraph: graph,
+		symbols:  symbols,
+	}, nil
+}
+
+func LoadSymbWGraph(filename string) (*SymbWGraph, error) {
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	var m map[string]map[string]Weight
+	err = yaml.Unmarshal(content, &m)
+	if err != nil {
+		return nil, err
+	}
+	graph := NewWGraph[string](uint(len(m)))
+	symbols := WPopulate(graph, m)
+	return &SymbWGraph{
+		WGraph:  graph,
+		symbols: symbols,
+	}, nil
+}
+
+func NewSymbDigraph(cap uint) *SymbDigraph {
+	return &SymbDigraph{
+		Digraph: NewDigraph[string](cap),
+		symbols: make(map[string]Id, cap),
 	}
 }
 
-type Symbol struct {
-	syb2vet map[string]int
-	vet2syb []string
-}
-
-func (sg *Symbol) scanVertical(v string) {
-	if _, ok := sg.syb2vet[v]; !ok {
-		sg.syb2vet[v] = len(sg.vet2syb)
-		sg.vet2syb = append(sg.vet2syb, v)
+func NewSymbGraph(cap uint) *SymbGraph {
+	return &SymbGraph{
+		Graph:   NewGraph[string](cap),
+		symbols: make(map[string]Id, cap),
 	}
 }
 
-func (sg *Symbol) SymbolOf(v int) string {
-	return sg.vet2syb[v]
+type SymbDigraph struct {
+	*Digraph[string]
+	symbols map[string]Id
 }
 
-func (sg *Symbol) VetOf(s string) int {
-	v, ok := sg.syb2vet[s]
+func (sg *SymbDigraph) AddVertex(v string) {
+	if _, ok := sg.symbols[v]; !ok {
+		sg.symbols[v] = sg.Digraph.AddVertex(v)
+	}
+}
+
+func (sg *SymbDigraph) AddEdge(src, dst string) error {
+	srcId, ok := sg.symbols[src]
 	if !ok {
-		return -1
+		srcId = sg.Digraph.AddVertex(src)
 	}
-	return v
+	dstId, ok := sg.symbols[dst]
+	if !ok {
+		dstId = sg.Digraph.AddVertex(dst)
+	}
+	sg.Digraph.AddEdge(srcId, dstId)
+	return nil
+}
+
+func (sg *SymbDigraph) SymbOf(v Id) string {
+	return sg.Digraph.vertices[v]
+}
+
+func (sg *SymbDigraph) IdOf(s string) Id {
+	return sg.symbols[s]
+}
+
+type SymbGraph struct {
+	*Graph[string]
+	symbols map[string]Id
+}
+
+func (sg *SymbGraph) AddVertex(v string) {
+	if _, ok := sg.symbols[v]; !ok {
+		sg.symbols[v] = sg.Graph.AddVertex(v)
+	}
+}
+
+func (sg *SymbGraph) AddEdge(src, dst string) error {
+	srcId, ok := sg.symbols[src]
+	if !ok {
+		srcId = sg.Graph.AddVertex(src)
+	}
+	dstId, ok := sg.symbols[dst]
+	if !ok {
+		dstId = sg.Graph.AddVertex(dst)
+	}
+	sg.Graph.AddEdge(srcId, dstId)
+	return nil
+}
+
+func (sg *SymbGraph) SymbOf(v Id) string {
+	return sg.Graph.vertices[v]
+}
+
+func (sg *SymbGraph) IdOf(s string) Id {
+	return sg.symbols[s]
+}
+
+type SymbWGraph struct {
+	*WGraph[string]
+	symbols map[string]Id
+}
+
+func (sg *SymbWGraph) AddVertex(v string) {
+	if _, ok := sg.symbols[v]; !ok {
+		sg.symbols[v] = sg.WGraph.AddVertex(v)
+	}
+}
+
+func (sg *SymbWGraph) AddEdge(src, dst string, w Weight) error {
+	srcId, ok := sg.symbols[src]
+	if !ok {
+		srcId = sg.WGraph.AddVertex(src)
+	}
+	dstId, ok := sg.symbols[dst]
+	if !ok {
+		dstId = sg.WGraph.AddVertex(dst)
+	}
+	sg.WGraph.AddEdge(srcId, dstId, w)
+	return nil
+}
+
+func (sg *SymbWGraph) SymbOf(v Id) string {
+	return sg.WGraph.vertices[v]
+}
+
+func (sg *SymbWGraph) IdOf(s string) Id {
+	return sg.symbols[s]
+}
+
+type SymbWDigraph struct {
+	*WDigraph[string]
+	symbols map[string]Id
+}
+
+func (sg *SymbWDigraph) AddVertex(v string) {
+	if _, ok := sg.symbols[v]; !ok {
+		sg.symbols[v] = sg.WDigraph.AddVertex(v)
+	}
+}
+
+func (sg *SymbWDigraph) AddEdge(src, dst string, w Weight) error {
+	srcId, ok := sg.symbols[src]
+	if !ok {
+		srcId = sg.WDigraph.AddVertex(src)
+	}
+	dstId, ok := sg.symbols[dst]
+	if !ok {
+		dstId = sg.WDigraph.AddVertex(dst)
+	}
+	sg.WDigraph.AddEdge(srcId, dstId, w)
+	return nil
+}
+
+func (sg *SymbWDigraph) SymbOf(v Id) string {
+	return sg.WDigraph.vertices[v]
+}
+
+func (sg *SymbWDigraph) IdOf(s string) Id {
+	return sg.symbols[s]
 }
