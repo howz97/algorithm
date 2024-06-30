@@ -22,25 +22,17 @@ import (
 
 func TestDijkstra_Simple(t *testing.T) {
 	g, err := LoadSymbWDigraph(testDir + "w_digraph.yml")
-	if err != nil {
-		t.Fatal(err)
-	}
+	fatalIfErr(t, err)
 	sps, err := g.SearcherDijkstra()
-	if err != nil {
-		t.Fatal(err)
-	}
+	fatalIfErr(t, err)
 	CheckSearcher(t, sps, g.WDigraph)
 }
 
 func TestTopological_Simple(t *testing.T) {
 	g, err := LoadSymbWDigraph(testDir + "no_cycle_w.yml")
-	if err != nil {
-		t.Fatal(err)
-	}
+	fatalIfErr(t, err)
 	sps, err := g.SearcherTopological()
-	if err != nil {
-		t.Fatal(err)
-	}
+	fatalIfErr(t, err)
 	CheckSearcher(t, sps, g.WDigraph)
 }
 
@@ -76,18 +68,15 @@ func CheckSearcher[T any](t *testing.T, s *Searcher[T], dg *WDigraph[T]) {
 
 func CheckSPT[T any](t *testing.T, tree *PathTree[T], dg *WDigraph[T]) {
 	dg.IterWEdge(func(from, to Id, w Weight) bool {
-		if tree.distTo[from]+w < tree.distTo[to] {
-			t.Errorf("edge %d->%d should belong to SPT: %v + %v < %v", from, to, tree.distTo[from], w, tree.distTo[to])
+		d1 := tree.distTo[from]
+		d2 := tree.distTo[to]
+		if d1 < DistanceMax && d1+w < d2 {
+			t.Errorf("edge %d->%d should belong to SPT: %v + %v < %v", from, to, d1, w, d2)
 			return false
 		}
 		return true
 	})
 }
-
-const (
-	vertLowerLimit = 100
-	vertRange      = 900
-)
 
 func TestTopological(t *testing.T) {
 	LoopTestSearcher(t, 2, func(wd *WDigraph[int]) (*Searcher[int], error) {
@@ -146,15 +135,35 @@ func RandWDigraph(edgeLimit int) (wd *WDigraph[int]) {
 }
 
 func ExampleWDigraph() {
-	g, _ := LoadSymbWDigraph(testDir + "no_cycle_w.yml")
+	g, err := LoadSymbWDigraph(testDir + "no_cycle_w.yml")
+	panicIfErr(err)
+
 	searcher, err := g.SearcherDijkstra()
+	panicIfErr(err)
+	fmt.Println(searcher.GetPath(g.IdOf("B"), g.IdOf("C")))
+
+	searcher, err = g.SearcherTopological()
+	panicIfErr(err)
+	fmt.Println(searcher.GetPath(g.IdOf("B"), g.IdOf("C")))
+
+	searcher, err = g.SearcherBellmanFord()
+	panicIfErr(err)
+	fmt.Println(searcher.GetPath(g.IdOf("B"), g.IdOf("C")))
+
+	// Output:
+	// [Distance=85] B->D(29) D->G(52) G->C(4)
+	// [Distance=85] B->D(29) D->G(52) G->C(4)
+	// [Distance=85] B->D(29) D->G(52) G->C(4)
+}
+
+func panicIfErr(err error) {
 	if err != nil {
 		panic(err)
 	}
-	// searcher, _ := g.SearcherTopological()
-	// searcher, _ := g.SearcherBellmanFord()
-	fmt.Println(searcher.GetPath(g.IdOf("B"), g.IdOf("C")).Str())
+}
 
-	// Output:
-	// [TotalDistance=1.02] 1->3(0.29) 3->7(0.39) 7->2(0.34)
+func fatalIfErr(t *testing.T, err error) {
+	if err != nil {
+		t.Fatal(err)
+	}
 }

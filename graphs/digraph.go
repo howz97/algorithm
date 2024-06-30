@@ -56,7 +56,7 @@ func (dg *Digraph[T]) Vertex(v Id) T {
 
 // AddEdge add a new edge
 func (dg *Digraph[T]) AddEdge(src, dst Id) error {
-	return dg.addWeightedEdge(src, dst, 1)
+	return dg.addWeightedEdge(src, dst, DistanceDefault)
 }
 
 // NumEdge get the number of edges
@@ -189,7 +189,7 @@ func (dg *Digraph[T]) FindNegativeEdgeFrom(start Id) (src Id, dst Id) {
 // FindCycle find any directed cycle in dg
 func (dg *Digraph[T]) FindCycle() []Id {
 	marks := make([]bool, dg.NumVert())
-	path := NewPath()
+	path := NewPath[T](dg.vertices)
 	for v, m := range marks {
 		if !m {
 			if dg.detectCycleDFS(Id(v), marks, path) {
@@ -202,30 +202,30 @@ func (dg *Digraph[T]) FindCycle() []Id {
 
 // FindCycleFrom find any directed cycle from vertical v in dg
 // But not include cycle that can not be accessed from v
-func (dg *Digraph[T]) FindCycleFrom(v Id) *Path {
+func (dg *Digraph[T]) FindCycleFrom(v Id) *Path[T] {
 	marks := make([]bool, dg.NumVert())
-	path := NewPath()
+	path := NewPath[T](dg.vertices)
 	if dg.detectCycleDFS(v, marks, path) {
 		return path
 	}
 	return nil
 }
 
-func (dg *Digraph[T]) detectCycleDFS(v Id, marked []bool, path *Path) bool {
+func (dg *Digraph[T]) detectCycleDFS(v Id, marked []bool, path *Path[T]) bool {
 	found := false
 	dg.IterWAdjacent(v, func(a Id, w Weight) bool {
 		if marked[a] {
 			return true
 		}
 		if path.HasVert(a) {
-			path.Push(v, a, w)
+			path.PushBack(edge{v, a, w})
 			found = true
 			return false
 		}
-		path.Push(v, a, w)
+		path.PushBack(edge{v, a, w})
 		found = dg.detectCycleDFS(a, marked, path)
 		if !found {
-			path.Pop()
+			path.PopBack()
 		}
 		return !found
 	})
@@ -557,16 +557,16 @@ func (bfs *BFS[T]) CanReach(dst Id) bool {
 }
 
 // ShortestPathTo get the shortest path to dst (ignore weight)
-func (bfs *BFS[T]) ShortestPathTo(dst Id) *Path {
+func (bfs *BFS[T]) ShortestPathTo(dst Id) *Path[T] {
 	if !bfs.CanReach(dst) {
 		return nil
 	}
 	if dst == bfs.src {
 		return nil
 	}
-	path := NewPath()
+	path := NewPath[T](bfs.dg.vertices)
 	for dst != bfs.src {
-		path.Push(bfs.edgeTo[dst], dst, 1)
+		path.PushBack(edge{bfs.edgeTo[dst], dst, 1})
 		dst = bfs.edgeTo[dst]
 	}
 	// path.Reverse()

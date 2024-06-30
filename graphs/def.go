@@ -16,6 +16,7 @@ package graphs
 
 import (
 	"errors"
+	"fmt"
 	"math"
 )
 
@@ -25,8 +26,11 @@ var (
 	ErrInvalidYaml   = errors.New("invalid yaml file")
 )
 
-const DistanceMax Weight = math.MaxInt
-const DistanceZero Weight = 0
+const (
+	DistanceZero    Weight = 0
+	DistanceDefault Weight = 1
+	DistanceMax     Weight = math.MaxInt
+)
 
 type Weight int
 
@@ -34,6 +38,24 @@ type Id int
 
 func (i Id) Hash() uintptr {
 	return uintptr(i)
+}
+
+type ErrCycle []Id
+
+func (c ErrCycle) Error() string {
+	str := "cycle path exists: "
+	for i, v := range c {
+		if i > 0 {
+			str += " -> "
+		}
+		str += fmt.Sprint(v)
+	}
+	return str
+}
+
+type edge struct {
+	from, to Id
+	weight   Weight
 }
 
 type IGraph[V any] interface {

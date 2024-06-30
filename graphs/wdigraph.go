@@ -16,7 +16,6 @@ package graphs
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/howz97/algorithm/basic"
 	"github.com/howz97/algorithm/pqueue"
@@ -115,14 +114,15 @@ func (spt *PathTree[T]) DistanceTo(dst Id) Weight {
 }
 
 // PathTo get the path from src to dst
-func (spt *PathTree[T]) PathTo(dst Id) *Path {
+func (spt *PathTree[T]) PathTo(dst Id) *Path[T] {
 	src := spt.edgeTo[dst]
 	if src < 0 {
 		return nil
 	}
-	path := NewPath()
+	path := NewPath[T](spt.wdg.vertices)
 	for {
-		path.Push(src, dst, spt.distTo[dst]-spt.distTo[src])
+		dist := spt.distTo[dst] - spt.distTo[src]
+		path.PushBack(edge{src, dst, dist})
 		dst = src
 		src = spt.edgeTo[dst]
 		if src < 0 {
@@ -229,7 +229,7 @@ func (spt *PathTree[T]) bellmanFordRelax(v Id, q *basic.List[Id], onQ []bool) {
 }
 
 func (g *WDigraph[T]) SearcherDijkstra() (*Searcher[T], error) {
-	if src, dst := g.FindNegativeEdge(); src >= 0 {
+	if src, dst := g.FindNegativeEdge(); src != dst {
 		return nil, fmt.Errorf(fmt.Sprintf("negative edge %d->%d: %v", src, dst, g.GetWeight(src, dst)))
 	}
 	sps := &Searcher[T]{
@@ -294,35 +294,23 @@ func (s *Searcher[T]) GetDistance(src, dst Id) Weight {
 	return s.spt[src].DistanceTo(dst)
 }
 
-func (s *Searcher[T]) GetPath(src, dst Id) *Path {
+func (s *Searcher[T]) GetPath(src, dst Id) *Path[T] {
 	return s.spt[src].PathTo(dst)
 }
 
-func NewPath() *Path {
-	return &Path{
-		Stack: basic.NewStack[edge](2),
+func NewPath[T any](vertices []T) *Path[T] {
+	return &Path[T]{
+		Stack:    basic.NewStack[edge](2),
+		vertices: vertices,
 	}
 }
 
-type Path struct {
+type Path[T any] struct {
 	*basic.Stack[edge]
+	vertices []T
 }
 
-func (p *Path) Push(from, to Id, w Weight) {
-	p.Stack.PushBack(edge{
-		from:   from,
-		to:     to,
-		weight: w,
-	})
-}
-
-func (p *Path) Pop() edge {
-	e := p.Stack.Back()
-	p.Stack.PopBack()
-	return e
-}
-
-func (p *Path) Distance() Weight {
+func (p *Path[T]) Distance() Weight {
 	d := DistanceZero
 	p.Iterate(false, func(e edge) bool {
 		d += e.weight
@@ -331,7 +319,7 @@ func (p *Path) Distance() Weight {
 	return d
 }
 
-func (p *Path) HasVert(v Id) bool {
+func (p *Path[T]) HasVert(v Id) bool {
 	if p.Size() <= 0 {
 		return false
 	}
@@ -349,20 +337,23 @@ func (p *Path) HasVert(v Id) bool {
 	return found
 }
 
-func (p *Path) Str() string {
+func (p *Path[T]) String() string {
 	if p == nil || p.Size() <= 0 {
 		return "path not exist"
 	}
-	i2s := strconv.Itoa
-	str := fmt.Sprintf("[TotalDistance=%v]", p.Distance())
+	str := fmt.Sprintf("[Distance=%v]", p.Distance())
 	p.Iterate(true, func(e edge) bool {
-		str += " " + e.string(i2s)
+		str += " "
+		str += fmt.Sprintf("%v->%v", p.vertices[e.from], p.vertices[e.to])
+		if e.weight != DistanceDefault {
+			str += fmt.Sprint("(", e.weight, ")")
+		}
 		return true
 	})
 	return str
 }
 
-func (p *Path) Cycle() []Id {
+func (p *Path[T]) Cycle() []Id {
 	if p.Size() == 0 {
 		return nil
 	}
@@ -377,26 +368,4 @@ func (p *Path) Cycle() []Id {
 		return true
 	})
 	return cycle
-}
-
-type ErrCycle []Id
-
-func (c ErrCycle) Error() string {
-	str := "cycle path exists: "
-	for i, v := range c {
-		if i > 0 {
-			str += " -> "
-		}
-		str += fmt.Sprint(v)
-	}
-	return str
-}
-
-type edge struct {
-	from, to Id
-	weight   Weight
-}
-
-func (e *edge) string(i2s func(int) string) string {
-	return fmt.Sprintf("%s->%s(%d)", i2s(int(e.from)), i2s(int(e.to)), e.weight)
 }

@@ -246,5 +246,9 @@ func ExampleBFS() {
 	}
 	bfs := dg.BFS(dg.IdOf("B"))
 	fmt.Println(bfs.CanReach(dg.IdOf("F")))
-	fmt.Println(bfs.ShortestPathTo(dg.IdOf("C")).Str())
+	fmt.Println(bfs.ShortestPathTo(dg.IdOf("C")))
+
+	// Output:
+	// false
+	// [Distance=3] B->D D->G G->C
 }
