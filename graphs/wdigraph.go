@@ -122,7 +122,7 @@ func (spt *PathTree[T]) PathTo(dst Id) *Path[T] {
 	path := NewPath[T](spt.wdg.vertices)
 	for {
 		dist := spt.distTo[dst] - spt.distTo[src]
-		path.PushBack(edge{src, dst, dist})
+		path.PushBack(Edge{src, dst, dist})
 		dst = src
 		src = spt.edgeTo[dst]
 		if src < 0 {
@@ -300,19 +300,19 @@ func (s *Searcher[T]) GetPath(src, dst Id) *Path[T] {
 
 func NewPath[T any](vertices []T) *Path[T] {
 	return &Path[T]{
-		Stack:    basic.NewStack[edge](2),
+		Stack:    basic.NewStack[Edge](2),
 		vertices: vertices,
 	}
 }
 
 type Path[T any] struct {
-	*basic.Stack[edge]
+	*basic.Stack[Edge]
 	vertices []T
 }
 
 func (p *Path[T]) Distance() Weight {
 	d := DistanceZero
-	p.Iterate(false, func(e edge) bool {
+	p.Iterate(false, func(e Edge) bool {
 		d += e.weight
 		return true
 	})
@@ -324,7 +324,7 @@ func (p *Path[T]) HasVert(v Id) bool {
 		return false
 	}
 	found := false
-	p.Iterate(false, func(e edge) bool {
+	p.Iterate(false, func(e Edge) bool {
 		if e.from == v {
 			found = true
 			return false
@@ -342,7 +342,7 @@ func (p *Path[T]) String() string {
 		return "path not exist"
 	}
 	str := fmt.Sprintf("[Distance=%v]", p.Distance())
-	p.Iterate(true, func(e edge) bool {
+	p.Iterate(true, func(e Edge) bool {
 		str += " "
 		str += fmt.Sprintf("%v->%v", p.vertices[e.from], p.vertices[e.to])
 		if e.weight != DistanceDefault {
@@ -359,11 +359,11 @@ func (p *Path[T]) Cycle() []Id {
 	}
 	e := p.Peek()
 	x := e.to
-	i := p.Find(func(v edge) bool {
+	i := p.Find(func(v Edge) bool {
 		return v.from == x
 	})
 	cycle := make([]Id, 0, p.Size())
-	p.IterRange(i, p.Size()-1, func(e edge) bool {
+	p.IterRange(i, p.Size()-1, func(e Edge) bool {
 		cycle = append(cycle, e.from)
 		return true
 	})

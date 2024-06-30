@@ -218,11 +218,11 @@ func (dg *Digraph[T]) detectCycleDFS(v Id, marked []bool, path *Path[T]) bool {
 			return true
 		}
 		if path.HasVert(a) {
-			path.PushBack(edge{v, a, w})
+			path.PushBack(Edge{v, a, w})
 			found = true
 			return false
 		}
-		path.PushBack(edge{v, a, w})
+		path.PushBack(Edge{v, a, w})
 		found = dg.detectCycleDFS(a, marked, path)
 		if !found {
 			path.PopBack()
@@ -574,7 +574,7 @@ func (bfs *BFS[T]) ShortestPathTo(dst Id) *Path[T] {
 	}
 	path := NewPath[T](bfs.vertices)
 	for dst != bfs.src {
-		path.PushBack(edge{bfs.edgeTo[dst], dst, 1})
+		path.PushBack(Edge{bfs.edgeTo[dst], dst, 1})
 		dst = bfs.edgeTo[dst]
 	}
 	// path.Reverse()

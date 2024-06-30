@@ -23,7 +23,6 @@ import (
 var (
 	ErrInvalidVertex = errors.New("invalid vertex")
 	ErrInvalidEdge   = errors.New("invalid edge")
-	ErrInvalidYaml   = errors.New("invalid yaml file")
 )
 
 const (
@@ -53,7 +52,7 @@ func (c ErrCycle) Error() string {
 	return str
 }
 
-type edge struct {
+type Edge struct {
 	from, to Id
 	weight   Weight
 }

@@ -34,7 +34,7 @@ func (g *WGraph[T]) AddEdge(src, dst Id, w Weight) error {
 
 // LazyPrim gets the minimum spanning tree by Lazy-Prim algorithm. g MUST be a connected graph
 func (g *WGraph[T]) LazyPrim() (mst *WGraph[T]) {
-	pq := pqueue.NewPaired[Weight, *edge](g.NumVert())
+	pq := pqueue.NewPaired[Weight, *Edge](g.NumVert())
 	mst = NewWGraph[T](g.NumVert())
 	for _, v := range g.vertices {
 		mst.AddVertex(v)
@@ -42,7 +42,7 @@ func (g *WGraph[T]) LazyPrim() (mst *WGraph[T]) {
 	marked := make([]bool, g.NumVert())
 	marked[0] = true
 	g.IterWAdjacent(0, func(dst Id, w Weight) bool {
-		pq.PushPair(w, &edge{
+		pq.PushPair(w, &Edge{
 			from:   0,
 			to:     dst,
 			weight: w,
@@ -60,11 +60,11 @@ func (g *WGraph[T]) LazyPrim() (mst *WGraph[T]) {
 	return
 }
 
-func lazyPrimVisit[T any](g *WGraph[T], v Id, marked []bool, pq *pqueue.Paired[Weight, *edge]) {
+func lazyPrimVisit[T any](g *WGraph[T], v Id, marked []bool, pq *pqueue.Paired[Weight, *Edge]) {
 	marked[v] = true
 	g.IterWAdjacent(v, func(a Id, w Weight) bool {
 		if !marked[a] {
-			pq.PushPair(w, &edge{
+			pq.PushPair(w, &Edge{
 				from:   v,
 				to:     a,
 				weight: w,
@@ -123,9 +123,9 @@ func (g *WGraph[T]) Kruskal() (mst *WGraph[T]) {
 		mst.AddVertex(v)
 	}
 	uf := NewUnionFind(int(g.NumVert()))
-	pq := pqueue.NewPaired[Weight, *edge](g.NumVert())
+	pq := pqueue.NewPaired[Weight, *Edge](g.NumVert())
 	g.IterWEdge(func(src, dst Id, w Weight) bool {
-		pq.PushPair(w, &edge{
+		pq.PushPair(w, &Edge{
 			from:   src,
 			to:     dst,
 			weight: w,
