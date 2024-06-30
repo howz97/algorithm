@@ -25,7 +25,7 @@ import (
 
 const testDir = "../assets/graphs/"
 
-func TestSCC_IsStronglyConnected(t *testing.T) {
+func TestSCC_IsStrongConn(t *testing.T) {
 	g := NewDigraph[string](0)
 	m := Populate(g, map[string][]string{
 		"0":  {"1", "5"},
@@ -44,21 +44,21 @@ func TestSCC_IsStronglyConnected(t *testing.T) {
 	scc := g.SCC()
 	t.Log("number of SCC:", scc.NumComponents())
 	for i := Id(0); uint(i) < g.NumVert(); i++ {
-		t.Logf("SCC ID of vertical(%v): %v\n", i, scc.Comp(i))
+		t.Logf("SCC ID of vertical(%v): %v\n", i, scc.Component(i))
 	}
-	if !scc.IsStronglyConn(m["1"], m["1"]) {
+	if !scc.IsStrongConn(m["1"], m["1"]) {
 		t.Fatal()
 	}
-	if !scc.IsStronglyConn(m["0"], m["4"]) {
+	if !scc.IsStrongConn(m["0"], m["4"]) {
 		t.Fatal()
 	}
-	if !scc.IsStronglyConn(m["9"], m["11"]) {
+	if !scc.IsStrongConn(m["9"], m["11"]) {
 		t.Fatal()
 	}
-	if scc.IsStronglyConn(m["1"], m["0"]) {
+	if scc.IsStrongConn(m["1"], m["0"]) {
 		t.Fatal()
 	}
-	if scc.IsStronglyConn(m["11"], m["8"]) {
+	if scc.IsStrongConn(m["11"], m["8"]) {
 		t.Fatal()
 	}
 }
@@ -92,13 +92,13 @@ func ExampleSCC() {
 	scc := g.SCC()
 	fmt.Println("amount of strongly connected component:", scc.NumComponents())
 	var vertices []Id
-	scc.IterComponent(scc.Comp(0), func(v Id) bool {
+	scc.IterComponentById(scc.Component(0), func(v Id) bool {
 		vertices = append(vertices, v)
 		return true
 	})
 	sort.Shell(vertices)
 	fmt.Println("vertices strongly connected with 0:", vertices)
-	fmt.Println(scc.IsStronglyConn(0, 6))
+	fmt.Println(scc.IsStrongConn(0, 6))
 
 	// Output:
 	// amount of strongly connected component: 5

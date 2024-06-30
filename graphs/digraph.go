@@ -440,14 +440,16 @@ func (dg *Digraph[T]) Marshal() ([]byte, error) {
 
 // SCC is strong connected components of digraph
 // vertices in the same component can access each other
-type SCC struct {
+type SCC[T any] struct {
+	vertices   []T
 	locate     []Id   // vertical -> componentID
 	components [][]Id // componentID -> vertices
 }
 
 // SCC calculate strong connected components of digraph with kosaraju algorithm
-func (dg *Digraph[T]) SCC() *SCC {
-	scc := &SCC{
+func (dg *Digraph[T]) SCC() *SCC[T] {
+	scc := &SCC[T]{
+		vertices:   dg.vertices,
 		locate:     make([]Id, dg.NumVert()),
 		components: make([][]Id, 1),
 	}
@@ -468,17 +470,17 @@ func (dg *Digraph[T]) SCC() *SCC {
 	return scc
 }
 
-// IsStronglyConn check whether src is strongly connected with dst
-func (scc *SCC) IsStronglyConn(src, dst Id) bool {
+// IsStrongConn check whether src is strongly connected with dst
+func (scc *SCC[T]) IsStrongConn(src, dst Id) bool {
 	return scc.locate[src] == scc.locate[dst]
 }
 
-// Comp get the strongly connected component ID of vertical v
-func (scc *SCC) Comp(v Id) Id {
+// Component get the strongly connected component ID of vertical v
+func (scc *SCC[T]) Component(v Id) Id {
 	return scc.locate[v]
 }
 
-func (scc *SCC) IterComponent(c Id, fn func(Id) bool) {
+func (scc *SCC[T]) IterComponentById(c Id, fn func(Id) bool) {
 	for _, w := range scc.components[c] {
 		if !fn(w) {
 			break
@@ -486,8 +488,14 @@ func (scc *SCC) IterComponent(c Id, fn func(Id) bool) {
 	}
 }
 
+func (scc *SCC[T]) IterComponent(c Id, fn func(T) bool) {
+	scc.IterComponentById(c, func(id Id) bool {
+		return fn(scc.vertices[id])
+	})
+}
+
 // NumComponents get the number of components
-func (scc *SCC) NumComponents() int {
+func (scc *SCC[T]) NumComponents() int {
 	return len(scc.components) - 1
 }
 
@@ -519,19 +527,19 @@ func (tc Reachable) Iterate(src Id, fn func(v Id) bool) {
 }
 
 type BFS[T any] struct {
-	dg     *Digraph[T]
-	src    Id
-	marked []bool
-	edgeTo []Id
+	vertices []T
+	src      Id
+	marked   []bool
+	edgeTo   []Id
 }
 
 // BFS save all BFS information from src
 func (dg *Digraph[T]) BFS(src Id) *BFS[T] {
 	bfs := &BFS[T]{
-		dg:     dg,
-		src:    src,
-		marked: make([]bool, dg.NumVert()),
-		edgeTo: make([]Id, dg.NumVert()),
+		vertices: dg.vertices,
+		src:      src,
+		marked:   make([]bool, dg.NumVert()),
+		edgeTo:   make([]Id, dg.NumVert()),
 	}
 	q := basic.NewList[Id]()
 	bfs.marked[src] = true
@@ -564,7 +572,7 @@ func (bfs *BFS[T]) ShortestPathTo(dst Id) *Path[T] {
 	if dst == bfs.src {
 		return nil
 	}
-	path := NewPath[T](bfs.dg.vertices)
+	path := NewPath[T](bfs.vertices)
 	for dst != bfs.src {
 		path.PushBack(edge{bfs.edgeTo[dst], dst, 1})
 		dst = bfs.edgeTo[dst]
