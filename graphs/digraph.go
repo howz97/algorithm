@@ -31,7 +31,7 @@ func NewDigraph[T any](size uint) *Digraph[T] {
 
 type Digraph[T any] struct {
 	edges    []*search.HashMap[Id, Weight]
-	vertices []T
+	vertices []T // Id -> vertex
 }
 
 func (dg *Digraph[T]) AddVertex(vtx T) Id {
@@ -43,12 +43,12 @@ func (dg *Digraph[T]) AddVertex(vtx T) Id {
 
 // NumVert get the number of vertices
 func (dg *Digraph[T]) NumVert() uint {
-	return uint(len(dg.edges))
+	return uint(len(dg.vertices))
 }
 
 // HasVert indicate whether dg contains vertical v
 func (dg *Digraph[T]) HasVert(v Id) bool {
-	return int(v) < len(dg.edges)
+	return int(v) < len(dg.vertices)
 }
 
 func (dg *Digraph[T]) Vertex(v Id) T {
@@ -85,7 +85,6 @@ func (dg *Digraph[T]) addWeightedEdge(src, dst Id, w Weight) error {
 	if src == dst {
 		return ErrInvalidEdge
 	}
-	// invalid source vertex will panic
 	dg.edges[src].Put(dst, w)
 	return nil
 }
@@ -137,13 +136,13 @@ func (dg *Digraph[T]) Adjacent(v Id) (adj []Id) {
 
 func (dg *Digraph[T]) String() string {
 	out := ""
-	for i := range dg.edges {
-		out += fmt.Sprint(i) + " :"
+	for i := range dg.vertices {
+		out += fmt.Sprint(dg.vertices[i]) + " : ["
 		dg.IterAdjacent(Id(i), func(j Id) bool {
-			out += " " + fmt.Sprint(j)
+			out += " " + fmt.Sprint(dg.vertices[j])
 			return true
 		})
-		out += "\n"
+		out += "]\n"
 	}
 	out += "\n"
 	return out
