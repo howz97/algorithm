@@ -56,7 +56,7 @@ Algorithm (Sedgewick, 4th) implemented in golang.
   * Data Compression
     * [Huffman](strings/compress/huffman.go)
     * [LZW](strings/compress/lzw.go)
-## [Priority Queues](pq)
+## [Priority Queues](pqueue)
   * Heap
   * Leftist Heap
   * Binomial Heap
